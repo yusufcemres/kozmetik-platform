@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -30,10 +31,19 @@ export default function FavoritesScreen() {
     }, []),
   );
 
+  const [refreshing, setRefreshing] = useState(false);
+
   const handleRemove = async (productId: number) => {
     const updated = await removeFavorite(productId);
     setFavorites(updated);
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    const favs = await getFavorites();
+    setFavorites(favs);
+    setRefreshing(false);
+  }, []);
 
   if (loading) {
     return (
@@ -70,6 +80,14 @@ export default function FavoritesScreen() {
         data={favorites}
         keyExtractor={(item) => item.product_id.toString()}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}

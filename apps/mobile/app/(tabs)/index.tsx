@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getProducts, getNeeds, Product, Need } from '@/services/api';
@@ -17,20 +18,42 @@ export default function HomeScreen() {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [needs, setNeeds] = useState<Need[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    Promise.all([
+  const fetchData = useCallback(async () => {
+    await Promise.all([
       getProducts({ page: 1, limit: 8 })
         .then((r) => setPopularProducts(r.data.data || []))
         .catch(() => {}),
       getNeeds()
         .then((r) => setNeeds(r.data.data || []))
         .catch(() => {}),
-    ]).finally(() => setLoading(false));
+    ]);
   }, []);
 
+  useEffect(() => {
+    fetchData().finally(() => setLoading(false));
+  }, [fetchData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
+    >
       {/* Hero */}
       <View style={styles.hero}>
         <Text style={styles.heroTitle}>Kozmetik Platform</Text>

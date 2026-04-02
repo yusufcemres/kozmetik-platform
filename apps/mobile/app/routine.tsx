@@ -9,65 +9,78 @@ import {
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { getFavorites, FavoriteItem } from '@/stores/favorites';
+import {
+  getRoutine,
+  saveRoutine,
+  RoutineStep,
+} from '@/stores/routine';
 import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
 
 type TimeOfDay = 'morning' | 'evening';
 
-interface RoutineStep {
-  order: number;
-  label: string;
-  icon: string;
-  product?: FavoriteItem;
-}
-
-const MORNING_STEPS = [
-  { order: 1, label: 'Temizleyici', icon: '🧴' },
-  { order: 2, label: 'Tonik', icon: '💧' },
-  { order: 3, label: 'Serum', icon: '✨' },
-  { order: 4, label: 'Nemlendirici', icon: '🧊' },
-  { order: 5, label: 'Güneş Kremi', icon: '☀️' },
-];
-
-const EVENING_STEPS = [
-  { order: 1, label: 'Temizleyici (1. adım)', icon: '🧴' },
-  { order: 2, label: 'Temizleyici (2. adım)', icon: '🫧' },
-  { order: 3, label: 'Aktif (Retinol/AHA/BHA)', icon: '⚡' },
-  { order: 4, label: 'Nemlendirici', icon: '🧊' },
-  { order: 5, label: 'Göz Kremi', icon: '👁️' },
-];
-
 export default function RoutineScreen() {
   const router = useRouter();
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('morning');
-  const [morningSteps, setMorningSteps] = useState<RoutineStep[]>(
-    MORNING_STEPS.map((s) => ({ ...s })),
-  );
-  const [eveningSteps, setEveningSteps] = useState<RoutineStep[]>(
-    EVENING_STEPS.map((s) => ({ ...s })),
-  );
+  const [morningSteps, setMorningSteps] = useState<RoutineStep[]>([]);
+  const [eveningSteps, setEveningSteps] = useState<RoutineStep[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [selectingStep, setSelectingStep] = useState<number | null>(null);
 
+  // Load persisted routine + favorites on focus
   useFocusEffect(
     useCallback(() => {
       getFavorites().then(setFavorites);
+      getRoutine().then((data) => {
+        setMorningSteps(data.morning);
+        setEveningSteps(data.evening);
+      });
     }, []),
   );
 
   const steps = timeOfDay === 'morning' ? morningSteps : eveningSteps;
   const setSteps = timeOfDay === 'morning' ? setMorningSteps : setEveningSteps;
 
+  const persistRoutine = (morning: RoutineStep[], evening: RoutineStep[]) => {
+    saveRoutine({ morning, evening, updatedAt: new Date().toISOString() });
+  };
+
   const assignProduct = (stepOrder: number, fav: FavoriteItem) => {
-    setSteps((prev) =>
-      prev.map((s) => (s.order === stepOrder ? { ...s, product: fav } : s)),
-    );
+    const updater = (prev: RoutineStep[]) =>
+      prev.map((s) => (s.order === stepOrder ? { ...s, product: fav } : s));
+
+    if (timeOfDay === 'morning') {
+      setMorningSteps((prev) => {
+        const next = updater(prev);
+        persistRoutine(next, eveningSteps);
+        return next;
+      });
+    } else {
+      setEveningSteps((prev) => {
+        const next = updater(prev);
+        persistRoutine(morningSteps, next);
+        return next;
+      });
+    }
     setSelectingStep(null);
   };
 
   const clearProduct = (stepOrder: number) => {
-    setSteps((prev) =>
-      prev.map((s) => (s.order === stepOrder ? { ...s, product: undefined } : s)),
-    );
+    const updater = (prev: RoutineStep[]) =>
+      prev.map((s) => (s.order === stepOrder ? { ...s, product: undefined } : s));
+
+    if (timeOfDay === 'morning') {
+      setMorningSteps((prev) => {
+        const next = updater(prev);
+        persistRoutine(next, eveningSteps);
+        return next;
+      });
+    } else {
+      setEveningSteps((prev) => {
+        const next = updater(prev);
+        persistRoutine(morningSteps, next);
+        return next;
+      });
+    }
   };
 
   // Check for known ingredient interactions
