@@ -6,16 +6,16 @@ services:
     container_name: kozmetik-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: kozmetik
-      POSTGRES_PASSWORD: kozmetik_dev
-      POSTGRES_DB: kozmetik_platform
+      POSTGRES_USER: ${DB_USER:-kozmetik}
+      POSTGRES_PASSWORD: ${DB_PASS:-kozmetik_dev}
+      POSTGRES_DB: ${DB_NAME:-kozmetik_platform}
     ports:
-      - '5432:5432'
+      - '${DB_PORT:-5432}:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U kozmetik -d kozmetik_platform']
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-kozmetik} -d ${DB_NAME:-kozmetik_platform}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,6 +33,47 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: ../../docker/Dockerfile.api
+    container_name: kozmetik-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '${API_PORT:-3001}:3001'
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-kozmetik}
+      DB_PASS: ${DB_PASS:-kozmetik_dev}
+      DB_NAME: ${DB_NAME:-kozmetik_platform}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY: ${JWT_EXPIRY:-7d}
+      REDIS_URL: redis://redis:6379
+      API_PORT: 3001
+      SENTRY_DSN: ${SENTRY_DSN:-}
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: ../../docker/Dockerfile.web
+    container_name: kozmetik-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://api:3001/api/v1
+      NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
 
 volumes:
   pgdata:
