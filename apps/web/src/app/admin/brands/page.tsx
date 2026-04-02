@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
@@ -20,15 +22,33 @@ const columns = [
   },
 ];
 
+const formFields: FormField[] = [
+  { key: 'brand_name', label: 'Marka Adı', required: true, placeholder: 'La Roche-Posay' },
+  { key: 'country_of_origin', label: 'Menşei Ülke', placeholder: 'Fransa' },
+  { key: 'website_url', label: 'Web Sitesi', placeholder: 'https://...' },
+  { key: 'logo_url', label: 'Logo URL', placeholder: 'https://...' },
+  { key: 'is_active', label: 'Aktif', type: 'checkbox', defaultValue: true },
+];
+
 export default function BrandsPage() {
   const crud = useAdminCrud({ endpoint: '/brands', idField: 'brand_id' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const openCreate = () => { setEditItem(null); setModalOpen(true); };
+  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    if (editItem) return crud.updateItem(editItem.brand_id, data);
+    return crud.createItem(data);
+  };
 
   return (
     <div>
       <PageHeader
         title="Markalar"
         description="Kozmetik markalarını yönetin"
-        action={{ label: 'Yeni Marka', onClick: () => {} }}
+        action={{ label: 'Yeni Marka', onClick: openCreate }}
       />
       <AdminTable
         columns={columns}
@@ -40,8 +60,16 @@ export default function BrandsPage() {
         search={crud.search}
         onSearch={crud.handleSearch}
         searchPlaceholder="Marka ara..."
-        onEdit={() => {}}
+        onEdit={openEdit}
         onDelete={(row) => crud.deleteItem(row.brand_id)}
+      />
+      <AdminFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        title={editItem ? 'Marka Düzenle' : 'Yeni Marka'}
+        fields={formFields}
+        initialData={editItem}
       />
     </div>
   );

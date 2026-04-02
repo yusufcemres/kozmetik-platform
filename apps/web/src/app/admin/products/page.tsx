@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
@@ -35,15 +37,53 @@ const columns = [
   },
 ];
 
+const formFields: FormField[] = [
+  { key: 'product_name', label: 'Ürün Adı', required: true, placeholder: 'Effaclar Duo+ SPF30' },
+  { key: 'brand_id', label: 'Marka ID', type: 'number', required: true, placeholder: '1' },
+  { key: 'category_id', label: 'Kategori ID', type: 'number', required: true, placeholder: '1' },
+  {
+    key: 'domain_type', label: 'Domain', type: 'select', defaultValue: 'cosmetic',
+    options: [
+      { value: 'cosmetic', label: 'Kozmetik' },
+      { value: 'supplement', label: 'Takviye' },
+    ],
+  },
+  { key: 'product_type_label', label: 'Ürün Tipi', placeholder: 'Nemlendirici Krem' },
+  { key: 'short_description', label: 'Kısa Açıklama', type: 'textarea', placeholder: 'Ürün hakkında kısa bilgi...' },
+  { key: 'barcode', label: 'Barkod', placeholder: '8690572...' },
+  { key: 'target_area', label: 'Hedef Bölge', placeholder: 'Yüz' },
+  { key: 'usage_time_hint', label: 'Kullanım Zamanı', placeholder: 'Sabah ve akşam' },
+  {
+    key: 'status', label: 'Durum', type: 'select', defaultValue: 'draft',
+    options: [
+      { value: 'draft', label: 'Taslak' },
+      { value: 'published', label: 'Yayında' },
+      { value: 'archived', label: 'Arşivlenmiş' },
+    ],
+  },
+];
+
 export default function ProductsPage() {
   const crud = useAdminCrud({ endpoint: '/products', limit: 15, idField: 'product_id' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const openCreate = () => { setEditItem(null); setModalOpen(true); };
+  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    if (editItem) {
+      return crud.updateItem(editItem.product_id, data);
+    }
+    return crud.createItem(data);
+  };
 
   return (
     <div>
       <PageHeader
         title="Ürünler"
         description="Kozmetik ürünlerini yönetin"
-        action={{ label: 'Yeni Ürün', onClick: () => {} }}
+        action={{ label: 'Yeni Ürün', onClick: openCreate }}
       />
       <AdminTable
         columns={columns}
@@ -55,8 +95,16 @@ export default function ProductsPage() {
         search={crud.search}
         onSearch={crud.handleSearch}
         searchPlaceholder="Ürün adı veya marka ara..."
-        onEdit={() => {}}
+        onEdit={openEdit}
         onDelete={(row) => crud.deleteItem(row.product_id)}
+      />
+      <AdminFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        title={editItem ? 'Ürün Düzenle' : 'Yeni Ürün'}
+        fields={formFields}
+        initialData={editItem}
       />
     </div>
   );

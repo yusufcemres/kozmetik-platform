@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { ToastProvider } from '@/components/admin/Toast';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
@@ -34,37 +35,39 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
-        <Link href="/admin" className="text-xl font-bold mb-6 text-primary">
-          Kozmetik Admin
-        </Link>
-        <nav className="space-y-1 flex-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors ${
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <span>{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="pt-4 border-t border-gray-700 text-xs text-gray-500">
-          <Link href="/" className="hover:text-white">
-            Siteye git
+    <ToastProvider>
+      <div className="flex min-h-screen">
+        <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
+          <Link href="/admin" className="text-xl font-bold mb-6 text-primary">
+            Kozmetik Admin
           </Link>
-        </div>
-      </aside>
-      <main className="flex-1 bg-gray-50 p-8 overflow-auto">{children}</main>
-    </div>
+          <nav className="space-y-1 flex-1 overflow-y-auto">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors ${
+                    isActive
+                      ? 'bg-primary text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="pt-4 border-t border-gray-700 text-xs text-gray-500">
+            <Link href="/" className="hover:text-white">
+              Siteye git
+            </Link>
+          </div>
+        </aside>
+        <main className="flex-1 bg-gray-50 p-8 overflow-auto">{children}</main>
+      </div>
+    </ToastProvider>
   );
 }

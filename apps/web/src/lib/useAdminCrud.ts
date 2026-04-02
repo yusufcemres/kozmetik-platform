@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { api } from './api';
+import { useToast } from '@/components/admin/Toast';
 
 interface PageMeta {
   total: number;
@@ -23,6 +24,7 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
 
@@ -62,13 +64,38 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
     if (!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return false;
     try {
       await api.delete(`${endpoint}/${id}`, { token });
+      toast('Kayıt silindi', 'success');
       await fetchData();
       return true;
     } catch (err: any) {
-      alert(err.message || 'Silme hatası');
+      toast(err.message || 'Silme hatası', 'error');
       return false;
     }
-  }, [endpoint, token, fetchData]);
+  }, [endpoint, token, fetchData, toast]);
+
+  const createItem = useCallback(async (body: Record<string, any>) => {
+    try {
+      await api.post(endpoint, body, { token });
+      toast('Kayıt oluşturuldu', 'success');
+      await fetchData();
+      return true;
+    } catch (err: any) {
+      toast(err.message || 'Oluşturma hatası', 'error');
+      return false;
+    }
+  }, [endpoint, token, fetchData, toast]);
+
+  const updateItem = useCallback(async (id: number | string, body: Record<string, any>) => {
+    try {
+      await api.put(`${endpoint}/${id}`, body, { token });
+      toast('Kayıt güncellendi', 'success');
+      await fetchData();
+      return true;
+    } catch (err: any) {
+      toast(err.message || 'Güncelleme hatası', 'error');
+      return false;
+    }
+  }, [endpoint, token, fetchData, toast]);
 
   const handleSearch = (term: string) => {
     setSearch(term);
@@ -84,6 +111,8 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
     setPage,
     search,
     handleSearch,
+    createItem,
+    updateItem,
     deleteItem,
     refetch: fetchData,
     token,

@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
@@ -28,8 +30,31 @@ const columns = [
   },
 ];
 
+const formFields: FormField[] = [
+  {
+    key: 'status', label: 'Durum', type: 'select', required: true,
+    options: [
+      { value: 'pending', label: 'Beklemede' },
+      { value: 'accepted', label: 'Kabul Edildi' },
+      { value: 'rejected', label: 'Reddedildi' },
+    ],
+  },
+  { key: 'admin_note', label: 'Admin Notu', type: 'textarea', placeholder: 'Düzeltme hakkında not...' },
+];
+
 export default function CorrectionsPage() {
   const crud = useAdminCrud({ endpoint: '/admin/corrections', idField: 'correction_id' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    if (editItem) {
+      return crud.updateItem(editItem.correction_id, data);
+    }
+    return false;
+  };
 
   return (
     <div>
@@ -41,7 +66,15 @@ export default function CorrectionsPage() {
         meta={crud.meta}
         page={crud.page}
         onPageChange={crud.setPage}
-        onEdit={() => {}}
+        onEdit={openEdit}
+      />
+      <AdminFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        title="Düzeltme Değerlendir"
+        fields={formFields}
+        initialData={editItem}
       />
     </div>
   );

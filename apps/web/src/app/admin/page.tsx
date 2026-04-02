@@ -38,10 +38,19 @@ const severityColor: Record<string, string> = {
   info: 'bg-blue-400',
 };
 
+interface EntityCounts {
+  products: number;
+  ingredients: number;
+  needs: number;
+  articles: number;
+  brands: number;
+}
+
 export default function AdminDashboard() {
   const [qc, setQc] = useState<QcReport | null>(null);
   const [affiliate, setAffiliate] = useState<AffiliateMetrics | null>(null);
   const [b2b, setB2b] = useState<B2bMetrics | null>(null);
+  const [counts, setCounts] = useState<EntityCounts>({ products: 0, ingredients: 0, needs: 0, articles: 0, brands: 0 });
   const [loading, setLoading] = useState(true);
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
@@ -51,10 +60,22 @@ export default function AdminDashboard() {
       api.get<QcReport>('/admin/qc/report', { token }),
       api.get<AffiliateMetrics>('/admin/affiliate/metrics', { token }),
       api.get<B2bMetrics>('/admin/b2b/metrics', { token }),
-    ]).then(([qcRes, affRes, b2bRes]) => {
+      api.get<{ meta: { total: number } }>('/products?page=1&limit=1', { token }),
+      api.get<{ meta: { total: number } }>('/ingredients?page=1&limit=1', { token }),
+      api.get<{ meta: { total: number } }>('/needs?page=1&limit=1', { token }),
+      api.get<{ meta: { total: number } }>('/articles/admin?page=1&limit=1', { token }),
+      api.get<{ meta: { total: number } }>('/brands?page=1&limit=1', { token }),
+    ]).then(([qcRes, affRes, b2bRes, prodRes, ingRes, needRes, artRes, brandRes]) => {
       if (qcRes.status === 'fulfilled') setQc(qcRes.value);
       if (affRes.status === 'fulfilled') setAffiliate(affRes.value);
       if (b2bRes.status === 'fulfilled') setB2b(b2bRes.value);
+      setCounts({
+        products: prodRes.status === 'fulfilled' ? prodRes.value?.meta?.total ?? 0 : 0,
+        ingredients: ingRes.status === 'fulfilled' ? ingRes.value?.meta?.total ?? 0 : 0,
+        needs: needRes.status === 'fulfilled' ? needRes.value?.meta?.total ?? 0 : 0,
+        articles: artRes.status === 'fulfilled' ? artRes.value?.meta?.total ?? 0 : 0,
+        brands: brandRes.status === 'fulfilled' ? brandRes.value?.meta?.total ?? 0 : 0,
+      });
       setLoading(false);
     });
   }, []);
@@ -64,11 +85,12 @@ export default function AdminDashboard() {
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
       {/* Primary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Toplam Ürün" value="-" icon="📦" />
-        <StatCard label="İçerik Maddesi" value="-" icon="🧪" />
-        <StatCard label="İhtiyaç" value="-" icon="🎯" />
-        <StatCard label="Makale" value="-" icon="📝" />
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <StatCard label="Ürün" value={loading ? '...' : counts.products} icon="📦" />
+        <StatCard label="İçerik Maddesi" value={loading ? '...' : counts.ingredients} icon="🧪" />
+        <StatCard label="İhtiyaç" value={loading ? '...' : counts.needs} icon="🎯" />
+        <StatCard label="Marka" value={loading ? '...' : counts.brands} icon="🏷️" />
+        <StatCard label="Makale" value={loading ? '...' : counts.articles} icon="📝" />
       </div>
 
       {/* QC + Affiliate + B2B Summary Row */}

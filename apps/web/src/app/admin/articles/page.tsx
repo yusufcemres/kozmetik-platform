@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
@@ -32,15 +34,53 @@ const columns = [
   },
 ];
 
+const formFields: FormField[] = [
+  { key: 'title', label: 'Başlık', required: true, placeholder: 'Niacinamide Rehberi: Faydaları ve Kullanımı' },
+  {
+    key: 'content_type', label: 'İçerik Türü', type: 'select', defaultValue: 'guide',
+    options: [
+      { value: 'guide', label: 'Rehber' },
+      { value: 'ingredient_explainer', label: 'İçerik Anlatımı' },
+      { value: 'need_guide', label: 'İhtiyaç Rehberi' },
+      { value: 'label_reading', label: 'Etiket Okuma' },
+      { value: 'comparison', label: 'Karşılaştırma' },
+      { value: 'news', label: 'Haber' },
+    ],
+  },
+  { key: 'summary', label: 'Özet', type: 'textarea', placeholder: 'Makale özeti...' },
+  { key: 'body_markdown', label: 'İçerik (Markdown)', type: 'textarea', placeholder: '## Giriş\n\nMakale içeriği...' },
+  {
+    key: 'status', label: 'Durum', type: 'select', defaultValue: 'draft',
+    options: [
+      { value: 'draft', label: 'Taslak' },
+      { value: 'in_review', label: 'İncelemede' },
+      { value: 'published', label: 'Yayında' },
+      { value: 'archived', label: 'Arşivlenmiş' },
+    ],
+  },
+];
+
 export default function ArticlesPage() {
   const crud = useAdminCrud({ endpoint: '/articles/admin', idField: 'article_id' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const openCreate = () => { setEditItem(null); setModalOpen(true); };
+  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    if (editItem) {
+      return crud.updateItem(editItem.article_id, data);
+    }
+    return crud.createItem(data);
+  };
 
   return (
     <div>
       <PageHeader
         title="Makaleler"
         description="Blog ve rehber içerikleri yönetin"
-        action={{ label: 'Yeni Makale', onClick: () => {} }}
+        action={{ label: 'Yeni Makale', onClick: openCreate }}
       />
       <AdminTable
         columns={columns}
@@ -52,8 +92,16 @@ export default function ArticlesPage() {
         search={crud.search}
         onSearch={crud.handleSearch}
         searchPlaceholder="Makale başlığı ara..."
-        onEdit={() => {}}
+        onEdit={openEdit}
         onDelete={(row) => crud.deleteItem(row.article_id)}
+      />
+      <AdminFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        title={editItem ? 'Makale Düzenle' : 'Yeni Makale'}
+        fields={formFields}
+        initialData={editItem}
       />
     </div>
   );

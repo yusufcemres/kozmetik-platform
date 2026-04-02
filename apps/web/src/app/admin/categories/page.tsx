@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
@@ -21,15 +23,40 @@ const columns = [
   },
 ];
 
+const formFields: FormField[] = [
+  { key: 'category_name', label: 'Kategori Adı', required: true, placeholder: 'Yüz Bakım' },
+  {
+    key: 'domain_type', label: 'Domain', type: 'select', defaultValue: 'cosmetic',
+    options: [
+      { value: 'cosmetic', label: 'Kozmetik' },
+      { value: 'supplement', label: 'Takviye' },
+    ],
+  },
+  { key: 'sort_order', label: 'Sıralama', type: 'number', defaultValue: 0 },
+  { key: 'is_active', label: 'Aktif', type: 'checkbox', defaultValue: true },
+];
+
 export default function CategoriesPage() {
   const crud = useAdminCrud({ endpoint: '/categories', idField: 'category_id' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+
+  const openCreate = () => { setEditItem(null); setModalOpen(true); };
+  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+
+  const handleSubmit = async (data: Record<string, any>) => {
+    if (editItem) {
+      return crud.updateItem(editItem.category_id, data);
+    }
+    return crud.createItem(data);
+  };
 
   return (
     <div>
       <PageHeader
         title="Kategoriler"
         description="Ürün kategorilerini yönetin"
-        action={{ label: 'Yeni Kategori', onClick: () => {} }}
+        action={{ label: 'Yeni Kategori', onClick: openCreate }}
       />
       <AdminTable
         columns={columns}
@@ -41,8 +68,16 @@ export default function CategoriesPage() {
         search={crud.search}
         onSearch={crud.handleSearch}
         searchPlaceholder="Kategori ara..."
-        onEdit={() => {}}
+        onEdit={openEdit}
         onDelete={(row) => crud.deleteItem(row.category_id)}
+      />
+      <AdminFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+        title={editItem ? 'Kategori Düzenle' : 'Yeni Kategori'}
+        fields={formFields}
+        initialData={editItem}
       />
     </div>
   );
