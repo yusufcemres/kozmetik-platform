@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'brand_id', label: 'ID' },
@@ -20,6 +21,8 @@ const columns = [
 ];
 
 export default function BrandsPage() {
+  const crud = useAdminCrud({ endpoint: '/brands', idField: 'brand_id' });
+
   return (
     <div>
       <PageHeader
@@ -27,7 +30,19 @@ export default function BrandsPage() {
         description="Kozmetik markalarını yönetin"
         action={{ label: 'Yeni Marka', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="Marka ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.brand_id)}
+      />
     </div>
   );
 }

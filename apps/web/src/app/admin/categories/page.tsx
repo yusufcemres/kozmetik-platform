@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'category_id', label: 'ID' },
@@ -21,6 +22,8 @@ const columns = [
 ];
 
 export default function CategoriesPage() {
+  const crud = useAdminCrud({ endpoint: '/categories', idField: 'category_id' });
+
   return (
     <div>
       <PageHeader
@@ -28,7 +31,19 @@ export default function CategoriesPage() {
         description="Ürün kategorilerini yönetin"
         action={{ label: 'Yeni Kategori', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="Kategori ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.category_id)}
+      />
     </div>
   );
 }

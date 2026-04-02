@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'ingredient_need_mapping_id', label: 'ID' },
@@ -21,6 +22,8 @@ const columns = [
 ];
 
 export default function MappingsPage() {
+  const crud = useAdminCrud({ endpoint: '/mappings', idField: 'ingredient_need_mapping_id' });
+
   return (
     <div>
       <PageHeader
@@ -28,7 +31,19 @@ export default function MappingsPage() {
         description="İçerik maddeleri ile ihtiyaçlar arası ilişkiyi yönetin"
         action={{ label: 'Yeni Eşleşme', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="İçerik veya ihtiyaç ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.ingredient_need_mapping_id)}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'ingredient_id', label: 'ID' },
@@ -28,6 +29,8 @@ const columns = [
 ];
 
 export default function IngredientsPage() {
+  const crud = useAdminCrud({ endpoint: '/ingredients', idField: 'ingredient_id' });
+
   return (
     <div>
       <PageHeader
@@ -35,7 +38,19 @@ export default function IngredientsPage() {
         description="INCI bazlı içerik maddelerini yönetin"
         action={{ label: 'Yeni İçerik', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="INCI adı ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.ingredient_id)}
+      />
     </div>
   );
 }

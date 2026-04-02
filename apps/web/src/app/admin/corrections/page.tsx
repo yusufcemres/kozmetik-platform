@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'correction_id', label: 'ID' },
@@ -28,10 +29,20 @@ const columns = [
 ];
 
 export default function CorrectionsPage() {
+  const crud = useAdminCrud({ endpoint: '/admin/corrections', idField: 'correction_id' });
+
   return (
     <div>
       <PageHeader title="Düzeltme Bildirimleri" description="Kullanıcılardan gelen hata bildirimleri" />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        onEdit={() => {}}
+      />
     </div>
   );
 }

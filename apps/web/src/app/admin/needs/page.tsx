@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'need_id', label: 'ID' },
@@ -21,6 +22,8 @@ const columns = [
 ];
 
 export default function NeedsPage() {
+  const crud = useAdminCrud({ endpoint: '/needs', idField: 'need_id' });
+
   return (
     <div>
       <PageHeader
@@ -28,7 +31,19 @@ export default function NeedsPage() {
         description="Cilt ihtiyaçlarını ve sorunlarını yönetin"
         action={{ label: 'Yeni İhtiyaç', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="İhtiyaç ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.need_id)}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'article_id', label: 'ID' },
@@ -13,6 +14,7 @@ const columns = [
     render: (v: string) => {
       const colors: Record<string, string> = {
         draft: 'bg-gray-100 text-gray-700',
+        in_review: 'bg-yellow-100 text-yellow-700',
         published: 'bg-green-100 text-green-700',
         archived: 'bg-red-100 text-red-700',
       };
@@ -31,6 +33,8 @@ const columns = [
 ];
 
 export default function ArticlesPage() {
+  const crud = useAdminCrud({ endpoint: '/articles/admin', idField: 'article_id' });
+
   return (
     <div>
       <PageHeader
@@ -38,7 +42,19 @@ export default function ArticlesPage() {
         description="Blog ve rehber içerikleri yönetin"
         action={{ label: 'Yeni Makale', onClick: () => {} }}
       />
-      <AdminTable columns={columns} data={[]} onEdit={() => {}} onDelete={() => {}} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+        search={crud.search}
+        onSearch={crud.handleSearch}
+        searchPlaceholder="Makale başlığı ara..."
+        onEdit={() => {}}
+        onDelete={(row) => crud.deleteItem(row.article_id)}
+      />
     </div>
   );
 }

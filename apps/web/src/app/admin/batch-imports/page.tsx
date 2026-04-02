@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'import_id', label: 'ID' },
@@ -16,6 +17,7 @@ const columns = [
     render: (v: string) => {
       const colors: Record<string, string> = {
         pending: 'bg-yellow-100 text-yellow-700',
+        processing: 'bg-blue-100 text-blue-700',
         completed: 'bg-green-100 text-green-700',
         failed: 'bg-red-100 text-red-700',
       };
@@ -29,10 +31,19 @@ const columns = [
 ];
 
 export default function BatchImportsPage() {
+  const crud = useAdminCrud({ endpoint: '/admin/batch-imports' });
+
   return (
     <div>
       <PageHeader title="Toplu Import" description="CSV import geçmişi" />
-      <AdminTable columns={columns} data={[]} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+      />
     </div>
   );
 }

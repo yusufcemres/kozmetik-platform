@@ -2,6 +2,7 @@
 
 import PageHeader from '@/components/admin/PageHeader';
 import AdminTable from '@/components/admin/AdminTable';
+import { useAdminCrud } from '@/lib/useAdminCrud';
 
 const columns = [
   { key: 'log_id', label: 'ID' },
@@ -17,10 +18,19 @@ const columns = [
 ];
 
 export default function AuditLogPage() {
+  const crud = useAdminCrud({ endpoint: '/admin/audit-logs', limit: 30 });
+
   return (
     <div>
       <PageHeader title="Audit Log" description="Tüm değişiklik geçmişi" />
-      <AdminTable columns={columns} data={[]} />
+      <AdminTable
+        columns={columns}
+        data={crud.data}
+        loading={crud.loading}
+        meta={crud.meta}
+        page={crud.page}
+        onPageChange={crud.setPage}
+      />
     </div>
   );
 }
