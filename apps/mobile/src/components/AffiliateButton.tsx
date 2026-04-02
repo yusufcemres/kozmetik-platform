@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AffiliateLink } from '../services/api';
+import { openAffiliateLink } from '../services/deeplink';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
 
 interface Props {
@@ -43,7 +44,7 @@ export default function AffiliateButton({ links }: Props) {
             <TouchableOpacity
               key={link.affiliate_link_id}
               style={[styles.linkButton, { backgroundColor: bgColor }]}
-              onPress={() => Linking.openURL(link.affiliate_url)}
+              onPress={() => openAffiliateLink(link.platform, link.affiliate_url)}
             >
               <Text style={styles.linkLabel}>{label}</Text>
               {link.price_snapshot != null && (

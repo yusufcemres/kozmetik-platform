@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, ScrollView, Image, StyleSheet, ActivityIndicator, TouchableOpacity,
+  View, Text, ScrollView, Image, StyleSheet, ActivityIndicator, TouchableOpacity, Share,
 } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import type { HomeStackParamList } from '../navigation/AppNavigator';
 import { getProductBySlug, Product } from '../services/api';
 import { usePersonalScore } from '../hooks/usePersonalScore';
 import { isFavorite, addFavorite, removeFavorite } from '../stores/favorites';
+import { generateShareLink } from '../services/deeplink';
 import ScoreBar from '../components/ScoreBar';
 import AffiliateButton from '../components/AffiliateButton';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
@@ -79,6 +80,15 @@ export default function ProductDetailScreen() {
             )}
             <Text style={styles.name}>{product.product_name}</Text>
           </View>
+          <TouchableOpacity
+            onPress={() => {
+              const url = generateShareLink('product', product.product_slug);
+              Share.share({ message: `${product.product_name} - ${url}`, url });
+            }}
+            style={styles.favButton}
+          >
+            <Text style={{ fontSize: 24 }}>📤</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={toggleFavorite} style={styles.favButton}>
             <Text style={{ fontSize: 24 }}>{fav ? '❤️' : '🤍'}</Text>
           </TouchableOpacity>

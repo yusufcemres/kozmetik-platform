@@ -16,8 +16,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kozmetikplatform.app",
+      "associatedDomains": ["applinks:kozmetikplatform.com"],
       "infoPlist": {
-        "NSCameraUsageDescription": "Barkod tarama ve INCI etiketi OCR için kamera erişimi gereklidir."
+        "NSCameraUsageDescription": "Barkod tarama ve INCI etiketi OCR için kamera erişimi gereklidir.",
+        "LSApplicationQueriesSchemes": ["trendyol", "hepsiburada"]
       }
     },
     "android": {
@@ -26,7 +28,31 @@
         "backgroundColor": "#0D9488"
       },
       "package": "com.kozmetikplatform.app",
-      "permissions": ["CAMERA"]
+      "permissions": ["CAMERA"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/urunler"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/icerikler"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/ihtiyaclar"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
