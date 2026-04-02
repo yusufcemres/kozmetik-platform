@@ -68,10 +68,29 @@
 | GET | `/skin-profiles/:anonymousId` | Profil getir |
 | PUT | `/skin-profiles/:anonymousId` | Profil güncelle |
 
+### Fiyat Takibi
+| Method | Path | Açıklama |
+|--------|------|----------|
+| GET | `/products/:productId/price-drops` | Ürün fiyat düşüş bilgisi |
+| GET | `/affiliate-links/:linkId/price-history?days=30` | Fiyat geçmişi (grafik için) |
+
 ### Düzeltmeler
 | Method | Path | Açıklama |
 |--------|------|----------|
 | POST | `/corrections` | Hata bildir (public) |
+
+## B2B API Endpoints (X-API-Key Required)
+
+| Method | Path | Açıklama |
+|--------|------|----------|
+| GET | `/b2b/v1/products?page=1&limit=50` | Ürün verisi (bulk export) |
+| GET | `/b2b/v1/ingredients?page=1&limit=50` | İçerik maddesi verisi |
+| GET | `/b2b/v1/products/prices?page=1&limit=50` | Fiyat verisi |
+| GET | `/b2b/v1/needs` | İhtiyaç/concern verisi |
+| GET | `/b2b/v1/product-scores?product_id=...` | Ürün-ihtiyaç skorları |
+
+**Auth:** `X-API-Key` header. Key'ler admin panelden oluşturulur.
+**Rate Limit:** Varsayılan 1000/saat, 10000/gün (key bazlı ayarlanabilir).
 
 ## Admin Endpoints (JWT Required)
 
@@ -126,6 +145,42 @@ Her entity için: `POST`, `GET` (list), `GET /:id`, `PUT /:id`, `DELETE /:id`
 | GET | `/admin/qc/products/without-ingredients` | INCI'siz ürünler |
 | GET | `/admin/qc/products/without-scores` | Skorsuz ürünler |
 | GET | `/admin/qc/ingredients/duplicates` | Duplicate INCI |
+
+### Supplement Yönetimi
+| Method | Path | Açıklama |
+|--------|------|----------|
+| GET | `/admin/supplements` | Supplement listesi |
+| POST | `/admin/supplements/:productId/details` | Supplement detayı ekle |
+| PUT | `/admin/supplements/:productId/details` | Supplement detayı güncelle |
+| POST | `/admin/supplements/:productId/nutrition` | Besin içeriği ekle |
+
+### Etkileşim Yönetimi
+| Method | Path | Açıklama |
+|--------|------|----------|
+| POST | `/admin/interactions` | Etkileşim oluştur |
+| GET | `/admin/interactions` | Tüm etkileşimler |
+| GET | `/admin/interactions/ingredient/:id` | Ingredient bazlı etkileşimler |
+| POST | `/admin/interactions/check-product/:productId` | Ürün etkileşim kontrolü |
+
+### Affiliate & Fiyat Takip
+| Method | Path | Açıklama |
+|--------|------|----------|
+| POST | `/admin/affiliate/update-prices` | Tüm fiyatları güncelle (batch) |
+| POST | `/admin/affiliate/update-price/:linkId` | Tek link fiyatı güncelle |
+| GET | `/admin/affiliate/metrics` | Affiliate metrikleri |
+| GET | `/admin/affiliate/price-alerts?threshold=5` | Son 24s fiyat düşüş bildirimleri |
+
+### B2B API Yönetimi
+| Method | Path | Açıklama |
+|--------|------|----------|
+| POST | `/admin/b2b/api-keys` | API key oluştur |
+| GET | `/admin/b2b/api-keys` | API key listesi |
+| GET | `/admin/b2b/api-keys/:id/stats` | Key kullanım istatistikleri |
+| DELETE | `/admin/b2b/api-keys/:id` | Key iptal et |
+| POST | `/admin/b2b/api-keys/:id/webhooks` | Webhook oluştur |
+| GET | `/admin/b2b/api-keys/:id/webhooks` | Webhook listesi |
+| DELETE | `/admin/b2b/webhooks/:id` | Webhook sil |
+| GET | `/admin/b2b/metrics` | B2B metrikleri |
 
 ### Sistem
 | Method | Path | Açıklama |

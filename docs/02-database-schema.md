@@ -2,7 +2,7 @@
 
 ## Genel Bakış
 
-31 tablo, 6 domain grubunda organize:
+37 tablo, 8 domain grubunda organize:
 
 ## Tablo Grupları
 
@@ -50,6 +50,24 @@
 | `need_related_articles` | id | İhtiyaç-makale junction |
 | `sponsorship_disclosures` | disclosure_id | Sponsorluk şeffaflık kaydı |
 
+### Supplement (Faz 2) (3)
+| Tablo | PK | Açıklama |
+|-------|-----|----------|
+| `supplement_details` | supplement_detail_id | Ürün bazlı supplement detayları (form, serving, warnings) |
+| `supplement_ingredients` | supplement_ingredient_id | Supplement besin içeriği (amount, unit, daily_value) |
+| `ingredient_interactions` | interaction_id | İçerik etkileşimleri (severity, recommendation) |
+
+### Fiyat Takibi (Faz 3) (1)
+| Tablo | PK | Açıklama |
+|-------|-----|----------|
+| `price_history` | price_history_id | Affiliate link fiyat geçmişi (price, in_stock, currency) |
+
+### B2B (Faz 4) (2)
+| Tablo | PK | Açıklama |
+|-------|-----|----------|
+| `api_keys` | api_key_id | B2B API anahtarları (hash, rate limit, usage tracking) |
+| `webhooks` | webhook_id | Webhook tanımları (events, auto-disable after failures) |
+
 ### Kullanıcı & Sistem (6)
 | Tablo | PK | Açıklama |
 |-------|-----|----------|
@@ -74,6 +92,14 @@
 | GIN trigram | `needs.need_name` | pg_trgm |
 | UNIQUE | `affiliate_links(product_id, platform)` | Composite |
 | UNIQUE | `user_skin_profiles.anonymous_id` | B-tree |
+| INDEX | `price_history.affiliate_link_id` | B-tree |
+| INDEX | `price_history.recorded_at` | B-tree DESC |
+| UNIQUE | `api_keys.key_hash` | B-tree |
+| UNIQUE | `api_keys.key_prefix` | B-tree |
+| INDEX | `webhooks.api_key_id` | B-tree |
+| INDEX | `ingredient_interactions.ingredient_a_id` | B-tree |
+| INDEX | `ingredient_interactions.ingredient_b_id` | B-tree |
+| INDEX | `supplement_ingredients.product_id` | B-tree |
 
 ## ER İlişki Özeti
 
@@ -89,6 +115,11 @@ Product 1──N ProductImage
 Ingredient 1──N IngredientAlias
 Ingredient 1──N IngredientEvidenceLink
 Ingredient 1──N IngredientNeedMapping N──1 Need
+Ingredient 1──N IngredientInteraction (A ve B tarafı)
+Product 1──1 SupplementDetail (domain_type = 'supplement')
+Product 1──N SupplementIngredient N──1 Ingredient
+AffiliateLink 1──N PriceHistory
+ApiKey 1──N Webhook
 AdminUser N──1 AdminRole
 ```
 

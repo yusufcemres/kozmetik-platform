@@ -49,7 +49,10 @@ kozmetik-platform/
 | Veritabanı | PostgreSQL 15 + pg_trgm |
 | Cache | Redis 7 |
 | Auth | JWT (passport-jwt) + bcrypt |
+| Mobil | Expo (React Native) + TypeScript |
 | Monorepo | pnpm workspaces |
+| Cron | @nestjs/schedule |
+| Rate Limit | @nestjs/throttler |
 | Shared | TypeScript interfaces + enums + scoring constants |
 
 ## Fazlar
@@ -57,10 +60,10 @@ kozmetik-platform/
 | Faz | Kapsam | Durum |
 |-----|--------|-------|
 | Faz 1 | Web MVP (17 prompt) | ✅ Tamamlandı |
-| Faz 2 | Supplement domain genişleme | Planlı |
-| Faz 2.5 | Mobil uygulama (Expo) | Planlı |
-| Faz 3 | E-ticaret entegrasyonu | Planlı |
-| Faz 4 | B2B API | Planlı |
+| Faz 2 | Supplement domain genişleme | ✅ Tamamlandı |
+| Faz 2.5 | Mobil uygulama (Expo) | ✅ Tamamlandı |
+| Faz 3 | E-ticaret (Affiliate + Fiyat Takip) | ✅ Tamamlandı |
+| Faz 4 | B2B API (Key, Rate Limit, Webhook, Export) | ✅ Tamamlandı |
 
 ## Temel Kavramlar
 
@@ -70,3 +73,7 @@ kozmetik-platform/
 - **Scoring Engine**: Ürün-ihtiyaç uyumluluk skorları + kişisel profil skoru
 - **INCI Ingestion**: Ham INCI text → parse → fuzzy match → DB eşleştirme pipeline'ı
 - **Skin Profile**: Anonim kullanıcı profili (localStorage + backend sync)
+- **Supplement**: Takviye ürünleri (besin içeriği, etkileşim kontrolü)
+- **Affiliate Provider**: Platform bazlı fiyat çekme (Trendyol, Hepsiburada, Amazon TR)
+- **Price Tracking**: Otomatik fiyat güncelleme (cron) + fiyat düşüş tespiti
+- **B2B API**: API key auth, rate limiting, webhook, bulk data export

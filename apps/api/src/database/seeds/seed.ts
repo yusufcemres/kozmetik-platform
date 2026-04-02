@@ -204,6 +204,43 @@ async function seed() {
     `);
     console.log('  ✓ Sample skin profiles');
 
+    // ===== SUPPLEMENT CATEGORIES + NEEDS =====
+    await ds.query(`
+      INSERT INTO categories (category_name, category_slug, domain_type, sort_order) VALUES
+        ('Vitamin & Mineral', 'vitamin-mineral', 'supplement', 10),
+        ('Probiyotik', 'probiyotik', 'supplement', 11),
+        ('Bitkisel Takviye', 'bitkisel-takviye', 'supplement', 12),
+        ('Omega & Yağ Asitleri', 'omega-yag-asitleri', 'supplement', 13)
+      ON CONFLICT (category_slug) DO NOTHING
+    `);
+    await ds.query(`
+      INSERT INTO needs (need_name, need_slug, need_group, short_description, user_friendly_label, domain_type) VALUES
+        ('Enerji & Canlılık', 'enerji-canlilik', 'Genel Sağlık', 'Enerji düzeyini artırmaya destek', 'Enerji ve canlılık desteği', 'supplement'),
+        ('Bağışıklık Desteği', 'bagisiklik-destegi', 'Genel Sağlık', 'Bağışıklık sistemini destekleme', 'Bağışıklık güçlendirme', 'supplement'),
+        ('Sindirim Sağlığı', 'sindirim-sagligi', 'Sindirim', 'Sindirim sistemi dengesini koruma', 'Sindirim düzeni desteği', 'supplement'),
+        ('Kemik & Eklem', 'kemik-eklem', 'Kas-İskelet', 'Kemik ve eklem sağlığını destekleme', 'Kemik ve eklem güçlendirme', 'supplement')
+      ON CONFLICT (need_slug) DO NOTHING
+    `);
+    console.log('  ✓ Supplement categories + needs');
+
+    // ===== INGREDIENT INTERACTIONS =====
+    await ds.query(`
+      INSERT INTO ingredient_interactions (ingredient_a_id, ingredient_b_id, severity, domain_type, interaction_context, description, recommendation)
+      SELECT a.ingredient_id, b.ingredient_id, v.severity, v.domain_type, 'ingredient', v.description, v.recommendation
+      FROM (VALUES
+        ('retinol', 'glycolic-acid', 'moderate', 'cosmetic', 'Retinol ve AHA birlikte kullanılmamalı — aşırı tahriş ve bariyer hasarı riski', 'Farklı günlerde veya sabah/akşam ayrı kullanın'),
+        ('retinol', 'salicylic-acid', 'mild', 'cosmetic', 'Retinol ve BHA birlikte dikkatli kullanılmalı', 'Cildiniz tolere ediyorsa kullanabilirsiniz, aksi halde farklı günlere ayırın'),
+        ('retinol', 'ascorbic-acid', 'mild', 'cosmetic', 'Retinol ve C vitamini birlikte etkisizleşebilir', 'C vitamini sabah, retinol akşam kullanın'),
+        ('glycolic-acid', 'salicylic-acid', 'moderate', 'cosmetic', 'AHA ve BHA birlikte aşırı eksfoliasyona neden olabilir', 'Aynı anda kullanmayın, farklı günlere ayırın'),
+        ('niacinamide', 'ascorbic-acid', 'mild', 'cosmetic', 'Birlikte flush (kızarıklık) riski — eski bilgi, modern formüllerde sorun yok', 'Modern formülasyonlarda birlikte kullanılabilir'),
+        ('ceramide-np', 'hyaluronic-acid', 'none', 'cosmetic', 'Birlikte mükemmel çalışır — ceramide bariyeri güçlendirir, HA nemi çeker', 'Birlikte kullanımı önerilir')
+      ) AS v(slug_a, slug_b, severity, domain_type, description, recommendation)
+      JOIN ingredients a ON a.ingredient_slug = v.slug_a
+      JOIN ingredients b ON b.ingredient_slug = v.slug_b
+      ON CONFLICT DO NOTHING
+    `);
+    console.log('  ✓ Ingredient interactions');
+
     console.log('\nSeed completed successfully!');
     console.log('Admin login: admin@kozmetik.com / SuperAdmin123!');
   } catch (error) {
