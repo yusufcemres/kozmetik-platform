@@ -137,7 +137,7 @@ export default function ProductDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>İçerik Maddeleri</Text>
           <Text style={styles.inciText}>
-            {product.ingredients?.map((pi: any) =>
+            {(product as any).ingredients?.map((pi: any) =>
               pi.ingredient?.inci_name || `#${pi.ingredient_id}`
             ).join(', ') || 'INCI analizi yapılmamış'}
           </Text>

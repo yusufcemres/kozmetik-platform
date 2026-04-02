@@ -9,6 +9,21 @@ export const api = axios.create({
   },
 });
 
+/** Simple wrapper that unwraps axios response data */
+export const apiClient = {
+  get: <T = any>(url: string, params?: Record<string, any>): Promise<T> =>
+    api.get<T>(url, { params }).then((res: { data: T }) => res.data),
+
+  post: <T = any>(url: string, body?: any): Promise<T> =>
+    api.post<T>(url, body).then((res: { data: T }) => res.data),
+
+  put: <T = any>(url: string, body?: any): Promise<T> =>
+    api.put<T>(url, body).then((res: { data: T }) => res.data),
+
+  delete: <T = any>(url: string): Promise<T> =>
+    api.delete<T>(url).then((res: { data: T }) => res.data),
+};
+
 // === Types ===
 
 export interface PaginatedResponse<T> {

@@ -3,26 +3,50 @@ import {
   View,
   Text,
   ScrollView,
+  Image,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Share,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getProductBySlug, Product } from '@/services/api';
+import { usePersonalScore } from '@/hooks/usePersonalScore';
+import { isFavorite, addFavorite, removeFavorite } from '@/stores/favorites';
+import { generateShareLink } from '@/services/deeplink';
+import ScoreBar from '@/components/ScoreBar';
+import AffiliateButton from '@/components/AffiliateButton';
 import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
-import { apiClient } from '@/services/api';
 
 export default function ProductDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const [product, setProduct] = useState<any>(null);
+  const router = useRouter();
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fav, setFav] = useState(false);
+  const { score: personalScore } = usePersonalScore(product?.product_id ?? null);
 
   useEffect(() => {
-    apiClient
-      .get(`/products/slug/${slug}`)
-      .then((data) => setProduct(data))
+    if (!slug) return;
+    getProductBySlug(slug)
+      .then((r) => {
+        setProduct(r.data);
+        isFavorite(r.data.product_id).then(setFav);
+      })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [slug]);
+
+  const toggleFavorite = async () => {
+    if (!product) return;
+    if (fav) {
+      await removeFavorite(product.product_id);
+      setFav(false);
+    } else {
+      await addFavorite(product);
+      setFav(true);
+    }
+  };
 
   if (loading) {
     return (
@@ -40,109 +64,219 @@ export default function ProductDetailScreen() {
     );
   }
 
+  const imageUrl = product.images?.[0]?.image_url;
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.brandName}>{product.brand?.brand_name || 'Marka'}</Text>
-        <Text style={styles.productName}>{product.product_name}</Text>
-        {product.category && (
-          <Text style={styles.category}>{product.category.category_name}</Text>
-        )}
-      </View>
-
-      {/* Score Section */}
-      <View style={styles.scoreSection}>
-        <Text style={styles.sectionTitle}>Uyumluluk Skorları</Text>
-        <View style={styles.scoresRow}>
-          <View style={styles.scoreCard}>
-            <Text style={styles.scoreValue}>
-              {product.rank_score ? `${Math.round(product.rank_score)}%` : '—'}
-            </Text>
-            <Text style={styles.scoreLabel}>Genel Skor</Text>
-          </View>
-          <View style={styles.scoreCard}>
-            <Text style={styles.scoreValue}>—</Text>
-            <Text style={styles.scoreLabel}>Kişisel Uyum</Text>
-          </View>
+    <ScrollView style={styles.container}>
+      {/* Image */}
+      {imageUrl ? (
+        <Image source={{ uri: imageUrl }} style={styles.heroImage} />
+      ) : (
+        <View style={styles.heroPlaceholder}>
+          <Text style={{ fontSize: 48 }}>📦</Text>
         </View>
+      )}
+
+      <View style={styles.content}>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            {product.brand && (
+              <Text style={styles.brand}>{product.brand.brand_name}</Text>
+            )}
+            <Text style={styles.name}>{product.product_name}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              const url = generateShareLink('product', product.product_slug);
+              Share.share({ message: `${product.product_name} - ${url}`, url });
+            }}
+            style={styles.iconButton}
+          >
+            <Text style={{ fontSize: 24 }}>📤</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleFavorite} style={styles.iconButton}>
+            <Text style={{ fontSize: 24 }}>{fav ? '❤️' : '🤍'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {product.short_description && (
+          <Text style={styles.description}>{product.short_description}</Text>
+        )}
+
+        {/* Need Scores */}
+        {product.need_scores && product.need_scores.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Uyumluluk Skorları</Text>
+            {product.need_scores.map((ns) => (
+              <ScoreBar
+                key={ns.need_id}
+                label={ns.need?.need_name || `İhtiyaç #${ns.need_id}`}
+                score={ns.score}
+                showPersonal={!!personalScore}
+                personalScore={personalScore?.personal_score}
+                penalties={personalScore?.penalties}
+              />
+            ))}
+          </View>
+        )}
+
+        {/* Personal Score Highlight */}
+        {personalScore && (
+          <View style={styles.personalCard}>
+            <Text style={styles.personalTitle}>Senin Cildine Uyumu</Text>
+            <Text
+              style={[
+                styles.personalValue,
+                {
+                  color:
+                    personalScore.personal_score >= 60
+                      ? colors.success
+                      : colors.warning,
+                },
+              ]}
+            >
+              %{Math.round(personalScore.personal_score)}
+            </Text>
+            {personalScore.penalties.length > 0 && (
+              <Text style={styles.penaltyNote}>
+                Hassasiyetlerin: {personalScore.penalties.join(', ')}
+              </Text>
+            )}
+          </View>
+        )}
+
+        {/* Ingredients */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>İçerik Maddeleri</Text>
+          <Text style={styles.inciText}>
+            {(product as any).ingredients
+              ?.map(
+                (pi: any) =>
+                  pi.ingredient?.inci_name || `#${pi.ingredient_id}`,
+              )
+              .join(', ') || 'INCI analizi yapılmamış'}
+          </Text>
+        </View>
+
+        {/* Affiliate */}
+        {product.affiliate_links && product.affiliate_links.length > 0 && (
+          <AffiliateButton links={product.affiliate_links} />
+        )}
+
+        {/* Meta */}
+        <View style={styles.metaRow}>
+          {product.category && (
+            <View style={styles.metaChip}>
+              <Text style={styles.metaText}>
+                {product.category.category_name}
+              </Text>
+            </View>
+          )}
+          {product.product_type_label && (
+            <View style={styles.metaChip}>
+              <Text style={styles.metaText}>{product.product_type_label}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Compare CTA */}
+        <TouchableOpacity
+          style={styles.compareButton}
+          onPress={() => router.push('/compare')}
+        >
+          <Text style={styles.compareButtonText}>⚖️ Başka ürünle karşılaştır</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Ingredients Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>İçerik Listesi</Text>
-        <Text style={styles.placeholder}>
-          M2 sprint'inde tam ingredient listesi gösterilecek
-        </Text>
-      </View>
-
-      {/* Affiliate Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Nereden Alınır?</Text>
-        <Text style={styles.placeholder}>
-          M9 sprint'inde affiliate linkler gösterilecek
-        </Text>
-      </View>
+      <View style={{ height: spacing.xxl }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { paddingBottom: spacing.xxl },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  errorText: { fontSize: fontSize.md, color: colors.error },
-  header: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+  errorText: { color: colors.textMuted, fontSize: fontSize.md },
+  heroImage: { width: '100%', height: 300, backgroundColor: colors.surface },
+  heroPlaceholder: {
+    width: '100%',
+    height: 200,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  brandName: {
-    fontSize: fontSize.sm,
-    color: colors.primary,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
+  content: { padding: spacing.md },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
   },
-  productName: {
+  brand: { fontSize: fontSize.sm, color: colors.primary, fontWeight: '600' },
+  name: {
     fontSize: fontSize.xl,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.xs,
+    marginTop: 2,
   },
-  category: { fontSize: fontSize.sm, color: colors.textSecondary },
-  scoreSection: { padding: spacing.md },
-  section: { padding: spacing.md },
+  iconButton: { padding: spacing.sm },
+  description: {
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
+    lineHeight: 24,
+    marginBottom: spacing.md,
+  },
+  section: { marginTop: spacing.lg },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.text,
     marginBottom: spacing.sm,
   },
-  scoresRow: { flexDirection: 'row', gap: spacing.sm },
-  scoreCard: {
-    flex: 1,
+  inciText: { fontSize: fontSize.sm, color: colors.textSecondary, lineHeight: 22 },
+  personalCard: {
+    backgroundColor: '#F0FDFA',
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
+    alignItems: 'center',
+  },
+  personalTitle: {
+    fontSize: fontSize.sm,
+    color: colors.primaryDark,
+    fontWeight: '600',
+  },
+  personalValue: {
+    fontSize: 36,
+    fontWeight: '800',
+    marginVertical: spacing.xs,
+  },
+  penaltyNote: {
+    fontSize: fontSize.xs,
+    color: colors.warning,
+    textAlign: 'center',
+  },
+  metaRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
+  metaChip: {
     backgroundColor: colors.surface,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: borderRadius.sm,
+  },
+  metaText: { fontSize: fontSize.xs, color: colors.textSecondary },
+  compareButton: {
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.primary,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
   },
-  scoreValue: {
-    fontSize: fontSize.xxl,
-    fontWeight: '700',
+  compareButtonText: {
+    fontSize: fontSize.md,
     color: colors.primary,
-  },
-  scoreLabel: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: spacing.xs },
-  placeholder: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
-    fontStyle: 'italic',
-    padding: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.md,
-    textAlign: 'center',
+    fontWeight: '600',
   },
 });

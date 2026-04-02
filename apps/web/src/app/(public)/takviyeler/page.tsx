@@ -21,10 +21,10 @@ export default function SupplementsListPage() {
 
   useEffect(() => {
     api
-      .get('/supplements', { params: { page, limit: 12 } })
-      .then((res: any) => {
-        setProducts(res.data || []);
-        setTotalPages(res.meta?.totalPages || 1);
+      .get<{ data: SupplementProduct[]; meta: { totalPages: number } }>(`/supplements?page=${page}&limit=12`)
+      .then((data) => {
+        setProducts(data.data || []);
+        setTotalPages(data.meta?.totalPages || 1);
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));

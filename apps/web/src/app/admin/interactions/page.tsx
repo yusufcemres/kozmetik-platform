@@ -39,13 +39,13 @@ export default function InteractionsPage() {
 
   const fetchData = (p: number) => {
     setLoading(true);
-    const params: any = { page: p, limit: 20 };
-    if (severityFilter) params.severity = severityFilter;
+    const qs = new URLSearchParams({ page: String(p), limit: '20' });
+    if (severityFilter) qs.set('severity', severityFilter);
     api
-      .get('/interactions', { params })
-      .then((res: any) => {
-        setData(res.data || []);
-        setTotal(res.meta?.total || 0);
+      .get<{ data: Interaction[]; meta: { total: number } }>(`/interactions?${qs}`)
+      .then((data) => {
+        setData(data.data || []);
+        setTotal(data.meta?.total || 0);
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));

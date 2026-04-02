@@ -22,10 +22,10 @@ export default function SupplementsPage() {
   const fetchData = (p: number) => {
     setLoading(true);
     api
-      .get('/supplements', { params: { page: p, limit: 20 } })
-      .then((res: any) => {
-        setData(res.data || []);
-        setTotal(res.meta?.total || 0);
+      .get<{ data: SupplementProduct[]; meta: { total: number } }>(`/supplements?page=${p}&limit=20`)
+      .then((data) => {
+        setData(data.data || []);
+        setTotal(data.meta?.total || 0);
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
@@ -56,19 +56,31 @@ export default function SupplementsPage() {
           <p>Henüz supplement ürün yok</p>
         </div>
       ) : (
-        <AdminTable
-          columns={[
-            { key: 'product_id', label: 'ID' },
-            { key: 'product_name', label: 'Ürün Adı' },
-            { key: 'brand', label: 'Marka', render: (v: any) => v?.brand_name || '-' },
-            { key: 'category', label: 'Kategori', render: (v: any) => v?.category_name || '-' },
-            { key: 'status', label: 'Durum' },
-          ]}
-          data={data}
-          page={page}
-          total={total}
-          onPageChange={setPage}
-        />
+        <>
+          <AdminTable
+            columns={[
+              { key: 'product_id', label: 'ID' },
+              { key: 'product_name', label: 'Ürün Adı' },
+              { key: 'brand', label: 'Marka', render: (v: any) => v?.brand_name || '-' },
+              { key: 'category', label: 'Kategori', render: (v: any) => v?.category_name || '-' },
+              { key: 'status', label: 'Durum' },
+            ]}
+            data={data}
+          />
+          {total > 20 && (
+            <div className="flex justify-center gap-2 mt-4">
+              {Array.from({ length: Math.ceil(total / 20) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-3 py-1 rounded text-sm ${p === page ? 'bg-teal-600 text-white' : 'border hover:bg-gray-50'}`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

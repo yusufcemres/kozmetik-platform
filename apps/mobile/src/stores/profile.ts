@@ -46,7 +46,7 @@ export async function syncProfile(data: {
     paraben: boolean;
     essential_oils: boolean;
   };
-  age_range?: string;
+  age_range?: string | null;
 }): Promise<SkinProfile> {
   const anonymousId = await getAnonymousId();
 
@@ -66,6 +66,7 @@ export async function syncProfile(data: {
   const created = await createSkinProfile({
     anonymous_id: anonymousId,
     ...data,
+    age_range: data.age_range ?? null,
   });
   await saveLocalProfile(created.data);
   return created.data;
