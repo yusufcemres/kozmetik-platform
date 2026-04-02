@@ -18,6 +18,7 @@ import { ProfilesModule } from './modules/profiles/profiles.module';
 import { SystemModule } from './modules/system/system.module';
 import { SupplementsModule } from './modules/supplements/supplements.module';
 import { InteractionsModule } from './modules/interactions/interactions.module';
+import { AffiliateModule } from './modules/affiliate/affiliate.module';
 
 // DB connection is conditional — works without Docker for initial development
 const skipDb = process.env.SKIP_DB === 'true';
@@ -50,7 +51,7 @@ const featureModules = skipDb
       AuthModule, CategoriesModule, BrandsModule, IngredientsModule, NeedsModule,
       ProductsModule, IngestionModule, MappingsModule, MethodologyModule,
       ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
-      SupplementsModule, InteractionsModule,
+      SupplementsModule, InteractionsModule, AffiliateModule,
     ];
 
 @Module({

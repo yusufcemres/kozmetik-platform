@@ -32,6 +32,9 @@ export { IngredientRelatedArticle } from './ingredient-related-article.entity';
 export { NeedRelatedArticle } from './need-related-article.entity';
 export { SponsorshipDisclosure } from './sponsorship-disclosure.entity';
 
+// Fiyat Takibi (Faz 3)
+export { PriceHistory } from './price-history.entity';
+
 // Supplement (Faz 2)
 export { SupplementDetail } from './supplement-detail.entity';
 export { SupplementIngredient } from './supplement-ingredient.entity';
