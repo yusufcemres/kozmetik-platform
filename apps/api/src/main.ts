@@ -3,6 +3,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import compression from 'compression';
 import { AppModule } from './app.module';
 import { initSentry } from './sentry';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
@@ -19,6 +20,9 @@ async function bootstrap() {
 
   // Security: Helmet
   app.use(helmet());
+
+  // Response compression (gzip/deflate)
+  app.use(compression({ threshold: 1024 }));
 
   // Global prefix
   app.setGlobalPrefix('api/v1');

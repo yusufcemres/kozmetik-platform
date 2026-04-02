@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import {
   ApiKey, Webhook, Product, Ingredient, Need,
   AffiliateLink, ProductNeedScore, ProductIngredient,
@@ -17,18 +15,6 @@ import { ApiKeyGuard } from '@common/guards/api-key.guard';
     TypeOrmModule.forFeature([
       ApiKey, Webhook, Product, Ingredient, Need,
       AffiliateLink, ProductNeedScore, ProductIngredient,
-    ]),
-    ThrottlerModule.forRoot([
-      {
-        name: 'b2b-hourly',
-        ttl: 3600000,
-        limit: 1000,
-      },
-      {
-        name: 'b2b-daily',
-        ttl: 86400000,
-        limit: 10000,
-      },
     ]),
   ],
   controllers: [B2bController, B2bExportController],

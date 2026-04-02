@@ -1,10 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { SearchService } from './search.service';
 import { SearchQueryDto, SuggestQueryDto } from './dto/search.dto';
 
 @ApiTags('Search')
 @Controller('search')
+@Throttle({ public: { ttl: 60000, limit: 30 } })
 export class SearchController {
   constructor(private readonly service: SearchService) {}
 

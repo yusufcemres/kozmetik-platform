@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './health.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -62,10 +64,19 @@ const featureModules = skipDb
       isGlobal: true,
       envFilePath: '../../.env',
     }),
+    // Global rate limiting: 60 req/min per IP for public endpoints
+    ThrottlerModule.forRoot([{
+      name: 'public',
+      ttl: 60000,
+      limit: 60,
+    }]),
     RedisCacheModule,
     ...dbModule,
     ...featureModules,
   ],
   controllers: [HealthController],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}
