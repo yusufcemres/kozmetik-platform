@@ -40,6 +40,10 @@ export { SupplementDetail } from './supplement-detail.entity';
 export { SupplementIngredient } from './supplement-ingredient.entity';
 export { IngredientInteraction } from './ingredient-interaction.entity';
 
+// B2B (Faz 4)
+export { ApiKey } from './api-key.entity';
+export { Webhook } from './webhook.entity';
+
 // Admin & Sistem
 export { AdminRole } from './admin-role.entity';
 export { AdminUser } from './admin-user.entity';

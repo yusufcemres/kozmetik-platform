@@ -18,6 +18,7 @@ const navItems = [
   { href: '/admin/supplements', label: 'Supplement', icon: '💊' },
   { href: '/admin/interactions', label: 'Etkileşimler', icon: '⚗️' },
   { href: '/admin/affiliate-links', label: 'Affiliate', icon: '💰' },
+  { href: '/admin/b2b', label: 'B2B API', icon: '🔑' },
   { href: '/admin/approved-wordings', label: 'İfadeler', icon: '✅' },
   { href: '/admin/evidence-levels', label: 'Kanıt Seviyeleri', icon: '🔬' },
   { href: '/admin/audit-log', label: 'Audit Log', icon: '📋' },
