@@ -18,6 +18,9 @@ export default function Header() {
           <Link href="/ihtiyaclar" className="text-gray-600 hover:text-primary transition-colors">
             İhtiyaçlar
           </Link>
+          <Link href="/takviyeler" className="text-gray-600 hover:text-primary transition-colors">
+            Takviyeler
+          </Link>
           <Link href="/rehber" className="text-gray-600 hover:text-primary transition-colors">
             Rehber
           </Link>

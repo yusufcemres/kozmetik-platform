@@ -51,6 +51,11 @@ export class SearchQueryDto {
   @IsBoolean()
   allergen_free?: boolean;
 
+  @ApiPropertyOptional({ description: 'cosmetic or supplement', example: 'cosmetic' })
+  @IsOptional()
+  @IsString()
+  domain_type?: string;
+
   @ApiPropertyOptional({ description: 'Comma-separated ingredient IDs to include' })
   @IsOptional()
   @IsString()

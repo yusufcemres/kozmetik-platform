@@ -118,6 +118,13 @@ export class SearchService {
     ];
     const isNeed = needPatterns.some((p) => p.test(q));
 
+    // Supplement patterns
+    const supplementPatterns = [
+      /tablet/, /kapsül/, /vitamin/, /mineral/, /probiyotik/, /omega/,
+      /takviye/, /supplement/, /d3/, /b12/, /magnezyum/, /çinko/, /demir/,
+    ];
+    const isSupplement = supplementPatterns.some((p) => p.test(q));
+
     // Product patterns: brand names, product type labels
     const productPatterns = [
       /serum/, /krem/, /tonik/, /temizleyici/, /nemlendirici/, /spf/,
@@ -136,7 +143,7 @@ export class SearchService {
     limit: number,
   ): Promise<SearchResultItem[]> {
     let sql = `
-      SELECT p.product_id, p.product_name, p.product_slug, b.brand_name,
+      SELECT p.product_id, p.product_name, p.product_slug, p.domain_type, b.brand_name,
              similarity(LOWER(p.product_name), LOWER($1)) as sim
       FROM products p
       JOIN brands b ON b.brand_id = p.brand_id
@@ -145,6 +152,11 @@ export class SearchService {
     `;
     const params: any[] = [q, `%${q}%`];
     let paramIdx = 3;
+
+    if (filters.domain_type) {
+      sql += ` AND p.domain_type = $${paramIdx++}`;
+      params.push(filters.domain_type);
+    }
 
     if (filters.brand_id) {
       sql += ` AND p.brand_id = $${paramIdx++}`;

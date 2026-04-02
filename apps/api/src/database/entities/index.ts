@@ -32,6 +32,11 @@ export { IngredientRelatedArticle } from './ingredient-related-article.entity';
 export { NeedRelatedArticle } from './need-related-article.entity';
 export { SponsorshipDisclosure } from './sponsorship-disclosure.entity';
 
+// Supplement (Faz 2)
+export { SupplementDetail } from './supplement-detail.entity';
+export { SupplementIngredient } from './supplement-ingredient.entity';
+export { IngredientInteraction } from './ingredient-interaction.entity';
+
 // Admin & Sistem
 export { AdminRole } from './admin-role.entity';
 export { AdminUser } from './admin-user.entity';

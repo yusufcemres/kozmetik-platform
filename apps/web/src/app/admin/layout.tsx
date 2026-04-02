@@ -15,6 +15,8 @@ const navItems = [
   { href: '/admin/review-queue', label: 'Review Queue', icon: '👁️' },
   { href: '/admin/scoring-config', label: 'Scoring', icon: '⚙️' },
   { href: '/admin/qc', label: 'Kalite Kontrol', icon: '🔍' },
+  { href: '/admin/supplements', label: 'Supplement', icon: '💊' },
+  { href: '/admin/interactions', label: 'Etkileşimler', icon: '⚗️' },
   { href: '/admin/affiliate-links', label: 'Affiliate', icon: '💰' },
   { href: '/admin/approved-wordings', label: 'İfadeler', icon: '✅' },
   { href: '/admin/evidence-levels', label: 'Kanıt Seviyeleri', icon: '🔬' },
