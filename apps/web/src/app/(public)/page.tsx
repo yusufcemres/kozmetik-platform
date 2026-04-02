@@ -1,6 +1,36 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { api } from '@/lib/api';
+
+interface Stats {
+  products: number;
+  ingredients: number;
+  needs: number;
+  articles: number;
+}
 
 export default function HomePage() {
+  const [stats, setStats] = useState<Stats>({ products: 0, ingredients: 0, needs: 0, articles: 0 });
+
+  useEffect(() => {
+    // Fetch counts in parallel
+    Promise.allSettled([
+      api.get<{ meta: { total: number } }>('/products?limit=1'),
+      api.get<{ meta: { total: number } }>('/ingredients?limit=1'),
+      api.get<{ data: any[] }>('/needs?limit=100'),
+      api.get<{ meta: { total: number } }>('/articles?limit=1'),
+    ]).then(([pRes, iRes, nRes, aRes]) => {
+      setStats({
+        products: pRes.status === 'fulfilled' ? pRes.value.meta?.total || 0 : 0,
+        ingredients: iRes.status === 'fulfilled' ? iRes.value.meta?.total || 0 : 0,
+        needs: nRes.status === 'fulfilled' ? nRes.value.data?.length || 0 : 0,
+        articles: aRes.status === 'fulfilled' ? aRes.value.meta?.total || 0 : 0,
+      });
+    });
+  }, []);
+
   return (
     <div>
       {/* Hero */}
@@ -24,6 +54,26 @@ export default function HomePage() {
               </svg>
               Ürün, içerik veya cilt ihtiyacı ara...
             </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="flex justify-center gap-8 mt-10">
+            {[
+              { label: 'Ürün', value: stats.products, icon: '📦' },
+              { label: 'İçerik', value: stats.ingredients, icon: '🧪' },
+              { label: 'İhtiyaç', value: stats.needs, icon: '🎯' },
+              { label: 'Rehber', value: stats.articles, icon: '📝' },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="text-2xl font-bold text-gray-900">
+                  {s.value > 0 ? s.value : '-'}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  <span className="mr-1">{s.icon}</span>
+                  {s.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -66,6 +116,67 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Takviyeler + Rehber row */}
+      <section className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Link
+            href="/takviyeler"
+            className="bg-white border rounded-xl p-8 hover:shadow-lg hover:border-primary/30 transition-all group"
+          >
+            <div className="text-3xl mb-4">💊</div>
+            <h2 className="text-xl font-bold mb-2 group-hover:text-primary">Takviye Ürünleri</h2>
+            <p className="text-gray-500 text-sm">
+              Vitamin, mineral ve besin takviyeleri. İçerik analizi, etkileşim kontrolü ve besin değerleri.
+            </p>
+          </Link>
+
+          <Link
+            href="/rehber"
+            className="bg-white border rounded-xl p-8 hover:shadow-lg hover:border-primary/30 transition-all group"
+          >
+            <div className="text-3xl mb-4">📝</div>
+            <h2 className="text-xl font-bold mb-2 group-hover:text-primary">Rehber</h2>
+            <p className="text-gray-500 text-sm">
+              Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri. A&apos;dan Z&apos;ye cilt bakımı.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="bg-gray-50 py-16">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-10">Nasıl Çalışır?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '1',
+                title: 'Ürünü Bul',
+                desc: 'İsmini yaz veya barkodunu tara. INCI listesini otomatik analiz ediyoruz.',
+              },
+              {
+                step: '2',
+                title: 'İçerikleri Anla',
+                desc: 'Her içerik maddesinin ne işe yaradığını, kanıt seviyesini ve olası etkilerini gör.',
+              },
+              {
+                step: '3',
+                title: 'Cildine Uygunluğunu Gör',
+                desc: 'Cilt profilini oluştur, her ürün için kişisel uyum skorunu al.',
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
+                <p className="text-gray-500 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Profile CTA */}
       <section className="bg-primary/5 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -76,11 +187,22 @@ export default function HomePage() {
           </p>
           <Link
             href="/profilim"
-            className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+            className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
           >
             Profilimi Oluştur
           </Link>
         </div>
+      </section>
+
+      {/* Disclosure */}
+      <section className="max-w-4xl mx-auto px-4 py-8">
+        <p className="text-xs text-gray-400 text-center leading-relaxed">
+          Kozmetik Platform bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
+          niteliğinde değildir. Ürün sayfalarındaki satın alma linkleri komisyon içerebilir.{' '}
+          <Link href="/rehber" className="underline hover:text-gray-600">
+            Daha fazla bilgi
+          </Link>
+        </p>
       </section>
     </div>
   );
