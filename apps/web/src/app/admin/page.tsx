@@ -37,8 +37,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     api
-      .get('/admin/qc/report')
-      .then((res) => setQc(res.data))
+      .get<QcReport>('/admin/qc/report')
+      .then((data) => setQc(data))
       .catch(() => setQc(null))
       .finally(() => setLoading(false));
   }, []);

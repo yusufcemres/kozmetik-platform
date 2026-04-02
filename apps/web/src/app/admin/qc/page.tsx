@@ -47,8 +47,8 @@ export default function QcReportPage() {
   const fetchReport = () => {
     setLoading(true);
     api
-      .get('/admin/qc/report')
-      .then((res) => setReport(res.data))
+      .get<QcReport>('/admin/qc/report')
+      .then((data) => setReport(data))
       .catch(() => setReport(null))
       .finally(() => setLoading(false));
   };

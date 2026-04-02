@@ -10,6 +10,7 @@
     "build": "pnpm --filter shared build && pnpm --parallel --filter api --filter web build",
     "build:api": "pnpm --filter api build",
     "build:web": "pnpm --filter web build",
+    "dev:mobile": "pnpm --filter kozmetik-mobile start",
     "lint": "pnpm --parallel -r lint",
     "db:migrate": "pnpm --filter api migration:run",
     "db:seed": "pnpm --filter api seed",
