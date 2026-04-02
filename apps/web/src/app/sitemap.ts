@@ -30,10 +30,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Dynamic pages from API
-  const [productSlugs, ingredientSlugs, needSlugs] = await Promise.all([
+  const [productSlugs, ingredientSlugs, needSlugs, articleSlugs] = await Promise.all([
     fetchSlugs('/products', 'product_slug'),
     fetchSlugs('/ingredients', 'ingredient_slug'),
     fetchSlugs('/needs', 'need_slug'),
+    fetchSlugs('/articles', 'slug'),
   ]);
 
   const productPages: MetadataRoute.Sitemap = productSlugs.map((slug) => ({
@@ -57,5 +58,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...ingredientPages, ...needPages];
+  const articlePages: MetadataRoute.Sitemap = articleSlugs.map((slug) => ({
+    url: `${BASE_URL}/rehber/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...productPages, ...ingredientPages, ...needPages, ...articlePages];
 }

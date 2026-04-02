@@ -1,24 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
+
+interface Need {
+  need_id: number;
+  need_name: string;
+  need_slug: string;
+}
 
 const skinTypes = [
-  { value: 'oily', label: 'Yağlı' },
-  { value: 'dry', label: 'Kuru' },
-  { value: 'combination', label: 'Karma' },
-  { value: 'normal', label: 'Normal' },
-  { value: 'sensitive', label: 'Hassas' },
-];
-
-const concerns = [
-  { id: 1, label: 'Sivilce / Akne' },
-  { id: 2, label: 'Leke / Hiperpigmentasyon' },
-  { id: 3, label: 'Kırışıklık / Yaşlanma' },
-  { id: 4, label: 'Kuruluk / Dehidrasyon' },
-  { id: 5, label: 'Bariyer Desteği' },
-  { id: 6, label: 'Gözenek Sıkılaştırma' },
-  { id: 7, label: 'Cilt Tonu Eşitleme' },
-  { id: 8, label: 'Güneş Koruması' },
+  { value: 'oily', label: 'Yağlı', desc: 'Gün içinde parlama, geniş gözenekler' },
+  { value: 'dry', label: 'Kuru', desc: 'Sıkılık hissi, pullanma' },
+  { value: 'combination', label: 'Karma', desc: 'T-bölge yağlı, yanaklar kuru' },
+  { value: 'normal', label: 'Normal', desc: 'Dengeli nem, az sorun' },
+  { value: 'sensitive', label: 'Hassas', desc: 'Kızarıklık, tahriş eğilimi' },
 ];
 
 const sensitivities = [
@@ -33,6 +29,26 @@ export default function ProfilePage() {
   const [skinType, setSkinType] = useState('');
   const [selectedConcerns, setSelectedConcerns] = useState<number[]>([]);
   const [selectedSensitivities, setSelectedSensitivities] = useState<Record<string, boolean>>({});
+  const [needs, setNeeds] = useState<Need[]>([]);
+  const [saved, setSaved] = useState(false);
+
+  // Load existing profile + needs from API
+  useEffect(() => {
+    api
+      .get<{ data: Need[] }>('/needs?limit=50')
+      .then((res) => setNeeds(res.data || []))
+      .catch(() => {});
+
+    try {
+      const stored = localStorage.getItem('skin_profile');
+      if (stored) {
+        const profile = JSON.parse(stored);
+        if (profile.skin_type) setSkinType(profile.skin_type);
+        if (profile.concerns) setSelectedConcerns(profile.concerns);
+        if (profile.sensitivities) setSelectedSensitivities(profile.sensitivities);
+      }
+    } catch {}
+  }, []);
 
   const toggleConcern = (id: number) => {
     setSelectedConcerns((prev) =>
@@ -69,25 +85,26 @@ export default function ProfilePage() {
       {step === 1 && (
         <div>
           <h2 className="text-xl font-bold mb-6 text-center">Cilt tipin ne?</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {skinTypes.map((type) => (
               <button
                 key={type.value}
                 onClick={() => setSkinType(type.value)}
-                className={`border-2 rounded-xl p-4 text-center transition-all ${
+                className={`border-2 rounded-xl p-4 text-left transition-all ${
                   skinType === type.value
                     ? 'border-primary bg-primary/5'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                {type.label}
+                <span className="font-semibold">{type.label}</span>
+                <span className="block text-xs text-gray-500 mt-0.5">{type.desc}</span>
               </button>
             ))}
           </div>
           <button
             onClick={() => step < 3 && setStep(2)}
             disabled={!skinType}
-            className="w-full mt-8 bg-primary text-white py-3 rounded-lg disabled:opacity-50"
+            className="w-full mt-8 bg-primary text-white py-3 rounded-lg disabled:opacity-50 font-medium"
           >
             Devam
           </button>
@@ -102,19 +119,24 @@ export default function ProfilePage() {
             {selectedConcerns.length}/3 seçildi
           </p>
           <div className="grid grid-cols-2 gap-3">
-            {concerns.map((c) => (
+            {needs.map((need) => (
               <button
-                key={c.id}
-                onClick={() => toggleConcern(c.id)}
+                key={need.need_id}
+                onClick={() => toggleConcern(need.need_id)}
                 className={`border-2 rounded-xl p-4 text-left text-sm transition-all ${
-                  selectedConcerns.includes(c.id)
-                    ? 'border-primary bg-primary/5'
+                  selectedConcerns.includes(need.need_id)
+                    ? 'border-primary bg-primary/5 font-semibold'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                {c.label}
+                {need.need_name}
               </button>
             ))}
+            {needs.length === 0 && (
+              <p className="col-span-2 text-center text-sm text-gray-400 py-4">
+                İhtiyaçlar yükleniyor...
+              </p>
+            )}
           </div>
           <div className="flex gap-3 mt-8">
             <button onClick={() => setStep(1)} className="flex-1 border py-3 rounded-lg">
@@ -123,7 +145,7 @@ export default function ProfilePage() {
             <button
               onClick={() => setStep(3)}
               disabled={selectedConcerns.length === 0}
-              className="flex-1 bg-primary text-white py-3 rounded-lg disabled:opacity-50"
+              className="flex-1 bg-primary text-white py-3 rounded-lg disabled:opacity-50 font-medium"
             >
               Devam
             </button>
@@ -142,7 +164,7 @@ export default function ProfilePage() {
                 onClick={() => toggleSensitivity(s.key)}
                 className={`border-2 rounded-xl p-4 text-center text-sm transition-all ${
                   selectedSensitivities[s.key]
-                    ? 'border-red-400 bg-red-50'
+                    ? 'border-red-400 bg-red-50 font-semibold'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -156,19 +178,22 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => {
-                // Save to localStorage + API
+                const existing = localStorage.getItem('skin_profile');
+                const existingProfile = existing ? JSON.parse(existing) : {};
                 const profile = {
-                  anonymous_id: crypto.randomUUID(),
+                  anonymous_id: existingProfile.anonymous_id || crypto.randomUUID(),
                   skin_type: skinType,
                   concerns: selectedConcerns,
                   sensitivities: selectedSensitivities,
+                  updated_at: new Date().toISOString(),
                 };
                 localStorage.setItem('skin_profile', JSON.stringify(profile));
-                alert('Profil kaydedildi!');
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
               }}
-              className="flex-1 bg-primary text-white py-3 rounded-lg"
+              className="flex-1 bg-primary text-white py-3 rounded-lg font-medium"
             >
-              Profili Kaydet
+              {saved ? 'Kaydedildi!' : 'Profili Kaydet'}
             </button>
           </div>
         </div>
