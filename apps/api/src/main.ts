@@ -1,28 +1,48 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { initSentry } from './sentry';
+import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 
 // Initialize Sentry before app creation
 initSentry();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log'],
+  });
   const configService = app.get(ConfigService);
+  const isProduction = configService.get('NODE_ENV') === 'production';
+
+  // Security: Helmet
+  app.use(helmet());
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
 
   // CORS
+  const allowedOrigins = isProduction
+    ? [
+        configService.get('WEB_URL', 'https://kozmetikplatform.com'),
+        configService.get('MOBILE_URL', ''),
+      ].filter(Boolean)
+    : [
+        `http://localhost:${configService.get('WEB_PORT', 3000)}`,
+        'http://localhost:3000',
+      ];
+
   app.enableCors({
-    origin: [
-      `http://localhost:${configService.get('WEB_PORT', 3000)}`,
-      'http://localhost:3000',
-    ],
+    origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   });
+
+  // Global exception filter
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -36,21 +56,28 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Kozmetik Platform API')
-    .setDescription('Kozmetik ürün, içerik ve ihtiyaç karar destek platformu API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  // Swagger (disabled in production)
+  if (!isProduction) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Kozmetik Platform API')
+      .setDescription('Kozmetik ürün, içerik ve ihtiyaç karar destek platformu API')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, 'api-key')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   const port = configService.get('API_PORT', 3001);
   await app.listen(port);
-  console.log(`API running on http://localhost:${port}`);
-  console.log(`Swagger docs: http://localhost:${port}/api/docs`);
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`API running on http://localhost:${port}`);
+  if (!isProduction) {
+    logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
+  }
 }
 
 bootstrap();

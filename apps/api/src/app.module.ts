@@ -20,6 +20,7 @@ import { SupplementsModule } from './modules/supplements/supplements.module';
 import { InteractionsModule } from './modules/interactions/interactions.module';
 import { AffiliateModule } from './modules/affiliate/affiliate.module';
 import { B2bModule } from './modules/b2b/b2b.module';
+import { RedisCacheModule } from './common/cache/cache.module';
 
 // DB connection is conditional — works without Docker for initial development
 const skipDb = process.env.SKIP_DB === 'true';
@@ -61,6 +62,7 @@ const featureModules = skipDb
       isGlobal: true,
       envFilePath: '../../.env',
     }),
+    RedisCacheModule,
     ...dbModule,
     ...featureModules,
   ],

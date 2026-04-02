@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { SearchQueryDto, SuggestQueryDto } from './dto/search.dto';
+import { CacheService } from '@common/cache/cache.service';
 
 type SearchIntent = 'product' | 'ingredient' | 'need' | 'mixed';
 
@@ -13,12 +14,24 @@ export interface SearchResultItem {
   extra?: Record<string, any>;
 }
 
+const SEARCH_CACHE_TTL = 300;    // 5 dakika
+const SUGGEST_CACHE_TTL = 900;   // 15 dakika
+
 @Injectable()
 export class SearchService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly cache: CacheService,
+  ) {}
 
   async search(dto: SearchQueryDto) {
     const { q, page = 1, limit = 20 } = dto;
+
+    // Cache key from all search params
+    const cacheKey = `search:${JSON.stringify(dto)}`;
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return cached;
+
     const intent = this.detectIntent(q);
     const offset = (page - 1) * limit;
 
@@ -43,7 +56,7 @@ export class SearchService {
     results.sort((a, b) => b.score - a.score);
     const paginated = results.slice(offset, offset + limit);
 
-    return {
+    const response = {
       data: paginated,
       meta: {
         total: results.length,
@@ -53,12 +66,19 @@ export class SearchService {
         intent,
       },
     };
+
+    await this.cache.set(cacheKey, response, SEARCH_CACHE_TTL);
+    return response;
   }
 
   async suggest(dto: SuggestQueryDto) {
     const { q, limit = 8 } = dto;
     const term = q.toLowerCase().trim();
     if (term.length < 2) return [];
+
+    const cacheKey = `suggest:${term}:${limit}`;
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return cached;
 
     const suggestions: Array<{ type: string; name: string; slug: string }> = [];
 
@@ -98,7 +118,9 @@ export class SearchService {
     );
     suggestions.push(...needs.map((n: any) => ({ type: 'need', ...n })));
 
-    return suggestions.slice(0, limit);
+    const result = suggestions.slice(0, limit);
+    await this.cache.set(cacheKey, result, SUGGEST_CACHE_TTL);
+    return result;
   }
 
   private detectIntent(query: string): SearchIntent {
