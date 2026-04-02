@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository, LessThan, MoreThan } from 'typeorm';
 import { AffiliateLink, PriceHistory } from '@database/entities';
 import { BaseAffiliateProvider } from './providers';
 import { TrendyolProvider } from './providers/trendyol.provider';
@@ -155,6 +155,59 @@ export class AffiliateService {
     }
 
     return drops;
+  }
+
+  /**
+   * Son 24 saatte fiyatı düşen linkleri getir (bildirim için)
+   */
+  async getRecentPriceDropAlerts(thresholdPercent: number = 5) {
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+    const recentHistory = await this.priceRepo.find({
+      where: { recorded_at: MoreThan(oneDayAgo) },
+      order: { recorded_at: 'DESC' },
+    });
+
+    const linkIds = [...new Set(recentHistory.map((h) => h.affiliate_link_id))];
+    const alerts: Array<{
+      affiliate_link_id: number;
+      platform: string;
+      product_id: number;
+      old_price: number;
+      new_price: number;
+      drop_percent: number;
+    }> = [];
+
+    for (const linkId of linkIds) {
+      const link = await this.linkRepo.findOne({ where: { affiliate_link_id: linkId } });
+      if (!link) continue;
+
+      const prices = recentHistory
+        .filter((h) => h.affiliate_link_id === linkId)
+        .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
+
+      if (prices.length < 2) continue;
+
+      const oldPrice = Number(prices[0].price);
+      const newPrice = Number(prices[prices.length - 1].price);
+      if (oldPrice <= 0) continue;
+
+      const dropPercent = ((oldPrice - newPrice) / oldPrice) * 100;
+
+      if (dropPercent >= thresholdPercent) {
+        alerts.push({
+          affiliate_link_id: linkId,
+          platform: link.platform,
+          product_id: link.product_id,
+          old_price: oldPrice,
+          new_price: newPrice,
+          drop_percent: Math.round(dropPercent * 10) / 10,
+        });
+      }
+    }
+
+    return alerts.sort((a, b) => b.drop_percent - a.drop_percent);
   }
 
   /**

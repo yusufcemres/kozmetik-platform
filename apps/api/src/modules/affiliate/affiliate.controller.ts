@@ -58,4 +58,14 @@ export class AffiliateController {
   getMetrics() {
     return this.service.getAffiliateMetrics();
   }
+
+  @Get('admin/affiliate/price-alerts')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Son 24 saat fiyat düşüş bildirimleri' })
+  @ApiQuery({ name: 'threshold', required: false, description: 'Minimum düşüş yüzdesi (varsayılan: 5)' })
+  getPriceAlerts(@Query('threshold') threshold?: string) {
+    return this.service.getRecentPriceDropAlerts(threshold ? parseFloat(threshold) : 5);
+  }
 }
