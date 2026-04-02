@@ -93,3 +93,36 @@ export enum DisclosureLevel {
   STANDARD = 'standard',
   MINIMAL = 'minimal',
 }
+
+// === Faz 2 — Supplement Domain ===
+
+// Supplement form types
+export enum SupplementForm {
+  TABLET = 'tablet',
+  CAPSULE = 'capsule',
+  SOFTGEL = 'softgel',
+  POWDER = 'powder',
+  LIQUID = 'liquid',
+  GUMMY = 'gummy',
+  SPRAY = 'spray',
+  DROP = 'drop',
+}
+
+// Dosage units
+export enum DosageUnit {
+  MG = 'mg',
+  MCG = 'mcg',
+  G = 'g',
+  IU = 'IU',
+  ML = 'ml',
+  CFU = 'CFU', // probiyotik
+}
+
+// Interaction severity (supplement ↔ supplement, supplement ↔ medication)
+export enum InteractionSeverity {
+  NONE = 'none',
+  MILD = 'mild',
+  MODERATE = 'moderate',
+  SEVERE = 'severe',
+  CONTRAINDICATED = 'contraindicated',
+}

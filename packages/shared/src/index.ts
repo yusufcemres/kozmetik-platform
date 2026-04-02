@@ -11,6 +11,10 @@ export {
   AffiliatePlatform,
   OriginType,
   DisclosureLevel,
+  // Faz 2 — Supplement
+  SupplementForm,
+  DosageUnit,
+  InteractionSeverity,
 } from './types/enums';
 
 // Scoring Constants
@@ -23,3 +27,20 @@ export {
   SEARCH_SCORE_WEIGHTS,
   SENSITIVITY_PENALTIES,
 } from './constants/scoring';
+
+// Faz 2 Interfaces
+export type {
+  RoutineStep,
+  RoutineInteraction,
+  RoutineResult,
+  IRoutineEngine,
+  BarcodeScanResult,
+  OcrResult,
+  IBarcodeScanner,
+  AffiliatePrice,
+  AffiliateLinkParams,
+  IAffiliateProvider,
+  SyncPayload,
+  SyncResult,
+  IMobileSyncAdapter,
+} from './interfaces';
