@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -35,7 +35,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string; 
   need: { label: 'İhtiyaç', icon: '🎯', color: 'bg-purple-100 text-purple-700', path: '/ihtiyaclar' },
 };
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQuery = searchParams.get('q') || '';
@@ -350,5 +350,19 @@ export default function SearchPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center text-gray-400">
+          Yükleniyor...
+        </div>
+      }
+    >
+      <SearchPageContent />
+    </Suspense>
   );
 }
