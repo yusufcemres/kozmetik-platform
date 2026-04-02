@@ -1,0 +1,220 @@
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+import {
+  Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
+  AffiliateLink, FormulaRevision,
+} from '@database/entities';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateAffiliateLinkDto } from './dto/create-affiliate-link.dto';
+import { UpdateAffiliateLinkDto } from './dto/update-affiliate-link.dto';
+import { PaginationDto } from '@common/dto/pagination.dto';
+import { turkishSlug } from '@common/utils/turkish-slug';
+
+@Injectable()
+export class ProductsService {
+  constructor(
+    @InjectRepository(Product)
+    private readonly repo: Repository<Product>,
+    @InjectRepository(ProductLabel)
+    private readonly labelRepo: Repository<ProductLabel>,
+    @InjectRepository(ProductImage)
+    private readonly imageRepo: Repository<ProductImage>,
+    @InjectRepository(ProductMaster)
+    private readonly masterRepo: Repository<ProductMaster>,
+    @InjectRepository(ProductVariant)
+    private readonly variantRepo: Repository<ProductVariant>,
+    @InjectRepository(AffiliateLink)
+    private readonly affiliateRepo: Repository<AffiliateLink>,
+    @InjectRepository(FormulaRevision)
+    private readonly revisionRepo: Repository<FormulaRevision>,
+  ) {}
+
+  async create(dto: CreateProductDto) {
+    const slug = turkishSlug(dto.product_name);
+    const exists = await this.repo.findOne({ where: { product_slug: slug } });
+    if (exists) {
+      throw new ConflictException(`"${dto.product_name}" zaten mevcut`);
+    }
+
+    const { label, images, ...productData } = dto;
+    const entity = this.repo.create({ ...productData, product_slug: slug });
+    const saved = await this.repo.save(entity);
+
+    if (label) {
+      const labelEntity = this.labelRepo.create({
+        ...label,
+        product_id: saved.product_id,
+      });
+      await this.labelRepo.save(labelEntity);
+    }
+
+    if (images?.length) {
+      const imageEntities = images.map((img) =>
+        this.imageRepo.create({ ...img, product_id: saved.product_id }),
+      );
+      await this.imageRepo.save(imageEntities);
+    }
+
+    return this.findOne(saved.product_id);
+  }
+
+  async findAll(query: PaginationDto & { brand_id?: number; category_id?: number; status?: string }) {
+    const { page, limit, search, brand_id, category_id, status } = query;
+    const where: any = {};
+    if (search) where.product_name = Like(`%${search}%`);
+    if (brand_id) where.brand_id = brand_id;
+    if (category_id) where.category_id = category_id;
+    if (status) where.status = status;
+
+    const [data, total] = await this.repo.findAndCount({
+      where,
+      relations: ['brand', 'category', 'label', 'images'],
+      order: { created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async findOne(id: number) {
+    const entity = await this.repo.findOne({
+      where: { product_id: id },
+      relations: ['brand', 'category', 'variant', 'label', 'images', 'affiliate_links'],
+    });
+    if (!entity) throw new NotFoundException('Ürün bulunamadı');
+    return entity;
+  }
+
+  async findBySlug(slug: string) {
+    const entity = await this.repo.findOne({
+      where: { product_slug: slug },
+      relations: ['brand', 'category', 'variant', 'label', 'images', 'affiliate_links'],
+    });
+    if (!entity) throw new NotFoundException('Ürün bulunamadı');
+    return entity;
+  }
+
+  async update(id: number, dto: UpdateProductDto) {
+    const entity = await this.findOne(id);
+    const { label, images, ...productData } = dto;
+
+    if (productData.product_name) {
+      entity.product_slug = turkishSlug(productData.product_name);
+    }
+    Object.assign(entity, productData);
+    await this.repo.save(entity);
+
+    if (label) {
+      if (entity.label) {
+        Object.assign(entity.label, label);
+        await this.labelRepo.save(entity.label);
+      } else {
+        const labelEntity = this.labelRepo.create({
+          ...label,
+          product_id: id,
+        });
+        await this.labelRepo.save(labelEntity);
+      }
+    }
+
+    if (images !== undefined) {
+      await this.imageRepo.delete({ product_id: id });
+      if (images.length) {
+        const imageEntities = images.map((img) =>
+          this.imageRepo.create({ ...img, product_id: id }),
+        );
+        await this.imageRepo.save(imageEntities);
+      }
+    }
+
+    return this.findOne(id);
+  }
+
+  async updateStatus(id: number, status: string) {
+    const entity = await this.findOne(id);
+    entity.status = status;
+    return this.repo.save(entity);
+  }
+
+  async remove(id: number) {
+    const entity = await this.findOne(id);
+    entity.status = 'archived';
+    return this.repo.save(entity);
+  }
+
+  // === Affiliate Links ===
+
+  async createAffiliateLink(productId: number, dto: CreateAffiliateLinkDto) {
+    await this.findOne(productId); // verify product exists
+    const entity = this.affiliateRepo.create({
+      ...dto,
+      product_id: productId,
+      price_updated_at: dto.price_snapshot ? new Date() : undefined,
+    });
+    return this.affiliateRepo.save(entity);
+  }
+
+  async getAffiliateLinks(productId: number) {
+    return this.affiliateRepo.find({
+      where: { product_id: productId, is_active: true },
+      order: { platform: 'ASC' },
+    });
+  }
+
+  async updateAffiliateLink(linkId: number, dto: UpdateAffiliateLinkDto) {
+    const link = await this.affiliateRepo.findOne({
+      where: { affiliate_link_id: linkId },
+    });
+    if (!link) throw new NotFoundException('Affiliate link bulunamadı');
+
+    if (dto.price_snapshot !== undefined) {
+      link.price_updated_at = new Date();
+    }
+    Object.assign(link, dto);
+    return this.affiliateRepo.save(link);
+  }
+
+  async removeAffiliateLink(linkId: number) {
+    const link = await this.affiliateRepo.findOne({
+      where: { affiliate_link_id: linkId },
+    });
+    if (!link) throw new NotFoundException('Affiliate link bulunamadı');
+    return this.affiliateRepo.remove(link);
+  }
+
+  // === Formula Revisions ===
+
+  async addFormulaRevision(
+    productId: number,
+    data: { previous_inci_text: string; new_inci_text: string; change_summary?: string; changed_by?: string },
+  ) {
+    await this.findOne(productId);
+    const entity = this.revisionRepo.create({ ...data, product_id: productId });
+    return this.revisionRepo.save(entity);
+  }
+
+  async getFormulaRevisions(productId: number) {
+    return this.revisionRepo.find({
+      where: { product_id: productId },
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  // === Masters & Variants ===
+
+  async createMaster(data: { brand_id: number; category_id: number; master_name: string; domain_type?: string }) {
+    const entity = this.masterRepo.create(data);
+    return this.masterRepo.save(entity);
+  }
+
+  async createVariant(data: { master_id: number; region?: string; size_label?: string }) {
+    const entity = this.variantRepo.create(data);
+    return this.variantRepo.save(entity);
+  }
+}

@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import dataSource from '../data-source';
 
 async function seed() {
@@ -5,9 +6,6 @@ async function seed() {
   console.log('Database connected for seeding...');
 
   try {
-    // Seed will be populated in Prompt 14
-    // For now, just verify connection works
-
     // Evidence levels
     await ds.query(`
       INSERT INTO evidence_levels (level_key, level_name, description, rank_order, badge_color, badge_emoji)
@@ -35,7 +33,22 @@ async function seed() {
       ON CONFLICT (role_key) DO NOTHING
     `);
 
+    // Super admin user
+    const passwordHash = await bcrypt.hash('SuperAdmin123!', 12);
+    const roleResult = await ds.query(
+      `SELECT role_id FROM admin_roles WHERE role_key = 'super_admin'`,
+    );
+    if (roleResult.length > 0) {
+      await ds.query(
+        `INSERT INTO admin_users (email, password_hash, full_name, role_id)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (email) DO NOTHING`,
+        ['admin@kozmetik.com', passwordHash, 'Sistem Admin', roleResult[0].role_id],
+      );
+    }
+
     console.log('Seed completed successfully!');
+    console.log('Admin login: admin@kozmetik.com / SuperAdmin123!');
   } catch (error) {
     console.error('Seed failed:', error);
     throw error;

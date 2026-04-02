@@ -2,9 +2,25 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './health.controller';
+import { AuthModule } from './modules/auth/auth.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { BrandsModule } from './modules/brands/brands.module';
+import { IngredientsModule } from './modules/ingredients/ingredients.module';
+import { NeedsModule } from './modules/needs/needs.module';
+import { ProductsModule } from './modules/products/products.module';
+import { IngestionModule } from './modules/ingestion/ingestion.module';
+import { MappingsModule } from './modules/mappings/mappings.module';
+import { MethodologyModule } from './modules/methodology/methodology.module';
+import { ScoringModule } from './modules/scoring/scoring.module';
+import { SearchModule } from './modules/search/search.module';
+import { ContentModule } from './modules/content/content.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
+import { SystemModule } from './modules/system/system.module';
 
 // DB connection is conditional — works without Docker for initial development
-const dbModule = process.env.SKIP_DB === 'true'
+const skipDb = process.env.SKIP_DB === 'true';
+
+const dbModule = skipDb
   ? []
   : [
       TypeOrmModule.forRootAsync({
@@ -25,6 +41,15 @@ const dbModule = process.env.SKIP_DB === 'true'
       }),
     ];
 
+// Auth and other DB-dependent modules
+const featureModules = skipDb
+  ? []
+  : [
+      AuthModule, CategoriesModule, BrandsModule, IngredientsModule, NeedsModule,
+      ProductsModule, IngestionModule, MappingsModule, MethodologyModule,
+      ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
+    ];
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,6 +57,7 @@ const dbModule = process.env.SKIP_DB === 'true'
       envFilePath: '../../.env',
     }),
     ...dbModule,
+    ...featureModules,
   ],
   controllers: [HealthController],
 })
