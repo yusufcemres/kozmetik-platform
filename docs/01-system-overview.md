@@ -53,6 +53,11 @@ kozmetik-platform/
 | Monorepo | pnpm workspaces |
 | Cron | @nestjs/schedule |
 | Rate Limit | @nestjs/throttler |
+| Compression | gzip (compression middleware, threshold: 1KB) |
+| Security | helmet, CORS, rate limiting, security headers |
+| Monitoring | Sentry |
+| CI/CD | GitHub Actions (lint → test → build) |
+| Container | Docker multi-stage builds |
 | Shared | TypeScript interfaces + enums + scoring constants |
 
 ## Fazlar

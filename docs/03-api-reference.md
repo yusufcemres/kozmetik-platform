@@ -4,15 +4,30 @@
 
 - **Base URL:** `http://localhost:3001/api/v1`
 - **Auth:** JWT Bearer token (admin endpoint'ler için)
-- **Format:** JSON
-- **Swagger:** `http://localhost:3001/api/docs`
+- **Format:** JSON (gzip compressed, threshold: 1KB)
+- **Swagger:** `http://localhost:3001/api/docs` (sadece development)
+- **Rate Limit:** Global 60 req/min/IP, search 30 req/min/IP, B2B key bazlı
+- **Security:** helmet, CORS, X-Frame-Options: DENY, X-Content-Type-Options: nosniff
 
 ## Public Endpoints
 
 ### Health
 | Method | Path | Açıklama |
 |--------|------|----------|
-| GET | `/health` | Sunucu durumu |
+| GET | `/health` | Sunucu durumu (DB, Redis, uptime, memory) |
+
+Response:
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-04-02T...",
+  "service": "kozmetik-platform-api",
+  "version": "1.0.0",
+  "uptime": { "ms": 123456, "human": "1d 2h 3m 4s" },
+  "checks": { "database": "connected", "redis": "connected" },
+  "memory": { "rss_mb": 85, "heap_used_mb": 42 }
+}
+```
 
 ### Kategoriler
 | Method | Path | Açıklama |
