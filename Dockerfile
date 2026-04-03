@@ -1,5 +1,6 @@
 # Railway API deployment — run from monorepo root
 FROM node:20-alpine AS base
+RUN apk add --no-cache python3 make g++
 RUN corepack enable && corepack prepare pnpm@9 --activate
 WORKDIR /app
 
