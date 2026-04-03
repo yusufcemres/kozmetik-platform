@@ -195,6 +195,41 @@ export class IngestionService {
     };
   }
 
+  async getReviewQueue(status: string, page: number, limit: number) {
+    const qb = this.piRepo.createQueryBuilder('pi')
+      .leftJoinAndSelect('pi.product', 'p')
+      .leftJoinAndSelect('pi.ingredient', 'i');
+
+    if (status === 'review_needed') {
+      qb.where('pi.match_status IN (:...statuses)', { statuses: ['review', 'unmatched'] });
+    } else if (status === 'suggested') {
+      qb.where('pi.match_status = :status', { status: 'suggestion' });
+    } else {
+      qb.where('pi.match_status = :status', { status });
+    }
+
+    const [items, total] = await qb
+      .orderBy('pi.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async updateReviewItem(id: number, data: { ingredient_id?: number; match_status?: string; admin_note?: string }) {
+    const pi = await this.piRepo.findOne({ where: { product_ingredient_id: id } });
+    if (!pi) throw new NotFoundException('Review item bulunamadı');
+
+    if (data.ingredient_id !== undefined) pi.ingredient_id = data.ingredient_id;
+    if (data.match_status) pi.match_status = data.match_status === 'manual_matched' ? 'manual' : data.match_status;
+
+    return this.piRepo.save(pi);
+  }
+
   async bulkIngestCsv(csvContent: string): Promise<IngestResultDto[]> {
     const lines = csvContent.split('\n').filter((l) => l.trim());
     const results: IngestResultDto[] = [];

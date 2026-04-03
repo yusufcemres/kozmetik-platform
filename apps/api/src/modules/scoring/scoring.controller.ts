@@ -56,11 +56,22 @@ export class ScoringController {
     return this.service.getConfig();
   }
 
+  @Put('admin/scoring-config')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Scoring konfigürasyonu toplu güncelle' })
+  updateConfigBulk(
+    @Body() data: { weights?: Record<string, number>; penalties?: Record<string, number> },
+  ) {
+    return this.service.updateConfigBulk(data);
+  }
+
   @Put('admin/scoring-config/:key')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Scoring konfigürasyonu güncelle' })
+  @ApiOperation({ summary: 'Scoring konfigürasyonu tek key güncelle' })
   updateConfig(
     @Param('key') key: string,
     @Body('value') value: number,

@@ -86,7 +86,7 @@ export class SearchService {
     const products = await this.dataSource.query(
       `SELECT product_name as name, product_slug as slug
        FROM products
-       WHERE is_active IS NOT FALSE AND status != 'archived'
+       WHERE status != 'archived'
          AND product_name ILIKE $1
        ORDER BY product_name ASC
        LIMIT $2`,

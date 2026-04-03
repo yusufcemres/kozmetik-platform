@@ -49,7 +49,7 @@ const formFields: FormField[] = [
 ];
 
 export default function MappingsPage() {
-  const crud = useAdminCrud({ endpoint: '/mappings', idField: 'ingredient_need_mapping_id' });
+  const crud = useAdminCrud({ endpoint: '/ingredient-need-mappings', idField: 'ingredient_need_mapping_id' });
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
 

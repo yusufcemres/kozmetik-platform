@@ -48,7 +48,7 @@ const formFields: FormField[] = [
 ];
 
 export default function EvidenceLevelsPage() {
-  const crud = useAdminCrud({ endpoint: '/evidence-levels', idField: 'evidence_level_id' });
+  const crud = useAdminCrud({ endpoint: '/methodology/evidence-levels', idField: 'evidence_level_id' });
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
 

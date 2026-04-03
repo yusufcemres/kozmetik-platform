@@ -30,7 +30,7 @@ const formFields: FormField[] = [
 ];
 
 export default function ApprovedWordingsPage() {
-  const crud = useAdminCrud({ endpoint: '/admin/approved-wordings', idField: 'wording_id' });
+  const crud = useAdminCrud({ endpoint: '/methodology/approved-wordings', idField: 'wording_id' });
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
 

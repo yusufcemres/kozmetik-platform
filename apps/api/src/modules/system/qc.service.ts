@@ -117,7 +117,7 @@ export class QcService {
     const products = await this.productRepo
       .createQueryBuilder('p')
       .leftJoin('p.need_scores', 'ns')
-      .where('ns.score_id IS NULL')
+      .where('ns.product_need_score_id IS NULL')
       .select(['p.product_id', 'p.product_name'])
       .getMany();
 
@@ -135,7 +135,7 @@ export class QcService {
     const ingredients = await this.ingredientRepo
       .createQueryBuilder('i')
       .leftJoin('i.evidence_links', 'el')
-      .where('el.evidence_link_id IS NULL')
+      .where('el.link_id IS NULL')
       .select(['i.ingredient_id', 'i.inci_name'])
       .getMany();
 

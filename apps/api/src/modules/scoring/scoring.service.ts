@@ -278,6 +278,22 @@ export class ScoringService {
     return this.configRepo.find({ order: { config_group: 'ASC', config_key: 'ASC' } });
   }
 
+  async updateConfigBulk(data: { weights?: Record<string, number>; penalties?: Record<string, number> }) {
+    const updates: Promise<any>[] = [];
+    if (data.weights) {
+      for (const [key, value] of Object.entries(data.weights)) {
+        updates.push(this.updateConfig(key, value));
+      }
+    }
+    if (data.penalties) {
+      for (const [key, value] of Object.entries(data.penalties)) {
+        updates.push(this.updateConfig(key, value));
+      }
+    }
+    await Promise.all(updates);
+    return this.getConfig();
+  }
+
   async updateConfig(key: string, value: number) {
     const entity = await this.configRepo.findOne({ where: { config_key: key } });
     if (!entity) throw new NotFoundException(`Config "${key}" bulunamadı`);
