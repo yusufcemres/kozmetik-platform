@@ -41,7 +41,7 @@ const dbModule = skipDb
           password: configService.get<string>('DB_PASS', 'kozmetik_dev'),
           database: configService.get<string>('DB_NAME', 'kozmetik_platform'),
           autoLoadEntities: true,
-          synchronize: false,
+          synchronize: configService.get('DB_SYNC', 'false') === 'true',
           logging: configService.get('NODE_ENV') === 'development',
         }),
       }),
