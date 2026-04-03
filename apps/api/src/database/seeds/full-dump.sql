@@ -1678,7 +1678,7 @@ COPY public.admin_roles (role_id, role_key, role_name, description, permissions,
 --
 
 COPY public.admin_users (admin_user_id, email, password_hash, full_name, role_id, is_active, last_login_at, created_at, updated_at) FROM stdin;
-1	admin@kozmetik.com	$2b$12$GJrX2rkUlMzwzhlNKtuL.u/XoEcXX3yNgiqDO7gOApIYyYVBz0rMa	Sistem Admin	1	t	2026-04-03 03:58:40.672	2026-04-02 23:56:51.885138	2026-04-03 00:58:40.684935
+1	admin@kozmetik.com	$2b$12$GJrX2rkUlMzwzhlNKtuL.u/XoEcXX3yNgiqDO7gOApIYyYVBz0rMa	Sistem Admin	1	t	2026-04-03 04:28:49.154	2026-04-02 23:56:51.885138	2026-04-03 01:28:49.166924
 \.
 
 
@@ -1779,8 +1779,6 @@ COPY public.brands (brand_id, brand_name, brand_slug, country_of_origin, website
 8	Neutrogena	neutrogena	ABD	\N	\N	t	2026-04-02 23:56:51.922088	2026-04-02 23:56:51.922088
 9	Vichy	vichy	Fransa	\N	\N	t	2026-04-02 23:56:51.922088	2026-04-02 23:56:51.922088
 10	Nuxe	nuxe	Fransa	\N	\N	t	2026-04-02 23:56:51.922088	2026-04-02 23:56:51.922088
-11	Test Marka Güncellendi	test-marka-guncellendi	Türkiye	\N	\N	f	2026-04-03 00:21:52.749276	2026-04-03 00:22:23.899489
-12	API Test	api-test	\N	\N	\N	f	2026-04-03 00:33:23.558349	2026-04-03 00:33:30.792802
 13	COSRX	cosrx	Güney Kore	\N	\N	t	2026-04-03 00:52:14.342941	2026-04-03 00:52:14.342941
 \.
 
@@ -1802,7 +1800,6 @@ COPY public.categories (category_id, parent_category_id, category_name, category
 10	\N	Probiyotik	probiyotik	supplement	11	t	2026-04-02 23:56:52.078155	2026-04-02 23:56:52.078155
 11	\N	Bitkisel Takviye	bitkisel-takviye	supplement	12	t	2026-04-02 23:56:52.078155	2026-04-02 23:56:52.078155
 12	\N	Omega & Yağ Asitleri	omega-yag-asitleri	supplement	13	t	2026-04-02 23:56:52.078155	2026-04-02 23:56:52.078155
-13	\N	Test Kategori	test-kategori	cosmetic	99	f	2026-04-03 00:21:52.86751	2026-04-03 00:22:02.133779
 \.
 
 
@@ -1877,6 +1874,37 @@ COPY public.ingredient_aliases (alias_id, ingredient_id, alias_name, language, a
 --
 
 COPY public.ingredient_evidence_links (link_id, ingredient_id, source_url, source_title, source_type, publication_year, summary_note, created_at) FROM stdin;
+1	1	https://pubmed.ncbi.nlm.nih.gov/16766489/	Topical niacinamide reduces yellowing, wrinkling, red blotchiness, and hyperpigmented spots	randomized_controlled_trial	2006	N=50 RCT: 12 hafta %5 niacinamide kullanımı kırışıklık, hiperpigmentasyon ve kızarıklıkta anlamlı azalma gösterdi.	2026-04-03 01:27:46.92735
+2	1	https://pubmed.ncbi.nlm.nih.gov/17147561/	The effect of niacinamide on reducing cutaneous pigmentation and suppression of melanosome transfer	randomized_controlled_trial	2007	%5 niacinamide melanozom transferini baskılayarak hiperpigmentasyonu azalttı.	2026-04-03 01:27:46.92735
+3	1	https://pubmed.ncbi.nlm.nih.gov/16029674/	Niacinamide - mechanisms of action and its topical use in dermatology	systematic_review	2005	Niacinamide'in bariyer fonksiyonu, sebum üretimi ve anti-inflamatuar etkileri derlendi.	2026-04-03 01:27:46.92735
+4	2	https://pubmed.ncbi.nlm.nih.gov/26578346/	Retinoids in the treatment of skin aging	systematic_review	2016	Retinoidlerin anti-aging etkinliğini gösteren kapsamlı derleme. Kolajen sentezi artışı, MMP inhibisyonu.	2026-04-03 01:27:46.92735
+5	2	https://pubmed.ncbi.nlm.nih.gov/17515510/	Retinol at 0.025%, 0.05%, and 0.1% improve photoaging	randomized_controlled_trial	2007	N=36 RCT: 12 hafta retinol kullanımı fotoyaşlanma belirtilerinde doz bağımlı iyileşme gösterdi.	2026-04-03 01:27:46.92735
+6	3	https://pubmed.ncbi.nlm.nih.gov/22052267/	Efficacy of a new topical nano-hyaluronic acid in humans	randomized_controlled_trial	2012	N=76 RCT: Nano-hyaluronik asit göz çevresi kırışıklıklarını 2 haftada anlamlı azalttı.	2026-04-03 01:27:46.92735
+7	3	https://pubmed.ncbi.nlm.nih.gov/24720076/	Hyaluronic acid: A key molecule in skin aging	review	2014	HA'nın cilt yaşlanmasındaki rolü, nem tutma kapasitesi ve topikal etkinliği derlendi.	2026-04-03 01:27:46.92735
+8	4	https://pubmed.ncbi.nlm.nih.gov/19588644/	Salicylic acid as a peeling agent: a comprehensive review	systematic_review	2009	Salisilik asidin akne tedavisindeki etkinliği, güvenliği ve optimal konsantrasyonları derlendi.	2026-04-03 01:27:46.92735
+9	4	https://pubmed.ncbi.nlm.nih.gov/1588386/	Treatment of acne with topical salicylic acid	randomized_controlled_trial	1992	%2 salisilik asit akne lezyonlarını plaseboya kıyasla anlamlı azalttı.	2026-04-03 01:27:46.92735
+10	5	https://pubmed.ncbi.nlm.nih.gov/8784971/	An updated review of the use of glycolic acid	review	1996	Glikolik asidin dermal kollajen artışı, epidermis kalınlaştırma ve hiperpigmentasyon azaltma etkileri.	2026-04-03 01:27:46.92735
+11	6	https://pubmed.ncbi.nlm.nih.gov/12553851/	Ceramides and the skin barrier	review	2003	Ceramidlerin cilt bariyerindeki temel rolü, eksikliğinin hastalıklarla ilişkisi.	2026-04-03 01:27:46.92735
+12	6	https://pubmed.ncbi.nlm.nih.gov/25399625/	Ceramide-containing moisturizers for atopic dermatitis	meta_analysis	2015	Ceramide içeren nemlendiricilerin atopik dermatitte bariyer onarımındaki etkinliği.	2026-04-03 01:27:46.92735
+13	7	https://pubmed.ncbi.nlm.nih.gov/11896774/	Topical vitamin C and skin: mechanisms of action and clinical applications	review	2002	L-askorbik asidin kolajen sentezi, antioksidan koruma ve hiperpigmentasyon tedavisindeki etkinliği.	2026-04-03 01:27:46.92735
+14	8	https://pubmed.ncbi.nlm.nih.gov/12113198/	Moisturizing and anti-inflammatory properties of panthenol	review	2002	Panthenolün nem tutma, yara iyileşmesi ve anti-inflamatuar etkileri.	2026-04-03 01:27:46.92735
+15	9	https://pubmed.ncbi.nlm.nih.gov/12164455/	Zinc and skin health	review	2002	Çinkonun antimikrobiyal, anti-inflamatuar ve sebum düzenleyici etkileri.	2026-04-03 01:27:46.92735
+16	10	https://pubmed.ncbi.nlm.nih.gov/16029676/	Vitamin E in dermatology	review	2005	Tokoferolün antioksidan koruma, UV hasarı azaltma ve nemlendirme etkileri.	2026-04-03 01:27:46.92735
+17	11	https://pubmed.ncbi.nlm.nih.gov/22308653/	Therapeutic potential of Centella asiatica and its triterpenes	systematic_review	2012	Centella asiatica'nın yara iyileşmesi, anti-inflamatuar ve kolajen sentezi etkileri.	2026-04-03 01:27:46.92735
+18	12	https://pubmed.ncbi.nlm.nih.gov/18510666/	Glycerol and the skin: holistic approach to its origin and functions	review	2008	Gliserinin bariyer fonksiyonu, antimikrobiyal etki ve nemlendirme mekanizmaları.	2026-04-03 01:27:46.92735
+19	13	https://pubmed.ncbi.nlm.nih.gov/21923484/	Azelaic acid in dermatology: a review	systematic_review	2011	Azelaik asidin akne, rosacea ve hiperpigmentasyon tedavisindeki etkinliği.	2026-04-03 01:27:46.92735
+20	14	https://pubmed.ncbi.nlm.nih.gov/15149569/	Squalene and squalane in skin care	review	2004	Squalane'ın emollient ve antioksidan özellikleri, tüm cilt tipleri için uygunluğu.	2026-04-03 01:27:46.92735
+21	15	https://pubmed.ncbi.nlm.nih.gov/20646083/	Allantoin: cosmetic use and safety	review	2010	Allantoin'in yatıştırıcı, yumuşatıcı ve keratolotik etkileri.	2026-04-03 01:27:46.92735
+22	16	https://pubmed.ncbi.nlm.nih.gov/8651718/	Lactic acid as an AHA and its effects on the skin	review	1996	Laktik asidin eksfoliyasyon ve nemlendirme etkileri, glikolik aside kıyasla daha nazik.	2026-04-03 01:27:46.92735
+23	17	https://pubmed.ncbi.nlm.nih.gov/23439103/	Madecassoside anti-inflammatory mechanisms	in_vitro	2013	Madecassoside'in NF-kB yolağı üzerinden anti-inflamatuar etki mekanizması.	2026-04-03 01:27:46.92735
+24	18	https://pubmed.ncbi.nlm.nih.gov/24720076/	Sodium hyaluronate and skin hydration	review	2014	Sodyum hyaluronat'ın düşük moleküler ağırlığı sayesinde dermal penetrasyon avantajı.	2026-04-03 01:27:46.92735
+25	19	https://pubmed.ncbi.nlm.nih.gov/22507043/	Urea in dermatology: a review of its emollient, moisturizing, keratolytic properties	systematic_review	2012	Üre'nin %5-10 konsantrasyonda nemlendirici, %20+ keratolotik etkileri.	2026-04-03 01:27:46.92735
+26	20	https://pubmed.ncbi.nlm.nih.gov/30681787/	Bakuchiol: a retinol-like functional compound	randomized_controlled_trial	2019	N=44 RCT: Bakuchiol retinol ile karşılaştırılabilir anti-aging etki gösterdi, daha az irritasyon ile.	2026-04-03 01:28:27.051494
+27	25	https://pubmed.ncbi.nlm.nih.gov/12553854/	Dimethicone in skin care	review	2003	Dimethicone emollient, koruyucu bariyer ve nem kaybını önleme etkileri.	2026-04-03 01:28:27.051494
+28	21	https://pubmed.ncbi.nlm.nih.gov/18489300/	Water and skin physiology	review	2008	Suyun kozmetik formülasyonlardaki temel çözücü rolü ve cilt hidrasyonuyla ilişkisi.	2026-04-03 01:28:27.051494
+29	24	https://pubmed.ncbi.nlm.nih.gov/15149570/	Butylene glycol as humectant and solvent in cosmetics	review	2004	Butilen glikolün nem tutucu ve aktif madde taşıyıcı olarak kozmetikteki rolü.	2026-04-03 01:28:27.051494
+30	23	https://pubmed.ncbi.nlm.nih.gov/20642345/	Safety assessment of phenoxyethanol as a cosmetic preservative	safety_assessment	2010	Fenoksietanolün %1'e kadar konsantrasyonda güvenli koruyucu olduğu değerlendirildi.	2026-04-03 01:28:27.051494
+31	22	https://pubmed.ncbi.nlm.nih.gov/17177192/	Fragrance allergens in cosmetic products	systematic_review	2007	Kozmetik parfümlerindeki alerjen bileşenlerin incelenmesi, kontakt dermatit riski.	2026-04-03 01:28:27.051494
 \.
 
 
@@ -1954,6 +1982,9 @@ COPY public.ingredient_need_mappings (ingredient_need_mapping_id, ingredient_id,
 53	20	2	65	positive	\N	\N	2026-04-03 00:43:37.543892	2026-04-03 00:43:37.543892
 54	22	11	70	negative	\N	\N	2026-04-03 00:43:37.543892	2026-04-03 00:43:37.543892
 55	25	10	60	positive	\N	\N	2026-04-03 00:43:37.543892	2026-04-03 00:43:37.543892
+56	21	10	20	positive	\N	Formülasyonun temel çözücüsü, doğrudan nemlendirici etkisi düşük	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
+57	23	11	15	context_dependent	\N	Güvenli koruyucu, nadir durumlarda hassasiyet	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
+58	24	10	25	positive	\N	Hafif nem tutucu ve aktif madde taşıyıcı	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
 \.
 
 
@@ -2243,6 +2274,19 @@ COPY public.product_ingredients (product_ingredient_id, product_id, ingredient_i
 --
 
 COPY public.product_labels (product_label_id, product_id, inci_raw_text, ingredient_header_text, usage_instructions, warning_text, manufacturer_info, distributor_info, origin_info, batch_reference, expiry_info, pao_info, net_content_display, packaging_symbols_json, claim_texts_json, created_at, updated_at) FROM stdin;
+1	1	\N	\N	Temiz cilde sabah ve akşam uygulayın. Yüz ve vücut için uygundur. Nazikçe masaj yaparak yayın.	Göz çevresinden kaçının. Tahriş olursa kullanımı durdurun.	\N	\N	Fransa	\N	\N	12M	\N	\N	["3 temel ceramide içerir", "MVE teknolojisi ile 24 saat nemlendirme", "Parfümsüz", "Dermatolog önerisi"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+2	2	\N	\N	Islak yüze uygulayın, köpürterek masaj yapın, bol suyla durulayın. Günde 2 kez kullanılabilir.	Göz temasından kaçının. Temas halinde bol suyla yıkayın.	\N	\N	Fransa	\N	\N	12M	\N	\N	["Ceramide içerikli", "Yağlı ve normal ciltler için", "Parfümsüz", "Non-komedojenik"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+3	3	\N	\N	Akşam temizleme sonrası yüze ve boyuna uygulayın. Serum sonrası son adım olarak kullanın.	Yalnızca harici kullanım içindir.	\N	\N	Fransa	\N	\N	12M	\N	\N	["Niacinamide içerir", "Hafif doku", "Yağsız formül", "Gece bakım rutini için ideal"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+4	4	\N	\N	Temiz cilde sabah ve/veya akşam uygulayın. Tüm yüze ince bir tabaka halinde yayın.	Göz çevresinden kaçının. İlk kullanımda hafif kuruluk normal olabilir.	\N	\N	Fransa	\N	\N	12M	\N	\N	["Niacinamide + Salisilik Asit", "Sivilce sonrası izleri azaltır", "Yağ kontrolü sağlar", "Non-komedojenik"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+5	5	\N	\N	Güneşe çıkmadan 15-20 dk önce bol miktarda uygulayın. Her 2 saatte bir tekrarlayın. Yüzme ve terleme sonrası yeniden uygulayın.	Göz temasından kaçının. 6 ay altı bebeklerde kullanmayın. Güneş koruması tek başına yeterli değildir, koruyucu kıyafet ve gölge de önerilir.	\N	\N	Fransa	\N	\N	9M	\N	\N	["SPF 50+ geniş spektrum", "UVMUNE 400 teknolojisi", "Ultra uzun UVA koruması", "Suya dayanıklı"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+6	6	\N	\N	Tahriş olmuş veya hasarlı cilt bölgelerine günde 2 kez uygulayın. Yüz ve vücut için uygundur.	Derin yaralarda kullanmayın. Enfekte bölgelere uygulamayın.	\N	\N	Fransa	\N	\N	12M	\N	\N	["Panthenol %5", "Madecassoside", "Çinko", "Hassas ve tahriş olmuş ciltler için"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+7	7	\N	\N	Pamuk üzerine dökün, yüz ve göz makyajını nazikçe silin. Durulama gerektirmez.	Sadece harici kullanım. Göz hassasiyeti durumunda doktora danışın.	\N	\N	Fransa	\N	\N	12M	\N	\N	["Micellar teknoloji", "Hassas ciltler için", "Göz çevresi dahil", "Durulama gerektirmez", "Parfümsüz"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+8	11	\N	\N	Temizleme sonrası, nemlendirici öncesi birkaç damla yüze uygulayın. Sabah ve akşam kullanılabilir.	Dış kullanım içindir. C vitamini ile aynı rutinde kullanılabilir. Yüksek konsantrasyon hassas ciltlerde kızarıklık yapabilir, bu durumda kullanımı azaltın.	\N	\N	Kanada	\N	\N	12M	\N	\N	["Niacinamide %10", "Zinc PCA %1", "Gözenek görünümünü azaltır", "Yağ dengesini sağlar", "Vegan", "Cruelty-free"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+9	12	\N	\N	Temizleme sonrası nemli cilde birkaç damla uygulayın. Üzerine nemlendirici sürün. Sabah ve akşam kullanılabilir.	Kuru cilde uygulamayın, nem çekemeyeceği için kurutucu etki yapabilir. Nemli cilde uygulayın.	\N	\N	Kanada	\N	\N	6M	\N	\N	["3 farklı moleküler ağırlıkta hyaluronic acid", "Provitamin B5", "Derin nemlendirme", "Vegan"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+10	13	\N	\N	Akşam temizleme sonrası birkaç damla uygulayın. Haftada 2-3 kez başlayıp kademeli olarak artırın. Sabah mutlaka SPF kullanın.	Hamilelik ve emzirme döneminde KULLANMAYIN. AHA/BHA ile aynı akşam kullanmayın. Güneş hassasiyetini artırır, SPF zorunludur. İlk haftalarda soyulma ve kızarıklık normal olabilir (retinizasyon).	\N	\N	Kanada	\N	\N	6M	\N	\N	["Retinol %0.5", "Squalane bazlı", "Kırışıklık ve ince çizgileri azaltır", "Hücre yenilenmesini hızlandırır"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+11	14	\N	\N	Haftada en fazla 2 kez akşam kullanın. Temiz, kuru cilde uygulayın. 10 dakikadan fazla beklemeyin. Ilık suyla durulayın. Üzerine nemlendirici sürün.	Hassas ciltlerde, aktif sivilce veya açık yaralarda KULLANMAYIN. Diğer asitler, retinol veya C vitamini ile aynı gün kullanmayın. İlk kullanımda yanma hissi olabilir. Ertesi gün SPF zorunludur. Ciltte 10 dakikadan fazla bırakmayın.	\N	\N	Kanada	\N	\N	12M	\N	\N	["AHA %30 (Glikolik + Laktik)", "BHA %2 (Salisilik)", "10 dakikalık peeling", "Haftada 1-2 kez"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+12	20	\N	\N	Temiz cilde sabah ve akşam uygulayın. Serum sonrası, güneş kremi öncesi kullanın.	Göz çevresinden kaçının.	\N	\N	ABD	\N	\N	12M	\N	\N	["Hyaluronic acid içerir", "48 saat nemlendirme", "Yağsız jel formül", "Non-komedojenik"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
+13	24	\N	\N	Temiz cilde günde 2 kez uygulayın. Özellikle kuru ve çatlak bölgelere masaj yaparak yayın.	Açık yaralara uygulamayın. 3 yaş altı çocuklarda kullanmayın.	\N	\N	Almanya	\N	\N	12M	\N	\N	["Urea %5", "Ceramide", "Çok kuru ve pürüzlü ciltler için", "48 saat nemlendirme", "Parfümsüz"]	2026-04-03 01:26:23.742136	2026-04-03 01:26:23.742136
 \.
 
 
@@ -2422,31 +2466,31 @@ COPY public.product_variants (variant_id, master_id, region, size_label, created
 --
 
 COPY public.products (product_id, variant_id, brand_id, category_id, domain_type, product_name, product_slug, product_type_label, short_description, barcode, net_content_value, net_content_unit, target_area, usage_time_hint, status, created_at, updated_at) FROM stdin;
-7	\N	4	2	cosmetic	Bioderma Sensibio H2O	bioderma-sensibio-h2o	temizleyici	Hassas ciltler için misel su	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-8	\N	4	1	cosmetic	Bioderma Sebium Global	bioderma-sebium-global	bakım	Akne eğilimli ciltler için global bakım	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-9	\N	5	1	cosmetic	Avene Cicalfate+ Onarıcı Krem	avene-cicalfate-onarici-krem	onarıcı	Hassas ve irritasyonlu ciltler için onarıcı krem	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-10	\N	5	1	cosmetic	Avene Tolerance Extreme Emulsion	avene-tolerance-extreme	nemlendirici	Ultra hassas ciltler için minimalist nemlendirici	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-1	\N	2	1	cosmetic	CeraVe Moisturising Cream	cerave-moisturising-cream	nemlendirici	Kuru ve çok kuru ciltler için ceramide içerikli yoğun nemlendirici krem	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-2	\N	2	2	cosmetic	CeraVe Foaming Cleanser	cerave-foaming-cleanser	temizleyici	Normal ve yağlı ciltler için köpüren temizleyici jel	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-3	\N	2	1	cosmetic	CeraVe PM Facial Moisturising Lotion	cerave-pm-lotion	nemlendirici	Niacinamide içeren gece nemlendirici losyon	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-4	\N	1	1	cosmetic	La Roche-Posay Effaclar Duo+	lrp-effaclar-duo-plus	bakım	Sivilce eğilimli ciltler için bakım kremi	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-5	\N	1	3	cosmetic	La Roche-Posay Anthelios UVMUNE 400 SPF50+	lrp-anthelios-uvmune-400	güneş kremi	Çok yüksek koruma güneş kremi	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-6	\N	1	1	cosmetic	La Roche-Posay Cicaplast Baume B5+	lrp-cicaplast-baume-b5	onarıcı	Hassas ve irritasyonlu ciltler için onarıcı bariyer balm	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-20	\N	8	1	cosmetic	Neutrogena Hydro Boost Water Gel	neutrogena-hydro-boost	nemlendirici	Hyaluronik asit içeren su bazlı jel nemlendirici	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-21	\N	8	3	cosmetic	Neutrogena Ultra Sheer Dry-Touch SPF55	neutrogena-ultra-sheer-spf55	güneş kremi	Mat bitişli güneş kremi	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-18	\N	13	2	cosmetic	COSRX Low pH Good Morning Gel Cleanser	cosrx-low-ph-cleanser	temizleyici	Düşük pH jel temizleyici	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-11	\N	3	1	cosmetic	The Ordinary Niacinamide 10% + Zinc 1%	to-niacinamide-zinc	serum	Gözenek sıkılaştırıcı ve yağ dengeleyici serum	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-12	\N	3	1	cosmetic	The Ordinary Hyaluronic Acid 2% + B5	to-hyaluronic-acid-b5	serum	Multi-ağırlık hyaluronik asit nemlendirici serum	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-13	\N	3	1	cosmetic	The Ordinary Retinol 0.5% in Squalane	to-retinol-05-squalane	serum	Orta güçte retinol serumu	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-14	\N	3	1	cosmetic	The Ordinary AHA 30% + BHA 2% Peeling Solution	to-aha-bha-peeling	peeling	10 dakikalık eksfoliyan peeling	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-15	\N	3	1	cosmetic	The Ordinary Ascorbic Acid 8% + Alpha Arbutin 2%	to-ascorbic-acid-alpha-arbutin	serum	Aydınlatıcı C vitamini serumu	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-16	\N	3	1	cosmetic	The Ordinary Azelaic Acid Suspension 10%	to-azelaic-acid-10	bakım	Leke karşıtı ve sivilce bakım ürünü	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-22	\N	6	1	cosmetic	SVR Sebiaclear Serum	svr-sebiaclear-serum	serum	Niacinamide + gluconolactone sivilce serumu	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-23	\N	6	1	cosmetic	SVR Ampoule B3 Hydra	svr-ampoule-b3-hydra	serum	Niacinamide yoğun nemlendirici ampul	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-17	\N	13	1	cosmetic	COSRX Advanced Snail 96 Mucin Power Essence	cosrx-snail-96-essence	esans	Salyangoz müsini ile onarıcı ve nemlendirici esans	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-19	\N	13	1	cosmetic	COSRX BHA Blackhead Power Liquid	cosrx-bha-blackhead-liquid	tonik	Salisilik asit içeren siyah nokta bakım toniği	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-24	\N	7	1	cosmetic	Eucerin UreaRepair Plus %5 Urea Krem	eucerin-urearepair-5	nemlendirici	%5 Urea içeren yoğun nemlendirici	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
-25	\N	7	1	cosmetic	Eucerin DermoPurifyer Oil Control Jel Krem	eucerin-dermopurifyer-jel-krem	bakım	Yağlı ve akne eğilimli ciltler için mat bakım	\N	\N	\N	\N	\N	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+1	\N	2	1	cosmetic	CeraVe Moisturising Cream	cerave-moisturising-cream	nemlendirici	Kuru ve çok kuru ciltler için ceramide içerikli yoğun nemlendirici krem	\N	454.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+2	\N	2	2	cosmetic	CeraVe Foaming Cleanser	cerave-foaming-cleanser	temizleyici	Normal ve yağlı ciltler için köpüren temizleyici jel	\N	236.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+3	\N	2	1	cosmetic	CeraVe PM Facial Moisturising Lotion	cerave-pm-lotion	nemlendirici	Niacinamide içeren gece nemlendirici losyon	\N	52.00	ml	face	evening	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+4	\N	1	1	cosmetic	La Roche-Posay Effaclar Duo+	lrp-effaclar-duo-plus	bakım	Sivilce eğilimli ciltler için bakım kremi	\N	40.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+5	\N	1	3	cosmetic	La Roche-Posay Anthelios UVMUNE 400 SPF50+	lrp-anthelios-uvmune-400	güneş kremi	Çok yüksek koruma güneş kremi	\N	50.00	ml	face	morning	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+6	\N	1	1	cosmetic	La Roche-Posay Cicaplast Baume B5+	lrp-cicaplast-baume-b5	onarıcı	Hassas ve irritasyonlu ciltler için onarıcı bariyer balm	\N	40.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+7	\N	4	2	cosmetic	Bioderma Sensibio H2O	bioderma-sensibio-h2o	temizleyici	Hassas ciltler için misel su	\N	250.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+8	\N	4	1	cosmetic	Bioderma Sebium Global	bioderma-sebium-global	bakım	Akne eğilimli ciltler için global bakım	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+9	\N	5	1	cosmetic	Avene Cicalfate+ Onarıcı Krem	avene-cicalfate-onarici-krem	onarıcı	Hassas ve irritasyonlu ciltler için onarıcı krem	\N	40.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+10	\N	5	1	cosmetic	Avene Tolerance Extreme Emulsion	avene-tolerance-extreme	nemlendirici	Ultra hassas ciltler için minimalist nemlendirici	\N	50.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+11	\N	3	1	cosmetic	The Ordinary Niacinamide 10% + Zinc 1%	to-niacinamide-zinc	serum	Gözenek sıkılaştırıcı ve yağ dengeleyici serum	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+12	\N	3	1	cosmetic	The Ordinary Hyaluronic Acid 2% + B5	to-hyaluronic-acid-b5	serum	Multi-ağırlık hyaluronik asit nemlendirici serum	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+13	\N	3	1	cosmetic	The Ordinary Retinol 0.5% in Squalane	to-retinol-05-squalane	serum	Orta güçte retinol serumu	\N	30.00	ml	face	evening	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+14	\N	3	1	cosmetic	The Ordinary AHA 30% + BHA 2% Peeling Solution	to-aha-bha-peeling	peeling	10 dakikalık eksfoliyan peeling	\N	30.00	ml	face	evening	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+15	\N	3	1	cosmetic	The Ordinary Ascorbic Acid 8% + Alpha Arbutin 2%	to-ascorbic-acid-alpha-arbutin	serum	Aydınlatıcı C vitamini serumu	\N	30.00	ml	face	morning	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+16	\N	3	1	cosmetic	The Ordinary Azelaic Acid Suspension 10%	to-azelaic-acid-10	bakım	Leke karşıtı ve sivilce bakım ürünü	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+17	\N	13	1	cosmetic	COSRX Advanced Snail 96 Mucin Power Essence	cosrx-snail-96-essence	esans	Salyangoz müsini ile onarıcı ve nemlendirici esans	\N	100.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+18	\N	13	2	cosmetic	COSRX Low pH Good Morning Gel Cleanser	cosrx-low-ph-cleanser	temizleyici	Düşük pH jel temizleyici	\N	150.00	ml	face	morning	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+19	\N	13	1	cosmetic	COSRX BHA Blackhead Power Liquid	cosrx-bha-blackhead-liquid	tonik	Salisilik asit içeren siyah nokta bakım toniği	\N	100.00	ml	face	evening	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+20	\N	8	1	cosmetic	Neutrogena Hydro Boost Water Gel	neutrogena-hydro-boost	nemlendirici	Hyaluronik asit içeren su bazlı jel nemlendirici	\N	50.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+21	\N	8	3	cosmetic	Neutrogena Ultra Sheer Dry-Touch SPF55	neutrogena-ultra-sheer-spf55	güneş kremi	Mat bitişli güneş kremi	\N	88.00	ml	face	morning	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+22	\N	6	1	cosmetic	SVR Sebiaclear Serum	svr-sebiaclear-serum	serum	Niacinamide + gluconolactone sivilce serumu	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+23	\N	6	1	cosmetic	SVR Ampoule B3 Hydra	svr-ampoule-b3-hydra	serum	Niacinamide yoğun nemlendirici ampul	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+24	\N	7	1	cosmetic	Eucerin UreaRepair Plus %5 Urea Krem	eucerin-urearepair-5	nemlendirici	%5 Urea içeren yoğun nemlendirici	\N	75.00	ml	body	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+25	\N	7	1	cosmetic	Eucerin DermoPurifyer Oil Control Jel Krem	eucerin-dermopurifyer-jel-krem	bakım	Yağlı ve akne eğilimli ciltler için mat bakım	\N	50.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
 \.
 
 
@@ -2614,7 +2658,7 @@ SELECT pg_catalog.setval('public.ingredient_aliases_alias_id_seq', 19, true);
 -- Name: ingredient_evidence_links_link_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ingredient_evidence_links_link_id_seq', 1, false);
+SELECT pg_catalog.setval('public.ingredient_evidence_links_link_id_seq', 31, true);
 
 
 --
@@ -2628,7 +2672,7 @@ SELECT pg_catalog.setval('public.ingredient_interactions_interaction_id_seq', 6,
 -- Name: ingredient_need_mappings_ingredient_need_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ingredient_need_mappings_ingredient_need_mapping_id_seq', 55, true);
+SELECT pg_catalog.setval('public.ingredient_need_mappings_ingredient_need_mapping_id_seq', 58, true);
 
 
 --
@@ -2691,7 +2735,7 @@ SELECT pg_catalog.setval('public.product_ingredients_product_ingredient_id_seq',
 -- Name: product_labels_product_label_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.product_labels_product_label_id_seq', 1, false);
+SELECT pg_catalog.setval('public.product_labels_product_label_id_seq', 13, true);
 
 
 --

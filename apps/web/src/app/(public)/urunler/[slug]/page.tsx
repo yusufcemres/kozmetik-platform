@@ -58,8 +58,8 @@ interface AffiliateLink {
 }
 
 interface ProductLabel {
-  claims_text?: string;
-  warnings_text?: string;
+  claim_texts_json?: string[];
+  warning_text?: string;
   usage_instructions?: string;
 }
 
@@ -527,19 +527,23 @@ export default async function ProductDetailPage({
                 </p>
               </div>
             )}
-            {product.label.claims_text && (
+            {product.label.claim_texts_json && product.label.claim_texts_json.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Ürün İddiaları</h3>
-                <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 rounded-lg p-4">
-                  {product.label.claims_text}
-                </p>
+                <div className="text-gray-600 text-sm leading-relaxed bg-blue-50 rounded-lg p-4">
+                  <ul className="list-disc list-inside space-y-1">
+                    {product.label.claim_texts_json.map((claim, i) => (
+                      <li key={i}>{claim}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
-            {product.label.warnings_text && (
+            {product.label.warning_text && (
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Uyarılar</h3>
                 <p className="text-gray-600 text-sm leading-relaxed bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                  {product.label.warnings_text}
+                  {product.label.warning_text}
                 </p>
               </div>
             )}
