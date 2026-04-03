@@ -1678,7 +1678,7 @@ COPY public.admin_roles (role_id, role_key, role_name, description, permissions,
 --
 
 COPY public.admin_users (admin_user_id, email, password_hash, full_name, role_id, is_active, last_login_at, created_at, updated_at) FROM stdin;
-1	admin@kozmetik.com	$2b$12$GJrX2rkUlMzwzhlNKtuL.u/XoEcXX3yNgiqDO7gOApIYyYVBz0rMa	Sistem Admin	1	t	2026-04-03 04:28:49.154	2026-04-02 23:56:51.885138	2026-04-03 01:28:49.166924
+1	admin@kozmetik.com	$2b$12$GJrX2rkUlMzwzhlNKtuL.u/XoEcXX3yNgiqDO7gOApIYyYVBz0rMa	Sistem Admin	1	t	2026-04-03 04:36:09.825	2026-04-02 23:56:51.885138	2026-04-03 01:36:09.832701
 \.
 
 
@@ -1780,6 +1780,12 @@ COPY public.brands (brand_id, brand_name, brand_slug, country_of_origin, website
 9	Vichy	vichy	Fransa	\N	\N	t	2026-04-02 23:56:51.922088	2026-04-02 23:56:51.922088
 10	Nuxe	nuxe	Fransa	\N	\N	t	2026-04-02 23:56:51.922088	2026-04-02 23:56:51.922088
 13	COSRX	cosrx	Güney Kore	\N	\N	t	2026-04-03 00:52:14.342941	2026-04-03 00:52:14.342941
+14	Uriage	uriage	Fransa	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
+15	Ducray	ducray	Fransa	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
+16	Hada Labo	hada-labo	Japonya	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
+17	Klairs	klairs	Güney Kore	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
+18	Purito	purito	Güney Kore	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
+19	Some By Mi	some-by-mi	Güney Kore	\N	\N	t	2026-04-03 01:32:04.302072	2026-04-03 01:32:04.302072
 \.
 
 
@@ -1985,6 +1991,26 @@ COPY public.ingredient_need_mappings (ingredient_need_mapping_id, ingredient_id,
 56	21	10	20	positive	\N	Formülasyonun temel çözücüsü, doğrudan nemlendirici etkisi düşük	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
 57	23	11	15	context_dependent	\N	Güvenli koruyucu, nadir durumlarda hassasiyet	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
 58	24	10	25	positive	\N	Hafif nem tutucu ve aktif madde taşıyıcı	2026-04-03 01:28:35.759658	2026-04-03 01:28:35.759658
+59	26	3	40	positive	\N	Göz çevresi kırışıklıkları ve şişlik	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+60	27	2	85	positive	\N	Melanin inhibitörü, leke açıcı	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+61	27	7	75	positive	\N	Cilt tonu eşitleme	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+62	28	2	90	positive	\N	Güçlü hiperpigmentasyon azaltıcı	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+63	28	7	80	positive	\N	Cilt tonu eşitleme	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+64	29	10	65	positive	\N	Nemlendirme ve onarım	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+65	29	3	50	positive	\N	Anti-aging peptidler içerir	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+66	29	5	55	positive	\N	Bariyer onarımına destek	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+67	30	4	80	positive	\N	Zengin emollient, kuruluk giderici	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+68	30	5	70	positive	\N	Bariyer güçlendirici lipid	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+69	30	10	75	positive	\N	Derin nemlendirme	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+70	32	11	70	positive	\N	Yatıştırıcı, hassas ciltlere uygun	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+71	32	10	50	positive	\N	Hafif nemlendirme	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+72	33	3	80	positive	\N	Kolajen/elastin üretimi stimülasyonu	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+73	33	5	60	positive	\N	Doku onarımı	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+74	34	1	60	positive	\N	Hafif eksfoliyan, akne yardımcı	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+75	34	2	65	positive	\N	Leke açma, glikolik aside göre nazik	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+76	34	7	60	positive	\N	Cilt yüzeyi pürüzsüzleştirme	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+77	40	11	75	positive	\N	Anti-inflamatuar, yatıştırıcı	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
+78	40	5	45	positive	\N	Bariyer desteği	2026-04-03 01:31:51.96991	2026-04-03 01:31:51.96991
 \.
 
 
@@ -2042,6 +2068,21 @@ COPY public.ingredients (ingredient_id, domain_type, inci_name, common_name, ing
 23	cosmetic	Phenoxyethanol	Fenoksietanol	phenoxyethanol	Koruyucu	synthetic	Yaygın kullanılan koruyucu. Paraben alternatifi.	\N	\N	f	f	t	expert_opinion	t	2026-04-02 23:56:51.952602	2026-04-02 23:56:51.952602
 24	cosmetic	Butylene Glycol	Butilen Glikol	butylene-glycol	Nemlendirici	synthetic	Hafif nemlendirici ve çözücü. Aktif maddelerin penetrasyonunu artırır.	\N	\N	f	f	f	expert_opinion	t	2026-04-02 23:56:51.952602	2026-04-02 23:56:51.952602
 25	cosmetic	Dimethicone	Dimetikon	dimethicone	Silikon	synthetic	Cilt yüzeyini yumuşatan ve koruyan silikon. Tıkayıcı değildir.	\N	\N	f	f	f	expert_opinion	t	2026-04-02 23:56:51.952602	2026-04-02 23:56:51.952602
+26	cosmetic	Caffeine	Kafein	caffeine	Aktif	synthetic	Göz altı şişliklerini azaltır, mikrosirkülasyonu artırır.	\N	\N	f	f	f	randomized_controlled_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+27	cosmetic	Arbutin	Arbutin	arbutin	Aktif	natural	Melanin üretimini inhibe ederek lekeleri açar.	\N	\N	f	f	f	randomized_controlled_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+28	cosmetic	Tranexamic Acid	Traneksamik Asit	tranexamic-acid	Aktif	synthetic	Hiperpigmentasyonu azaltır, leke tedavisinde etkili.	\N	\N	f	f	f	randomized_controlled_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+29	cosmetic	Snail Secretion Filtrate	Salyangoz Salgısı Özütü	snail-secretion-filtrate	Aktif	natural	Yara iyileşmesi, nemlendirme ve anti-aging etkileri.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+30	cosmetic	Shea Butter	Shea Yağı	shea-butter	Emollient	natural	Zengin emollient, bariyer onarımı ve nemlendirme.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+31	cosmetic	Cetearyl Alcohol	Setearil Alkol	cetearyl-alcohol	Emollient	synthetic	Emülgatör ve kıvam artırıcı, cildi yumuşatır.	\N	\N	f	f	f	expert_opinion	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+32	cosmetic	Aloe Barbadensis Leaf Extract	Aloe Vera Özütü	aloe-vera	Aktif	natural	Yatıştırıcı, nemlendirici ve anti-inflamatuar etki.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+33	cosmetic	Copper Peptide	Bakır Peptidi	copper-peptide	Aktif	synthetic	Kolajen ve elastin üretimini uyarır, yara iyileşmesini destekler.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+34	cosmetic	Mandelic Acid	Mandelik Asit	mandelic-acid	Aktif	synthetic	Hafif AHA, hassas ciltlere uygun eksfoliyan.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+35	cosmetic	Vitamin E Acetate	Tokoferil Asetat	vitamin-e-acetate	Antioksidan	synthetic	Stabil E vitamini formu, antioksidan koruma.	\N	\N	f	f	f	review	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+36	cosmetic	Propanediol	Propandiol	propanediol	Humektan	natural	Bitkisel kaynaklı nem tutucu ve çözücü.	\N	\N	f	f	f	expert_opinion	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+37	cosmetic	Ethylhexyl Methoxycinnamate	Oktinoksat	octinoxate	UV Filtre	synthetic	UVB filtresi, güneş koruyucu aktif madde.	\N	\N	f	f	f	systematic_review	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+38	cosmetic	Zinc Oxide	Çinko Oksit	zinc-oxide	UV Filtre	mineral	Mineral güneş filtresi, geniş spektrum UVA+UVB koruma.	\N	\N	f	f	f	systematic_review	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+39	cosmetic	Titanium Dioxide	Titanyum Dioksit	titanium-dioxide	UV Filtre	mineral	Mineral güneş filtresi, UVB ağırlıklı koruma.	\N	\N	f	f	f	systematic_review	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
+40	cosmetic	Bisabolol	Bisabolol	bisabolol	Yatıştırıcı	natural	Papatya türevi yatıştırıcı, anti-inflamatuar.	\N	\N	f	f	f	clinical_trial	t	2026-04-03 01:31:35.665056	2026-04-03 01:31:35.665056
 \.
 
 
@@ -2140,6 +2181,31 @@ COPY public.product_images (image_id, product_id, image_url, image_type, sort_or
 23	23	https://placehold.co/600x600/f0ffe0/1a1a2e?text=SVR+Ampoule+B3	product	1	SVR Ampoule B3 Hydra	2026-04-03 01:04:40.524724
 24	24	https://placehold.co/600x600/fff0f0/1a1a2e?text=Eucerin+Urea	product	1	Eucerin UreaRepair Plus Krem	2026-04-03 01:04:40.524724
 25	25	https://placehold.co/600x600/fff0f0/1a1a2e?text=Eucerin+Oil+Ctrl	product	1	Eucerin DermoPurifyer Oil Control	2026-04-03 01:04:40.524724
+26	26	https://placehold.co/600x600/e0f0e0/1a1a2e?text=Vichy+M89	product	1	Vichy Mineral 89	2026-04-03 01:34:20.343541
+27	27	https://placehold.co/600x600/e0f0e0/1a1a2e?text=Vichy+Normaderm	product	1	Vichy Normaderm	2026-04-03 01:34:20.343541
+28	28	https://placehold.co/600x600/e0f0e0/1a1a2e?text=Vichy+Liftactiv	product	1	Vichy Liftactiv	2026-04-03 01:34:20.343541
+29	29	https://placehold.co/600x600/ffe8d0/1a1a2e?text=Nuxe+Huile	product	1	Nuxe Huile Prodigieuse	2026-04-03 01:34:20.343541
+30	30	https://placehold.co/600x600/ffe8d0/1a1a2e?text=Nuxe+Creme	product	1	Nuxe Creme Fraiche	2026-04-03 01:34:20.343541
+31	31	https://placehold.co/600x600/fef0e8/1a1a2e?text=Bioderma+Atoderm	product	1	Bioderma Atoderm	2026-04-03 01:34:20.343541
+32	32	https://placehold.co/600x600/fef0e8/1a1a2e?text=Bioderma+SPF50	product	1	Bioderma Photoderm	2026-04-03 01:34:20.343541
+33	33	https://placehold.co/600x600/f0f4f8/1a1a2e?text=CeraVe+SA	product	1	CeraVe SA Cleanser	2026-04-03 01:34:20.343541
+34	34	https://placehold.co/600x600/f0f4f8/1a1a2e?text=CeraVe+Eye	product	1	CeraVe Eye Repair	2026-04-03 01:34:20.343541
+35	35	https://placehold.co/600x600/e8f0fe/1a1a2e?text=LRP+Toleriane	product	1	LRP Toleriane	2026-04-03 01:34:20.343541
+36	36	https://placehold.co/600x600/e8f0fe/1a1a2e?text=LRP+Hyalu+B5	product	1	LRP Hyalu B5	2026-04-03 01:34:20.343541
+37	37	https://placehold.co/600x600/fff8f0/1a1a2e?text=TO+Caffeine	product	1	TO Caffeine Solution	2026-04-03 01:34:20.343541
+38	38	https://placehold.co/600x600/fff8f0/1a1a2e?text=TO+Squalane+CL	product	1	TO Squalane Cleanser	2026-04-03 01:34:20.343541
+39	39	https://placehold.co/600x600/fff8f0/1a1a2e?text=TO+Mandelic	product	1	TO Mandelic Acid	2026-04-03 01:34:20.343541
+40	40	https://placehold.co/600x600/fff8f0/1a1a2e?text=TO+Arbutin	product	1	TO Alpha Arbutin	2026-04-03 01:34:20.343541
+41	41	https://placehold.co/600x600/f8f0ff/1a1a2e?text=COSRX+Sun	product	1	COSRX Aloe Sun	2026-04-03 01:34:20.343541
+42	42	https://placehold.co/600x600/f0f0ff/1a1a2e?text=Uriage+Cica	product	1	Uriage Bariederm	2026-04-03 01:34:20.343541
+43	43	https://placehold.co/600x600/f0f0ff/1a1a2e?text=Uriage+Water	product	1	Uriage Eau Thermale	2026-04-03 01:34:20.343541
+44	44	https://placehold.co/600x600/f5f0e8/1a1a2e?text=Ducray+Keracnyl	product	1	Ducray Keracnyl	2026-04-03 01:34:20.343541
+45	45	https://placehold.co/600x600/ffe0e0/1a1a2e?text=Hada+Labo	product	1	Hada Labo Premium	2026-04-03 01:34:20.343541
+46	46	https://placehold.co/600x600/fff0e8/1a1a2e?text=Klairs+Toner	product	1	Klairs Toner	2026-04-03 01:34:20.343541
+47	47	https://placehold.co/600x600/fff0e8/1a1a2e?text=Klairs+Vit+C	product	1	Klairs Vitamin Drop	2026-04-03 01:34:20.343541
+48	48	https://placehold.co/600x600/e8ffe8/1a1a2e?text=Purito+Centella	product	1	Purito Centella	2026-04-03 01:34:20.343541
+49	49	https://placehold.co/600x600/e8f8ff/1a1a2e?text=SBM+Miracle	product	1	Some By Mi Toner	2026-04-03 01:34:20.343541
+50	50	https://placehold.co/600x600/e0f0ff/1a1a2e?text=Neutrogena+Ret	product	1	Neutrogena Retinol	2026-04-03 01:34:20.343541
 \.
 
 
@@ -2266,6 +2332,135 @@ COPY public.product_ingredients (product_ingredient_id, product_id, ingredient_i
 116	25	4	Salicylic Acid	3	\N	low	f	f	auto	1.00	2026-04-03 00:45:51.476771	2026-04-03 00:45:51.476771
 117	25	1	Niacinamide	4	\N	low	f	f	auto	1.00	2026-04-03 00:45:51.476771	2026-04-03 00:45:51.476771
 118	25	25	Dimethicone	5	\N	medium	f	f	auto	1.00	2026-04-03 00:45:51.476771	2026-04-03 00:45:51.476771
+119	26	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+120	26	18	Sodium Hyaluronate	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+121	26	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+122	26	24	Butylene Glycol	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+123	26	23	Phenoxyethanol	5	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+124	27	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+125	27	12	Glycerin	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+126	27	4	Salicylic Acid	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+127	27	1	Niacinamide	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+128	27	25	Dimethicone	5	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+129	27	22	Parfum	6	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+130	28	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+131	28	12	Glycerin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+132	28	25	Dimethicone	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+133	28	3	Hyaluronic Acid	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+134	28	7	Ascorbic Acid	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+135	28	22	Parfum	6	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+136	29	14	Squalane	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+137	29	10	Tocopherol	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+138	29	22	Parfum	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+139	30	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+140	30	12	Glycerin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+141	30	30	Shea Butter	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+142	30	3	Hyaluronic Acid	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+143	30	10	Tocopherol	5	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+144	30	22	Parfum	6	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+145	31	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+146	31	12	Glycerin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+147	31	30	Shea Butter	3	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+148	31	25	Dimethicone	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+149	31	15	Allantoin	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+150	31	6	Ceramide NP	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+151	32	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+152	32	37	Ethylhexyl Methoxycinnamate	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+153	32	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+154	32	10	Tocopherol	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+155	33	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+156	33	4	Salicylic Acid	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+157	33	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+158	33	1	Niacinamide	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+159	33	6	Ceramide NP	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+160	33	3	Hyaluronic Acid	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+161	34	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+162	34	12	Glycerin	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+163	34	25	Dimethicone	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+164	34	6	Ceramide NP	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+165	34	3	Hyaluronic Acid	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+166	34	26	Caffeine	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+167	35	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+168	35	12	Glycerin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+169	35	30	Shea Butter	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+170	35	25	Dimethicone	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+171	35	1	Niacinamide	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+172	35	6	Ceramide NP	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+173	36	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+174	36	3	Hyaluronic Acid	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+175	36	18	Sodium Hyaluronate	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+176	36	8	Panthenol	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+177	36	17	Madecassoside	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+178	36	23	Phenoxyethanol	6	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+179	37	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+180	37	26	Caffeine	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+181	37	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+182	37	36	Propanediol	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+183	38	14	Squalane	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+184	38	31	Cetearyl Alcohol	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+185	38	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+186	39	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+187	39	34	Mandelic Acid	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+188	39	36	Propanediol	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+189	39	3	Hyaluronic Acid	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+190	40	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+191	40	27	Arbutin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+192	40	3	Hyaluronic Acid	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+193	40	16	Lactic Acid	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+194	41	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+195	41	37	Ethylhexyl Methoxycinnamate	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+196	41	32	Aloe Barbadensis Leaf Extract	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+197	41	12	Glycerin	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+198	41	8	Panthenol	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+199	42	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+200	42	12	Glycerin	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+201	42	30	Shea Butter	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+202	42	33	Copper Peptide	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+203	42	8	Panthenol	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+204	42	11	Centella Asiatica Extract	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+205	43	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+206	43	12	Glycerin	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+207	43	3	Hyaluronic Acid	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+208	43	25	Dimethicone	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+209	43	10	Tocopherol	5	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+210	44	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+211	44	12	Glycerin	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+212	44	5	Glycolic Acid	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+213	44	1	Niacinamide	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+214	44	4	Salicylic Acid	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+215	45	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+216	45	3	Hyaluronic Acid	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+217	45	18	Sodium Hyaluronate	3	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+218	45	24	Butylene Glycol	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+219	45	19	Urea	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+220	46	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+221	46	24	Butylene Glycol	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+222	46	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+223	46	11	Centella Asiatica Extract	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+224	46	40	Bisabolol	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+225	46	3	Hyaluronic Acid	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+226	47	36	Propanediol	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+227	47	7	Ascorbic Acid	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+228	47	11	Centella Asiatica Extract	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+229	47	18	Sodium Hyaluronate	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+230	48	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+231	48	11	Centella Asiatica Extract	2	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+232	48	12	Glycerin	3	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+233	48	30	Shea Butter	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+234	48	17	Madecassoside	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+235	48	8	Panthenol	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+236	49	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+237	49	24	Butylene Glycol	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+238	49	5	Glycolic Acid	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+239	49	4	Salicylic Acid	4	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+240	49	1	Niacinamide	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+241	49	15	Allantoin	6	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+242	50	21	Aqua	1	\N	high	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+243	50	12	Glycerin	2	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+244	50	2	Retinol	3	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+245	50	25	Dimethicone	4	\N	medium	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+246	50	3	Hyaluronic Acid	5	\N	low	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
+247	50	23	Phenoxyethanol	6	\N	trace	f	f	auto	1.00	2026-04-03 01:33:58.251903	2026-04-03 01:33:58.251903
 \.
 
 
@@ -2303,145 +2498,292 @@ COPY public.product_masters (master_id, brand_id, category_id, master_name, doma
 --
 
 COPY public.product_need_scores (product_need_score_id, product_id, need_id, compatibility_score, score_reason_summary, explanation_logic, confidence_level, calculated_at) FROM stdin;
-1	1	4	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 03:46:24.133
-2	1	10	80.65	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 3}	high	2026-04-03 03:46:24.133
-3	1	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:24.133
-4	1	5	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:24.134
-5	1	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:24.134
-6	2	1	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-7	2	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-8	2	6	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-9	2	5	79.62	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}, {"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 2}	medium	2026-04-03 03:46:24.375
-10	2	9	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-11	2	4	87.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 03:46:24.375
-12	2	10	91.92	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 03:46:24.375
-13	2	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-14	2	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:24.375
-15	3	1	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-16	3	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-17	3	6	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-18	3	5	79.62	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}, {"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 2}	medium	2026-04-03 03:46:24.481
-19	3	9	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-20	3	4	86.89	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 03:46:24.481
-21	3	10	79.65	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 3}	high	2026-04-03 03:46:24.481
-22	3	3	60.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 60, "effect_type": "positive", "contribution": 0.21, "ingredient_id": 3}, {"strength": 0.14, "relevance": 60, "effect_type": "positive", "contribution": 0.08, "ingredient_id": 10}], "matched_count": 2}	medium	2026-04-03 03:46:24.481
-23	3	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-24	3	12	85.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 85, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 03:46:24.481
-25	4	1	86.92	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:24.605
-26	4	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.605
-27	4	6	78.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:24.605
-28	4	5	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:24.605
-29	4	9	78.08	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:24.605
-30	4	10	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 2}	medium	2026-04-03 03:46:24.605
-31	4	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:24.605
-32	5	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 03:46:24.701
-33	5	3	60.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 03:46:24.701
-34	5	10	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 2}	medium	2026-04-03 03:46:24.701
-35	5	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:24.701
-36	6	5	81.67	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 8}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 17}], "matched_count": 2}	medium	2026-04-03 03:46:24.816
-37	6	10	76.07	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 8}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 3}	high	2026-04-03 03:46:24.816
-38	6	11	86.67	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 8}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 17}], "matched_count": 2}	medium	2026-04-03 03:46:24.816
-39	6	1	80.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 9}], "matched_count": 1}	medium	2026-04-03 03:46:24.816
-40	6	9	85.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 9}], "matched_count": 1}	medium	2026-04-03 03:46:24.816
-41	6	4	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:24.816
-42	7	10	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:24.935
-43	7	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:24.935
-44	7	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:24.935
-45	7	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:24.935
-46	8	1	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 03:46:25.05
-47	8	6	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.05
-48	8	9	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 03:46:25.05
-49	8	10	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.05
-50	8	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.05
-51	8	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:25.05
-52	8	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:25.05
-53	9	5	72.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}, {"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 03:46:25.164
-54	9	10	75.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 3}	high	2026-04-03 03:46:25.164
-55	9	11	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 03:46:25.164
-56	9	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.164
-57	10	10	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 14}], "matched_count": 2}	medium	2026-04-03 03:46:25.278
-58	10	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.278
-59	10	5	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 03:46:25.278
-60	11	1	82.78	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 03:46:25.291
-61	11	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:25.291
-62	11	6	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:25.291
-63	11	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:25.291
-64	11	9	82.22	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 03:46:25.291
-65	11	10	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.291
-66	11	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.291
-67	12	4	92.50	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}], "matched_count": 2}	medium	2026-04-03 03:46:25.396
-68	12	10	88.33	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}], "matched_count": 3}	high	2026-04-03 03:46:25.396
-69	12	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:25.396
-70	12	5	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 03:46:25.396
-71	12	11	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 03:46:25.396
-72	13	3	95.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-73	13	2	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-74	13	1	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-75	13	6	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-76	13	10	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-77	13	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 03:46:25.503
-78	14	1	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-79	14	6	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-80	14	9	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-81	14	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-82	14	7	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 5}, {"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 16}], "matched_count": 2}	medium	2026-04-03 03:46:25.608
-83	14	3	65.00	\N	{"ingredients": [{"strength": 1, "relevance": 65, "effect_type": "positive", "contribution": 0.65, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-84	14	4	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 16}], "matched_count": 1}	medium	2026-04-03 03:46:25.608
-85	15	12	95.00	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 03:46:25.62
-86	15	2	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 03:46:25.62
-87	15	7	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 03:46:25.62
-88	15	3	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 03:46:25.62
-89	16	1	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 03:46:25.724
-90	16	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 03:46:25.724
-91	16	7	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 03:46:25.724
-92	16	10	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 1}	medium	2026-04-03 03:46:25.724
-93	17	5	72.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}, {"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 03:46:25.844
-94	17	10	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}], "matched_count": 2}	medium	2026-04-03 03:46:25.844
-95	17	11	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 03:46:25.844
-96	17	4	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}], "matched_count": 1}	medium	2026-04-03 03:46:25.844
-97	18	11	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 03:46:25.894
-98	18	5	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 03:46:25.894
-99	18	10	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.894
-100	18	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.894
-101	19	1	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.91
-102	19	6	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.91
-103	19	9	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 03:46:25.91
-104	19	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:25.91
-105	19	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 03:46:25.91
-106	20	4	89.44	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 03:46:25.925
-107	20	10	82.31	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 3}	high	2026-04-03 03:46:25.925
-108	20	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:25.925
-109	21	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 03:46:25.942
-110	21	3	60.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 03:46:25.942
-111	21	10	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 2}	medium	2026-04-03 03:46:25.942
-112	21	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.942
-113	22	1	86.67	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:25.962
-114	22	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:25.962
-115	22	6	78.33	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:25.962
-116	22	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:25.962
-117	22	9	78.33	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:25.962
-118	22	10	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.962
-119	22	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:25.962
-120	23	1	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-121	23	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-122	23	6	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-123	23	5	73.33	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}], "matched_count": 2}	medium	2026-04-03 03:46:26.062
-124	23	9	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-125	23	4	95.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-126	23	10	87.31	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}], "matched_count": 2}	medium	2026-04-03 03:46:26.062
-127	23	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-128	23	11	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 03:46:26.062
-129	24	5	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:26.076
-130	24	4	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 19}], "matched_count": 3}	high	2026-04-03 03:46:26.076
-131	24	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 03:46:26.076
-132	24	10	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 19}], "matched_count": 2}	medium	2026-04-03 03:46:26.076
-133	25	1	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:26.191
-134	25	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.191
-135	25	6	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:26.191
-136	25	5	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 03:46:26.191
-137	25	9	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 03:46:26.191
-138	25	10	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}], "matched_count": 2}	medium	2026-04-03 03:46:26.191
-139	25	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 03:46:26.191
+140	1	4	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 04:36:10.522
+141	1	10	56.87	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.56, "relevance": 25, "effect_type": "positive", "contribution": 0.14, "ingredient_id": 24}], "matched_count": 5}	high	2026-04-03 04:36:10.523
+142	1	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:10.523
+143	1	5	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:10.523
+144	1	11	65.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}, {"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:10.523
+145	2	1	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.564
+146	2	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.564
+147	2	6	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.564
+148	2	5	79.62	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}, {"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 2}	medium	2026-04-03 04:36:10.564
+149	2	9	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.564
+150	2	4	87.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 04:36:10.564
+151	2	10	60.65	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:10.564
+152	2	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:10.564
+153	2	11	65.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}, {"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:10.564
+154	3	1	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.786
+155	3	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.786
+156	3	6	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.786
+157	3	5	79.62	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}, {"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 2}	medium	2026-04-03 04:36:10.786
+158	3	9	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.786
+159	3	4	86.89	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 04:36:10.786
+160	3	10	60.71	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:10.786
+161	3	3	60.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 60, "effect_type": "positive", "contribution": 0.21, "ingredient_id": 3}, {"strength": 0.14, "relevance": 60, "effect_type": "positive", "contribution": 0.08, "ingredient_id": 10}], "matched_count": 2}	medium	2026-04-03 04:36:10.786
+162	3	11	65.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}, {"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:10.786
+163	3	12	85.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 85, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:10.786
+164	4	1	86.92	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:10.802
+165	4	2	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.802
+166	4	6	78.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:10.802
+167	4	5	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:10.802
+168	4	9	78.08	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:10.802
+169	4	10	53.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:10.802
+170	4	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:10.802
+171	4	11	15.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:10.802
+172	5	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.019
+173	5	3	60.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.019
+174	5	10	53.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.019
+175	5	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.019
+176	6	5	81.67	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 8}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 17}], "matched_count": 2}	medium	2026-04-03 04:36:11.046
+177	6	10	61.32	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 8}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.046
+178	6	11	86.67	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 8}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 17}], "matched_count": 2}	medium	2026-04-03 04:36:11.046
+179	6	1	80.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 9}], "matched_count": 1}	medium	2026-04-03 04:36:11.046
+180	6	9	85.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 9}], "matched_count": 1}	medium	2026-04-03 04:36:11.046
+181	6	4	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.046
+182	7	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.059
+183	7	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.059
+184	7	11	61.43	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}, {"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:11.059
+185	7	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.059
+186	8	1	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 04:36:11.072
+187	8	6	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.072
+188	8	9	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 04:36:11.072
+189	8	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.072
+190	8	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.072
+191	8	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.072
+192	8	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.072
+193	9	5	72.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}, {"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.085
+194	9	10	57.26	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.085
+195	9	11	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.085
+196	9	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.085
+197	10	10	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 14}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.097
+198	10	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.097
+199	10	5	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 04:36:11.097
+200	11	1	82.78	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 04:36:11.109
+201	11	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.11
+202	11	6	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.11
+203	11	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.11
+204	11	9	82.22	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 9}], "matched_count": 2}	medium	2026-04-03 04:36:11.11
+205	11	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.11
+206	11	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.11
+207	11	11	15.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.11
+208	12	4	92.50	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}], "matched_count": 2}	medium	2026-04-03 04:36:11.123
+209	12	10	66.29	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.123
+210	12	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.123
+211	12	5	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 04:36:11.123
+212	12	11	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:11.123
+213	13	3	95.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.136
+214	13	2	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.136
+215	13	1	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.136
+216	13	6	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.136
+217	13	10	55.56	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 14}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 2}	medium	2026-04-03 04:36:11.136
+218	13	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 04:36:11.136
+219	14	1	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+220	14	6	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+221	14	9	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+222	14	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+223	14	7	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 5}, {"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 16}], "matched_count": 2}	medium	2026-04-03 04:36:11.148
+224	14	3	65.00	\N	{"ingredients": [{"strength": 1, "relevance": 65, "effect_type": "positive", "contribution": 0.65, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+225	14	4	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 16}], "matched_count": 1}	medium	2026-04-03 04:36:11.148
+226	14	10	22.22	\N	{"ingredients": [{"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 2}	medium	2026-04-03 04:36:11.148
+227	15	12	95.00	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.162
+228	15	2	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.162
+229	15	7	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.162
+230	15	3	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.162
+231	15	10	22.22	\N	{"ingredients": [{"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 2}	medium	2026-04-03 04:36:11.162
+232	15	11	15.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.162
+233	16	1	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 04:36:11.173
+234	16	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 04:36:11.173
+235	16	7	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 13}], "matched_count": 1}	medium	2026-04-03 04:36:11.173
+236	16	10	37.78	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.173
+237	16	11	15.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.173
+238	17	5	72.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}, {"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.184
+305	29	12	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.741
+239	17	10	51.25	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.184
+240	17	11	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.184
+241	17	4	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}], "matched_count": 1}	medium	2026-04-03 04:36:11.184
+242	18	11	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 04:36:11.194
+243	18	5	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 04:36:11.194
+244	18	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.194
+245	18	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.194
+246	19	1	90.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.207
+247	19	6	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.207
+248	19	9	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 4}], "matched_count": 1}	medium	2026-04-03 04:36:11.207
+249	19	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.207
+250	19	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.207
+251	19	10	22.22	\N	{"ingredients": [{"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 2}	medium	2026-04-03 04:36:11.207
+252	20	4	89.44	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 04:36:11.414
+253	20	10	65.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.414
+254	20	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.414
+255	20	11	15.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.414
+256	21	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.43
+257	21	3	60.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.43
+258	21	10	53.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.43
+259	21	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.43
+260	22	1	86.67	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.444
+261	22	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.444
+262	22	6	78.33	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.444
+263	22	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.444
+264	22	9	78.33	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.444
+265	22	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.444
+266	22	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.444
+267	23	1	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+268	23	2	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+269	23	6	75.00	\N	{"ingredients": [{"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+270	23	5	73.33	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 1}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}], "matched_count": 2}	medium	2026-04-03 04:36:11.46
+271	23	9	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+272	23	4	95.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+273	23	10	58.04	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.46
+274	23	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+275	23	11	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 04:36:11.46
+276	24	5	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:11.475
+277	24	4	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 19}], "matched_count": 3}	high	2026-04-03 04:36:11.475
+278	24	11	61.43	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}, {"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 2}	medium	2026-04-03 04:36:11.475
+279	24	10	63.33	\N	{"ingredients": [{"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 19}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.475
+280	25	1	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.681
+281	25	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.681
+282	25	6	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.681
+283	25	5	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.681
+306	29	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.741
+284	25	9	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.681
+285	25	10	53.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.681
+286	25	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.682
+287	26	10	54.12	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 4}	high	2026-04-03 04:36:11.704
+288	26	4	87.50	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}], "matched_count": 2}	medium	2026-04-03 04:36:11.704
+289	26	11	15.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.03, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.704
+290	27	1	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.718
+291	27	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.718
+292	27	6	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.718
+293	27	5	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.718
+294	27	9	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.718
+295	27	10	53.85	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.718
+296	27	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.718
+297	27	11	0.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 70, "effect_type": "negative", "contribution": 0.1, "ingredient_id": 22}], "matched_count": 1}	medium	2026-04-03 04:36:11.718
+298	28	4	88.33	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 04:36:11.729
+299	28	10	62.27	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.729
+300	28	3	67.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 7}], "matched_count": 2}	medium	2026-04-03 04:36:11.729
+301	28	12	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.729
+302	28	2	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.729
+303	28	7	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.729
+304	28	11	0.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 70, "effect_type": "negative", "contribution": 0.1, "ingredient_id": 22}], "matched_count": 1}	medium	2026-04-03 04:36:11.729
+307	29	10	80.00	\N	{"ingredients": [{"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 04:36:11.741
+308	29	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 04:36:11.741
+309	29	11	0.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "negative", "contribution": 0.35, "ingredient_id": 22}], "matched_count": 1}	medium	2026-04-03 04:36:11.741
+310	30	4	85.43	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 30}], "matched_count": 3}	high	2026-04-03 04:36:11.753
+311	30	10	65.91	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.753
+312	30	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}, {"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 2}	medium	2026-04-03 04:36:11.753
+313	30	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.753
+314	30	11	0.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 70, "effect_type": "negative", "contribution": 0.1, "ingredient_id": 22}], "matched_count": 1}	medium	2026-04-03 04:36:11.753
+315	30	5	70.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 30}], "matched_count": 1}	medium	2026-04-03 04:36:11.753
+316	31	5	73.38	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 6}, {"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 15}, {"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 30}], "matched_count": 3}	high	2026-04-03 04:36:11.764
+317	31	4	82.87	\N	{"ingredients": [{"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 30}], "matched_count": 3}	high	2026-04-03 04:36:11.764
+318	31	11	80.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 6}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.764
+319	31	10	61.32	\N	{"ingredients": [{"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.764
+320	32	12	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.775
+321	32	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.775
+322	32	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.775
+323	32	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.775
+324	33	1	88.08	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.784
+325	33	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.784
+326	33	6	81.15	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.784
+327	33	5	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}, {"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 2}	medium	2026-04-03 04:36:11.785
+328	33	9	76.92	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.785
+329	33	4	87.12	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 04:36:11.785
+330	33	10	58.26	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 3}	high	2026-04-03 04:36:11.785
+331	33	3	60.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 60, "effect_type": "positive", "contribution": 0.21, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.785
+332	33	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:11.785
+333	34	4	87.78	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 6}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 3}	high	2026-04-03 04:36:11.796
+334	34	10	60.48	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.796
+335	34	3	51.76	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}, {"strength": 0.35, "relevance": 40, "effect_type": "positive", "contribution": 0.14, "ingredient_id": 26}], "matched_count": 2}	medium	2026-04-03 04:36:11.796
+336	34	5	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:11.796
+337	34	11	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:11.796
+338	35	1	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.808
+339	35	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.808
+340	35	6	75.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.808
+341	35	5	75.30	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}, {"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 6}, {"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 30}], "matched_count": 3}	high	2026-04-03 04:36:11.808
+342	35	9	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.808
+343	35	4	83.14	\N	{"ingredients": [{"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 6}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 30}], "matched_count": 3}	high	2026-04-03 04:36:11.808
+344	35	11	80.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 6}], "matched_count": 1}	medium	2026-04-03 04:36:11.808
+345	35	10	60.56	\N	{"ingredients": [{"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.808
+346	36	4	92.78	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}], "matched_count": 2}	medium	2026-04-03 04:36:11.819
+347	36	10	68.61	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 3}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 18}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.819
+348	36	3	60.00	\N	{"ingredients": [{"strength": 1, "relevance": 60, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.819
+349	36	5	81.92	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 8}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 17}], "matched_count": 2}	medium	2026-04-03 04:36:11.819
+350	36	11	79.93	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 8}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 17}, {"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 3}	high	2026-04-03 04:36:11.819
+351	37	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.829
+352	37	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.829
+353	37	3	40.00	\N	{"ingredients": [{"strength": 1, "relevance": 40, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 26}], "matched_count": 1}	medium	2026-04-03 04:36:11.829
+354	38	10	84.44	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 80, "effect_type": "positive", "contribution": 0.8, "ingredient_id": 14}], "matched_count": 2}	medium	2026-04-03 04:36:11.84
+355	38	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.84
+356	38	5	70.00	\N	{"ingredients": [{"strength": 1, "relevance": 70, "effect_type": "positive", "contribution": 0.7, "ingredient_id": 14}], "matched_count": 1}	medium	2026-04-03 04:36:11.84
+357	39	4	95.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.85
+358	39	10	45.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.85
+359	39	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.85
+360	39	1	60.00	\N	{"ingredients": [{"strength": 1, "relevance": 60, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 34}], "matched_count": 1}	medium	2026-04-03 04:36:11.85
+361	39	2	65.00	\N	{"ingredients": [{"strength": 1, "relevance": 65, "effect_type": "positive", "contribution": 0.65, "ingredient_id": 34}], "matched_count": 1}	medium	2026-04-03 04:36:11.85
+362	39	7	60.00	\N	{"ingredients": [{"strength": 1, "relevance": 60, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 34}], "matched_count": 1}	medium	2026-04-03 04:36:11.85
+363	40	4	85.38	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 16}], "matched_count": 2}	medium	2026-04-03 04:36:11.859
+364	40	10	53.33	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 3}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.859
+365	40	3	60.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.859
+366	40	7	75.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 16}, {"strength": 1, "relevance": 75, "effect_type": "positive", "contribution": 0.75, "ingredient_id": 27}], "matched_count": 2}	medium	2026-04-03 04:36:11.859
+367	40	2	85.00	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 27}], "matched_count": 1}	medium	2026-04-03 04:36:11.859
+368	41	5	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}], "matched_count": 1}	medium	2026-04-03 04:36:11.87
+369	41	10	54.68	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 50, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 32}], "matched_count": 4}	high	2026-04-03 04:36:11.87
+370	41	11	75.77	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 32}], "matched_count": 2}	medium	2026-04-03 04:36:11.87
+371	41	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.87
+372	42	5	72.44	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 8}, {"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 11}, {"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 30}, {"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 33}], "matched_count": 4}	high	2026-04-03 04:36:11.879
+373	42	10	62.88	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 8}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.879
+374	42	11	87.06	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 8}, {"strength": 0.35, "relevance": 90, "effect_type": "positive", "contribution": 0.32, "ingredient_id": 11}], "matched_count": 2}	medium	2026-04-03 04:36:11.879
+375	42	4	82.78	\N	{"ingredients": [{"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 30}], "matched_count": 2}	medium	2026-04-03 04:36:11.879
+376	42	3	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 33}], "matched_count": 1}	medium	2026-04-03 04:36:11.879
+377	43	4	88.85	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 04:36:11.889
+378	43	10	60.48	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.889
+379	43	3	60.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}, {"strength": 0.2, "relevance": 60, "effect_type": "positive", "contribution": 0.12, "ingredient_id": 10}], "matched_count": 2}	medium	2026-04-03 04:36:11.889
+380	43	12	85.00	\N	{"ingredients": [{"strength": 0.2, "relevance": 85, "effect_type": "positive", "contribution": 0.17, "ingredient_id": 10}], "matched_count": 1}	medium	2026-04-03 04:36:11.889
+381	44	1	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.898
+382	44	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 5}], "matched_count": 2}	medium	2026-04-03 04:36:11.898
+383	44	6	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.898
+384	44	5	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}], "matched_count": 1}	medium	2026-04-03 04:36:11.898
+385	44	9	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.898
+386	44	7	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.898
+387	44	3	65.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 65, "effect_type": "positive", "contribution": 0.52, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.898
+388	44	10	51.11	\N	{"ingredients": [{"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 2}	medium	2026-04-03 04:36:11.898
+389	44	4	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 1}	medium	2026-04-03 04:36:11.898
+390	45	4	91.00	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 18}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 19}], "matched_count": 3}	high	2026-04-03 04:36:11.908
+391	45	10	61.63	\N	{"ingredients": [{"strength": 1, "relevance": 95, "effect_type": "positive", "contribution": 0.95, "ingredient_id": 3}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 18}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 19}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 5}	high	2026-04-03 04:36:11.908
+392	45	3	60.00	\N	{"ingredients": [{"strength": 1, "relevance": 60, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.908
+393	46	4	88.04	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 04:36:11.916
+394	46	10	49.24	\N	{"ingredients": [{"strength": 0.35, "relevance": 95, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 4}	high	2026-04-03 04:36:11.916
+395	46	3	60.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 60, "effect_type": "positive", "contribution": 0.21, "ingredient_id": 3}], "matched_count": 1}	medium	2026-04-03 04:36:11.916
+396	46	11	82.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 11}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 40}], "matched_count": 2}	medium	2026-04-03 04:36:11.916
+397	46	5	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 11}, {"strength": 0.5, "relevance": 45, "effect_type": "positive", "contribution": 0.23, "ingredient_id": 40}], "matched_count": 2}	medium	2026-04-03 04:36:11.916
+398	47	12	95.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 95, "effect_type": "positive", "contribution": 0.76, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+399	47	2	85.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+400	47	7	80.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+401	47	3	75.00	\N	{"ingredients": [{"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 7}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+402	47	11	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+403	47	5	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 11}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+404	47	10	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+405	47	4	90.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 18}], "matched_count": 1}	medium	2026-04-03 04:36:11.928
+406	48	5	79.81	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 8}, {"strength": 1, "relevance": 85, "effect_type": "positive", "contribution": 0.85, "ingredient_id": 11}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 17}, {"strength": 0.8, "relevance": 70, "effect_type": "positive", "contribution": 0.56, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.938
+407	48	10	60.42	\N	{"ingredients": [{"strength": 0.35, "relevance": 75, "effect_type": "positive", "contribution": 0.26, "ingredient_id": 8}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 75, "effect_type": "positive", "contribution": 0.6, "ingredient_id": 30}], "matched_count": 4}	high	2026-04-03 04:36:11.938
+408	48	11	89.05	\N	{"ingredients": [{"strength": 0.35, "relevance": 85, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 8}, {"strength": 1, "relevance": 90, "effect_type": "positive", "contribution": 0.9, "ingredient_id": 11}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 17}], "matched_count": 3}	high	2026-04-03 04:36:11.938
+409	48	4	82.50	\N	{"ingredients": [{"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}, {"strength": 0.8, "relevance": 80, "effect_type": "positive", "contribution": 0.64, "ingredient_id": 30}], "matched_count": 2}	medium	2026-04-03 04:36:11.938
+410	49	1	87.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 1}, {"strength": 0.5, "relevance": 90, "effect_type": "positive", "contribution": 0.45, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+411	49	2	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 5}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+412	49	6	80.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 1}, {"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+413	49	5	67.94	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 1}, {"strength": 0.35, "relevance": 65, "effect_type": "positive", "contribution": 0.23, "ingredient_id": 15}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+414	49	9	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 80, "effect_type": "positive", "contribution": 0.4, "ingredient_id": 1}, {"strength": 0.5, "relevance": 75, "effect_type": "positive", "contribution": 0.38, "ingredient_id": 4}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+415	49	7	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.948
+416	49	3	65.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 65, "effect_type": "positive", "contribution": 0.33, "ingredient_id": 5}], "matched_count": 1}	medium	2026-04-03 04:36:11.948
+417	49	11	80.00	\N	{"ingredients": [{"strength": 0.35, "relevance": 80, "effect_type": "positive", "contribution": 0.28, "ingredient_id": 15}], "matched_count": 1}	medium	2026-04-03 04:36:11.948
+418	49	10	22.22	\N	{"ingredients": [{"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}, {"strength": 0.8, "relevance": 25, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 24}], "matched_count": 2}	medium	2026-04-03 04:36:11.948
+419	50	3	77.50	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 2}, {"strength": 0.5, "relevance": 60, "effect_type": "positive", "contribution": 0.3, "ingredient_id": 3}], "matched_count": 2}	medium	2026-04-03 04:36:11.959
+420	50	2	85.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 85, "effect_type": "positive", "contribution": 0.43, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.959
+421	50	1	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.959
+422	50	6	70.00	\N	{"ingredients": [{"strength": 0.5, "relevance": 70, "effect_type": "positive", "contribution": 0.35, "ingredient_id": 2}], "matched_count": 1}	medium	2026-04-03 04:36:11.959
+423	50	4	88.85	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 85, "effect_type": "positive", "contribution": 0.68, "ingredient_id": 12}], "matched_count": 2}	medium	2026-04-03 04:36:11.959
+424	50	10	60.48	\N	{"ingredients": [{"strength": 0.5, "relevance": 95, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 3}, {"strength": 0.8, "relevance": 90, "effect_type": "positive", "contribution": 0.72, "ingredient_id": 12}, {"strength": 0.8, "relevance": 60, "effect_type": "positive", "contribution": 0.48, "ingredient_id": 25}, {"strength": 1, "relevance": 20, "effect_type": "positive", "contribution": 0.2, "ingredient_id": 21}], "matched_count": 4}	high	2026-04-03 04:36:11.959
+425	50	11	15.00	\N	{"ingredients": [{"strength": 0.14, "relevance": 15, "effect_type": "context_dependent", "contribution": 0.02, "ingredient_id": 23}], "matched_count": 1}	medium	2026-04-03 04:36:11.959
 \.
 
 
@@ -2491,6 +2833,31 @@ COPY public.products (product_id, variant_id, brand_id, category_id, domain_type
 23	\N	6	1	cosmetic	SVR Ampoule B3 Hydra	svr-ampoule-b3-hydra	serum	Niacinamide yoğun nemlendirici ampul	\N	30.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
 24	\N	7	1	cosmetic	Eucerin UreaRepair Plus %5 Urea Krem	eucerin-urearepair-5	nemlendirici	%5 Urea içeren yoğun nemlendirici	\N	75.00	ml	body	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
 25	\N	7	1	cosmetic	Eucerin DermoPurifyer Oil Control Jel Krem	eucerin-dermopurifyer-jel-krem	bakım	Yağlı ve akne eğilimli ciltler için mat bakım	\N	50.00	ml	face	both	published	2026-04-03 00:44:26.330898	2026-04-03 00:44:26.330898
+26	\N	9	1	cosmetic	Vichy Mineral 89 Hyaluronic Acid Booster	vichy-mineral-89	serum	Volkanik su ve hyaluronic acid ile güçlendirilmiş günlük nemlendirici booster.	\N	50.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+27	\N	9	1	cosmetic	Vichy Normaderm Phytosolution Double-Correction	vichy-normaderm-phytosolution	bakım	Sivilce eğilimli ciltler için çift etkili düzeltici bakım kremi.	\N	50.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+28	\N	9	1	cosmetic	Vichy Liftactiv Supreme	vichy-liftactiv-supreme	nemlendirici	Anti-aging nemlendirici krem. Kırışıklık ve sarkma karşıtı.	\N	50.00	ml	face	morning	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+29	\N	10	6	cosmetic	Nuxe Huile Prodigieuse	nuxe-huile-prodigieuse	yağ	Yüz, vücut ve saç için çok amaçlı kuru yağ. 7 bitkisel yağ içerir.	\N	100.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+30	\N	10	1	cosmetic	Nuxe Creme Fraiche de Beaute	nuxe-creme-fraiche	nemlendirici	48 saat nemlendirici krem. Bitkisel süt ve hyaluronic acid içerir.	\N	50.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+31	\N	4	6	cosmetic	Bioderma Atoderm Intensive Baume	bioderma-atoderm-intensive-baume	nemlendirici	Çok kuru ve atopik ciltler için yoğun onarıcı balm.	\N	200.00	ml	body	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+32	\N	4	3	cosmetic	Bioderma Photoderm MAX Cream SPF50+	bioderma-photoderm-max-spf50	güneş kremi	Hassas ciltler için çok yüksek koruma güneş kremi.	\N	40.00	ml	face	morning	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+33	\N	2	2	cosmetic	CeraVe SA Smoothing Cleanser	cerave-sa-smoothing-cleanser	temizleyici	Salisilik asit içeren pürüzsüzleştirici temizleyici. Pürüzlü ve sivilceli ciltler için.	\N	236.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+34	\N	2	4	cosmetic	CeraVe Eye Repair Cream	cerave-eye-repair-cream	göz kremi	Göz çevresi için onarıcı krem. Ceramide ve hyaluronic acid içerir.	\N	14.00	ml	eye	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+35	\N	1	1	cosmetic	La Roche-Posay Toleriane Sensitive	lrp-toleriane-sensitive	nemlendirici	Hassas ciltler için prebiyotik nemlendirici krem.	\N	40.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+36	\N	1	1	cosmetic	La Roche-Posay Hyalu B5 Serum	lrp-hyalu-b5-serum	serum	Hyaluronic acid ve B5 vitamin içeren anti-aging dolgunlaştırıcı serum.	\N	30.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+37	\N	3	4	cosmetic	The Ordinary Caffeine Solution 5% + EGCG	to-caffeine-solution-5	serum	Göz altı morlukları ve şişlikler için konsantre kafein serumu.	\N	30.00	ml	eye	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+38	\N	3	2	cosmetic	The Ordinary Squalane Cleanser	to-squalane-cleanser	temizleyici	Squalane bazlı nazik temizleyici. Makyaj çözücü olarak da kullanılabilir.	\N	50.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+39	\N	3	1	cosmetic	The Ordinary Mandelic Acid 10% + HA	to-mandelic-acid-10-ha	serum	Hassas ciltlere uygun hafif AHA eksfoliyan. Mandelik asit + hyaluronic acid.	\N	30.00	ml	face	evening	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+40	\N	3	1	cosmetic	The Ordinary Alpha Arbutin 2% + HA	to-alpha-arbutin-2-ha	serum	Leke karşıtı arbutin serum. Hiperpigmentasyon tedavisi için.	\N	30.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+41	\N	13	3	cosmetic	COSRX Aloe Soothing Sun Cream SPF50+ PA+++	cosrx-aloe-soothing-sun-cream	güneş kremi	Aloe vera içerikli yatıştırıcı güneş kremi. Hafif ve nemlendirici doku.	\N	50.00	ml	face	morning	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+42	\N	14	1	cosmetic	Uriage Bariederm Cica-Cream	uriage-bariederm-cica-cream	onarıcı	Tahriş olmuş ve hasarlı ciltler için onarıcı bakım kremi.	\N	40.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+43	\N	14	1	cosmetic	Uriage Eau Thermale Water Cream	uriage-eau-thermale-water-cream	nemlendirici	Termal su bazlı hafif nemlendirici krem. Tüm cilt tipleri için.	\N	40.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+44	\N	15	1	cosmetic	Ducray Keracnyl Serum	ducray-keracnyl-serum	serum	Sivilce izleri ve gözenekler için düzeltici serum.	\N	30.00	ml	face	evening	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+45	\N	16	1	cosmetic	Hada Labo Gokujyun Premium Hyaluronic Acid Lotion	hada-labo-gokujyun-premium	tonik	5 farklı hyaluronic acid içeren premium nemlendirici losyon/tonik.	\N	170.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+46	\N	17	1	cosmetic	Klairs Supple Preparation Facial Toner	klairs-supple-preparation-toner	tonik	Hassas ciltler için pH dengeleyici yatıştırıcı tonik.	\N	180.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+47	\N	17	1	cosmetic	Klairs Freshly Juiced Vitamin Drop	klairs-freshly-juiced-vitamin-drop	serum	%5 askorbik asit içeren hassas ciltlere uygun C vitamini serumu.	\N	35.00	ml	face	morning	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+48	\N	18	1	cosmetic	Purito Centella Green Level Recovery Cream	purito-centella-recovery-cream	nemlendirici	Centella asiatica ağırlıklı yatıştırıcı onarım kremi.	\N	50.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+49	\N	19	1	cosmetic	Some By Mi AHA BHA PHA 30 Days Miracle Toner	sbm-aha-bha-pha-miracle-toner	tonik	AHA, BHA ve PHA üçlü asit tonik. Sivilce eğilimli ciltler için 30 günlük mucize.	\N	150.00	ml	face	both	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
+50	\N	8	1	cosmetic	Neutrogena Retinol Boost Cream	neutrogena-retinol-boost-cream	nemlendirici	Retinol içeren anti-aging gece kremi. Kırışıklık ve ince çizgiler için.	\N	50.00	ml	face	evening	published	2026-04-03 01:32:54.268341	2026-04-03 01:32:54.268341
 \.
 
 
@@ -2616,7 +2983,7 @@ SELECT pg_catalog.setval('public.batch_imports_import_id_seq', 1, false);
 -- Name: brands_brand_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.brands_brand_id_seq', 13, true);
+SELECT pg_catalog.setval('public.brands_brand_id_seq', 19, true);
 
 
 --
@@ -2672,7 +3039,7 @@ SELECT pg_catalog.setval('public.ingredient_interactions_interaction_id_seq', 6,
 -- Name: ingredient_need_mappings_ingredient_need_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ingredient_need_mappings_ingredient_need_mapping_id_seq', 58, true);
+SELECT pg_catalog.setval('public.ingredient_need_mappings_ingredient_need_mapping_id_seq', 78, true);
 
 
 --
@@ -2686,7 +3053,7 @@ SELECT pg_catalog.setval('public.ingredient_related_articles_ingredient_related_
 -- Name: ingredients_ingredient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ingredients_ingredient_id_seq', 25, true);
+SELECT pg_catalog.setval('public.ingredients_ingredient_id_seq', 40, true);
 
 
 --
@@ -2721,14 +3088,14 @@ SELECT pg_catalog.setval('public.price_history_price_history_id_seq', 1, false);
 -- Name: product_images_image_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.product_images_image_id_seq', 25, true);
+SELECT pg_catalog.setval('public.product_images_image_id_seq', 50, true);
 
 
 --
 -- Name: product_ingredients_product_ingredient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.product_ingredients_product_ingredient_id_seq', 118, true);
+SELECT pg_catalog.setval('public.product_ingredients_product_ingredient_id_seq', 247, true);
 
 
 --
@@ -2749,7 +3116,7 @@ SELECT pg_catalog.setval('public.product_masters_master_id_seq', 1, false);
 -- Name: product_need_scores_product_need_score_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.product_need_scores_product_need_score_id_seq', 139, true);
+SELECT pg_catalog.setval('public.product_need_scores_product_need_score_id_seq', 425, true);
 
 
 --
@@ -2770,7 +3137,7 @@ SELECT pg_catalog.setval('public.product_variants_variant_id_seq', 1, false);
 -- Name: products_product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.products_product_id_seq', 25, true);
+SELECT pg_catalog.setval('public.products_product_id_seq', 50, true);
 
 
 --
