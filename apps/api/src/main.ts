@@ -32,6 +32,7 @@ async function bootstrap() {
     ? [
         configService.get('WEB_URL', 'https://kozmetikplatform.com'),
         configService.get('MOBILE_URL', ''),
+        configService.get('VERCEL_URL', ''),
       ].filter(Boolean)
     : [
         `http://localhost:${configService.get('WEB_PORT', 3000)}`,
@@ -74,8 +75,8 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
   }
 
-  const port = configService.get('API_PORT', 3001);
-  await app.listen(port);
+  const port = configService.get('PORT', configService.get('API_PORT', 3001));
+  await app.listen(port, '0.0.0.0');
 
   const logger = new Logger('Bootstrap');
   logger.log(`API running on http://localhost:${port}`);

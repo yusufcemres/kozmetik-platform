@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/.env
+*.log
+.git
+apps/web
+apps/mobile
+docs
+docker
