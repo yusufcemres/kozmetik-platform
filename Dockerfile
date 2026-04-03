@@ -22,13 +22,17 @@ RUN cd apps/api && pnpm run build
 FROM node:20-alpine
 WORKDIR /app
 
-COPY --from=base /app/apps/api/dist ./dist
-COPY --from=base /app/apps/api/package.json ./package.json
+# Copy entire node_modules tree (pnpm symlinks need full structure)
 COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/packages/shared/dist ./node_modules/shared/dist
-COPY --from=base /app/packages/shared/package.json ./node_modules/shared/package.json
+COPY --from=base /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=base /app/apps/api/dist ./apps/api/dist
+COPY --from=base /app/apps/api/package.json ./apps/api/package.json
+COPY --from=base /app/packages/shared/dist ./packages/shared/dist
+COPY --from=base /app/packages/shared/package.json ./packages/shared/package.json
+COPY --from=base /app/package.json ./package.json
 
 ENV NODE_ENV=production
 EXPOSE ${PORT:-3001}
 
+WORKDIR /app/apps/api
 CMD ["node", "dist/main.js"]
