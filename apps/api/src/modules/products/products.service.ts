@@ -85,7 +85,12 @@ export class ProductsService {
   async findOne(id: number) {
     const entity = await this.repo.findOne({
       where: { product_id: id },
-      relations: ['brand', 'category', 'variant', 'label', 'images', 'affiliate_links'],
+      relations: [
+        'brand', 'category', 'variant', 'label', 'images', 'affiliate_links',
+        'ingredients', 'ingredients.ingredient',
+        'need_scores', 'need_scores.need',
+      ],
+      order: { ingredients: { inci_order_rank: 'ASC' }, need_scores: { compatibility_score: 'DESC' } },
     });
     if (!entity) throw new NotFoundException('Ürün bulunamadı');
     return entity;
@@ -94,7 +99,12 @@ export class ProductsService {
   async findBySlug(slug: string) {
     const entity = await this.repo.findOne({
       where: { product_slug: slug },
-      relations: ['brand', 'category', 'variant', 'label', 'images', 'affiliate_links'],
+      relations: [
+        'brand', 'category', 'variant', 'label', 'images', 'affiliate_links',
+        'ingredients', 'ingredients.ingredient',
+        'need_scores', 'need_scores.need',
+      ],
+      order: { ingredients: { inci_order_rank: 'ASC' }, need_scores: { compatibility_score: 'DESC' } },
     });
     if (!entity) throw new NotFoundException('Ürün bulunamadı');
     return entity;

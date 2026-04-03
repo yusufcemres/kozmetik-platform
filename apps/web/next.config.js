@@ -11,6 +11,7 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.trendyol.com' },
       { protocol: 'https', hostname: '**.hepsiburada.com' },
       { protocol: 'https', hostname: '**.amazon.com.tr' },
+      { protocol: 'https', hostname: 'placehold.co' },
     ],
     formats: ['image/avif', 'image/webp'],
   },
