@@ -25,27 +25,86 @@ interface PriceHistoryData {
   platforms: PlatformData[];
 }
 
-const PLATFORM_COLORS: Record<string, string> = {
-  trendyol: '#F27A1A',
-  hepsiburada: '#FF6000',
-  amazon_tr: '#FF9900',
-  dermoeczanem: '#00A99D',
-  gratis: '#E91E63',
-  rossmann: '#D40E14',
-  watsons: '#00703C',
-  other: '#6B7280',
+interface PlatformBrand {
+  label: string;
+  color: string;
+  bg: string;
+  textOnBg: string;
+  logo: string;
+  gridLine: string;
+}
+
+const PLATFORMS: Record<string, PlatformBrand> = {
+  trendyol: {
+    label: 'Trendyol',
+    color: '#F27A1A',
+    bg: '#FFF4EB',
+    textOnBg: '#D4620E',
+    logo: '/logos/trendyol.svg',
+    gridLine: 'rgba(242,122,26,0.12)',
+  },
+  hepsiburada: {
+    label: 'Hepsiburada',
+    color: '#FF6000',
+    bg: '#FFF2E8',
+    textOnBg: '#CC4D00',
+    logo: '/logos/hepsiburada.svg',
+    gridLine: 'rgba(255,96,0,0.12)',
+  },
+  amazon_tr: {
+    label: 'Amazon TR',
+    color: '#FF9900',
+    bg: '#232F3E',
+    textOnBg: '#FF9900',
+    logo: '/logos/amazon_tr.svg',
+    gridLine: 'rgba(255,153,0,0.12)',
+  },
+  dermoeczanem: {
+    label: 'Dermoeczanem',
+    color: '#00A99D',
+    bg: '#E6F9F7',
+    textOnBg: '#008A80',
+    logo: '/logos/dermoeczanem.svg',
+    gridLine: 'rgba(0,169,157,0.12)',
+  },
+  gratis: {
+    label: 'Gratis',
+    color: '#E91E63',
+    bg: '#FDE8EF',
+    textOnBg: '#C2185B',
+    logo: '/logos/gratis.svg',
+    gridLine: 'rgba(233,30,99,0.12)',
+  },
+  rossmann: {
+    label: 'Rossmann',
+    color: '#D40E14',
+    bg: '#FDECEC',
+    textOnBg: '#B80C11',
+    logo: '/logos/rossmann.svg',
+    gridLine: 'rgba(212,14,20,0.12)',
+  },
+  watsons: {
+    label: 'Watsons',
+    color: '#00703C',
+    bg: '#E6F4ED',
+    textOnBg: '#005C31',
+    logo: '/logos/watsons.svg',
+    gridLine: 'rgba(0,112,60,0.12)',
+  },
 };
 
-const PLATFORM_LABELS: Record<string, string> = {
-  trendyol: 'Trendyol',
-  hepsiburada: 'Hepsiburada',
-  amazon_tr: 'Amazon TR',
-  dermoeczanem: 'Dermoeczanem',
-  gratis: 'Gratis',
-  rossmann: 'Rossmann',
-  watsons: 'Watsons',
-  other: 'Diğer',
+const FALLBACK: PlatformBrand = {
+  label: 'Diğer',
+  color: '#6B7280',
+  bg: '#F3F4F6',
+  textOnBg: '#4B5563',
+  logo: '',
+  gridLine: 'rgba(107,114,128,0.12)',
 };
+
+function getPlatform(key: string): PlatformBrand {
+  return PLATFORMS[key] || FALLBACK;
+}
 
 function formatTL(price: number): string {
   return new Intl.NumberFormat('tr-TR', {
@@ -125,6 +184,17 @@ export default function PriceChart({ productId }: { productId: number }) {
     return pts;
   };
 
+  // Area fill path (line + close to bottom)
+  const areaForPlatform = (platform: PlatformData) => {
+    if (platform.points.length < 2) return '';
+    const first = platform.points[0];
+    const last = platform.points[platform.points.length - 1];
+    const linePts = platform.points
+      .map((pt) => `${xScale(pt.date).toFixed(1)},${yScale(pt.price).toFixed(1)}`)
+      .join(' L');
+    return `M${linePts} L${xScale(last.date).toFixed(1)},${(PAD.top + chartH).toFixed(1)} L${xScale(first.date).toFixed(1)},${(PAD.top + chartH).toFixed(1)} Z`;
+  };
+
   const handleMouseMove = (
     e: React.MouseEvent<SVGSVGElement>,
     platform: string,
@@ -134,7 +204,6 @@ export default function PriceChart({ productId }: { productId: number }) {
     const rect = svg.getBoundingClientRect();
     const mouseX = ((e.clientX - rect.left) / rect.width) * W;
 
-    // Find nearest point
     let nearest = points[0];
     let minDist = Infinity;
     for (const pt of points) {
@@ -158,7 +227,7 @@ export default function PriceChart({ productId }: { productId: number }) {
   return (
     <div className="curator-card p-5 mb-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="label-caps text-on-surface-variant tracking-[0.2em]">Fiyat Takip Grafiği</h3>
+        <h3 className="label-caps text-on-surface-variant tracking-[0.2em]">Fiyat Takip</h3>
         <div className="flex gap-1">
           {[30, 60, 90].map((d) => (
             <button
@@ -179,15 +248,15 @@ export default function PriceChart({ productId }: { productId: number }) {
       {/* Period stats */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="bg-surface-container-low rounded-sm p-3 text-center">
-          <p className="label-caps text-score-high mb-1">Dönem En Düşük</p>
+          <p className="label-caps text-score-high mb-1">En Düşük</p>
           <p className="text-base font-bold text-score-high">{formatTL(data.global_min)}</p>
         </div>
         <div className="bg-surface-container-low rounded-sm p-3 text-center">
-          <p className="label-caps text-score-low mb-1">Dönem En Yüksek</p>
+          <p className="label-caps text-score-low mb-1">En Yüksek</p>
           <p className="text-base font-bold text-score-low">{formatTL(data.global_max)}</p>
         </div>
         <div className="bg-surface-container-low rounded-sm p-3 text-center">
-          <p className="label-caps text-on-surface-variant mb-1">Dönem Ortalama</p>
+          <p className="label-caps text-on-surface-variant mb-1">Ortalama</p>
           <p className="text-base font-bold text-on-surface">{formatTL(data.global_avg)}</p>
         </div>
       </div>
@@ -236,18 +305,32 @@ export default function PriceChart({ productId }: { productId: number }) {
             </text>
           ))}
 
-          {/* Platform lines */}
+          {/* Platform area fills + lines */}
           {data.platforms.map((platform) => {
-            const color = PLATFORM_COLORS[platform.platform] || '#6B7280';
+            const brand = getPlatform(platform.platform);
             const isHovered = hoveredPlatform === platform.platform;
             const isDimmed = hoveredPlatform && !isHovered;
 
             return (
               <g key={platform.platform}>
+                {/* Gradient area fill */}
+                <defs>
+                  <linearGradient id={`grad-${platform.platform}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={brand.color} stopOpacity={isHovered ? 0.2 : 0.08} />
+                    <stop offset="100%" stopColor={brand.color} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <path
+                  d={areaForPlatform(platform)}
+                  fill={`url(#grad-${platform.platform})`}
+                  opacity={isDimmed ? 0.05 : 1}
+                  className="transition-opacity duration-200"
+                />
+                {/* Line */}
                 <polyline
                   points={pathForPlatform(platform)}
                   fill="none"
-                  stroke={color}
+                  stroke={brand.color}
                   strokeWidth={isHovered ? 3 : 2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -267,51 +350,91 @@ export default function PriceChart({ productId }: { productId: number }) {
                   }}
                   style={{ cursor: 'crosshair' }}
                 />
+                {/* End dot */}
+                {platform.points.length > 0 && (
+                  <circle
+                    cx={xScale(platform.points[platform.points.length - 1].date)}
+                    cy={yScale(platform.points[platform.points.length - 1].price)}
+                    r={isHovered ? 5 : 3.5}
+                    fill={brand.color}
+                    stroke="#fff"
+                    strokeWidth={2}
+                    opacity={isDimmed ? 0.2 : 1}
+                    className="transition-all duration-200"
+                  />
+                )}
               </g>
             );
           })}
 
-          {/* Tooltip dot */}
-          {tooltip && (
-            <g>
-              <circle cx={tooltip.x} cy={tooltip.y} r={5} fill={PLATFORM_COLORS[tooltip.platform] || '#6B7280'} stroke="white" strokeWidth={2} />
-              <g transform={`translate(${tooltip.x < W / 2 ? tooltip.x + 12 : tooltip.x - 120}, ${Math.max(20, tooltip.y - 30)})`}>
-                <rect x={0} y={0} width={108} height={40} rx={6} fill="rgba(0,0,0,0.85)" />
-                <text x={8} y={16} className="text-[10px] fill-white font-medium" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                  {PLATFORM_LABELS[tooltip.platform] || tooltip.platform}
+          {/* Tooltip */}
+          {tooltip && (() => {
+            const brand = getPlatform(tooltip.platform);
+            const boxW = 130;
+            const boxH = 48;
+            const tx = tooltip.x < W / 2 ? tooltip.x + 14 : tooltip.x - boxW - 14;
+            const ty = Math.max(8, Math.min(H - boxH - 8, tooltip.y - boxH / 2));
+            return (
+              <g>
+                <circle cx={tooltip.x} cy={tooltip.y} r={6} fill={brand.color} stroke="#fff" strokeWidth={2.5} />
+                {/* Vertical guide line */}
+                <line x1={tooltip.x} y1={PAD.top} x2={tooltip.x} y2={PAD.top + chartH} stroke={brand.color} strokeWidth={1} opacity={0.2} strokeDasharray="4 3" />
+                {/* Tooltip box */}
+                <rect x={tx} y={ty} width={boxW} height={boxH} rx={6} fill={brand.bg} stroke={brand.color} strokeWidth={1} opacity={0.95} />
+                <text x={tx + 10} y={ty + 18} className="text-[11px] font-bold" style={{ fontFamily: 'Manrope, sans-serif' }} fill={brand.textOnBg}>
+                  {brand.label}
                 </text>
-                <text x={8} y={32} className="text-[11px] fill-white font-bold" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                  {formatTL(tooltip.price)} — {new Date(tooltip.date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
+                <text x={tx + 10} y={ty + 36} className="text-[12px] font-bold" style={{ fontFamily: 'Manrope, sans-serif' }} fill={brand.color}>
+                  {formatTL(tooltip.price)}
+                </text>
+                <text x={tx + boxW - 10} y={ty + 36} textAnchor="end" className="text-[9px]" style={{ fontFamily: 'Manrope, sans-serif' }} fill={brand.textOnBg} opacity={0.7}>
+                  {new Date(tooltip.date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
                 </text>
               </g>
-            </g>
-          )}
+            );
+          })()}
         </svg>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-outline-variant/20">
+      {/* Platform legend with logos */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-4 pt-4 border-t border-outline-variant/20">
         {data.platforms.map((platform) => {
-          const color = PLATFORM_COLORS[platform.platform] || '#6B7280';
+          const brand = getPlatform(platform.platform);
+          const isHovered = hoveredPlatform === platform.platform;
           return (
             <button
               key={platform.platform}
-              className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-sm border transition-all ${
-                hoveredPlatform === platform.platform
-                  ? 'border-outline bg-surface-container-low'
-                  : 'border-transparent hover:border-outline-variant/30'
-              }`}
+              className="flex items-center gap-2.5 p-2 rounded-md border transition-all duration-200"
+              style={{
+                borderColor: isHovered ? brand.color : 'transparent',
+                backgroundColor: isHovered ? brand.bg : 'transparent',
+              }}
               onMouseEnter={() => setHoveredPlatform(platform.platform)}
               onMouseLeave={() => setHoveredPlatform(null)}
             >
-              <span
-                className="w-2.5 h-2.5 rounded-full shrink-0"
-                style={{ backgroundColor: color }}
-              />
-              <span className="text-on-surface-variant font-medium">
-                {PLATFORM_LABELS[platform.platform] || platform.platform}
-              </span>
-              <span className="text-outline">{formatTL(platform.current)}</span>
+              {brand.logo ? (
+                <img
+                  src={brand.logo}
+                  alt={brand.label}
+                  className="h-5 w-auto shrink-0 rounded-sm"
+                  style={{ maxWidth: '60px' }}
+                />
+              ) : (
+                <span
+                  className="w-3 h-3 rounded-full shrink-0"
+                  style={{ backgroundColor: brand.color }}
+                />
+              )}
+              <div className="flex flex-col items-start min-w-0">
+                <span className="text-[10px] font-bold truncate" style={{ color: brand.color }}>
+                  {formatTL(platform.current)}
+                </span>
+                {platform.min !== platform.max && (
+                  <span className="text-[8px] text-outline truncate">
+                    {formatTL(platform.min)} — {formatTL(platform.max)}
+                  </span>
+                )}
+              </div>
             </button>
           );
         })}
