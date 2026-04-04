@@ -467,31 +467,27 @@ export default async function ProductDetailPage({
                   const isAllergen = pi.ingredient?.allergen_flag;
                   const isFragrance = pi.ingredient?.fragrance_flag;
                   return (
-                    <div
+                    <details
                       key={pi.product_ingredient_id}
-                      className={`px-4 py-3 ${
+                      className={`group px-4 py-3 ${
                         isAllergen ? 'bg-red-50/50' : isFragrance ? 'bg-orange-50/50' : ''
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <summary className="flex items-center gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                         <span className="text-xs text-gray-400 w-6 text-right">
                           {idx + 1}
                         </span>
-                        <div className="flex-1 min-w-0">
-                          {pi.ingredient ? (
-                            <Link
-                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                              className="text-sm font-medium text-gray-800 hover:text-primary"
-                            >
-                              {pi.ingredient_display_name}
-                            </Link>
-                          ) : (
-                            <span className="text-sm text-gray-800">
-                              {pi.ingredient_display_name}
-                            </span>
+                        <div className="flex-1 min-w-0 flex items-center gap-1.5">
+                          <span className="text-sm font-medium text-gray-800 group-open:text-primary transition-colors">
+                            {pi.ingredient_display_name}
+                          </span>
+                          {pi.ingredient?.function_summary && (
+                            <svg className="w-3.5 h-3.5 text-gray-300 group-open:rotate-180 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
                           )}
                           {pi.is_below_one_percent_estimate && (
-                            <span className="text-[10px] text-gray-400 ml-2">
+                            <span className="text-[10px] text-gray-400">
                               (&lt;1%)
                             </span>
                           )}
@@ -522,15 +518,23 @@ export default async function ProductDetailPage({
                             );
                           })()}
                         </div>
-                      </div>
-                      {pi.ingredient?.function_summary && (
-                        <div className="ml-9 mt-1.5 bg-gray-50 rounded px-3 py-2">
-                          <p className="text-xs text-gray-500 leading-relaxed">
-                            {pi.ingredient.function_summary}
-                          </p>
+                      </summary>
+                      {pi.ingredient && (
+                        <div className="ml-9 mt-2 bg-gradient-to-r from-primary/5 to-transparent border-l-2 border-primary/30 rounded-r-lg px-3 py-2.5 animate-[fadeIn_0.15s_ease-in]">
+                          {pi.ingredient.function_summary && (
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                              {pi.ingredient.function_summary}
+                            </p>
+                          )}
+                          <Link
+                            href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                            className="inline-block mt-1.5 text-[11px] text-primary hover:underline font-medium"
+                          >
+                            Detaylı bilgi &rarr;
+                          </Link>
                         </div>
                       )}
-                    </div>
+                    </details>
                   );
                 })}
               </div>
