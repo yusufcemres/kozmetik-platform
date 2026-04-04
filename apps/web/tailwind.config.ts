@@ -9,8 +9,8 @@ const config: Config = {
       colors: {
         // REVELA MD3 neutral earthy palette
         primary: {
-          DEFAULT: '#5f5e5e',
-          dim: '#535252',
+          DEFAULT: '#1a1a1a',
+          dim: '#111111',
           container: '#e5e2e1',
           fixed: '#e5e2e1',
           'fixed-dim': '#d7d4d3',
@@ -44,7 +44,7 @@ const config: Config = {
           container: '#edeeeb',
           'container-high': '#e6e9e6',
           'container-highest': '#e0e3e0',
-          tint: '#5f5e5e',
+          tint: '#1a1a1a',
           variant: '#e0e3e0',
         },
         'on-surface': '#2f3331',

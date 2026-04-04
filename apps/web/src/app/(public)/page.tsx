@@ -155,6 +155,8 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 
 export default async function HomePage() {
   const { topProducts, latest, categories, needs, brands } = await getHomeData();
+  // Fallback: if top-scored fails, use latest products
+  const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
   const cosmNeeds = needs.filter((n: Need) => n.need_group !== 'supplement');
   const parentCats = categories.filter((c: Category) => !c.parent_category_id);
 
@@ -181,14 +183,14 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="col-span-12 lg:col-span-5 relative">
-            {topProducts[0] && (
+            {featuredProducts[0] ? (
               <>
-                <Link href={`/urunler/${topProducts[0].product_slug}`} className="block">
+                <Link href={`/urunler/${featuredProducts[0].product_slug}`} className="block">
                   <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-sm">
-                    {topProducts[0].images?.[0]?.image_url ? (
+                    {featuredProducts[0].images?.[0]?.image_url ? (
                       <img
-                        src={topProducts[0].images[0].image_url}
-                        alt={topProducts[0].product_name}
+                        src={featuredProducts[0].images[0].image_url}
+                        alt={featuredProducts[0].product_name}
                         className="w-full h-full object-contain transition-transform duration-700 hover:scale-105"
                       />
                     ) : (
@@ -199,12 +201,16 @@ export default async function HomePage() {
                   </div>
                 </Link>
                 <div className="absolute -bottom-6 -left-6 bg-tertiary-container p-6 hidden md:block max-w-[220px] rounded-sm">
-                  <span className="label-caps text-on-tertiary-container block mb-3">En Uyumlu</span>
+                  <span className="label-caps text-on-tertiary-container block mb-3">Onerilen</span>
                   <p className="text-sm italic font-light text-on-tertiary-container">
-                    &ldquo;{topProducts[0].product_name}&rdquo;
+                    &ldquo;{featuredProducts[0].product_name}&rdquo;
                   </p>
                 </div>
               </>
+            ) : (
+              <div className="aspect-[4/5] bg-surface-container-low rounded-sm flex items-center justify-center">
+                <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }}>spa</span>
+              </div>
             )}
           </div>
         </div>
@@ -266,14 +272,14 @@ export default async function HomePage() {
       )}
 
       {/* Top Scored Products — New Arrivals style */}
-      {topProducts.length > 0 && (
+      {featuredProducts.length > 0 && (
         <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface">
           <div className="text-center mb-16 lg:mb-20">
             <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Bilimsel Analiz</span>
             <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {topProducts.slice(0, 8).map((p: Product, i: number) => (
+            {featuredProducts.slice(0, 8).map((p: Product, i: number) => (
               <ProductCard key={p.product_id} product={p} index={i} />
             ))}
           </div>

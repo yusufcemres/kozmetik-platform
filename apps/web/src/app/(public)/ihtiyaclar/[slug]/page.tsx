@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import ListModal from '@/components/public/ListModal';
 
 // === Types ===
 
@@ -249,67 +250,110 @@ export default async function NeedDetailPage({
             )}
           </div>
           {sortedMappings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {sortedMappings.map((m) => {
-                const effect = effectTypeLabel(m.effect_type);
-                const score = Math.round(m.relevance_score || 0);
-                return (
-                  <div
-                    key={m.mapping_id}
-                    className="curator-card p-4"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        {m.ingredient ? (
-                          <Link
-                            href={`/icerikler/${m.ingredient.ingredient_slug}`}
-                            className="font-medium text-on-surface hover:text-primary transition-colors"
-                          >
-                            {m.ingredient.inci_name}
-                          </Link>
-                        ) : (
-                          <span className="font-medium text-on-surface">
-                            Icerik #{m.ingredient_id}
+            <ListModal
+              title="Etkili Icerikler"
+              count={sortedMappings.length}
+              previewCount={6}
+              allChildren={
+                <div className="divide-y divide-outline-variant/20">
+                  {sortedMappings.map((m) => {
+                    const effect = effectTypeLabel(m.effect_type);
+                    const score = Math.round(m.relevance_score || 0);
+                    return (
+                      <div key={m.mapping_id} className="flex items-center gap-3 py-2.5">
+                        <div className="flex-1 min-w-0">
+                          {m.ingredient ? (
+                            <Link
+                              href={`/icerikler/${m.ingredient.ingredient_slug}`}
+                              className="text-sm font-medium text-on-surface hover:text-primary transition-colors"
+                            >
+                              {m.ingredient.inci_name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-medium text-on-surface">
+                              Icerik #{m.ingredient_id}
+                            </span>
+                          )}
+                          {m.ingredient?.common_name && (
+                            <span className="text-xs text-outline ml-2">
+                              {m.ingredient.common_name}
+                            </span>
+                          )}
+                        </div>
+                        <span className={`label-caps px-2 py-0.5 rounded-sm shrink-0 ${effect.color}`}>
+                          {effect.label}
+                        </span>
+                        <span className={`text-sm font-bold shrink-0 ${getScoreColor(score)}`}>
+                          %{score}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {sortedMappings.slice(0, 6).map((m) => {
+                  const effect = effectTypeLabel(m.effect_type);
+                  const score = Math.round(m.relevance_score || 0);
+                  return (
+                    <div
+                      key={m.mapping_id}
+                      className="curator-card p-4"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          {m.ingredient ? (
+                            <Link
+                              href={`/icerikler/${m.ingredient.ingredient_slug}`}
+                              className="font-medium text-on-surface hover:text-primary transition-colors"
+                            >
+                              {m.ingredient.inci_name}
+                            </Link>
+                          ) : (
+                            <span className="font-medium text-on-surface">
+                              Icerik #{m.ingredient_id}
+                            </span>
+                          )}
+                          {m.ingredient?.common_name && (
+                            <p className="text-xs text-outline mt-0.5">
+                              {m.ingredient.common_name}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`text-sm font-bold ${getScoreColor(score)}`}>
+                          %{score}
+                        </span>
+                      </div>
+
+                      {/* Score bar */}
+                      <div className="mt-2 h-1 bg-surface-container rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${getScoreBarColor(score)}`}
+                          style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`label-caps px-2 py-0.5 rounded-sm ${effect.color}`}>
+                          {effect.label}
+                        </span>
+                        {m.ingredient?.ingredient_group && (
+                          <span className="label-caps text-outline">
+                            {m.ingredient.ingredient_group}
                           </span>
                         )}
-                        {m.ingredient?.common_name && (
-                          <p className="text-xs text-outline mt-0.5">
-                            {m.ingredient.common_name}
-                          </p>
+                        {m.evidence_level && (
+                          <span className="label-caps text-outline">
+                            {m.evidence_level.replace(/_/g, ' ')}
+                          </span>
                         )}
                       </div>
-                      <span className={`text-sm font-bold ${getScoreColor(score)}`}>
-                        %{score}
-                      </span>
                     </div>
-
-                    {/* Score bar */}
-                    <div className="mt-2 h-1 bg-surface-container rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${getScoreBarColor(score)}`}
-                        style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`label-caps px-2 py-0.5 rounded-sm ${effect.color}`}>
-                        {effect.label}
-                      </span>
-                      {m.ingredient?.ingredient_group && (
-                        <span className="label-caps text-outline">
-                          {m.ingredient.ingredient_group}
-                        </span>
-                      )}
-                      {m.evidence_level && (
-                        <span className="label-caps text-outline">
-                          {m.evidence_level.replace(/_/g, ' ')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
               Henuz icerik eslesmesi tanimlanmamis
@@ -321,55 +365,97 @@ export default async function NeedDetailPage({
         <section className="mb-10">
           <h2 className="text-xl font-bold text-on-surface mb-4">Uyumlu Urunler</h2>
           {topScores.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {topScores.map((score) => {
-                const product = score.product;
-                if (!product) return null;
-                const imgUrl = product.images?.[0]?.image_url;
-                const compat = Math.round(Number(score.compatibility_score));
-                return (
-                  <Link
-                    key={score.product_need_score_id}
-                    href={`/urunler/${product.product_slug}`}
-                    className="curator-card overflow-hidden group"
-                  >
-                    <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden">
-                      {imgUrl ? (
-                        <img
-                          src={imgUrl}
-                          alt={product.product_name}
-                          className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      {product.brand && (
-                        <p className="label-caps text-outline">
-                          {product.brand.brand_name}
-                        </p>
-                      )}
-                      <p className="text-sm font-medium text-on-surface line-clamp-2 tracking-tight">
-                        {product.product_name}
-                      </p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
+            <ListModal
+              title="Uyumlu Urunler"
+              count={topScores.length}
+              previewCount={6}
+              allChildren={
+                <div className="divide-y divide-outline-variant/20">
+                  {topScores.map((score) => {
+                    const product = score.product;
+                    if (!product) return null;
+                    const compat = Math.round(Number(score.compatibility_score));
+                    return (
+                      <Link
+                        key={score.product_need_score_id}
+                        href={`/urunler/${product.product_slug}`}
+                        className="flex items-center gap-3 py-2.5 hover:bg-surface-container-low transition-colors -mx-5 px-5"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-on-surface">
+                            {product.product_name}
+                          </span>
+                          {product.brand && (
+                            <span className="text-xs text-outline ml-2">
+                              {product.brand.brand_name}
+                            </span>
+                          )}
+                        </div>
+                        <div className="w-16 h-1 bg-surface-container rounded-full overflow-hidden shrink-0">
                           <div
                             className={`h-full rounded-full ${getScoreBarColor(compat)}`}
                             style={{ width: `${Math.min(100, compat)}%` }}
                           />
                         </div>
-                        <span className={`text-[10px] font-bold ${getScoreColor(compat)}`}>
+                        <span className={`text-sm font-bold shrink-0 ${getScoreColor(compat)}`}>
                           %{compat}
                         </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              }
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {topScores.slice(0, 6).map((score) => {
+                  const product = score.product;
+                  if (!product) return null;
+                  const imgUrl = product.images?.[0]?.image_url;
+                  const compat = Math.round(Number(score.compatibility_score));
+                  return (
+                    <Link
+                      key={score.product_need_score_id}
+                      href={`/urunler/${product.product_slug}`}
+                      className="curator-card overflow-hidden group"
+                    >
+                      <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden">
+                        {imgUrl ? (
+                          <img
+                            src={imgUrl}
+                            alt={product.product_name}
+                            className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
+                        )}
                       </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                      <div className="p-3">
+                        {product.brand && (
+                          <p className="label-caps text-outline">
+                            {product.brand.brand_name}
+                          </p>
+                        )}
+                        <p className="text-sm font-medium text-on-surface line-clamp-2 tracking-tight">
+                          {product.product_name}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${getScoreBarColor(compat)}`}
+                              style={{ width: `${Math.min(100, compat)}%` }}
+                            />
+                          </div>
+                          <span className={`text-[10px] font-bold ${getScoreColor(compat)}`}>
+                            %{compat}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
               Henuz uyumlu urun bulunamadi

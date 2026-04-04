@@ -76,12 +76,22 @@ function ProductsListContent() {
     const catSlug = searchParams.get('category');
     const brandSlug = searchParams.get('brand');
     if (catSlug && categories.length > 0) {
-      const cat = categories.find((c) => c.category_slug === catSlug);
-      if (cat) setCategoryFilter(cat.category_id);
+      // Search both parent and child categories
+      let found: Category | undefined;
+      for (const cat of categories) {
+        if (cat.category_slug === catSlug) { found = cat; break; }
+        const child = cat.children?.find((c) => c.category_slug === catSlug);
+        if (child) { found = child; break; }
+      }
+      if (found) setCategoryFilter(found.category_id);
+    } else if (!catSlug) {
+      setCategoryFilter('');
     }
     if (brandSlug && brands.length > 0) {
       const brand = brands.find((b) => b.brand_slug === brandSlug);
       if (brand) setBrandFilter(brand.brand_id);
+    } else if (!brandSlug) {
+      setBrandFilter('');
     }
   }, [searchParams, categories, brands]);
 
@@ -102,6 +112,7 @@ function ProductsListContent() {
       setMeta(data.meta || { total: 0, page: 1, limit: 12, totalPages: 1 });
     } catch {
       setProducts([]);
+      setMeta({ total: 0, page: 1, limit: 12, totalPages: 1 });
     } finally {
       setLoading(false);
     }
