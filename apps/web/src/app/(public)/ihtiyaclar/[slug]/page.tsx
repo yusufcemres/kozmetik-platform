@@ -70,17 +70,14 @@ async function getMappings(needId: number): Promise<IngredientMapping[]> {
   }
 }
 
-async function getTopProducts(needName: string): Promise<{
-  data: ProductScore['product'][];
-  meta: { total: number };
-}> {
+async function getTopProducts(needId: number): Promise<ProductScore[]> {
   try {
-    return await apiFetch<{ data: ProductScore['product'][]; meta: { total: number } }>(
-      `/products?search=${encodeURIComponent(needName)}&limit=12&page=1`,
+    return await apiFetch<ProductScore[]>(
+      `/scoring/needs/${needId}/top-products?limit=12`,
       { next: { revalidate: 3600 } } as any,
     );
   } catch {
-    return { data: [], meta: { total: 0 } };
+    return [];
   }
 }
 
@@ -177,9 +174,9 @@ export default async function NeedDetailPage({
   const need = await getNeed(params.slug);
   if (!need) notFound();
 
-  const [mappings, productResults] = await Promise.all([
+  const [mappings, topScores] = await Promise.all([
     getMappings(need.need_id),
-    getTopProducts(need.need_name),
+    getTopProducts(need.need_id),
   ]);
 
   const sortedMappings = [...mappings].sort(
@@ -321,13 +318,16 @@ export default async function NeedDetailPage({
         {/* Compatible Products */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-4">Uyumlu Ürünler</h2>
-          {productResults.data && productResults.data.length > 0 ? (
+          {topScores.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {productResults.data.map((product: any) => {
+              {topScores.map((score) => {
+                const product = score.product;
+                if (!product) return null;
                 const imgUrl = product.images?.[0]?.image_url;
+                const compat = Math.round(Number(score.compatibility_score));
                 return (
                   <Link
-                    key={product.product_id}
+                    key={score.product_need_score_id}
                     href={`/urunler/${product.product_slug}`}
                     className="bg-white border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                   >
@@ -351,6 +351,17 @@ export default async function NeedDetailPage({
                       <p className="text-sm font-medium text-gray-800 line-clamp-2">
                         {product.product_name}
                       </p>
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${getScoreBarColor(compat)}`}
+                            style={{ width: `${Math.min(100, compat)}%` }}
+                          />
+                        </div>
+                        <span className={`text-xs font-bold ${getScoreColor(compat)}`}>
+                          %{compat}
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 );

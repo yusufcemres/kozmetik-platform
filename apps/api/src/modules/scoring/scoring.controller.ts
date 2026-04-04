@@ -37,6 +37,16 @@ export class ScoringController {
     return this.service.getNeedScores(id);
   }
 
+  @Get('scoring/needs/:needId/top-products')
+  @ApiOperation({ summary: 'İhtiyaç için en uyumlu ürünler' })
+  @ApiQuery({ name: 'limit', required: false })
+  getTopProductsByNeed(
+    @Param('needId', ParseIntPipe) needId: number,
+    @Query('limit') limit?: string,
+  ) {
+    return this.service.getTopProductsByNeed(needId, limit ? parseInt(limit) : 12);
+  }
+
   @Get('products/:id/personal-score')
   @ApiOperation({ summary: 'Kişisel uyum skoru' })
   @ApiQuery({ name: 'profile_id', required: true })

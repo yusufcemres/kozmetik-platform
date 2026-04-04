@@ -254,6 +254,15 @@ export class ScoringService {
     });
   }
 
+  async getTopProductsByNeed(needId: number, limit = 12) {
+    return this.scoreRepo.find({
+      where: { need_id: needId },
+      relations: ['product', 'product.brand', 'product.images'],
+      order: { compatibility_score: 'DESC' },
+      take: limit,
+    });
+  }
+
   async recalculateAll() {
     const products = await this.productRepo.find({
       where: { status: 'published' },

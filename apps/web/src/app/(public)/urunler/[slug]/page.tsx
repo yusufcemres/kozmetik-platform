@@ -46,6 +46,7 @@ interface ProductIngredient {
     ingredient_slug: string;
     allergen_flag: boolean;
     fragrance_flag: boolean;
+    function_summary?: string;
   };
 }
 
@@ -168,9 +169,22 @@ function platformLabel(platform: string): string {
     amazon_tr: 'Amazon TR',
     dermoeczanem: 'Dermoeczanem',
     gratis: 'Gratis',
+    rossmann: 'Rossmann',
+    watsons: 'Watsons',
     other: 'Diğer',
   };
   return map[platform] || platform;
+}
+
+function concentrationLabel(band: string): { label: string; color: string } {
+  const map: Record<string, { label: string; color: string }> = {
+    very_high: { label: 'Çok Yüksek', color: 'bg-green-100 text-green-700' },
+    high: { label: 'Yüksek', color: 'bg-green-50 text-green-600' },
+    medium: { label: 'Orta', color: 'bg-yellow-50 text-yellow-700' },
+    low: { label: 'Düşük', color: 'bg-gray-100 text-gray-500' },
+    trace: { label: 'Eser', color: 'bg-gray-50 text-gray-400' },
+  };
+  return map[band] || { label: band, color: 'text-gray-400' };
 }
 
 function formatPrice(price: number | null): string {
@@ -455,55 +469,67 @@ export default async function ProductDetailPage({
                   return (
                     <div
                       key={pi.product_ingredient_id}
-                      className={`flex items-center gap-3 px-4 py-3 ${
+                      className={`px-4 py-3 ${
                         isAllergen ? 'bg-red-50/50' : isFragrance ? 'bg-orange-50/50' : ''
                       }`}
                     >
-                      <span className="text-xs text-gray-400 w-6 text-right">
-                        {idx + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        {pi.ingredient ? (
-                          <Link
-                            href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                            className="text-sm font-medium text-gray-800 hover:text-primary"
-                          >
-                            {pi.ingredient_display_name}
-                          </Link>
-                        ) : (
-                          <span className="text-sm text-gray-800">
-                            {pi.ingredient_display_name}
-                          </span>
-                        )}
-                        {pi.is_below_one_percent_estimate && (
-                          <span className="text-[10px] text-gray-400 ml-2">
-                            (&lt;1%)
-                          </span>
-                        )}
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-400 w-6 text-right">
+                          {idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          {pi.ingredient ? (
+                            <Link
+                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                              className="text-sm font-medium text-gray-800 hover:text-primary"
+                            >
+                              {pi.ingredient_display_name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-gray-800">
+                              {pi.ingredient_display_name}
+                            </span>
+                          )}
+                          {pi.is_below_one_percent_estimate && (
+                            <span className="text-[10px] text-gray-400 ml-2">
+                              (&lt;1%)
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          {isAllergen && (
+                            <span
+                              className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded"
+                              title="Alerjen"
+                            >
+                              Alerjen
+                            </span>
+                          )}
+                          {isFragrance && (
+                            <span
+                              className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded"
+                              title="Parfüm"
+                            >
+                              Parfüm
+                            </span>
+                          )}
+                          {pi.concentration_band !== 'unknown' && (() => {
+                            const conc = concentrationLabel(pi.concentration_band);
+                            return (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${conc.color}`}>
+                                {conc.label}
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        {isAllergen && (
-                          <span
-                            className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded"
-                            title="Alerjen"
-                          >
-                            Alerjen
-                          </span>
-                        )}
-                        {isFragrance && (
-                          <span
-                            className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded"
-                            title="Parfüm"
-                          >
-                            Parfüm
-                          </span>
-                        )}
-                        {pi.concentration_band !== 'unknown' && (
-                          <span className="text-[10px] text-gray-400 uppercase">
-                            {pi.concentration_band}
-                          </span>
-                        )}
-                      </div>
+                      {pi.ingredient?.function_summary && (
+                        <div className="ml-9 mt-1.5 bg-gray-50 rounded px-3 py-2">
+                          <p className="text-xs text-gray-500 leading-relaxed">
+                            {pi.ingredient.function_summary}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
