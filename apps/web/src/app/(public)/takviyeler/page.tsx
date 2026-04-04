@@ -31,44 +31,58 @@ export default function SupplementsListPage() {
   }, [page]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Takviye Gıdalar</h1>
-      <p className="text-gray-500 mb-8">
-        Vitamin, mineral ve besin takviyelerini karşılaştır, içeriklerini analiz et
-      </p>
+    <div className="curator-section max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-10">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Saglik</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">TAKVIYE GIDALAR</h1>
+        <p className="text-on-surface-variant text-sm mt-2">
+          Vitamin, mineral ve besin takviyelerini karsilastir, iceriklerini analiz et
+        </p>
+      </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-400">Yükleniyor...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="curator-card p-5 animate-pulse">
+              <div className="h-4 bg-surface-container rounded w-2/3 mb-3" />
+              <div className="h-3 bg-surface-container rounded w-full mb-2" />
+              <div className="h-3 bg-surface-container rounded w-1/3" />
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">💊</p>
-          <p className="text-gray-400">Henüz takviye ürün eklenmemiş</p>
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">medication</span>
+          <p className="text-on-surface-variant">Henuz takviye urun eklenmemis</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((p) => (
               <Link
                 key={p.product_id}
                 href={`/takviyeler/${p.product_slug}`}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="curator-card p-5 group"
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">💊</span>
-                  <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="material-icon text-primary" aria-hidden="true">medication</span>
+                  <div className="min-w-0 flex-1">
                     {p.brand && (
-                      <p className="text-xs text-teal-600 font-semibold">
+                      <p className="label-caps text-outline truncate">
                         {p.brand.brand_name}
                       </p>
                     )}
-                    <h3 className="font-bold text-sm">{p.product_name}</h3>
+                    <h3 className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors tracking-tight">
+                      {p.product_name}
+                    </h3>
                   </div>
                 </div>
                 {p.short_description && (
-                  <p className="text-sm text-gray-500 line-clamp-2">{p.short_description}</p>
+                  <p className="text-sm text-on-surface-variant line-clamp-2 leading-relaxed">{p.short_description}</p>
                 )}
                 {p.category && (
-                  <span className="inline-block mt-2 text-xs bg-gray-100 px-2 py-0.5 rounded">
+                  <span className="label-caps text-outline bg-surface-container-low px-2 py-0.5 rounded-sm inline-block mt-3">
                     {p.category.category_name}
                   </span>
                 )}
@@ -77,13 +91,15 @@ export default function SupplementsListPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-center gap-2 mt-12">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-3 py-1 rounded text-sm ${
-                    p === page ? 'bg-teal-600 text-white' : 'border hover:bg-gray-50'
+                  className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
+                    p === page
+                      ? 'bg-primary text-on-primary'
+                      : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
                   }`}
                 >
                   {p}

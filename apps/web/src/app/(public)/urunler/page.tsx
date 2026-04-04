@@ -40,15 +40,15 @@ interface Brand {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 70) return 'text-green-600';
-  if (score >= 40) return 'text-yellow-600';
-  return 'text-red-500';
+  if (score >= 70) return 'text-score-high';
+  if (score >= 40) return 'text-score-medium';
+  return 'text-score-low';
 }
 
 function getScoreBarColor(score: number): string {
-  if (score >= 70) return 'bg-green-500';
-  if (score >= 40) return 'bg-yellow-500';
-  return 'bg-red-400';
+  if (score >= 70) return 'bg-score-high';
+  if (score >= 40) return 'bg-score-medium';
+  return 'bg-score-low';
 }
 
 function ProductsListContent() {
@@ -63,19 +63,15 @@ function ProductsListContent() {
   const [searchInput, setSearchInput] = useState('');
   const [brandFilter, setBrandFilter] = useState<number | ''>('');
   const [categoryFilter, setCategoryFilter] = useState<number | ''>('');
-
-  // Ref data
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Load filter data
   useEffect(() => {
     api.get<Category[]>('/categories/tree').then(setCategories).catch(() => {});
     api.get<Brand[]>('/products/popular-brands?limit=50').then(setBrands).catch(() => {});
   }, []);
 
-  // Read URL params on mount
   useEffect(() => {
     const catSlug = searchParams.get('category');
     const brandSlug = searchParams.get('brand');
@@ -134,64 +130,60 @@ function ProductsListContent() {
   const hasFilters = !!search || !!brandFilter || !!categoryFilter;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="curator-section max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-end justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold">Ürünler</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Kozmetik ürünleri incele, içeriklerini analiz et
-          </p>
+          <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Koleksiyon</span>
+          <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">ÜRÜNLER</h1>
         </div>
         <Link
           href="/karsilastir"
-          className="hidden sm:flex items-center gap-2 border rounded-lg px-4 py-2 text-sm text-gray-600 hover:border-primary hover:text-primary transition-colors"
+          className="hidden sm:flex items-center gap-2 curator-btn-outline text-[10px]"
         >
-          <span>⚖️</span> Karşılaştır
+          <span className="material-icon material-icon-sm" aria-hidden="true">compare</span>
+          Karşılaştır
         </Link>
       </div>
 
-      {/* Search + filter toggle */}
-      <div className="flex gap-2 mb-4">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+      {/* Search + filter */}
+      <div className="flex gap-3 mb-6">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-3">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Ürün adı veya marka ara..."
-            className="flex-1 border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            className="curator-input flex-1"
           />
-          <button
-            type="submit"
-            className="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
+          <button type="submit" className="curator-btn-primary text-[10px] px-6 py-3">
             Ara
           </button>
         </form>
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`border rounded-lg px-4 py-2.5 text-sm transition-colors ${
-            showFilters || hasFilters ? 'border-primary text-primary bg-primary/5' : 'text-gray-500 hover:border-gray-400'
+          className={`flex items-center gap-2 px-4 py-3 rounded-md border text-xs transition-all duration-300 ${
+            showFilters || hasFilters
+              ? 'border-primary text-primary bg-primary-container/30'
+              : 'border-outline-variant/30 text-on-surface-variant hover:border-outline'
           }`}
         >
-          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          Filtre
-          {hasFilters && <span className="ml-1 bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full">!</span>}
+          <span className="material-icon material-icon-sm" aria-hidden="true">tune</span>
+          <span className="hidden sm:inline uppercase tracking-widest">Filtre</span>
+          {hasFilters && <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full">!</span>}
         </button>
       </div>
 
       {/* Filter panel */}
       {showFilters && (
-        <div className="bg-gray-50 border rounded-xl p-5 mb-6 animate-slide-up">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Category filter */}
+        <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6 mb-8 animate-slide-up">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Kategori</label>
+              <label className="label-caps text-on-surface-variant mb-2 block">Kategori</label>
               <select
                 value={categoryFilter}
                 onChange={(e) => { setCategoryFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
-                className="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="curator-input"
               >
                 <option value="">Tüm Kategoriler</option>
                 {parentCats.map((cat) => (
@@ -206,14 +198,12 @@ function ProductsListContent() {
                 ))}
               </select>
             </div>
-
-            {/* Brand filter */}
             <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Marka</label>
+              <label className="label-caps text-on-surface-variant mb-2 block">Marka</label>
               <select
                 value={brandFilter}
                 onChange={(e) => { setBrandFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
-                className="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="curator-input"
               >
                 <option value="">Tüm Markalar</option>
                 {brands.map((b) => (
@@ -224,12 +214,8 @@ function ProductsListContent() {
               </select>
             </div>
           </div>
-
           {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="mt-3 text-sm text-red-500 hover:underline"
-            >
+            <button onClick={clearFilters} className="mt-4 label-caps text-error hover:underline underline-offset-4">
               Filtreleri Temizle
             </button>
           )}
@@ -238,41 +224,41 @@ function ProductsListContent() {
 
       {/* Results info */}
       {!loading && (
-        <p className="text-sm text-gray-400 mb-4">
+        <p className="text-xs text-outline mb-6">
           {meta.total} ürün bulundu
-          {search && <span> &mdash; &quot;{search}&quot; için sonuçlar</span>}
+          {search && <span> &mdash; &ldquo;{search}&rdquo; için sonuçlar</span>}
         </p>
       )}
 
       {/* Product grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white border rounded-xl overflow-hidden animate-pulse">
-              <div className="h-44 bg-gray-100" />
-              <div className="p-4 space-y-2">
-                <div className="h-3 bg-gray-100 rounded w-1/3" />
-                <div className="h-4 bg-gray-100 rounded w-2/3" />
-                <div className="h-2 bg-gray-100 rounded w-full mt-3" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="curator-card overflow-hidden animate-pulse">
+              <div className="aspect-[4/5] bg-surface-container" />
+              <div className="p-4 space-y-3">
+                <div className="h-2 bg-surface-container rounded w-1/3" />
+                <div className="h-4 bg-surface-container rounded w-2/3" />
+                <div className="h-2 bg-surface-container rounded w-full" />
               </div>
             </div>
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">📦</p>
-          <p className="text-gray-400">
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">inventory_2</span>
+          <p className="text-on-surface-variant">
             {hasFilters ? 'Filtrelere uygun ürün bulunamadı' : 'Henüz ürün eklenmemiş'}
           </p>
           {hasFilters && (
-            <button onClick={clearFilters} className="mt-3 text-primary hover:underline text-sm">
+            <button onClick={clearFilters} className="mt-4 label-caps text-primary hover:underline underline-offset-4">
               Filtreleri Temizle
             </button>
           )}
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => {
               const imgUrl = product.images?.[0]?.image_url;
               const avgScore =
@@ -287,45 +273,41 @@ function ProductsListContent() {
                 <Link
                   key={product.product_id}
                   href={`/urunler/${product.product_slug}`}
-                  className="bg-white border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group"
+                  className="curator-card overflow-hidden group"
                 >
-                  <div className="h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden">
                     {imgUrl ? (
                       <img
                         src={imgUrl}
                         alt={product.product_name}
-                        className="h-full w-full object-contain group-hover:scale-105 transition-transform"
+                        className="h-full w-full object-contain grayscale-[10%] group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
                     ) : (
-                      <span className="text-4xl text-gray-300">📦</span>
+                      <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
                     )}
                   </div>
                   <div className="p-4">
                     {product.brand && (
-                      <p className="text-xs text-primary font-semibold mb-0.5">
-                        {product.brand.brand_name}
-                      </p>
+                      <p className="label-caps text-outline mb-1">{product.brand.brand_name}</p>
                     )}
-                    <h3 className="font-bold text-sm text-gray-800 line-clamp-2 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-sm text-on-surface line-clamp-2 tracking-tight">
                       {product.product_name}
                     </h3>
-                    <div className="flex items-center gap-2 mt-2">
-                      {product.category && (
-                        <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
-                          {product.category.category_name}
-                        </span>
-                      )}
-                    </div>
+                    {product.category && (
+                      <span className="label-caps text-outline-variant mt-1.5 block">
+                        {product.category.category_name}
+                      </span>
+                    )}
                     {avgScore !== null && (
                       <div className="mt-3 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${getScoreBarColor(avgScore)}`}
                             style={{ width: `${avgScore}%` }}
                           />
                         </div>
-                        <span className={`text-xs font-bold ${getScoreColor(avgScore)}`}>
+                        <span className={`text-[10px] font-bold ${getScoreColor(avgScore)}`}>
                           %{avgScore}
                         </span>
                       </div>
@@ -338,13 +320,13 @@ function ProductsListContent() {
 
           {/* Pagination */}
           {meta.totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-center gap-2 mt-12">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                &larr; Önceki
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
               </button>
               {Array.from({ length: Math.min(meta.totalPages, 7) }, (_, i) => {
                 let pageNum: number;
@@ -361,8 +343,10 @@ function ProductsListContent() {
                   <button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
-                    className={`px-3 py-1.5 rounded text-sm ${
-                      pageNum === page ? 'bg-primary text-white' : 'border hover:bg-gray-50'
+                    className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
+                      pageNum === page
+                        ? 'bg-primary text-on-primary'
+                        : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
                     }`}
                   >
                     {pageNum}
@@ -372,9 +356,9 @@ function ProductsListContent() {
               <button
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page === meta.totalPages}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                Sonraki &rarr;
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
               </button>
             </div>
           )}
@@ -386,7 +370,7 @@ function ProductsListContent() {
 
 export default function ProductsListPage() {
   return (
-    <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-8 text-center text-gray-400">Yükleniyor...</div>}>
+    <Suspense fallback={<div className="curator-section text-center text-outline">Yükleniyor...</div>}>
       <ProductsListContent />
     </Suspense>
   );

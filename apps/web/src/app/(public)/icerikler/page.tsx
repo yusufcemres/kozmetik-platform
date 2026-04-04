@@ -29,9 +29,9 @@ const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 function originLabel(type: string): string {
   const map: Record<string, string> = {
-    natural: 'Doğal',
+    natural: 'Dogal',
     synthetic: 'Sentetik',
-    semi_synthetic: 'Yarı-sentetik',
+    semi_synthetic: 'Yari-sentetik',
     biotechnology: 'Biyoteknoloji',
   };
   return map[type] || type;
@@ -82,25 +82,29 @@ export default function IngredientsListPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">İçerik Maddeleri</h1>
-      <p className="text-gray-500 mb-6">
-        A&apos;dan Z&apos;ye kozmetik içerik maddeleri ansiklopedisi
-      </p>
+    <div className="curator-section max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-10">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Ansiklopedi</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">ICERIK MADDELERI</h1>
+        <p className="text-on-surface-variant text-sm mt-2">
+          A&apos;dan Z&apos;ye kozmetik icerik maddeleri ansiklopedisi
+        </p>
+      </div>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="mb-4">
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="İçerik adı ara... (örn. Niacinamide, Retinol)"
-            className="flex-1 border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            placeholder="Icerik adi ara... (orn. Niacinamide, Retinol)"
+            className="curator-input flex-1"
           />
           <button
             type="submit"
-            className="bg-primary text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="curator-btn-primary text-[10px] px-6 py-3"
           >
             Ara
           </button>
@@ -112,7 +116,7 @@ export default function IngredientsListPage() {
                 setSearchInput('');
                 setPage(1);
               }}
-              className="border px-4 py-2.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50"
+              className="curator-btn-outline text-[10px] px-4 py-3"
             >
               Temizle
             </button>
@@ -126,10 +130,10 @@ export default function IngredientsListPage() {
           <button
             key={letter}
             onClick={() => handleLetterFilter(letter)}
-            className={`w-8 h-8 rounded text-sm font-medium border transition-colors ${
+            className={`w-8 h-8 rounded-sm text-xs font-medium border transition-colors ${
               search === letter
-                ? 'bg-primary text-white border-primary'
-                : 'hover:bg-primary hover:text-white'
+                ? 'bg-primary text-on-primary border-primary'
+                : 'border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low hover:border-outline'
             }`}
           >
             {letter}
@@ -139,12 +143,12 @@ export default function IngredientsListPage() {
 
       {/* Results info */}
       {!loading && (
-        <p className="text-sm text-gray-400 mb-4">
-          {meta.total} içerik maddesi bulundu
+        <p className="text-xs text-outline mb-6">
+          {meta.total} icerik maddesi bulundu
           {search && search.length > 1 && (
             <span>
               {' '}
-              &mdash; &quot;{search}&quot; için sonuçlar
+              &mdash; &quot;{search}&quot; icin sonuclar
             </span>
           )}
         </p>
@@ -152,14 +156,22 @@ export default function IngredientsListPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Yükleniyor...</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="curator-card p-5 animate-pulse">
+              <div className="h-4 bg-surface-container rounded w-2/3 mb-3" />
+              <div className="h-3 bg-surface-container rounded w-1/3 mb-2" />
+              <div className="h-3 bg-surface-container rounded w-full" />
+            </div>
+          ))}
+        </div>
       ) : ingredients.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">🧪</p>
-          <p className="text-gray-400">
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">science</span>
+          <p className="text-on-surface-variant">
             {search
-              ? 'Aramanızla eşleşen içerik bulunamadı'
-              : 'Henüz içerik maddesi eklenmemiş'}
+              ? 'Aramanizla eslesen icerik bulunamadi'
+              : 'Henuz icerik maddesi eklenmemis'}
           </p>
         </div>
       ) : (
@@ -169,11 +181,11 @@ export default function IngredientsListPage() {
               <Link
                 key={ing.ingredient_id}
                 href={`/icerikler/${ing.ingredient_slug}`}
-                className="bg-white border rounded-lg p-4 hover:shadow-md hover:border-primary/30 transition-all group"
+                className="curator-card p-5 group"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-sm text-gray-800 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors tracking-tight">
                       {ing.inci_name}
                     </h3>
                     {ing.common_name && (
@@ -182,35 +194,35 @@ export default function IngredientsListPage() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {ing.allergen_flag && (
-                      <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded" title="Alerjen">
+                      <span className="label-caps text-error bg-error/10 px-1.5 py-0.5 rounded-sm" title="Alerjen">
                         Alerjen
                       </span>
                     )}
                     {ing.fragrance_flag && (
-                      <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded" title="Parfüm">
-                        Parfüm
+                      <span className="label-caps text-on-surface-variant bg-tertiary-container px-1.5 py-0.5 rounded-sm" title="Parfum">
+                        Parfum
                       </span>
                     )}
                   </div>
                 </div>
                 {ing.function_summary && (
-                  <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
                     {ing.function_summary}
                   </p>
                 )}
-                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                <div className="flex flex-wrap items-center gap-1.5 mt-3">
                   {ing.ingredient_group && (
-                    <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
+                    <span className="label-caps text-outline bg-surface-container-low px-2 py-0.5 rounded-sm">
                       {ing.ingredient_group}
                     </span>
                   )}
                   {ing.origin_type && (
-                    <span className="text-[10px] bg-teal-50 text-teal-600 px-2 py-0.5 rounded">
+                    <span className="label-caps text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded-sm">
                       {originLabel(ing.origin_type)}
                     </span>
                   )}
                   {ing.evidence_level && (
-                    <span className="text-[10px] bg-blue-50 text-blue-500 px-2 py-0.5 rounded">
+                    <span className="label-caps text-outline bg-surface-container-low px-2 py-0.5 rounded-sm">
                       {ing.evidence_level.replace(/_/g, ' ')}
                     </span>
                   )}
@@ -221,13 +233,13 @@ export default function IngredientsListPage() {
 
           {/* Pagination */}
           {meta.totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-center gap-2 mt-12">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                &larr; Önceki
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
               </button>
               {Array.from({ length: Math.min(meta.totalPages, 7) }, (_, i) => {
                 let pageNum: number;
@@ -244,10 +256,10 @@ export default function IngredientsListPage() {
                   <button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
-                    className={`px-3 py-1.5 rounded text-sm ${
+                    className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
                       pageNum === page
-                        ? 'bg-primary text-white'
-                        : 'border hover:bg-gray-50'
+                        ? 'bg-primary text-on-primary'
+                        : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
                     }`}
                   >
                     {pageNum}
@@ -257,9 +269,9 @@ export default function IngredientsListPage() {
               <button
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page === meta.totalPages}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                Sonraki &rarr;
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
               </button>
             </div>
           )}

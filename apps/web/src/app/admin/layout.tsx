@@ -36,7 +36,7 @@ export default function AdminLayout({
 
   return (
     <ToastProvider>
-      <div className="flex min-h-screen">
+      <div className="admin-theme flex min-h-screen">
         <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
           <Link href="/admin" className="text-xl font-bold mb-6 text-primary">
             Kozmetik Admin

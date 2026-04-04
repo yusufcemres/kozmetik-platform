@@ -156,18 +156,18 @@ export default function PriceChart({ productId }: { productId: number }) {
   };
 
   return (
-    <div className="bg-white border rounded-xl p-5 mb-4">
+    <div className="curator-card p-5 mb-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-800">Fiyat Takip Grafiği</h3>
+        <h3 className="label-caps text-on-surface-variant tracking-[0.2em]">Fiyat Takip Grafiği</h3>
         <div className="flex gap-1">
           {[30, 60, 90].map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`text-xs px-3 py-1 rounded-full transition-colors ${
+              className={`text-[10px] px-3 py-1.5 rounded-sm tracking-wider uppercase transition-colors ${
                 days === d
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
               }`}
             >
               {d} gün
@@ -178,17 +178,17 @@ export default function PriceChart({ productId }: { productId: number }) {
 
       {/* Period stats */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 text-center">
-          <p className="text-[10px] text-green-600 font-medium">Dönem En Düşük</p>
-          <p className="text-base font-bold text-green-700">{formatTL(data.global_min)}</p>
+        <div className="bg-surface-container-low rounded-sm p-3 text-center">
+          <p className="label-caps text-score-high mb-1">Dönem En Düşük</p>
+          <p className="text-base font-bold text-score-high">{formatTL(data.global_min)}</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 text-center">
-          <p className="text-[10px] text-red-600 font-medium">Dönem En Yüksek</p>
-          <p className="text-base font-bold text-red-700">{formatTL(data.global_max)}</p>
+        <div className="bg-surface-container-low rounded-sm p-3 text-center">
+          <p className="label-caps text-score-low mb-1">Dönem En Yüksek</p>
+          <p className="text-base font-bold text-score-low">{formatTL(data.global_max)}</p>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 text-center">
-          <p className="text-[10px] text-blue-600 font-medium">Dönem Ortalama</p>
-          <p className="text-base font-bold text-blue-700">{formatTL(data.global_avg)}</p>
+        <div className="bg-surface-container-low rounded-sm p-3 text-center">
+          <p className="label-caps text-on-surface-variant mb-1">Dönem Ortalama</p>
+          <p className="text-base font-bold text-on-surface">{formatTL(data.global_avg)}</p>
         </div>
       </div>
 
@@ -207,14 +207,15 @@ export default function PriceChart({ productId }: { productId: number }) {
                 y1={yScale(tick)}
                 x2={W - PAD.right}
                 y2={yScale(tick)}
-                stroke="#f0f0f0"
+                stroke="#e8e5e0"
                 strokeWidth={1}
               />
               <text
                 x={PAD.left - 8}
                 y={yScale(tick) + 4}
                 textAnchor="end"
-                className="text-[10px] fill-gray-400"
+                className="text-[10px] fill-outline"
+                style={{ fontFamily: 'Manrope, sans-serif' }}
               >
                 {formatTL(tick)}
               </text>
@@ -228,7 +229,8 @@ export default function PriceChart({ productId }: { productId: number }) {
               x={xScale(date)}
               y={H - 5}
               textAnchor="middle"
-              className="text-[10px] fill-gray-400"
+              className="text-[10px] fill-outline"
+              style={{ fontFamily: 'Manrope, sans-serif' }}
             >
               {new Date(date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
             </text>
@@ -275,10 +277,10 @@ export default function PriceChart({ productId }: { productId: number }) {
               <circle cx={tooltip.x} cy={tooltip.y} r={5} fill={PLATFORM_COLORS[tooltip.platform] || '#6B7280'} stroke="white" strokeWidth={2} />
               <g transform={`translate(${tooltip.x < W / 2 ? tooltip.x + 12 : tooltip.x - 120}, ${Math.max(20, tooltip.y - 30)})`}>
                 <rect x={0} y={0} width={108} height={40} rx={6} fill="rgba(0,0,0,0.85)" />
-                <text x={8} y={16} className="text-[10px] fill-white font-medium">
+                <text x={8} y={16} className="text-[10px] fill-white font-medium" style={{ fontFamily: 'Manrope, sans-serif' }}>
                   {PLATFORM_LABELS[tooltip.platform] || tooltip.platform}
                 </text>
-                <text x={8} y={32} className="text-[11px] fill-white font-bold">
+                <text x={8} y={32} className="text-[11px] fill-white font-bold" style={{ fontFamily: 'Manrope, sans-serif' }}>
                   {formatTL(tooltip.price)} — {new Date(tooltip.date).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
                 </text>
               </g>
@@ -288,16 +290,16 @@ export default function PriceChart({ productId }: { productId: number }) {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-3">
+      <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-outline-variant/20">
         {data.platforms.map((platform) => {
           const color = PLATFORM_COLORS[platform.platform] || '#6B7280';
           return (
             <button
               key={platform.platform}
-              className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border transition-all ${
+              className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-sm border transition-all ${
                 hoveredPlatform === platform.platform
-                  ? 'border-gray-400 bg-gray-50'
-                  : 'border-transparent hover:border-gray-200'
+                  ? 'border-outline bg-surface-container-low'
+                  : 'border-transparent hover:border-outline-variant/30'
               }`}
               onMouseEnter={() => setHoveredPlatform(platform.platform)}
               onMouseLeave={() => setHoveredPlatform(null)}
@@ -306,10 +308,10 @@ export default function PriceChart({ productId }: { productId: number }) {
                 className="w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-gray-600 font-medium">
+              <span className="text-on-surface-variant font-medium">
                 {PLATFORM_LABELS[platform.platform] || platform.platform}
               </span>
-              <span className="text-gray-400">{formatTL(platform.current)}</span>
+              <span className="text-outline">{formatTL(platform.current)}</span>
             </button>
           );
         })}

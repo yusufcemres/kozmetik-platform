@@ -15,7 +15,7 @@ interface Need {
 
 function groupLabel(group: string): string {
   const map: Record<string, string> = {
-    skin_concern: 'Cilt Sorunları',
+    skin_concern: 'Cilt Sorunlari',
     skin_goal: 'Cilt Hedefleri',
     sensitivity: 'Hassasiyetler',
   };
@@ -24,11 +24,11 @@ function groupLabel(group: string): string {
 
 function groupIcon(group: string): string {
   const map: Record<string, string> = {
-    skin_concern: '🔴',
-    skin_goal: '✨',
-    sensitivity: '⚠️',
+    skin_concern: 'error_outline',
+    skin_goal: 'auto_awesome',
+    sensitivity: 'warning_amber',
   };
-  return map[group] || '🎯';
+  return map[group] || 'target';
 }
 
 export default function NeedsListPage() {
@@ -58,29 +58,40 @@ export default function NeedsListPage() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Cilt İhtiyaçları</h1>
-      <p className="text-gray-500 mb-8">
-        Cilt sorunlarını ve ihtiyaçlarını keşfet, her biri için en etkili içerik maddelerini öğren
-      </p>
+    <div className="curator-section max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-10">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Kesfet</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">CILT IHTIYACLARI</h1>
+        <p className="text-on-surface-variant text-sm mt-2">
+          Cilt sorunlarini ve ihtiyaclarini kesfet, her biri icin en etkili icerik maddelerini ogren
+        </p>
+      </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Yükleniyor...</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="curator-card p-5 animate-pulse">
+              <div className="h-4 bg-surface-container rounded w-2/3 mb-3" />
+              <div className="h-3 bg-surface-container rounded w-full" />
+            </div>
+          ))}
+        </div>
       ) : needs.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">🎯</p>
-          <p className="text-gray-400">Henüz ihtiyaç tanımlanmamış</p>
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">target</span>
+          <p className="text-on-surface-variant">Henuz ihtiyac tanimlanmamis</p>
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-12">
           {sortedGroups.map((group) => (
             <section key={group}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">{groupIcon(group)}</span>
-                <h2 className="text-xl font-bold text-gray-800">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="material-icon text-primary" aria-hidden="true">{groupIcon(group)}</span>
+                <h2 className="text-xl font-bold text-on-surface">
                   {groupLabel(group)}
                 </h2>
-                <span className="text-sm text-gray-400">
+                <span className="label-caps text-outline">
                   ({grouped[group].length})
                 </span>
               </div>
@@ -89,9 +100,9 @@ export default function NeedsListPage() {
                   <Link
                     key={need.need_id}
                     href={`/ihtiyaclar/${need.need_slug}`}
-                    className="bg-white border rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all group"
+                    className="curator-card p-5 group"
                   >
-                    <h3 className="font-bold text-gray-800 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors tracking-tight">
                       {need.need_name}
                     </h3>
                     {need.user_friendly_label && (
@@ -100,12 +111,13 @@ export default function NeedsListPage() {
                       </p>
                     )}
                     {need.short_description && (
-                      <p className="text-sm text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
                         {need.short_description}
                       </p>
                     )}
-                    <span className="inline-block text-xs text-primary font-medium mt-3">
-                      Detayları gör &rarr;
+                    <span className="inline-flex items-center gap-1 label-caps text-primary mt-3">
+                      Detaylari gor
+                      <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
                     </span>
                   </Link>
                 ))}
@@ -116,18 +128,18 @@ export default function NeedsListPage() {
       )}
 
       {/* Profile CTA */}
-      <div className="mt-12 bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
-        <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Hangi İhtiyaçlar Seninle İlgili?
+      <div className="mt-16 curator-card p-8 text-center">
+        <h3 className="text-xl headline-tight text-on-surface mb-2">
+          HANGI IHTIYACLAR SENINLE ILGILI?
         </h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Cilt profilini oluştur, sana özel ihtiyaç ve ürün önerileri al.
+        <p className="text-sm text-on-surface-variant mb-6">
+          Cilt profilini olustur, sana ozel ihtiyac ve urun onerileri al.
         </p>
         <Link
           href="/profilim"
-          className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary/90 transition-colors text-sm font-semibold"
+          className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
         >
-          Profilimi Oluştur
+          PROFILIMI OLUSTUR
         </Link>
       </div>
     </div>

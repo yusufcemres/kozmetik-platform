@@ -29,10 +29,10 @@ interface Suggestion {
   slug: string;
 }
 
-const TYPE_CONFIG: Record<string, { label: string; icon: string; color: string; path: string }> = {
-  product: { label: 'Ürün', icon: '📦', color: 'bg-blue-100 text-blue-700', path: '/urunler' },
-  ingredient: { label: 'İçerik', icon: '🧪', color: 'bg-teal-100 text-teal-700', path: '/icerikler' },
-  need: { label: 'İhtiyaç', icon: '🎯', color: 'bg-purple-100 text-purple-700', path: '/ihtiyaclar' },
+const TYPE_CONFIG: Record<string, { label: string; icon: string; path: string }> = {
+  product: { label: 'Urun', icon: 'inventory_2', path: '/urunler' },
+  ingredient: { label: 'Icerik', icon: 'science', path: '/icerikler' },
+  need: { label: 'Ihtiyac', icon: 'target', path: '/ihtiyaclar' },
 };
 
 function SearchPageContent() {
@@ -71,14 +71,12 @@ function SearchPageContent() {
     }
   }, []);
 
-  // Initial search from URL param
   useEffect(() => {
     if (initialQuery) {
       doSearch(initialQuery, 1);
     }
   }, [initialQuery, doSearch]);
 
-  // Auto-suggest
   const fetchSuggestions = useCallback(async (term: string) => {
     if (term.length < 2) {
       setSuggestions([]);
@@ -140,10 +138,10 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="curator-section max-w-4xl mx-auto">
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="relative mb-6">
-        <div className="flex gap-2">
+      <form onSubmit={handleSearch} className="relative mb-8">
+        <div className="flex gap-3">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -152,8 +150,8 @@ function SearchPageContent() {
               onChange={(e) => handleInputChange(e.target.value)}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Ürün, içerik maddesi veya cilt ihtiyacı ara..."
-              className="w-full border-2 border-gray-200 rounded-xl px-6 py-4 text-lg focus:outline-none focus:border-primary pr-12"
+              placeholder="Urun, icerik maddesi veya cilt ihtiyaci ara..."
+              className="w-full border border-outline-variant/30 rounded-sm px-6 py-4 text-lg focus:outline-none focus:border-primary bg-surface text-on-surface pr-12"
               autoFocus
             />
             {query && (
@@ -166,15 +164,15 @@ function SearchPageContent() {
                   setMeta(null);
                   inputRef.current?.focus();
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
               >
-                &times;
+                <span className="material-icon material-icon-sm" aria-hidden="true">close</span>
               </button>
             )}
 
             {/* Suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50 overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-outline-variant/20 rounded-sm shadow-lg z-50 overflow-hidden">
                 {suggestions.map((s, i) => {
                   const cfg = TYPE_CONFIG[s.type];
                   return (
@@ -182,11 +180,11 @@ function SearchPageContent() {
                       key={`${s.type}-${s.id}-${i}`}
                       type="button"
                       onMouseDown={() => handleSuggestionClick(s)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low text-left transition-colors"
                     >
-                      <span className="text-lg">{cfg.icon}</span>
-                      <span className="flex-1 text-sm font-medium text-gray-800">{s.name}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded ${cfg.color}`}>
+                      <span className="material-icon text-outline-variant" aria-hidden="true">{cfg.icon}</span>
+                      <span className="flex-1 text-sm font-medium text-on-surface">{s.name}</span>
+                      <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm">
                         {cfg.label}
                       </span>
                     </button>
@@ -197,9 +195,9 @@ function SearchPageContent() {
           </div>
           <button
             type="submit"
-            className="bg-primary text-white px-8 py-4 rounded-xl text-lg font-medium hover:bg-primary/90 transition-colors"
+            className="curator-btn-primary px-8 py-4 text-sm"
           >
-            Ara
+            ARA
           </button>
         </div>
       </form>
@@ -211,13 +209,13 @@ function SearchPageContent() {
             <button
               key={key}
               onClick={() => handleTypeFilter(key)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs tracking-wider uppercase transition-colors ${
                 typeFilter === key
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/20 hover:border-outline'
               }`}
             >
-              <span>{cfg.icon}</span>
+              <span className="material-icon material-icon-sm" aria-hidden="true">{cfg.icon}</span>
               {cfg.label}
             </button>
           ))}
@@ -226,38 +224,38 @@ function SearchPageContent() {
 
       {/* Empty state */}
       {!loading && !meta && !query && (
-        <div className="text-center text-gray-400 py-16">
-          <p className="text-5xl mb-4">🔍</p>
-          <p>Aramak istediğiniz terimi yazın</p>
-          <p className="text-sm mt-2">
-            Örn: &quot;niacinamide&quot;, &quot;sivilce&quot;, &quot;La Roche-Posay&quot;
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">search</span>
+          <p className="text-on-surface-variant">Aramak istediginiz terimi yazin</p>
+          <p className="text-sm text-outline mt-2">
+            Orn: &quot;niacinamide&quot;, &quot;sivilce&quot;, &quot;La Roche-Posay&quot;
           </p>
         </div>
       )}
 
       {/* Loading */}
       {loading && (
-        <div className="text-center py-16 text-gray-400">Aranıyor...</div>
+        <div className="text-center py-24 text-outline">Araniyor...</div>
       )}
 
       {/* Results */}
       {!loading && meta && (
         <>
-          <p className="text-sm text-gray-500 mb-4">
-            {meta.total} sonuç bulundu
+          <p className="text-xs text-outline mb-6">
+            {meta.total} sonuc bulundu
             {meta.intent !== 'mixed' && (
-              <span className="text-gray-400"> — algılanan: {meta.intent}</span>
+              <span className="text-outline"> — algilanan: {meta.intent}</span>
             )}
           </p>
 
           {results.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-5xl mb-4">🤷</p>
-              <p className="text-gray-500">
-                &quot;{query}&quot; için sonuç bulunamadı
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">search_off</span>
+              <p className="text-on-surface-variant">
+                &quot;{query}&quot; icin sonuc bulunamadi
               </p>
-              <p className="text-sm text-gray-400 mt-2">
-                Farklı anahtar kelimeler deneyin veya yazımı kontrol edin
+              <p className="text-sm text-outline mt-2">
+                Farkli anahtar kelimeler deneyin veya yazimi kontrol edin
               </p>
             </div>
           ) : (
@@ -268,31 +266,31 @@ function SearchPageContent() {
                   <Link
                     key={`${r.type}-${r.id}`}
                     href={resultLink(r)}
-                    className="flex items-center gap-4 bg-white border rounded-lg p-4 hover:shadow-md hover:border-primary/30 transition-all group"
+                    className="flex items-center gap-4 curator-card p-4 group"
                   >
-                    <span className="text-2xl">{cfg.icon}</span>
+                    <span className="material-icon text-outline-variant" aria-hidden="true">{cfg.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-gray-800 group-hover:text-primary transition-colors truncate">
+                        <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors truncate tracking-tight">
                           {r.name}
                         </h3>
-                        <span className={`text-[10px] px-2 py-0.5 rounded shrink-0 ${cfg.color}`}>
+                        <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm shrink-0">
                           {cfg.label}
                         </span>
                       </div>
                       {r.extra?.brand_name && (
-                        <p className="text-xs text-primary mt-0.5">{r.extra.brand_name}</p>
+                        <p className="label-caps text-primary mt-0.5">{r.extra.brand_name}</p>
                       )}
                       {r.extra?.common_name && (
-                        <p className="text-xs text-gray-500 mt-0.5">{r.extra.common_name}</p>
+                        <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.common_name}</p>
                       )}
                       {r.extra?.description && (
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-1">{r.extra.description}</p>
+                        <p className="text-xs text-outline mt-1 line-clamp-1">{r.extra.description}</p>
                       )}
                     </div>
                     <div className="shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-xs font-bold text-gray-500">
+                      <div className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+                        <span className="text-xs font-bold text-on-surface-variant">
                           {Math.round(r.score * 100)}
                         </span>
                       </div>
@@ -305,13 +303,13 @@ function SearchPageContent() {
 
           {/* Pagination */}
           {meta.totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex justify-center gap-2 mt-12">
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                &larr; Önceki
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
               </button>
               {Array.from({ length: Math.min(meta.totalPages, 7) }, (_, i) => {
                 let pageNum: number;
@@ -328,10 +326,10 @@ function SearchPageContent() {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-1.5 rounded text-sm ${
+                    className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
                       pageNum === page
-                        ? 'bg-primary text-white'
-                        : 'border hover:bg-gray-50'
+                        ? 'bg-primary text-on-primary'
+                        : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
                     }`}
                   >
                     {pageNum}
@@ -341,9 +339,9 @@ function SearchPageContent() {
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page === meta.totalPages}
-                className="px-3 py-1.5 rounded text-sm border disabled:opacity-30 hover:bg-gray-50"
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
               >
-                Sonraki &rarr;
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
               </button>
             </div>
           )}
@@ -357,8 +355,8 @@ export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center text-gray-400">
-          Yükleniyor...
+        <div className="curator-section max-w-4xl mx-auto text-center text-outline">
+          Yukleniyor...
         </div>
       }
     >

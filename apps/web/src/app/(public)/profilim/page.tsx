@@ -10,18 +10,18 @@ interface Need {
 }
 
 const skinTypes = [
-  { value: 'oily', label: 'Yağlı', desc: 'Gün içinde parlama, geniş gözenekler' },
-  { value: 'dry', label: 'Kuru', desc: 'Sıkılık hissi, pullanma' },
-  { value: 'combination', label: 'Karma', desc: 'T-bölge yağlı, yanaklar kuru' },
-  { value: 'normal', label: 'Normal', desc: 'Dengeli nem, az sorun' },
-  { value: 'sensitive', label: 'Hassas', desc: 'Kızarıklık, tahriş eğilimi' },
+  { value: 'oily', label: 'Yagli', desc: 'Gun icinde parlama, genis gozenekler', icon: 'water_drop' },
+  { value: 'dry', label: 'Kuru', desc: 'Sikillik hissi, pullanma', icon: 'air' },
+  { value: 'combination', label: 'Karma', desc: 'T-bolge yagli, yanaklar kuru', icon: 'contrast' },
+  { value: 'normal', label: 'Normal', desc: 'Dengeli nem, az sorun', icon: 'check_circle' },
+  { value: 'sensitive', label: 'Hassas', desc: 'Kizariklik, tahris egilimi', icon: 'warning_amber' },
 ];
 
 const sensitivities = [
-  { key: 'fragrance', label: 'Parfüm' },
-  { key: 'alcohol', label: 'Alkol' },
-  { key: 'paraben', label: 'Paraben' },
-  { key: 'essential_oils', label: 'Esansiyel Yağlar' },
+  { key: 'fragrance', label: 'Parfum', icon: 'spa' },
+  { key: 'alcohol', label: 'Alkol', icon: 'science' },
+  { key: 'paraben', label: 'Paraben', icon: 'block' },
+  { key: 'essential_oils', label: 'Esansiyel Yaglar', icon: 'eco' },
 ];
 
 export default function ProfilePage() {
@@ -32,7 +32,6 @@ export default function ProfilePage() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [saved, setSaved] = useState(false);
 
-  // Load existing profile + needs from API
   useEffect(() => {
     api
       .get<{ data: Need[] }>('/needs?limit=50')
@@ -61,22 +60,33 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-center mb-2">Cilt Profili</h1>
-      <p className="text-gray-500 text-center mb-8">
-        Profilini oluştur, ürünlerin sana ne kadar uygun olduğunu gör
-      </p>
+    <div className="curator-section max-w-2xl mx-auto">
+      <div className="text-center mb-10">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Profil</span>
+        <h1 className="text-3xl headline-tight text-on-surface">CILT PROFILI</h1>
+        <p className="text-on-surface-variant text-sm mt-2">
+          Profilini olustur, urunlerin sana ne kadar uygun oldugunu gor
+        </p>
+      </div>
 
       {/* Progress */}
-      <div className="flex items-center justify-center gap-2 mb-12">
+      <div className="flex items-center justify-center gap-3 mb-12">
         {[1, 2, 3].map((s) => (
-          <div
-            key={s}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              s === step ? 'bg-primary text-white' : s < step ? 'bg-primary/20 text-primary' : 'bg-gray-200'
-            }`}
-          >
-            {s}
+          <div key={s} className="flex items-center gap-3">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                s === step ? 'bg-primary text-on-primary' : s < step ? 'bg-primary/20 text-primary' : 'bg-surface-container text-outline'
+              }`}
+            >
+              {s < step ? (
+                <span className="material-icon material-icon-sm" aria-hidden="true">check</span>
+              ) : (
+                s
+              )}
+            </div>
+            {s < 3 && (
+              <div className={`w-12 h-px ${s < step ? 'bg-primary' : 'bg-outline-variant/30'}`} />
+            )}
           </div>
         ))}
       </div>
@@ -84,29 +94,34 @@ export default function ProfilePage() {
       {/* Step 1: Skin Type */}
       {step === 1 && (
         <div>
-          <h2 className="text-xl font-bold mb-6 text-center">Cilt tipin ne?</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-6 text-center">Cilt tipin ne?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {skinTypes.map((type) => (
               <button
                 key={type.value}
                 onClick={() => setSkinType(type.value)}
-                className={`border-2 rounded-xl p-4 text-left transition-all ${
+                className={`curator-card p-4 text-left transition-all flex items-start gap-3 ${
                   skinType === type.value
-                    ? 'border-primary bg-primary/5'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-primary ring-1 ring-primary'
+                    : ''
                 }`}
               >
-                <span className="font-semibold">{type.label}</span>
-                <span className="block text-xs text-gray-500 mt-0.5">{type.desc}</span>
+                <span className={`material-icon mt-0.5 ${skinType === type.value ? 'text-primary' : 'text-outline-variant'}`} aria-hidden="true">
+                  {type.icon}
+                </span>
+                <div>
+                  <span className="font-semibold text-on-surface">{type.label}</span>
+                  <span className="block text-xs text-on-surface-variant mt-0.5">{type.desc}</span>
+                </div>
               </button>
             ))}
           </div>
           <button
             onClick={() => step < 3 && setStep(2)}
             disabled={!skinType}
-            className="w-full mt-8 bg-primary text-white py-3 rounded-lg disabled:opacity-50 font-medium"
+            className="w-full mt-8 curator-btn-primary py-3 text-sm disabled:opacity-50"
           >
-            Devam
+            DEVAM
           </button>
         </div>
       )}
@@ -114,40 +129,40 @@ export default function ProfilePage() {
       {/* Step 2: Concerns */}
       {step === 2 && (
         <div>
-          <h2 className="text-xl font-bold mb-2 text-center">En önemli 3 ihtiyacını seç</h2>
-          <p className="text-sm text-gray-500 text-center mb-6">
-            {selectedConcerns.length}/3 seçildi
+          <h2 className="text-xl font-bold text-on-surface mb-2 text-center">En onemli 3 ihtiyacini sec</h2>
+          <p className="text-sm text-on-surface-variant text-center mb-6">
+            {selectedConcerns.length}/3 secildi
           </p>
           <div className="grid grid-cols-2 gap-3">
             {needs.map((need) => (
               <button
                 key={need.need_id}
                 onClick={() => toggleConcern(need.need_id)}
-                className={`border-2 rounded-xl p-4 text-left text-sm transition-all ${
+                className={`curator-card p-4 text-left text-sm transition-all ${
                   selectedConcerns.includes(need.need_id)
-                    ? 'border-primary bg-primary/5 font-semibold'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-primary ring-1 ring-primary font-semibold text-on-surface'
+                    : 'text-on-surface-variant'
                 }`}
               >
                 {need.need_name}
               </button>
             ))}
             {needs.length === 0 && (
-              <p className="col-span-2 text-center text-sm text-gray-400 py-4">
-                İhtiyaçlar yükleniyor...
+              <p className="col-span-2 text-center text-sm text-outline py-4">
+                Ihtiyaclar yukleniyor...
               </p>
             )}
           </div>
           <div className="flex gap-3 mt-8">
-            <button onClick={() => setStep(1)} className="flex-1 border py-3 rounded-lg">
-              Geri
+            <button onClick={() => setStep(1)} className="flex-1 curator-btn-outline py-3 text-sm">
+              GERI
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={selectedConcerns.length === 0}
-              className="flex-1 bg-primary text-white py-3 rounded-lg disabled:opacity-50 font-medium"
+              className="flex-1 curator-btn-primary py-3 text-sm disabled:opacity-50"
             >
-              Devam
+              DEVAM
             </button>
           </div>
         </div>
@@ -156,25 +171,30 @@ export default function ProfilePage() {
       {/* Step 3: Sensitivities */}
       {step === 3 && (
         <div>
-          <h2 className="text-xl font-bold mb-6 text-center">Hassasiyetin var mı?</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-6 text-center">Hassasiyetin var mi?</h2>
           <div className="grid grid-cols-2 gap-3">
             {sensitivities.map((s) => (
               <button
                 key={s.key}
                 onClick={() => toggleSensitivity(s.key)}
-                className={`border-2 rounded-xl p-4 text-center text-sm transition-all ${
+                className={`curator-card p-4 text-center text-sm transition-all flex flex-col items-center gap-2 ${
                   selectedSensitivities[s.key]
-                    ? 'border-red-400 bg-red-50 font-semibold'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-error ring-1 ring-error'
+                    : ''
                 }`}
               >
-                {s.label}
+                <span className={`material-icon ${selectedSensitivities[s.key] ? 'text-error' : 'text-outline-variant'}`} aria-hidden="true">
+                  {s.icon}
+                </span>
+                <span className={selectedSensitivities[s.key] ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}>
+                  {s.label}
+                </span>
               </button>
             ))}
           </div>
           <div className="flex gap-3 mt-8">
-            <button onClick={() => setStep(2)} className="flex-1 border py-3 rounded-lg">
-              Geri
+            <button onClick={() => setStep(2)} className="flex-1 curator-btn-outline py-3 text-sm">
+              GERI
             </button>
             <button
               onClick={() => {
@@ -191,9 +211,9 @@ export default function ProfilePage() {
                 setSaved(true);
                 setTimeout(() => setSaved(false), 3000);
               }}
-              className="flex-1 bg-primary text-white py-3 rounded-lg font-medium"
+              className="flex-1 curator-btn-primary py-3 text-sm"
             >
-              {saved ? 'Kaydedildi!' : 'Profili Kaydet'}
+              {saved ? 'KAYDEDILDI!' : 'PROFILI KAYDET'}
             </button>
           </div>
         </div>

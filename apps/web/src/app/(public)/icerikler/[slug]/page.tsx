@@ -77,7 +77,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const ingredient = await getIngredient(params.slug);
   if (!ingredient) {
-    return { title: 'İçerik Bulunamadı' };
+    return { title: 'Icerik Bulunamadi' };
   }
 
   const title = ingredient.common_name
@@ -85,13 +85,13 @@ export async function generateMetadata({
     : ingredient.inci_name;
   const description =
     ingredient.function_summary ||
-    `${ingredient.inci_name} içerik maddesi hakkında bilimsel bilgi, etkileri ve güvenlik profili.`;
+    `${ingredient.inci_name} icerik maddesi hakkinda bilimsel bilgi, etkileri ve guvenlik profili.`;
 
   return {
     title,
     description,
     openGraph: {
-      title: `${title} | Kozmetik Platform`,
+      title: `${title} | REVELA`,
       description,
       type: 'article',
     },
@@ -108,29 +108,29 @@ export async function generateMetadata({
 
 // === Helpers ===
 
-function evidenceLabel(level: string): { label: string; color: string; bg: string } {
-  const map: Record<string, { label: string; color: string; bg: string }> = {
-    systematic_review: { label: 'Sistematik Derleme', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
-    randomized_controlled: { label: 'Randomize Kontrollü', color: 'text-green-600', bg: 'bg-green-50 border-green-200' },
-    cohort_study: { label: 'Kohort Çalışma', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-    case_control: { label: 'Vaka-Kontrol', color: 'text-blue-500', bg: 'bg-blue-50 border-blue-200' },
-    expert_opinion: { label: 'Uzman Görüşü', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200' },
-    in_vitro: { label: 'In Vitro', color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200' },
-    traditional_use: { label: 'Geleneksel Kullanım', color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-    anecdotal: { label: 'Anekdotal', color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
-    strong: { label: 'Güçlü Kanıt', color: 'text-green-600', bg: 'bg-green-50 border-green-200' },
-    moderate: { label: 'Orta Kanıt', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
-    limited: { label: 'Sınırlı Kanıt', color: 'text-yellow-600', bg: 'bg-yellow-50 border-yellow-200' },
-    insufficient: { label: 'Yetersiz Kanıt', color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' },
+function evidenceLabel(level: string): { label: string; color: string } {
+  const map: Record<string, { label: string; color: string }> = {
+    systematic_review: { label: 'Sistematik Derleme', color: 'text-score-high' },
+    randomized_controlled: { label: 'Randomize Kontrollu', color: 'text-score-high' },
+    cohort_study: { label: 'Kohort Calisma', color: 'text-primary' },
+    case_control: { label: 'Vaka-Kontrol', color: 'text-primary' },
+    expert_opinion: { label: 'Uzman Gorusu', color: 'text-score-medium' },
+    in_vitro: { label: 'In Vitro', color: 'text-on-surface-variant' },
+    traditional_use: { label: 'Geleneksel Kullanim', color: 'text-on-surface-variant' },
+    anecdotal: { label: 'Anekdotal', color: 'text-outline' },
+    strong: { label: 'Guclu Kanit', color: 'text-score-high' },
+    moderate: { label: 'Orta Kanit', color: 'text-primary' },
+    limited: { label: 'Sinirli Kanit', color: 'text-score-medium' },
+    insufficient: { label: 'Yetersiz Kanit', color: 'text-outline' },
   };
-  return map[level] || { label: level.replace(/_/g, ' '), color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' };
+  return map[level] || { label: level.replace(/_/g, ' '), color: 'text-outline' };
 }
 
 function originLabel(type: string): string {
   const map: Record<string, string> = {
-    natural: 'Doğal',
+    natural: 'Dogal',
     synthetic: 'Sentetik',
-    semi_synthetic: 'Yarı-sentetik',
+    semi_synthetic: 'Yari-sentetik',
     biotechnology: 'Biyoteknoloji',
   };
   return map[type] || type;
@@ -142,7 +142,7 @@ function sourceTypeLabel(type: string): string {
     journal: 'Bilimsel Dergi',
     book: 'Kitap',
     fda: 'FDA',
-    eu_regulation: 'AB Regülasyonu',
+    eu_regulation: 'AB Regulasyonu',
   };
   return map[type] || type;
 }
@@ -157,7 +157,7 @@ function ingredientJsonLd(ingredient: Ingredient) {
     alternateName: ingredient.common_name || undefined,
     description:
       ingredient.function_summary ||
-      `${ingredient.inci_name} kozmetik içerik maddesi hakkında bilgi.`,
+      `${ingredient.inci_name} kozmetik icerik maddesi hakkinda bilgi.`,
     ...(ingredient.evidence_links && ingredient.evidence_links.length > 0
       ? {
           citation: ingredient.evidence_links.map((el) => ({
@@ -188,10 +188,10 @@ export default async function IngredientDetailPage({
     : null;
 
   const flags = [
-    ingredient.allergen_flag && { label: 'Alerjen', icon: '⚠️', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
-    ingredient.fragrance_flag && { label: 'Parfüm/Koku', icon: '🌸', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700' },
-    ingredient.preservative_flag && { label: 'Koruyucu', icon: '🛡️', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-  ].filter(Boolean) as { label: string; icon: string; bg: string; border: string; text: string }[];
+    ingredient.allergen_flag && { label: 'Alerjen', icon: 'warning', color: 'text-error bg-error/10 border-error/20' },
+    ingredient.fragrance_flag && { label: 'Parfum/Koku', icon: 'spa', color: 'text-on-surface-variant bg-tertiary-container border-tertiary-container' },
+    ingredient.preservative_flag && { label: 'Koruyucu', icon: 'shield', color: 'text-primary bg-primary/5 border-primary/20' },
+  ].filter(Boolean) as { label: string; icon: string; color: string }[];
 
   return (
     <>
@@ -200,19 +200,19 @@ export default async function IngredientDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ingredientJsonLd(ingredient)) }}
       />
 
-      <article className="max-w-4xl mx-auto px-4 py-8">
+      <article className="curator-section max-w-4xl mx-auto">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-400 mb-6 flex items-center gap-1">
-          <Link href="/icerikler" className="hover:text-primary">
-            İçerikler
+        <nav className="label-caps text-outline mb-8 flex items-center gap-2">
+          <Link href="/icerikler" className="hover:text-primary transition-colors">
+            Icerikler
           </Link>
-          <span>/</span>
-          <span className="text-gray-600">{ingredient.inci_name}</span>
+          <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
+          <span className="text-on-surface-variant">{ingredient.inci_name}</span>
         </nav>
 
         {/* Header */}
-        <div className="bg-white border rounded-xl p-6 md:p-8 mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <div className="curator-card p-6 md:p-8 mb-8">
+          <h1 className="text-2xl md:text-3xl headline-tight text-on-surface">
             {ingredient.inci_name}
           </h1>
           {ingredient.common_name && (
@@ -223,8 +223,8 @@ export default async function IngredientDetailPage({
 
           {/* Aliases */}
           {ingredient.aliases && ingredient.aliases.length > 0 && (
-            <p className="text-sm text-gray-400 mt-2">
-              Diğer adları:{' '}
+            <p className="text-sm text-outline mt-2">
+              Diger adlari:{' '}
               {ingredient.aliases.map((a) => a.alias_name).join(', ')}
             </p>
           )}
@@ -232,19 +232,17 @@ export default async function IngredientDetailPage({
           {/* Badges */}
           <div className="flex flex-wrap gap-2 mt-4">
             {ingredient.ingredient_group && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full border border-gray-200">
+              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-sm border border-outline-variant/20">
                 {ingredient.ingredient_group}
               </span>
             )}
             {ingredient.origin_type && (
-              <span className="text-xs bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full border border-teal-200">
+              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-sm border border-outline-variant/20">
                 {originLabel(ingredient.origin_type)}
               </span>
             )}
             {evidence && (
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full border ${evidence.bg} ${evidence.color}`}
-              >
+              <span className={`label-caps px-2.5 py-1 rounded-sm bg-surface-container-low border border-outline-variant/20 ${evidence.color}`}>
                 {evidence.label}
               </span>
             )}
@@ -257,10 +255,10 @@ export default async function IngredientDetailPage({
             {flags.map((flag) => (
               <div
                 key={flag.label}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border ${flag.bg} ${flag.border}`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-sm border ${flag.color}`}
               >
-                <span>{flag.icon}</span>
-                <span className={`text-sm font-medium ${flag.text}`}>
+                <span className="material-icon material-icon-sm" aria-hidden="true">{flag.icon}</span>
+                <span className="text-sm font-medium">
                   {flag.label}
                 </span>
               </div>
@@ -270,11 +268,11 @@ export default async function IngredientDetailPage({
 
         {/* Sensitivity Note */}
         {ingredient.sensitivity_note && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
-            <p className="text-sm font-semibold text-yellow-800 mb-1">
+          <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-4 mb-8">
+            <p className="text-sm font-semibold text-on-surface mb-1">
               Hassasiyet Notu
             </p>
-            <p className="text-sm text-yellow-700 leading-relaxed">
+            <p className="text-sm text-on-surface-variant leading-relaxed">
               {ingredient.sensitivity_note}
             </p>
           </div>
@@ -283,8 +281,8 @@ export default async function IngredientDetailPage({
         {/* Function Summary */}
         {ingredient.function_summary && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Ne İşe Yarar?</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-xl font-bold text-on-surface mb-3">Ne Ise Yarar?</h2>
+            <p className="text-on-surface-variant leading-relaxed">
               {ingredient.function_summary}
             </p>
           </section>
@@ -293,9 +291,9 @@ export default async function IngredientDetailPage({
         {/* Detailed Description */}
         {ingredient.detailed_description && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-3">Detaylı Bilgi</h2>
-            <div className="bg-gray-50 rounded-lg p-5">
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+            <h2 className="text-xl font-bold text-on-surface mb-3">Detayli Bilgi</h2>
+            <div className="bg-surface-container-low rounded-sm p-5">
+              <p className="text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {ingredient.detailed_description}
               </p>
             </div>
@@ -304,22 +302,22 @@ export default async function IngredientDetailPage({
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-500 mb-1">Kanıt Seviyesi</p>
-            <p className={`text-lg font-bold ${evidence ? evidence.color : 'text-gray-400'}`}>
-              {evidence ? evidence.label : 'Belirtilmemiş'}
+          <div className="curator-card p-4">
+            <p className="label-caps text-outline mb-1">Kanit Seviyesi</p>
+            <p className={`text-lg font-bold ${evidence ? evidence.color : 'text-outline'}`}>
+              {evidence ? evidence.label : 'Belirtilmemis'}
             </p>
           </div>
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-500 mb-1">Grup</p>
-            <p className="text-lg font-bold text-gray-800">
-              {ingredient.ingredient_group || 'Belirtilmemiş'}
+          <div className="curator-card p-4">
+            <p className="label-caps text-outline mb-1">Grup</p>
+            <p className="text-lg font-bold text-on-surface">
+              {ingredient.ingredient_group || 'Belirtilmemis'}
             </p>
           </div>
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-500 mb-1">Kaynak</p>
-            <p className="text-lg font-bold text-gray-800">
-              {ingredient.origin_type ? originLabel(ingredient.origin_type) : 'Belirtilmemiş'}
+          <div className="curator-card p-4">
+            <p className="label-caps text-outline mb-1">Kaynak</p>
+            <p className="text-lg font-bold text-on-surface">
+              {ingredient.origin_type ? originLabel(ingredient.origin_type) : 'Belirtilmemis'}
             </p>
           </div>
         </div>
@@ -327,7 +325,7 @@ export default async function IngredientDetailPage({
         {/* Evidence Links */}
         {ingredient.evidence_links && ingredient.evidence_links.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-4">Bilimsel Kaynaklar</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-4">Bilimsel Kaynaklar</h2>
             <div className="space-y-3">
               {ingredient.evidence_links.map((el) => (
                 <a
@@ -335,33 +333,35 @@ export default async function IngredientDetailPage({
                   href={el.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-white border rounded-lg p-4 hover:shadow-md hover:border-primary/30 transition-all"
+                  className="block curator-card p-4 group"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-primary mt-0.5">📄</span>
+                    <span className="material-icon text-primary mt-0.5" aria-hidden="true">description</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 hover:text-primary">
+                      <p className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">
                         {el.source_title}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         {el.source_type && (
-                          <span className="text-xs text-gray-400">
+                          <span className="label-caps text-outline">
                             {sourceTypeLabel(el.source_type)}
                           </span>
                         )}
                         {el.publication_year && (
-                          <span className="text-xs text-gray-400">
+                          <span className="label-caps text-outline">
                             ({el.publication_year})
                           </span>
                         )}
                       </div>
                       {el.summary_note && (
-                        <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                        <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
                           {el.summary_note}
                         </p>
                       )}
                     </div>
-                    <span className="text-xs text-primary shrink-0">Kaynak &rarr;</span>
+                    <span className="label-caps text-primary shrink-0">
+                      Kaynak <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                    </span>
                   </div>
                 </a>
               ))}
@@ -372,45 +372,47 @@ export default async function IngredientDetailPage({
         {/* Products containing this ingredient */}
         {products.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold mb-4">
-              Bu İçeriği Barındıran Ürünler
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                {products.length} ürün
+            <div className="flex items-end justify-between mb-4">
+              <h2 className="text-xl font-bold text-on-surface">
+                Bu Icerigi Barindiran Urunler
+              </h2>
+              <span className="label-caps text-outline">
+                {products.length} urun
               </span>
-            </h2>
+            </div>
             <div className="relative">
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
                 {products.map((p) => {
                   const img = p.images?.[0]?.image_url;
                   return (
                     <Link
                       key={p.product_id}
                       href={`/urunler/${p.product_slug}`}
-                      className="flex-shrink-0 w-48 snap-start bg-white border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group"
+                      className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
                     >
-                      <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden">
                         {img ? (
                           <img
                             src={img}
                             alt={p.product_name}
-                            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
                         ) : (
-                          <span className="text-4xl text-gray-200">📦</span>
+                          <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
                         )}
                       </div>
                       <div className="p-3">
                         {p.brand && (
-                          <p className="text-[10px] text-primary font-semibold truncate">
+                          <p className="label-caps text-outline truncate">
                             {p.brand.brand_name}
                           </p>
                         )}
-                        <p className="text-xs font-medium text-gray-800 line-clamp-2 mt-0.5 leading-snug">
+                        <p className="text-xs font-medium text-on-surface line-clamp-2 mt-0.5 leading-snug">
                           {p.product_name}
                         </p>
                         {p.category && (
-                          <p className="text-[10px] text-gray-400 mt-1 truncate">
+                          <p className="label-caps text-outline-variant mt-1 truncate">
                             {p.category.category_name}
                           </p>
                         )}
@@ -419,19 +421,20 @@ export default async function IngredientDetailPage({
                   );
                 })}
               </div>
-              {/* Fade edges */}
-              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+              {/* Fade edge */}
+              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
             </div>
           </section>
         )}
 
         {/* Back Link */}
-        <div className="border-t pt-8">
+        <div className="border-t border-outline-variant/20 pt-8">
           <Link
             href="/icerikler"
-            className="text-primary hover:underline text-sm font-medium"
+            className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
           >
-            &larr; Tüm İçerik Maddeleri
+            <span className="material-icon material-icon-sm" aria-hidden="true">arrow_back</span>
+            Tum Icerik Maddeleri
           </Link>
         </div>
       </article>

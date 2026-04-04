@@ -1,13 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-white text-gray-900 antialiased;
+    @apply bg-surface text-on-background antialiased;
+    font-feature-settings: 'liga' 1, 'calt' 1;
   }
 }
 
+@layer components {
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .label-caps {
+    @apply uppercase tracking-widest text-[10px] font-semibold;
+  }
+
+  .headline-tight {
+    @apply font-extrabold tracking-tighter leading-none;
+  }
+
+  .curator-card {
+    @apply bg-surface-container-lowest border border-outline-variant/30 rounded-md transition-all duration-500;
+  }
+
+  .curator-card:hover {
+    @apply shadow-lg shadow-black/5 border-outline/40;
+  }
+
+  .curator-btn {
+    @apply inline-flex items-center gap-3 text-[10px] font-label uppercase tracking-widest px-8 py-4 rounded-md transition-all duration-300 active:scale-95;
+  }
+
+  .curator-btn-primary {
+    @apply curator-btn bg-primary text-on-primary hover:bg-primary-dim;
+  }
+
+  .curator-btn-outline {
+    @apply curator-btn border border-outline-variant text-on-surface hover:bg-surface-container-low;
+  }
+
+  .curator-input {
+    @apply w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-md text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors;
+  }
+
+  .curator-section {
+    @apply py-24 px-6 lg:px-16;
+  }
+
+  .curator-divider {
+    @apply h-px bg-outline-variant/20;
+  }
+}
+
+@layer utilities {
+  .material-icon {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .material-icon-filled {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .material-icon-sm {
+    font-size: 20px;
+  }
+
+  .material-icon-lg {
+    font-size: 36px;
+  }
+}
+
+/* Existing keyframes */
 @keyframes slide-up {
   from {
     opacity: 0;
@@ -26,4 +107,10 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Admin override — preserve old green theme */
+.admin-theme {
+  font-family: 'Inter', system-ui, sans-serif;
+  --admin-primary: #2f9468;
 }

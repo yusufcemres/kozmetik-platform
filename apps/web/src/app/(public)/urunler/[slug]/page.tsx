@@ -123,7 +123,7 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
-      title: `${title} | Kozmetik Platform`,
+      title: `${title} | REVELA`,
       description,
       type: 'article',
       ...(imageUrl ? { images: [{ url: imageUrl, width: 600, height: 600, alt: title }] } : {}),
@@ -143,15 +143,15 @@ export async function generateMetadata({
 // === Helpers ===
 
 function getScoreColor(score: number): string {
-  if (score >= 70) return 'text-green-600';
-  if (score >= 40) return 'text-yellow-600';
-  return 'text-red-500';
+  if (score >= 70) return 'text-score-high';
+  if (score >= 40) return 'text-score-medium';
+  return 'text-score-low';
 }
 
 function getScoreBg(score: number): string {
-  if (score >= 70) return 'bg-green-50 border-green-200';
-  if (score >= 40) return 'bg-yellow-50 border-yellow-200';
-  return 'bg-red-50 border-red-200';
+  if (score >= 70) return 'bg-score-high-bg border-score-high-border';
+  if (score >= 40) return 'bg-score-medium-bg border-score-medium-border';
+  return 'bg-score-low-bg border-score-low-border';
 }
 
 function getScoreBarWidth(score: number): string {
@@ -159,9 +159,9 @@ function getScoreBarWidth(score: number): string {
 }
 
 function getScoreBarColor(score: number): string {
-  if (score >= 70) return 'bg-green-500';
-  if (score >= 40) return 'bg-yellow-500';
-  return 'bg-red-400';
+  if (score >= 70) return 'bg-score-high';
+  if (score >= 40) return 'bg-score-medium';
+  return 'bg-score-low';
 }
 
 function platformLabel(platform: string): string {
@@ -180,13 +180,13 @@ function platformLabel(platform: string): string {
 
 function concentrationLabel(band: string): { label: string; color: string } {
   const map: Record<string, { label: string; color: string }> = {
-    very_high: { label: 'Çok Yüksek', color: 'bg-green-100 text-green-700' },
-    high: { label: 'Yüksek', color: 'bg-green-50 text-green-600' },
-    medium: { label: 'Orta', color: 'bg-yellow-50 text-yellow-700' },
-    low: { label: 'Düşük', color: 'bg-gray-100 text-gray-500' },
-    trace: { label: 'Eser', color: 'bg-gray-50 text-gray-400' },
+    very_high: { label: 'Çok Yüksek', color: 'bg-score-high-bg text-score-high' },
+    high: { label: 'Yüksek', color: 'bg-score-high-bg/50 text-score-high' },
+    medium: { label: 'Orta', color: 'bg-score-medium-bg text-score-medium' },
+    low: { label: 'Düşük', color: 'bg-surface-container text-on-surface-variant' },
+    trace: { label: 'Eser', color: 'bg-surface-container text-outline' },
   };
-  return map[band] || { label: band, color: 'text-gray-400' };
+  return map[band] || { label: band, color: 'text-outline' };
 }
 
 function formatPrice(price: number | null): string {
@@ -222,7 +222,7 @@ function productJsonLd(product: Product) {
       ? {
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: (avgScore / 20).toFixed(1), // 0-100 → 0-5 scale
+            ratingValue: (avgScore / 20).toFixed(1),
             bestRating: '5',
             ratingCount: product.need_scores?.length || 1,
           },
@@ -275,119 +275,104 @@ export default async function ProductDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
       />
 
-      <article className="max-w-5xl mx-auto px-4 py-8">
+      <article className="max-w-6xl mx-auto px-6 lg:px-16 py-8 lg:py-12">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-400 mb-6 flex items-center gap-1">
-          <Link href="/urunler" className="hover:text-primary">
+        <nav className="label-caps text-outline mb-8 flex items-center gap-2">
+          <Link href="/urunler" className="hover:text-on-surface transition-colors">
             Ürünler
           </Link>
           <span>/</span>
           {product.category && (
             <>
-              <span>{product.category.category_name}</span>
+              <span className="text-on-surface-variant">{product.category.category_name}</span>
               <span>/</span>
             </>
           )}
-          <span className="text-gray-600">{product.product_name}</span>
+          <span className="text-on-surface">{product.product_name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div className="editorial-grid gap-8 lg:gap-12 mb-16">
           {/* Image */}
-          <div className="relative bg-gray-50 rounded-xl aspect-square flex items-center justify-center overflow-hidden">
-            <div className="absolute top-3 right-3 z-10">
-              <FavoriteButton
-                product_id={product.product_id}
-                product_name={product.product_name}
-                product_slug={product.product_slug}
-                brand_name={product.brand?.brand_name}
-                image_url={imageUrl}
-              />
+          <div className="col-span-12 md:col-span-6 relative">
+            <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center overflow-hidden">
+              <div className="absolute top-4 right-4 z-10">
+                <FavoriteButton
+                  product_id={product.product_id}
+                  product_name={product.product_name}
+                  product_slug={product.product_slug}
+                  brand_name={product.brand?.brand_name}
+                  image_url={imageUrl}
+                />
+              </div>
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={product.product_name}
+                  width={600}
+                  height={600}
+                  className="object-contain w-full h-full transition-transform duration-700 hover:scale-105"
+                  priority
+                />
+              ) : (
+                <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }} aria-hidden="true">inventory_2</span>
+              )}
             </div>
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={product.product_name}
-                width={600}
-                height={600}
-                className="object-contain w-full h-full"
-                priority
-              />
-            ) : (
-              <span className="text-gray-300 text-7xl">📦</span>
-            )}
           </div>
 
           {/* Info */}
-          <div>
+          <div className="col-span-12 md:col-span-6">
             {product.brand && (
-              <p className="text-sm font-semibold text-primary mb-1">
+              <p className="label-caps text-primary mb-2 tracking-[0.2em]">
                 {product.brand.brand_name}
               </p>
             )}
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl lg:text-3xl headline-tight text-on-surface mb-4">
               {product.product_name}
             </h1>
 
             {/* Meta badges */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-6">
               {product.category && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
                   {product.category.category_name}
                 </span>
               )}
               {product.product_type_label && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
                   {product.product_type_label}
                 </span>
               )}
               {product.target_area && (
-                <span className="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">
-                  {product.target_area === 'face'
-                    ? 'Yüz'
-                    : product.target_area === 'body'
-                      ? 'Vücut'
-                      : product.target_area === 'hair'
-                        ? 'Saç'
-                        : product.target_area === 'eye'
-                          ? 'Göz Çevresi'
-                          : product.target_area}
+                <span className="label-caps bg-tertiary-container px-3 py-1.5 rounded-md text-on-tertiary-container">
+                  {product.target_area === 'face' ? 'Yüz' : product.target_area === 'body' ? 'Vücut' : product.target_area === 'hair' ? 'Saç' : product.target_area === 'eye' ? 'Göz Çevresi' : product.target_area}
                 </span>
               )}
               {product.usage_time_hint && (
-                <span className="text-xs bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full">
-                  {product.usage_time_hint === 'morning'
-                    ? 'Sabah'
-                    : product.usage_time_hint === 'evening'
-                      ? 'Akşam'
-                      : product.usage_time_hint === 'both'
-                        ? 'Sabah & Akşam'
-                        : product.usage_time_hint}
+                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
+                  {product.usage_time_hint === 'morning' ? 'Sabah' : product.usage_time_hint === 'evening' ? 'Akşam' : product.usage_time_hint === 'both' ? 'Sabah & Akşam' : product.usage_time_hint}
                 </span>
               )}
               {product.net_content_value && (
-                <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
-                  {product.net_content_value}
-                  {product.net_content_unit || 'ml'}
+                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-outline">
+                  {product.net_content_value}{product.net_content_unit || 'ml'}
                 </span>
               )}
             </div>
 
             {product.short_description && (
-              <p className="text-gray-600 leading-relaxed mb-6">
+              <p className="text-on-surface-variant leading-relaxed mb-8">
                 {product.short_description}
               </p>
             )}
 
             {/* Overall Score */}
             {avgScore !== null && (
-              <div
-                className={`rounded-xl border p-5 mb-4 ${getScoreBg(avgScore)}`}
-              >
-                <p className="text-sm text-gray-600 mb-1">Genel Uyum Skoru</p>
-                <p className={`text-3xl font-bold ${getScoreColor(avgScore)}`}>
+              <div className={`rounded-md border p-6 mb-6 ${getScoreBg(avgScore)}`}>
+                <p className="label-caps text-on-surface-variant mb-1">Genel Uyum Skoru</p>
+                <p className={`text-4xl headline-tight ${getScoreColor(avgScore)}`}>
                   %{avgScore}
                 </p>
-                <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mt-3 h-2 bg-surface-container rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${getScoreBarColor(avgScore)}`}
                     style={{ width: getScoreBarWidth(avgScore) }}
@@ -397,13 +382,13 @@ export default async function ProductDetailPage({
             )}
 
             {/* Personal Score CTA */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-              <p className="text-sm text-gray-600">Senin Cildine Uyumu</p>
-              <p className="text-lg font-bold text-blue-600 mt-1">
+            <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
+              <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
+              <p className="text-lg font-bold text-primary mt-1">
                 Kişisel skorunu gör
               </p>
-              <p className="text-xs text-gray-400 mt-1">
-                <Link href="/profilim" className="text-primary hover:underline">
+              <p className="text-xs text-outline mt-2">
+                <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
                   Cilt profili oluştur
                 </Link>{' '}
                 &rarr; sana özel uyumluluk skoru
@@ -414,51 +399,44 @@ export default async function ProductDetailPage({
 
         {/* Need Scores */}
         {product.need_scores && product.need_scores.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold mb-2">Uyumluluk Skorları</h2>
-            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+          <section className="mb-16">
+            <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface">Uyumluluk Skorları</h2>
+            <p className="text-sm text-on-surface-variant mb-6 leading-relaxed">
               Skorlar, ürünün INCI listesindeki her bir etken maddenin bilimsel kanıt seviyesi,
               konsantrasyon sıralaması ve ilgili cilt ihtiyacına katkısı analiz edilerek hesaplanır.
-              <span className="font-medium text-green-600"> %70+</span> yüksek uyum,
-              <span className="font-medium text-yellow-600"> %40-69</span> orta uyum,
-              <span className="font-medium text-red-500"> %40 altı</span> düşük uyum anlamına gelir.
+              <span className="font-medium text-score-high"> %70+</span> yüksek uyum,
+              <span className="font-medium text-score-medium"> %40-69</span> orta uyum,
+              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum anlamına gelir.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {product.need_scores.map((ns) => {
                 const score = Math.round(Number(ns.compatibility_score));
                 return (
                   <div
                     key={ns.product_need_score_id}
-                    className="bg-white border rounded-lg p-4 flex items-center gap-4"
+                    className="curator-card p-5 flex items-center gap-4"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">
+                      <p className="text-sm font-medium text-on-surface">
                         {ns.need ? (
-                          <Link
-                            href={`/ihtiyaclar/${ns.need.need_slug}`}
-                            className="hover:text-primary"
-                          >
+                          <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
                             {ns.need.need_name}
                           </Link>
                         ) : (
                           `İhtiyaç #${ns.need_id}`
                         )}
                       </p>
-                      <div className="mt-1.5 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="mt-2 h-1.5 bg-surface-container rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${getScoreBarColor(score)}`}
                           style={{ width: getScoreBarWidth(score) }}
                         />
                       </div>
                       {ns.score_reason_summary && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          {ns.score_reason_summary}
-                        </p>
+                        <p className="text-[10px] text-outline mt-1.5">{ns.score_reason_summary}</p>
                       )}
                     </div>
-                    <span
-                      className={`text-lg font-bold ${getScoreColor(score)}`}
-                    >
+                    <span className={`text-xl font-bold ${getScoreColor(score)}`}>
                       %{score}
                     </span>
                   </div>
@@ -469,68 +447,56 @@ export default async function ProductDetailPage({
         )}
 
         {/* INCI Ingredients */}
-        <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4">
+        <section className="mb-16">
+          <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">
             İçerik Listesi (INCI)
             {sortedIngredients.length > 0 && (
-              <span className="text-sm font-normal text-gray-400 ml-2">
+              <span className="text-sm font-normal text-outline ml-2">
                 {sortedIngredients.length} madde
               </span>
             )}
           </h2>
           {sortedIngredients.length > 0 ? (
-            <div className="bg-white border rounded-xl overflow-hidden">
-              <div className="divide-y">
+            <div className="curator-card overflow-hidden">
+              <div className="divide-y divide-outline-variant/15">
                 {sortedIngredients.map((pi, idx) => {
                   const isAllergen = pi.ingredient?.allergen_flag;
                   const isFragrance = pi.ingredient?.fragrance_flag;
                   return (
                     <details
                       key={pi.product_ingredient_id}
-                      className={`group px-4 py-3 ${
-                        isAllergen ? 'bg-red-50/50' : isFragrance ? 'bg-orange-50/50' : ''
+                      className={`group px-5 py-3.5 ${
+                        isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
                       }`}
                     >
                       <summary className="flex items-center gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                        <span className="text-xs text-gray-400 w-6 text-right">
+                        <span className="label-caps text-outline w-6 text-right">
                           {idx + 1}
                         </span>
-                        <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                          <span className="text-sm font-medium text-gray-800 group-open:text-primary transition-colors">
+                        <div className="flex-1 min-w-0 flex items-center gap-2">
+                          <span className="text-sm font-medium text-on-surface group-open:text-primary transition-colors">
                             {pi.ingredient_display_name}
                           </span>
                           {pi.ingredient?.function_summary && (
-                            <svg className="w-3.5 h-3.5 text-gray-300 group-open:rotate-180 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
+                              expand_more
+                            </span>
                           )}
                           {pi.is_below_one_percent_estimate && (
-                            <span className="text-[10px] text-gray-400">
-                              (&lt;1%)
-                            </span>
+                            <span className="label-caps text-outline">(&lt;1%)</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-2">
                           {isAllergen && (
-                            <span
-                              className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded"
-                              title="Alerjen"
-                            >
-                              Alerjen
-                            </span>
+                            <span className="label-caps bg-error/10 text-error px-2 py-0.5 rounded-md">Alerjen</span>
                           )}
                           {isFragrance && (
-                            <span
-                              className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded"
-                              title="Parfüm"
-                            >
-                              Parfüm
-                            </span>
+                            <span className="label-caps bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-md">Parfüm</span>
                           )}
                           {pi.concentration_band !== 'unknown' && (() => {
                             const conc = concentrationLabel(pi.concentration_band);
                             return (
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${conc.color}`}>
+                              <span className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}>
                                 {conc.label}
                               </span>
                             );
@@ -538,15 +504,15 @@ export default async function ProductDetailPage({
                         </div>
                       </summary>
                       {pi.ingredient && (
-                        <div className="ml-9 mt-2 bg-gradient-to-r from-primary/5 to-transparent border-l-2 border-primary/30 rounded-r-lg px-3 py-2.5 animate-[fadeIn_0.15s_ease-in]">
+                        <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
                           {pi.ingredient.function_summary && (
-                            <p className="text-xs text-gray-600 leading-relaxed">
+                            <p className="text-xs text-on-surface-variant leading-relaxed">
                               {pi.ingredient.function_summary}
                             </p>
                           )}
                           <Link
                             href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                            className="inline-block mt-1.5 text-[11px] text-primary hover:underline font-medium"
+                            className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
                           >
                             Detaylı bilgi &rarr;
                           </Link>
@@ -558,7 +524,8 @@ export default async function ProductDetailPage({
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-lg p-6 text-gray-400 text-sm">
+            <div className="bg-surface-container-low rounded-md p-8 text-on-surface-variant text-sm text-center">
+              <span className="material-icon material-icon-lg text-outline-variant block mb-2" aria-hidden="true">science</span>
               INCI analizi henüz yapılmamış
             </div>
           )}
@@ -566,19 +533,19 @@ export default async function ProductDetailPage({
 
         {/* Label Info */}
         {product.label && (
-          <section className="mb-12">
+          <section className="mb-16">
             {product.label.usage_instructions && (
               <div className="mb-6">
-                <h2 className="text-xl font-bold mb-3">Kullanım</h2>
-                <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 rounded-lg p-4">
+                <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">Kullanım</h2>
+                <p className="text-on-surface-variant text-sm leading-relaxed bg-surface-container-low rounded-md p-5">
                   {product.label.usage_instructions}
                 </p>
               </div>
             )}
             {product.label.claim_texts_json && product.label.claim_texts_json.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Ürün İddiaları</h3>
-                <div className="text-gray-600 text-sm leading-relaxed bg-blue-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-3 text-on-surface">Ürün İddiaları</h3>
+                <div className="text-on-surface-variant text-sm leading-relaxed bg-tertiary-container/30 rounded-md p-5">
                   <ul className="list-disc list-inside space-y-1">
                     {product.label.claim_texts_json.map((claim, i) => (
                       <li key={i}>{claim}</li>
@@ -589,8 +556,8 @@ export default async function ProductDetailPage({
             )}
             {product.label.warning_text && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Uyarılar</h3>
-                <p className="text-gray-600 text-sm leading-relaxed bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                <h3 className="text-lg font-semibold mb-3 text-on-surface">Uyarılar</h3>
+                <p className="text-on-surface-variant text-sm leading-relaxed bg-error/5 rounded-md p-5 border border-error/20">
                   {product.label.warning_text}
                 </p>
               </div>
@@ -598,7 +565,7 @@ export default async function ProductDetailPage({
           </section>
         )}
 
-        {/* Affiliate Links — Cimri Style */}
+        {/* Affiliate Links */}
         {activeLinks.length > 0 && (() => {
           const priced = activeLinks.filter((l) => l.price_snapshot && l.price_snapshot > 0);
           const prices = priced.map((l) => Number(l.price_snapshot));
@@ -613,61 +580,38 @@ export default async function ProductDetailPage({
           });
 
           return (
-            <section className="mb-12">
-              <h2 className="text-xl font-bold mb-4">Nereden Alınır?</h2>
+            <section className="mb-16">
+              <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">Nereden Alınır?</h2>
 
               {/* Price summary */}
               {prices.length >= 2 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <p className="text-[10px] text-green-600 font-medium">En Ucuz</p>
-                    <p className="text-lg font-bold text-green-700">{formatPrice(minPrice)}</p>
-                    {cheapest && <p className="text-[10px] text-green-500">{platformLabel(cheapest.platform)}</p>}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                  <div className="bg-score-high-bg border border-score-high-border rounded-md p-4 text-center">
+                    <p className="label-caps text-score-high">En Ucuz</p>
+                    <p className="text-lg font-bold text-score-high mt-1">{formatPrice(minPrice)}</p>
+                    {cheapest && <p className="label-caps text-score-high/60 mt-1">{platformLabel(cheapest.platform)}</p>}
                   </div>
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
-                    <p className="text-[10px] text-red-600 font-medium">En Pahalı</p>
-                    <p className="text-lg font-bold text-red-700">{formatPrice(maxPrice)}</p>
+                  <div className="bg-score-low-bg border border-score-low-border rounded-md p-4 text-center">
+                    <p className="label-caps text-score-low">En Pahalı</p>
+                    <p className="text-lg font-bold text-score-low mt-1">{formatPrice(maxPrice)}</p>
                   </div>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                    <p className="text-[10px] text-blue-600 font-medium">Ortalama</p>
-                    <p className="text-lg font-bold text-blue-700">{formatPrice(avgPrice)}</p>
+                  <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-4 text-center">
+                    <p className="label-caps text-on-surface-variant">Ortalama</p>
+                    <p className="text-lg font-bold text-on-surface mt-1">{formatPrice(avgPrice)}</p>
                   </div>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
-                    <p className="text-[10px] text-gray-500 font-medium">Platform Sayısı</p>
-                    <p className="text-lg font-bold text-gray-700">{priced.length}</p>
+                  <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-4 text-center">
+                    <p className="label-caps text-on-surface-variant">Platform</p>
+                    <p className="text-lg font-bold text-on-surface mt-1">{priced.length}</p>
                   </div>
                 </div>
               )}
 
-              {/* Price tracking chart */}
+              {/* Price chart */}
               <PriceChart productId={product.product_id} />
 
-              {/* Price bar visual */}
-              {prices.length >= 2 && minPrice !== maxPrice && (
-                <div className="bg-white border rounded-lg p-4 mb-4">
-                  <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
-                    <span>Ucuz</span>
-                    <span>Pahalı</span>
-                  </div>
-                  <div className="relative h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full">
-                    {priced.map((link) => {
-                      const pos = ((Number(link.price_snapshot) - minPrice) / (maxPrice - minPrice)) * 100;
-                      return (
-                        <div
-                          key={link.affiliate_link_id}
-                          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-gray-700 rounded-full"
-                          style={{ left: `${Math.min(97, Math.max(3, pos))}%` }}
-                          title={`${platformLabel(link.platform)}: ${formatPrice(Number(link.price_snapshot))}`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
               {/* Vertical price list */}
-              <div className="bg-white border rounded-xl overflow-hidden divide-y">
-                {sorted.map((link, idx) => {
+              <div className="curator-card overflow-hidden divide-y divide-outline-variant/15">
+                {sorted.map((link) => {
                   const isCheapest = link.price_snapshot && Number(link.price_snapshot) === minPrice && prices.length >= 2;
                   return (
                     <a
@@ -675,35 +619,27 @@ export default async function ProductDetailPage({
                       href={link.affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer nofollow sponsored"
-                      className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors ${isCheapest ? 'bg-green-50/50' : ''}`}
+                      className={`flex items-center gap-4 px-6 py-5 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                     >
                       {isCheapest && (
-                        <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded font-bold shrink-0">
+                        <span className="label-caps bg-score-high text-white px-2.5 py-1 rounded-md shrink-0">
                           EN UCUZ
                         </span>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-800">{platformLabel(link.platform)}</p>
+                        <p className="font-semibold text-on-surface">{platformLabel(link.platform)}</p>
                       </div>
                       {link.price_snapshot ? (
-                        <div className="text-right shrink-0">
-                          <p className="text-lg font-bold text-gray-900">{formatPrice(Number(link.price_snapshot))}</p>
-                        </div>
+                        <p className="text-lg font-bold text-on-surface shrink-0">{formatPrice(Number(link.price_snapshot))}</p>
                       ) : (
-                        <p className="text-sm text-gray-400 shrink-0">Fiyat bilgisi yok</p>
+                        <p className="text-sm text-outline shrink-0">Fiyat bilgisi yok</p>
                       )}
-                      <div className="shrink-0">
-                        <span className="inline-flex items-center justify-center w-10 h-10 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </span>
-                      </div>
+                      <span className="material-icon text-primary shrink-0" aria-hidden="true">arrow_forward</span>
                     </a>
                   );
                 })}
               </div>
-              <p className="text-xs text-gray-400 mt-3">
+              <p className="text-xs text-outline mt-4">
                 Bağımsız platformuz, komisyon alınan linkler içerebilir. Fiyatlar son güncelleme tarihine aittir.
               </p>
             </section>
@@ -711,14 +647,12 @@ export default async function ProductDetailPage({
         })()}
 
         {/* Compare CTA */}
-        <div className="border-t pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-sm">
+        <div className="border-t border-outline-variant/20 pt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <p className="text-on-surface-variant text-sm">
             Bu ürünü başka bir ürünle karşılaştırmak ister misin?
           </p>
-          <Link
-            href="/ara"
-            className="border border-primary text-primary px-6 py-2.5 rounded-lg hover:bg-primary/5 transition-colors text-sm font-semibold"
-          >
+          <Link href="/karsilastir" className="curator-btn-outline">
+            <span className="material-icon material-icon-sm" aria-hidden="true">compare</span>
             Ürünleri Karşılaştır
           </Link>
         </div>

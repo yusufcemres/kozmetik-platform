@@ -62,24 +62,27 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Favorilerim</h1>
-      <p className="text-gray-500 mb-6 text-sm">Beğendiğin ürünleri kaydet ve cilt bakım rutinini oluştur.</p>
+    <div className="curator-section max-w-4xl mx-auto">
+      <div className="mb-10">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Koleksiyon</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">FAVORILERIM</h1>
+        <p className="text-on-surface-variant text-sm mt-2">Begendigi urunleri kaydet ve cilt bakim rutinini olustur.</p>
+      </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-8 w-fit">
+      <div className="flex gap-1 bg-surface-container-low rounded-sm p-1 mb-8 w-fit">
         <button
           onClick={() => setTab('favorites')}
-          className={`px-5 py-2 rounded-md text-sm font-medium transition-colors ${
-            tab === 'favorites' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          className={`px-5 py-2 rounded-sm text-xs tracking-wider uppercase font-medium transition-colors ${
+            tab === 'favorites' ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
           }`}
         >
           Favorilerim ({favorites.length})
         </button>
         <button
           onClick={() => setTab('routine')}
-          className={`px-5 py-2 rounded-md text-sm font-medium transition-colors ${
-            tab === 'routine' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          className={`px-5 py-2 rounded-sm text-xs tracking-wider uppercase font-medium transition-colors ${
+            tab === 'routine' ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
           }`}
         >
           Rutinim ({routine.morning.length + routine.evening.length})
@@ -90,63 +93,61 @@ export default function FavoritesPage() {
       {tab === 'favorites' && (
         <>
           {favorites.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-5xl mb-4">💝</p>
-              <p className="text-gray-500">Henüz favorin yok</p>
-              <p className="text-sm text-gray-400 mt-2">Ürün sayfalarındaki kalp ikonuna tıklayarak favori ekle</p>
-              <Link href="/urunler" className="inline-block mt-4 text-primary hover:underline text-sm font-medium">
-                Ürünleri Keşfet &rarr;
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">favorite_border</span>
+              <p className="text-on-surface-variant">Henuz favorin yok</p>
+              <p className="text-sm text-outline mt-2">Urun sayfalarindaki kalp ikonuna tiklayarak favori ekle</p>
+              <Link href="/urunler" className="inline-flex items-center gap-1 mt-4 label-caps text-primary hover:underline underline-offset-4">
+                Urunleri Kesfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
               </Link>
             </div>
           ) : (
             <div className="space-y-3">
               {favorites.map((fav) => (
-                <div key={fav.product_id} className="bg-white border rounded-xl p-4 flex items-center gap-4 group">
+                <div key={fav.product_id} className="curator-card p-4 flex items-center gap-4 group">
                   <Link href={`/urunler/${fav.product_slug}`} className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-surface-container-low rounded-sm overflow-hidden shrink-0 flex items-center justify-center">
                       {fav.image_url ? (
                         <img src={fav.image_url} alt={fav.product_name} className="w-full h-full object-contain" />
                       ) : (
-                        <span className="text-2xl text-gray-300">📦</span>
+                        <span className="material-icon text-outline-variant" aria-hidden="true">inventory_2</span>
                       )}
                     </div>
                     <div className="min-w-0">
                       {fav.brand_name && (
-                        <p className="text-xs text-primary font-semibold">{fav.brand_name}</p>
+                        <p className="label-caps text-outline">{fav.brand_name}</p>
                       )}
-                      <p className="text-sm font-bold text-gray-800 truncate group-hover:text-primary transition-colors">
+                      <p className="text-sm font-semibold text-on-surface truncate group-hover:text-primary transition-colors tracking-tight">
                         {fav.product_name}
                       </p>
                     </div>
                   </Link>
                   <div className="flex items-center gap-2 shrink-0">
                     <div className="relative group/menu">
-                      <button className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+                      <button className="label-caps text-primary bg-primary/5 px-3 py-1.5 rounded-sm hover:bg-primary/10 transition-colors">
                         + Rutine Ekle
                       </button>
-                      <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 hidden group-hover/menu:block">
+                      <div className="absolute right-0 top-full mt-1 bg-surface border border-outline-variant/20 rounded-sm shadow-lg z-10 hidden group-hover/menu:block">
                         <button
                           onClick={() => handleAddToRoutine('morning', fav)}
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low whitespace-nowrap transition-colors"
                         >
-                          ☀️ Sabah Rutini
+                          <span className="material-icon material-icon-sm text-score-medium" aria-hidden="true">light_mode</span> Sabah Rutini
                         </button>
                         <button
                           onClick={() => handleAddToRoutine('evening', fav)}
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low whitespace-nowrap transition-colors"
                         >
-                          🌙 Akşam Rutini
+                          <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
                         </button>
                       </div>
                     </div>
                     <button
                       onClick={() => handleRemoveFav(fav.product_id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                      title="Kaldır"
+                      className="text-outline hover:text-error transition-colors p-1"
+                      title="Kaldir"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <span className="material-icon material-icon-sm" aria-hidden="true">close</span>
                     </button>
                   </div>
                 </div>
@@ -160,43 +161,43 @@ export default function FavoritesPage() {
       {tab === 'routine' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Morning */}
-          <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-5">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <span>☀️</span> Sabah Rutini
+          <div className="curator-card p-5 border-l-2 border-l-score-medium">
+            <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span> Sabah Rutini
             </h3>
             {routine.morning.length === 0 ? (
-              <p className="text-sm text-gray-400 py-4 text-center">
-                Favori ürünlerinden sabah rutinine ekle
+              <p className="text-sm text-outline py-4 text-center">
+                Favori urunlerinden sabah rutinine ekle
               </p>
             ) : (
               <div className="space-y-2">
                 {routine.morning.map((item, idx) => (
-                  <div key={item.product_id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm">
-                    <span className="text-xs font-bold text-amber-500 w-5">{idx + 1}</span>
+                  <div key={item.product_id} className="bg-surface-container-low rounded-sm p-3 flex items-center gap-3">
+                    <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
                     <Link href={`/urunler/${item.product_slug}`} className="flex-1 min-w-0">
-                      <p className="text-xs text-primary font-semibold">{item.brand_name}</p>
-                      <p className="text-sm font-medium text-gray-800 truncate">{item.product_name}</p>
+                      <p className="label-caps text-outline">{item.brand_name}</p>
+                      <p className="text-sm font-medium text-on-surface truncate">{item.product_name}</p>
                     </Link>
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => moveItem('morning', idx, -1)}
                         disabled={idx === 0}
-                        className="text-gray-400 hover:text-gray-600 disabled:opacity-20 text-xs"
+                        className="text-outline hover:text-on-surface disabled:opacity-20 transition-colors"
                       >
-                        ▲
+                        <span className="material-icon material-icon-sm" aria-hidden="true">expand_less</span>
                       </button>
                       <button
                         onClick={() => moveItem('morning', idx, 1)}
                         disabled={idx === routine.morning.length - 1}
-                        className="text-gray-400 hover:text-gray-600 disabled:opacity-20 text-xs"
+                        className="text-outline hover:text-on-surface disabled:opacity-20 transition-colors"
                       >
-                        ▼
+                        <span className="material-icon material-icon-sm" aria-hidden="true">expand_more</span>
                       </button>
                       <button
                         onClick={() => handleRemoveFromRoutine('morning', item.product_id)}
-                        className="text-gray-400 hover:text-red-500 ml-1"
+                        className="text-outline hover:text-error ml-1 transition-colors"
                       >
-                        &times;
+                        <span className="material-icon material-icon-sm" aria-hidden="true">close</span>
                       </button>
                     </div>
                   </div>
@@ -206,43 +207,43 @@ export default function FavoritesPage() {
           </div>
 
           {/* Evening */}
-          <div className="bg-indigo-50/50 border border-indigo-200 rounded-xl p-5">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <span>🌙</span> Akşam Rutini
+          <div className="curator-card p-5 border-l-2 border-l-primary">
+            <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
             </h3>
             {routine.evening.length === 0 ? (
-              <p className="text-sm text-gray-400 py-4 text-center">
-                Favori ürünlerinden akşam rutinine ekle
+              <p className="text-sm text-outline py-4 text-center">
+                Favori urunlerinden aksam rutinine ekle
               </p>
             ) : (
               <div className="space-y-2">
                 {routine.evening.map((item, idx) => (
-                  <div key={item.product_id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm">
-                    <span className="text-xs font-bold text-indigo-500 w-5">{idx + 1}</span>
+                  <div key={item.product_id} className="bg-surface-container-low rounded-sm p-3 flex items-center gap-3">
+                    <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
                     <Link href={`/urunler/${item.product_slug}`} className="flex-1 min-w-0">
-                      <p className="text-xs text-primary font-semibold">{item.brand_name}</p>
-                      <p className="text-sm font-medium text-gray-800 truncate">{item.product_name}</p>
+                      <p className="label-caps text-outline">{item.brand_name}</p>
+                      <p className="text-sm font-medium text-on-surface truncate">{item.product_name}</p>
                     </Link>
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => moveItem('evening', idx, -1)}
                         disabled={idx === 0}
-                        className="text-gray-400 hover:text-gray-600 disabled:opacity-20 text-xs"
+                        className="text-outline hover:text-on-surface disabled:opacity-20 transition-colors"
                       >
-                        ▲
+                        <span className="material-icon material-icon-sm" aria-hidden="true">expand_less</span>
                       </button>
                       <button
                         onClick={() => moveItem('evening', idx, 1)}
                         disabled={idx === routine.evening.length - 1}
-                        className="text-gray-400 hover:text-gray-600 disabled:opacity-20 text-xs"
+                        className="text-outline hover:text-on-surface disabled:opacity-20 transition-colors"
                       >
-                        ▼
+                        <span className="material-icon material-icon-sm" aria-hidden="true">expand_more</span>
                       </button>
                       <button
                         onClick={() => handleRemoveFromRoutine('evening', item.product_id)}
-                        className="text-gray-400 hover:text-red-500 ml-1"
+                        className="text-outline hover:text-error ml-1 transition-colors"
                       >
-                        &times;
+                        <span className="material-icon material-icon-sm" aria-hidden="true">close</span>
                       </button>
                     </div>
                   </div>
@@ -252,29 +253,33 @@ export default function FavoritesPage() {
           </div>
 
           {/* Routine tips */}
-          <div className="md:col-span-2 bg-gray-50 border rounded-xl p-5">
-            <h3 className="font-bold text-sm text-gray-700 mb-2">Rutin Sıralama Önerileri</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500">
+          <div className="md:col-span-2 bg-surface-container-low border border-outline-variant/20 rounded-sm p-5">
+            <h3 className="font-semibold text-sm text-on-surface mb-3">Rutin Siralama Onerileri</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-on-surface-variant">
               <div>
-                <p className="font-semibold text-amber-600 mb-1">☀️ Sabah</p>
+                <p className="font-semibold text-score-medium mb-1 flex items-center gap-1">
+                  <span className="material-icon material-icon-sm" aria-hidden="true">light_mode</span> Sabah
+                </p>
                 <ol className="list-decimal list-inside space-y-0.5">
                   <li>Temizleyici</li>
                   <li>Tonik</li>
                   <li>Serum (C Vitamini)</li>
-                  <li>Göz Kremi</li>
+                  <li>Goz Kremi</li>
                   <li>Nemlendirici</li>
-                  <li>Güneş Kremi (SPF 30+)</li>
+                  <li>Gunes Kremi (SPF 30+)</li>
                 </ol>
               </div>
               <div>
-                <p className="font-semibold text-indigo-600 mb-1">🌙 Akşam</p>
+                <p className="font-semibold text-primary mb-1 flex items-center gap-1">
+                  <span className="material-icon material-icon-sm" aria-hidden="true">dark_mode</span> Aksam
+                </p>
                 <ol className="list-decimal list-inside space-y-0.5">
-                  <li>Makyaj Temizleyici / Yağ</li>
-                  <li>Yüz Temizleyici</li>
+                  <li>Makyaj Temizleyici / Yag</li>
+                  <li>Yuz Temizleyici</li>
                   <li>Tonik</li>
                   <li>Aktif (Retinol / AHA-BHA)</li>
                   <li>Serum</li>
-                  <li>Göz Kremi</li>
+                  <li>Goz Kremi</li>
                   <li>Nemlendirici / Gece Kremi</li>
                 </ol>
               </div>

@@ -41,7 +41,7 @@ interface Brand {
 
 async function getHomeData() {
   const [topProducts, latestRes, categories, needsRes, brands] = await Promise.allSettled([
-    apiFetch<Product[]>('/products/top-scored?limit=6', { next: { revalidate: 3600 } } as any),
+    apiFetch<Product[]>('/products/top-scored?limit=8', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
     apiFetch<{ data: Need[] }>('/needs?limit=100', { next: { revalidate: 86400 } } as any),
@@ -60,15 +60,15 @@ async function getHomeData() {
 // === Helpers ===
 
 function getScoreColor(score: number): string {
-  if (score >= 70) return 'text-green-600';
-  if (score >= 40) return 'text-yellow-600';
-  return 'text-red-500';
+  if (score >= 70) return 'text-score-high';
+  if (score >= 40) return 'text-score-medium';
+  return 'text-score-low';
 }
 
 function getScoreBarColor(score: number): string {
-  if (score >= 70) return 'bg-green-500';
-  if (score >= 40) return 'bg-yellow-500';
-  return 'bg-red-400';
+  if (score >= 70) return 'bg-score-high';
+  if (score >= 40) return 'bg-score-medium';
+  return 'bg-score-low';
 }
 
 function avgScore(product: Product): number | null {
@@ -80,77 +80,73 @@ function avgScore(product: Product): number | null {
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
-  'Yüz Bakım': '✨',
-  'Temizleme': '🫧',
-  'Güneş Koruma': '☀️',
-  'Göz Bakım': '👁️',
-  'Dudak Bakım': '💋',
-  'Vücut Bakım': '🧴',
-  'Saç Bakım': '💇',
-  'Makyaj': '💄',
+  'Yüz Bakım': 'spa',
+  'Temizleme': 'water_drop',
+  'Güneş Koruma': 'wb_sunny',
+  'Göz Bakım': 'visibility',
+  'Dudak Bakım': 'mood',
+  'Vücut Bakım': 'self_improvement',
+  'Saç Bakım': 'content_cut',
+  'Makyaj': 'palette',
 };
 
-const NEED_ICONS: Record<string, string> = {
-  'Sivilce / Akne': '🔴',
-  'Leke / Hiperpigmentasyon': '🎯',
-  'Kırışıklık / Yaşlanma': '⏳',
-  'Kuruluk / Dehidrasyon': '💧',
-  'Yağ Kontrolü': '✋',
-  'Hassasiyet / Kızarıklık': '🌸',
-  'Gözenek': '🔍',
-  'Cilt Tonu Eşitleme': '🌈',
-  'Cilt Bariyeri': '🛡️',
-  'Bariyer Desteği': '🛡️',
-  'Koyu Halka': '👀',
-  'Mat Görünüm': '🌿',
-};
+// === Product Card ===
 
-// === Product Card Component ===
-
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   const imgUrl = product.images?.[0]?.image_url;
   const score = avgScore(product);
+  const stars = score !== null ? Math.round(score / 20) : 0;
 
   return (
     <Link
       href={`/urunler/${product.product_slug}`}
-      className="bg-white border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group"
+      className={`flex flex-col curator-card p-4 -m-0 group ${index % 2 !== 0 ? 'mt-0 lg:mt-12' : ''}`}
     >
-      <div className="h-40 bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div className="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-sm">
         {imgUrl ? (
           <img
             src={imgUrl}
             alt={product.product_name}
-            className="h-full w-full object-contain group-hover:scale-105 transition-transform"
+            className="w-full h-full object-contain grayscale-[10%] transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
-          <span className="text-4xl text-gray-300">📦</span>
-        )}
-      </div>
-      <div className="p-4">
-        {product.brand && (
-          <p className="text-xs text-primary font-semibold mb-0.5">
-            {product.brand.brand_name}
-          </p>
-        )}
-        <h3 className="font-bold text-sm text-gray-800 line-clamp-2 group-hover:text-primary transition-colors">
-          {product.product_name}
-        </h3>
-        {score !== null && (
-          <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${getScoreBarColor(score)}`}
-                style={{ width: `${score}%` }}
-              />
-            </div>
-            <span className={`text-xs font-bold ${getScoreColor(score)}`}>
-              %{score}
-            </span>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="material-icon material-icon-lg text-outline-variant">inventory_2</span>
           </div>
         )}
       </div>
+      <div className="space-y-1.5">
+        {product.brand && (
+          <p className="label-caps text-outline">{product.brand.brand_name}</p>
+        )}
+        {score !== null && (
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span
+                key={i}
+                className={`text-[14px] ${i <= stars ? 'material-icon-filled' : 'material-icon'} text-outline-variant`}
+                style={{ fontSize: '14px' }}
+                aria-hidden="true"
+              >
+                {i <= stars ? 'star' : (i - 0.5 <= stars ? 'star_half' : 'star')}
+              </span>
+            ))}
+            <span className="label-caps text-outline-variant ml-1">%{score}</span>
+          </div>
+        )}
+        <h4 className="text-lg font-semibold tracking-tight text-on-surface line-clamp-2">
+          {product.product_name}
+        </h4>
+        {product.category && (
+          <p className="text-xs text-on-surface-variant font-light">
+            {product.category.category_name}
+          </p>
+        )}
+      </div>
+      <span className="mt-4 label-caps text-primary border-b border-primary/20 hover:border-primary pb-1 self-start transition-all duration-300">
+        İncele
+      </span>
     </Link>
   );
 }
@@ -164,124 +160,103 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-primary/5 via-white to-primary/10 py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Kozmetik Ürünlerini Anla
-          </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            INCI listesini analiz et, cildine uygun ürünleri keşfet.
-            Bilimsel kanıta dayalı, bağımsız ve Türkçe.
-          </p>
-
-          <div className="max-w-xl mx-auto">
+      {/* Hero Section */}
+      <section className="px-6 lg:px-16 py-16 lg:py-24 mb-16 lg:mb-24">
+        <div className="editorial-grid gap-8 items-end">
+          <div className="col-span-12 lg:col-span-7 mb-12 lg:mb-0">
+            <h1 className="text-6xl lg:text-8xl xl:text-9xl headline-tight leading-[0.85] mb-8 text-on-surface">
+              CİLDİNİ<br />
+              <span className="text-outline-variant">ANLA.</span>
+            </h1>
+            <p className="max-w-md text-lg text-on-surface-variant mb-10 leading-relaxed">
+              INCI listesini analiz et, bilimsel kanıtlarla cildine en uygun ürünleri keşfet.
+              Bağımsız, Türkçe, bilime dayalı.
+            </p>
             <Link
               href="/ara"
-              className="flex items-center gap-3 bg-white border-2 border-gray-200 rounded-xl px-6 py-4 text-gray-400 hover:border-primary hover:shadow-md transition-all shadow-sm"
+              className="curator-btn-primary"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              Ürün, içerik veya cilt ihtiyacı ara...
+              Koleksiyonu Keşfet
+              <span className="material-icon material-icon-sm group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span>
             </Link>
           </div>
-
-          {/* Stats */}
-          <div className="flex justify-center gap-8 mt-10">
-            {[
-              { label: 'Ürün', value: latest.meta?.total || 1785 },
-              { label: 'İçerik', value: 5000 },
-              { label: 'Marka', value: 113 },
-              { label: 'Kategori', value: categories.length || 57 },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl font-bold text-gray-900">
-                  {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
-              </div>
-            ))}
+          <div className="col-span-12 lg:col-span-5 relative">
+            {topProducts[0] && (
+              <>
+                <Link href={`/urunler/${topProducts[0].product_slug}`} className="block">
+                  <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-sm">
+                    {topProducts[0].images?.[0]?.image_url ? (
+                      <img
+                        src={topProducts[0].images[0].image_url}
+                        alt={topProducts[0].product_name}
+                        className="w-full h-full object-contain transition-transform duration-700 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }}>spa</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                <div className="absolute -bottom-6 -left-6 bg-tertiary-container p-6 hidden md:block max-w-[220px] rounded-sm">
+                  <span className="label-caps text-on-tertiary-container block mb-3">En Uyumlu</span>
+                  <p className="text-sm italic font-light text-on-tertiary-container">
+                    &ldquo;{topProducts[0].product_name}&rdquo;
+                  </p>
+                </div>
+              </>
+            )}
           </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="flex flex-wrap justify-start gap-12 mt-16 lg:mt-20">
+          {[
+            { label: 'Ürün Analizi', value: latest.meta?.total || 1785 },
+            { label: 'İçerik Maddesi', value: 5000 },
+            { label: 'Marka', value: 113 },
+            { label: 'Kategori', value: categories.length || 57 },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className="text-3xl headline-tight text-on-surface">
+                {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}
+              </p>
+              <p className="label-caps text-outline mt-1">{s.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Kategoriler */}
+      {/* Curated Categories */}
       {parentCats.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 py-14">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Kategoriler</h2>
-            <Link href="/urunler" className="text-sm text-primary hover:underline font-medium">
-              Tümünü Gör &rarr;
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            {parentCats.map((cat: Category) => (
-              <Link
-                key={cat.category_id}
-                href={`/urunler?category=${cat.category_slug}`}
-                className="bg-white border rounded-xl p-4 text-center hover:shadow-md hover:border-primary/30 transition-all group"
-              >
-                <span className="text-2xl block mb-2">{CATEGORY_ICONS[cat.category_name] || '📂'}</span>
-                <span className="text-xs font-semibold text-gray-700 group-hover:text-primary transition-colors">
-                  {cat.category_name}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* En Uyumlu Ürünler */}
-      {topProducts.length > 0 && (
-        <section className="bg-gray-50 py-14">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold">En Uyumlu Ürünler</h2>
-                <p className="text-sm text-gray-500 mt-1">Cilt ihtiyaçlarına en yüksek uyum skoru alan ürünler</p>
-              </div>
-              <Link href="/urunler" className="text-sm text-primary hover:underline font-medium">
-                Tümünü Gör &rarr;
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {topProducts.map((p: Product) => (
-                <ProductCard key={p.product_id} product={p} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Cilt İhtiyaçları */}
-      {cosmNeeds.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 py-14">
-          <div className="flex items-center justify-between mb-6">
+        <section className="bg-surface-container-low py-24 lg:py-32 px-6 lg:px-16">
+          <div className="mb-16 flex justify-between items-end">
             <div>
-              <h2 className="text-2xl font-bold">Cilt İhtiyaçları</h2>
-              <p className="text-sm text-gray-500 mt-1">İhtiyacına göre en etkili içerikleri ve ürünleri bul</p>
+              <h2 className="text-3xl lg:text-4xl headline-tight mb-2">KATEGORİLER</h2>
+              <p className="label-caps text-on-surface-variant">Disipline göre keşfet</p>
             </div>
-            <Link href="/ihtiyaclar" className="text-sm text-primary hover:underline font-medium">
-              Tümünü Gör &rarr;
+            <div className="h-px flex-grow mx-8 bg-outline-variant/20 hidden md:block" />
+            <Link href="/urunler" className="label-caps hover:underline underline-offset-8 transition-all text-on-surface">
+              Tümünü Gör
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {cosmNeeds.map((need: Need) => (
+            {parentCats.slice(0, 8).map((cat: Category) => (
               <Link
-                key={need.need_id}
-                href={`/ihtiyaclar/${need.need_slug}`}
-                className="bg-white border rounded-xl p-5 hover:shadow-md hover:border-primary/30 transition-all group"
+                key={cat.category_id}
+                href={`/urunler?category=${cat.category_slug}`}
+                className="group relative bg-surface-container-lowest rounded-sm p-8 hover:shadow-lg transition-all duration-500 border border-outline-variant/10 hover:border-outline-variant/30"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xl">{NEED_ICONS[need.need_name] || '💎'}</span>
-                  <h3 className="font-bold text-sm text-gray-800 group-hover:text-primary transition-colors">
-                    {need.need_name}
-                  </h3>
-                </div>
-                {need.short_description && (
-                  <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                    {need.short_description}
+                <span
+                  className="material-icon material-icon-lg text-primary/60 group-hover:text-primary transition-colors duration-500 block mb-4"
+                  aria-hidden="true"
+                >
+                  {CATEGORY_ICONS[cat.category_name] || 'category'}
+                </span>
+                <h3 className="text-lg font-bold tracking-tight text-on-surface">{cat.category_name}</h3>
+                {cat.children && cat.children.length > 0 && (
+                  <p className="label-caps text-on-surface-variant mt-2">
+                    {cat.children.length} alt kategori
                   </p>
                 )}
               </Link>
@@ -290,44 +265,93 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Yeni Eklenenler */}
-      {latest.data && latest.data.length > 0 && (
-        <section className="bg-gray-50 py-14">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold">Yeni Eklenenler</h2>
-                <p className="text-sm text-gray-500 mt-1">Son eklenen ürünler</p>
-              </div>
-              <Link href="/urunler" className="text-sm text-primary hover:underline font-medium">
-                Tümünü Gör &rarr;
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {latest.data.map((p: Product) => (
-                <ProductCard key={p.product_id} product={p} />
-              ))}
-            </div>
+      {/* Top Scored Products — New Arrivals style */}
+      {topProducts.length > 0 && (
+        <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface">
+          <div className="text-center mb-16 lg:mb-20">
+            <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Bilimsel Analiz</span>
+            <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {topProducts.slice(0, 8).map((p: Product, i: number) => (
+              <ProductCard key={p.product_id} product={p} index={i} />
+            ))}
           </div>
         </section>
       )}
 
-      {/* Popüler Markalar */}
+      {/* Popular Brands */}
       {brands.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 py-14">
-          <h2 className="text-2xl font-bold mb-6">Popüler Markalar</h2>
-          <div className="flex flex-wrap gap-3">
-            {brands.map((b: Brand) => (
+        <section className="py-16 px-6 lg:px-16 border-t border-outline-variant/10">
+          <div className="flex flex-wrap justify-between items-center gap-8 lg:gap-12 opacity-40 grayscale hover:opacity-60 hover:grayscale-0 transition-all duration-700">
+            {brands.slice(0, 8).map((b: Brand) => (
               <Link
                 key={b.brand_id}
                 href={`/urunler?brand=${b.brand_slug}`}
-                className="bg-white border rounded-full px-5 py-2.5 hover:shadow-md hover:border-primary/30 transition-all group flex items-center gap-2"
+                className="text-lg lg:text-xl font-bold tracking-tight text-on-surface hover:text-primary transition-colors"
               >
-                <span className="text-sm font-semibold text-gray-700 group-hover:text-primary transition-colors">
-                  {b.brand_name}
-                </span>
-                <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">
-                  {b.product_count}
+                {b.brand_name.toUpperCase()}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* How It Works */}
+      <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface-container-low">
+        <div className="editorial-grid gap-12 lg:gap-16">
+          <div className="col-span-12 lg:col-span-5">
+            <span className="label-caps text-outline mb-6 block tracking-[0.3em]">Sürecimiz</span>
+            <h2 className="text-4xl lg:text-5xl headline-tight leading-tight mb-8 text-on-surface">
+              BİLİMSEL<br />TİTİZLİK.
+            </h2>
+            <p className="text-on-surface-variant leading-relaxed">
+              Her ürünün INCI listesini moleküler düzeyde analiz ediyor,
+              bilimsel literatürle çapraz kontrol yapıyor ve cilt ihtiyaçlarına
+              göre uyumluluk skoru üretiyoruz.
+            </p>
+          </div>
+          <div className="col-span-12 lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+            {[
+              { icon: 'science', title: 'İçerik Laboratuvarı', desc: 'Her aktif bileşenin moleküler dökümü, etkinlik ve cilt uyumluluğu doğrulaması.' },
+              { icon: 'verified_user', title: 'Kanıt Değerlendirme', desc: 'Sistematik derleme, klinik çalışma ve uzman görüşü bazında kanıt seviyesi atanır.' },
+              { icon: 'eco', title: 'Kaynak İzleme', desc: 'Doğal, sentetik veya biyoteknoloji kaynaklı her içerik maddesinin kökeni takip edilir.' },
+              { icon: 'auto_awesome', title: 'Uyum Skoru', desc: 'Cilt tipine ve ihtiyaçlarına özel, kişiselleştirilmiş uyumluluk skoru hesaplanır.' },
+            ].map((item) => (
+              <div key={item.title} className="flex flex-col gap-4">
+                <span className="material-icon material-icon-lg text-primary" aria-hidden="true">{item.icon}</span>
+                <h4 className="text-lg font-bold tracking-tight uppercase text-on-surface">{item.title}</h4>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Skin Needs */}
+      {cosmNeeds.length > 0 && (
+        <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface">
+          <div className="text-center mb-16">
+            <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Cilt Analizi</span>
+            <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">CİLT İHTİYAÇLARI</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {cosmNeeds.map((need: Need) => (
+              <Link
+                key={need.need_id}
+                href={`/ihtiyaclar/${need.need_slug}`}
+                className="curator-card p-6 group"
+              >
+                <h3 className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors tracking-tight">
+                  {need.need_name}
+                </h3>
+                {need.short_description && (
+                  <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mt-2">
+                    {need.short_description}
+                  </p>
+                )}
+                <span className="label-caps text-primary/60 group-hover:text-primary mt-3 block transition-colors">
+                  Keşfet &rarr;
                 </span>
               </Link>
             ))}
@@ -335,81 +359,57 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Nasıl Çalışır */}
-      <section className="bg-gradient-to-br from-primary/5 to-primary/10 py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-10">Nasıl Çalışır?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: '1', title: 'Ürünü Bul', desc: 'İsmini yaz veya kategoriden seç. INCI listesini otomatik analiz ediyoruz.' },
-              { step: '2', title: 'İçerikleri Anla', desc: 'Her içerik maddesinin ne işe yaradığını, kanıt seviyesini ve olası etkilerini gör.' },
-              { step: '3', title: 'Uygunluğunu Gör', desc: 'Cilt profilini oluştur, her ürün için kişisel uyum skorunu al.' },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                  {item.step}
-                </div>
-                <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
-              </div>
-            ))}
+      {/* Skin Profiling CTA */}
+      <section className="py-32 lg:py-48 px-6 lg:px-16 text-center bg-surface-container-lowest">
+        <div className="max-w-3xl mx-auto">
+          <span className="label-caps text-outline mb-8 block tracking-[0.5em]">Kişiselleştirilmiş Analiz</span>
+          <h2 className="text-5xl lg:text-7xl xl:text-8xl headline-tight leading-[0.9] mb-10 text-on-surface">
+            CİLDİN,<br />SENİN TASARIMIN.
+          </h2>
+          <p className="text-lg text-on-surface-variant mb-12 max-w-xl mx-auto">
+            Cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.
+            Her ürün sayfasında sana özel uyumluluk skoru al.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/profilim" className="curator-btn-primary">
+              Profilimi Oluştur
+            </Link>
+            <Link href="/karsilastir" className="curator-btn-outline">
+              Ürünleri Karşılaştır
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Quick links */}
-      <section className="max-w-6xl mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link
-            href="/karsilastir"
-            className="bg-white border rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all group"
-          >
-            <div className="text-2xl mb-3">⚖️</div>
-            <h3 className="text-lg font-bold mb-1 group-hover:text-primary">Ürün Karşılaştır</h3>
-            <p className="text-gray-500 text-sm">2-3 ürünü yan yana koy, ingredient farklarını gör.</p>
-          </Link>
-          <Link
-            href="/profilim"
-            className="bg-white border rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all group"
-          >
-            <div className="text-2xl mb-3">👤</div>
-            <h3 className="text-lg font-bold mb-1 group-hover:text-primary">Cilt Profilim</h3>
-            <p className="text-gray-500 text-sm">Cilt tipini belirle, kişisel uyum skorlarını gör.</p>
-          </Link>
-          <Link
-            href="/rehber"
-            className="bg-white border rounded-xl p-6 hover:shadow-lg hover:border-primary/30 transition-all group"
-          >
-            <div className="text-2xl mb-3">📝</div>
-            <h3 className="text-lg font-bold mb-1 group-hover:text-primary">Rehber & Blog</h3>
-            <p className="text-gray-500 text-sm">Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri.</p>
-          </Link>
-        </div>
-      </section>
-
-      {/* Profile CTA */}
-      <section className="bg-primary/5 py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-3">Cilt Profilini Oluştur</h2>
-          <p className="text-gray-600 mb-6">
-            Cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.
-            Her ürün sayfasında sana özel uyum skoru gör.
-          </p>
-          <Link
-            href="/profilim"
-            className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
-          >
-            Profilimi Oluştur
-          </Link>
+      {/* Quick Links */}
+      <section className="py-16 px-6 lg:px-16 bg-surface">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {[
+            { href: '/karsilastir', icon: 'compare', title: 'Ürün Karşılaştır', desc: '2-3 ürünü yan yana koy, ingredient farklarını gör.' },
+            { href: '/rehber', icon: 'menu_book', title: 'Rehber & Blog', desc: 'Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri.' },
+            { href: '/favorilerim', icon: 'favorite_border', title: 'Favorilerim & Rutin', desc: 'Beğendiğin ürünleri kaydet, sabah/akşam rutinini oluştur.' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="curator-card p-8 group"
+            >
+              <span className="material-icon material-icon-lg text-primary/50 group-hover:text-primary transition-colors mb-4 block" aria-hidden="true">
+                {item.icon}
+              </span>
+              <h3 className="text-lg font-bold tracking-tight mb-2 text-on-surface">{item.title}</h3>
+              <p className="text-sm text-on-surface-variant">{item.desc}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
       {/* Disclosure */}
-      <section className="max-w-4xl mx-auto px-4 py-8">
-        <p className="text-xs text-gray-400 text-center leading-relaxed">
-          Kozmetik Platform bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
+      <section className="max-w-4xl mx-auto px-6 py-8">
+        <p className="text-xs text-outline text-center leading-relaxed">
+          REVELA bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
           niteliğinde değildir. Ürün sayfalarındaki satın alma linkleri komisyon içerebilir.{' '}
-          <Link href="/rehber" className="underline hover:text-gray-600">
+          <Link href="/rehber" className="underline hover:text-on-surface-variant transition-colors">
             Daha fazla bilgi
           </Link>
         </p>

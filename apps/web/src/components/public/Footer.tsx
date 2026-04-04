@@ -2,42 +2,67 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-16">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-white font-bold mb-3">Kozmetik Platform</h3>
-            <p className="text-sm">
-              Kozmetik ürünlerin içeriklerini anla, ihtiyacına uygun ürünleri keşfet.
-            </p>
+    <footer className="bg-surface-container-low w-full py-16 px-6 lg:px-12 mt-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start max-w-7xl mx-auto">
+        {/* Brand */}
+        <div>
+          <div className="text-xl font-bold tracking-tight text-on-surface mb-6">REVELA</div>
+          <p className="text-sm text-on-surface-variant max-w-xs leading-relaxed">
+            Kozmetik ürünlerin gerçek içeriğini ortaya çıkar. Bilimsel kanıtlarla desteklenen,
+            bağımsız içerik analiz platformu.
+          </p>
+        </div>
+
+        {/* Link columns */}
+        <div className="grid grid-cols-2 gap-8">
+          <div className="flex flex-col gap-4">
+            <span className="label-caps text-on-surface font-bold text-xs">Keşfet</span>
+            <Link href="/urunler" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              Ürünler
+            </Link>
+            <Link href="/icerikler" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              İçerik Maddeleri
+            </Link>
+            <Link href="/ihtiyaclar" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              İhtiyaçlar
+            </Link>
+            <Link href="/rehber" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              Rehber
+            </Link>
           </div>
-          <div>
-            <h4 className="text-white font-semibold mb-3 text-sm">Keşfet</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/urunler" className="hover:text-white">Ürünler</Link></li>
-              <li><Link href="/icerikler" className="hover:text-white">İçerik Maddeleri</Link></li>
-              <li><Link href="/ihtiyaclar" className="hover:text-white">İhtiyaçlar</Link></li>
-              <li><Link href="/rehber" className="hover:text-white">Rehber</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold mb-3 text-sm">Hakkımızda</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/hakkimizda" className="hover:text-white">Biz Kimiz?</Link></li>
-              <li><Link href="/metodoloji" className="hover:text-white">Metodolojimiz</Link></li>
-              <li><Link href="/iletisim" className="hover:text-white">İletişim</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-semibold mb-3 text-sm">Yasal</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/gizlilik" className="hover:text-white">Gizlilik Politikası</Link></li>
-              <li><Link href="/kullanim-kosullari" className="hover:text-white">Kullanım Koşulları</Link></li>
-            </ul>
+          <div className="flex flex-col gap-4">
+            <span className="label-caps text-on-surface font-bold text-xs">Destek</span>
+            <Link href="/hakkimizda" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              Hakkımızda
+            </Link>
+            <Link href="/metodoloji" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              Metodoloji
+            </Link>
+            <Link href="/iletisim" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              İletişim
+            </Link>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-          &copy; {new Date().getFullYear()} Kozmetik Platform. Tüm hakları saklıdır.
+
+        {/* Right */}
+        <div className="flex flex-col items-start md:items-end gap-6">
+          <div className="flex gap-5">
+            <span className="material-icon material-icon-sm text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors" aria-hidden="true">public</span>
+            <span className="material-icon material-icon-sm text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors" aria-hidden="true">share</span>
+            <span className="material-icon material-icon-sm text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors" aria-hidden="true">mail</span>
+          </div>
+          <p className="text-sm text-on-surface-variant text-left md:text-right">
+            &copy; {new Date().getFullYear()} REVELA. Tüm hakları saklıdır.
+          </p>
+          <div className="flex gap-4">
+            <Link href="/gizlilik" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
+              Gizlilik Politikası
+            </Link>
+            <span className="text-outline-variant">/</span>
+            <Link href="/kullanim-kosullari" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
+              Kullanım Koşulları
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -27,11 +27,11 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const article = await getArticle(params.slug);
-  if (!article) return { title: 'Makale bulunamadı' };
+  if (!article) return { title: 'Makale bulunamadi' };
 
   return {
     title: article.title,
-    description: article.summary || `${article.title} — Kozmetik Platform Rehber`,
+    description: article.summary || `${article.title} — REVELA Rehber`,
     openGraph: {
       title: article.title,
       description: article.summary || '',
@@ -42,12 +42,12 @@ export async function generateMetadata({
 }
 
 const CONTENT_TYPES: Record<string, { label: string; icon: string }> = {
-  guide: { label: 'Rehber', icon: '📖' },
-  ingredient_explainer: { label: 'İçerik İnceleme', icon: '🧪' },
-  need_guide: { label: 'İhtiyaç Rehberi', icon: '🎯' },
-  label_reading: { label: 'Etiket Okuma', icon: '🏷️' },
-  comparison: { label: 'Karşılaştırma', icon: '⚖️' },
-  news: { label: 'Haber', icon: '📰' },
+  guide: { label: 'Rehber', icon: 'menu_book' },
+  ingredient_explainer: { label: 'Icerik Inceleme', icon: 'science' },
+  need_guide: { label: 'Ihtiyac Rehberi', icon: 'target' },
+  label_reading: { label: 'Etiket Okuma', icon: 'label' },
+  comparison: { label: 'Karsilastirma', icon: 'compare' },
+  news: { label: 'Haber', icon: 'newspaper' },
 };
 
 function formatDate(dateStr: string): string {
@@ -67,11 +67,11 @@ function renderMarkdown(md: string): string {
       if (!trimmed) return '';
       // Headings
       if (trimmed.startsWith('### '))
-        return `<h3 class="text-lg font-bold text-gray-900 mt-6 mb-2">${trimmed.slice(4)}</h3>`;
+        return `<h3 class="text-lg font-bold text-on-surface mt-6 mb-2">${trimmed.slice(4)}</h3>`;
       if (trimmed.startsWith('## '))
-        return `<h2 class="text-xl font-bold text-gray-900 mt-8 mb-3">${trimmed.slice(3)}</h2>`;
+        return `<h2 class="text-xl font-bold text-on-surface mt-8 mb-3">${trimmed.slice(3)}</h2>`;
       if (trimmed.startsWith('# '))
-        return `<h1 class="text-2xl font-bold text-gray-900 mt-8 mb-3">${trimmed.slice(2)}</h1>`;
+        return `<h1 class="text-2xl font-bold text-on-surface mt-8 mb-3">${trimmed.slice(2)}</h1>`;
       // List block
       if (trimmed.startsWith('- ')) {
         const items = trimmed
@@ -79,19 +79,19 @@ function renderMarkdown(md: string): string {
           .filter((l) => l.startsWith('- '))
           .map((l) => `<li class="ml-4">${inlineFormat(l.slice(2))}</li>`)
           .join('');
-        return `<ul class="list-disc space-y-1 my-3 text-gray-700">${items}</ul>`;
+        return `<ul class="list-disc space-y-1 my-3 text-on-surface-variant">${items}</ul>`;
       }
       // Paragraph
-      return `<p class="text-gray-700 leading-relaxed my-3">${inlineFormat(trimmed.replace(/\n/g, '<br/>'))}</p>`;
+      return `<p class="text-on-surface-variant leading-relaxed my-3">${inlineFormat(trimmed.replace(/\n/g, '<br/>'))}</p>`;
     })
     .join('');
 }
 
 function inlineFormat(text: string): string {
   return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-on-surface">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="bg-gray-100 px-1 rounded text-sm">$1</code>');
+    .replace(/`(.+?)`/g, '<code class="bg-surface-container-low px-1 rounded-sm text-sm">$1</code>');
 }
 
 export default async function GuideDetailPage({
@@ -105,34 +105,36 @@ export default async function GuideDetailPage({
   const cfg = CONTENT_TYPES[article.content_type] || CONTENT_TYPES.guide;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="curator-section max-w-3xl mx-auto">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <nav className="label-caps text-outline mb-8 flex items-center gap-2">
         <Link href="/rehber" className="hover:text-primary transition-colors">
           Rehber
         </Link>
-        <span>/</span>
-        <span className="text-gray-600 truncate">{article.title}</span>
+        <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
+        <span className="text-on-surface-variant truncate">{article.title}</span>
       </nav>
 
       {/* Header */}
-      <header className="mb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">{cfg.icon}</span>
-          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-medium">
+      <header className="mb-10">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-icon text-outline-variant" aria-hidden="true">{cfg.icon}</span>
+          <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm">
             {cfg.label}
           </span>
           {article.published_at && (
-            <span className="text-xs text-gray-400">
+            <span className="label-caps text-outline">
               {formatDate(article.published_at)}
             </span>
           )}
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">{article.title}</h1>
+        <h1 className="text-3xl headline-tight text-on-surface mb-3">{article.title}</h1>
         {article.summary && (
-          <p className="text-lg text-gray-600 leading-relaxed">{article.summary}</p>
+          <p className="text-lg text-on-surface-variant leading-relaxed">{article.summary}</p>
         )}
       </header>
+
+      <div className="curator-divider mb-8" />
 
       {/* Body */}
       {article.body_markdown ? (
@@ -141,19 +143,20 @@ export default async function GuideDetailPage({
           dangerouslySetInnerHTML={{ __html: renderMarkdown(article.body_markdown) }}
         />
       ) : (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">📝</p>
-          <p>Makale içeriği henüz eklenmemiş</p>
+        <div className="text-center py-24">
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">article</span>
+          <p className="text-on-surface-variant">Makale icerigi henuz eklenmemis</p>
         </div>
       )}
 
       {/* Back link */}
-      <div className="mt-12 pt-6 border-t">
+      <div className="mt-12 pt-8 border-t border-outline-variant/20">
         <Link
           href="/rehber"
-          className="text-sm text-primary hover:underline"
+          className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
         >
-          &larr; Tüm rehberler
+          <span className="material-icon material-icon-sm" aria-hidden="true">arrow_back</span>
+          Tum rehberler
         </Link>
       </div>
 
@@ -169,7 +172,7 @@ export default async function GuideDetailPage({
             datePublished: article.published_at,
             publisher: {
               '@type': 'Organization',
-              name: 'Kozmetik Platform',
+              name: 'REVELA',
               url: 'https://kozmetikplatform.com',
             },
           }),
