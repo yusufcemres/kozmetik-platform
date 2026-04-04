@@ -643,6 +643,7 @@ export default async function ProductDetailPage({
           const maxPrice = prices.length ? Math.max(...prices) : 0;
           const avgPrice = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
           const cheapest = priced.find((l) => Number(l.price_snapshot) === minPrice);
+          const mostExpensive = priced.find((l) => Number(l.price_snapshot) === maxPrice);
           const sorted = [...activeLinks].sort((a, b) => {
             if (!a.price_snapshot) return 1;
             if (!b.price_snapshot) return -1;
@@ -672,6 +673,15 @@ export default async function ProductDetailPage({
                   <div className="bg-score-low-bg border border-score-low-border rounded-md p-4 text-center">
                     <p className="label-caps text-score-low">En Pahalı</p>
                     <p className="text-lg font-bold text-score-low mt-1">{formatPrice(maxPrice)}</p>
+                    {mostExpensive && (
+                      <div className="flex items-center justify-center mt-1.5">
+                        {PLATFORM_INFO[mostExpensive.platform]?.logo ? (
+                          <img src={PLATFORM_INFO[mostExpensive.platform].logo} alt={platformLabel(mostExpensive.platform)} className="h-5 w-auto rounded-sm" style={{ maxWidth: '60px' }} />
+                        ) : (
+                          <p className="label-caps text-score-low/60">{platformLabel(mostExpensive.platform)}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-4 text-center">
                     <p className="label-caps text-on-surface-variant">Ortalama</p>
