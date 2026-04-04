@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import PriceChart from '@/components/public/PriceChart';
+import ListModal from '@/components/public/ListModal';
 
 // === Types ===
 
@@ -457,36 +458,43 @@ export default async function ProductDetailPage({
             )}
           </h2>
           {sortedIngredients.length > 0 ? (
-            <div className="curator-card overflow-hidden">
-              <div className="divide-y divide-outline-variant/15">
-                {sortedIngredients.map((pi, idx) => {
-                  const isAllergen = pi.ingredient?.allergen_flag;
-                  const isFragrance = pi.ingredient?.fragrance_flag;
-                  return (
-                    <details
-                      key={pi.product_ingredient_id}
-                      className={`group px-5 py-3.5 ${
-                        isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
-                      }`}
-                    >
-                      <summary className="flex items-center gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                        <span className="label-caps text-outline w-6 text-right">
+            <ListModal
+              title="İçerik Listesi (INCI)"
+              count={sortedIngredients.length}
+              previewCount={10}
+              allChildren={
+                <div className="divide-y divide-outline-variant/15">
+                  {sortedIngredients.map((pi, idx) => {
+                    const isAllergen = pi.ingredient?.allergen_flag;
+                    const isFragrance = pi.ingredient?.fragrance_flag;
+                    return (
+                      <div
+                        key={pi.product_ingredient_id}
+                        className={`flex items-center gap-3 py-2.5 ${
+                          isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
+                        }`}
+                      >
+                        <span className="label-caps text-outline w-6 text-right shrink-0">
                           {idx + 1}
                         </span>
-                        <div className="flex-1 min-w-0 flex items-center gap-2">
-                          <span className="text-sm font-medium text-on-surface group-open:text-primary transition-colors">
-                            {pi.ingredient_display_name}
-                          </span>
-                          {pi.ingredient?.function_summary && (
-                            <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
-                              expand_more
+                        <div className="flex-1 min-w-0">
+                          {pi.ingredient ? (
+                            <Link
+                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                              className="text-sm font-medium text-on-surface hover:text-primary transition-colors"
+                            >
+                              {pi.ingredient_display_name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-medium text-on-surface">
+                              {pi.ingredient_display_name}
                             </span>
                           )}
                           {pi.is_below_one_percent_estimate && (
-                            <span className="label-caps text-outline">(&lt;1%)</span>
+                            <span className="label-caps text-outline ml-1">(&lt;1%)</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           {isAllergen && (
                             <span className="label-caps bg-error/10 text-error px-2 py-0.5 rounded-md">Alerjen</span>
                           )}
@@ -502,27 +510,79 @@ export default async function ProductDetailPage({
                             );
                           })()}
                         </div>
-                      </summary>
-                      {pi.ingredient && (
-                        <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
-                          {pi.ingredient.function_summary && (
-                            <p className="text-xs text-on-surface-variant leading-relaxed">
-                              {pi.ingredient.function_summary}
-                            </p>
-                          )}
-                          <Link
-                            href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                            className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
-                          >
-                            Detaylı bilgi &rarr;
-                          </Link>
-                        </div>
-                      )}
-                    </details>
-                  );
-                })}
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+            >
+              <div className="curator-card overflow-hidden">
+                <div className="divide-y divide-outline-variant/15">
+                  {sortedIngredients.slice(0, 10).map((pi, idx) => {
+                    const isAllergen = pi.ingredient?.allergen_flag;
+                    const isFragrance = pi.ingredient?.fragrance_flag;
+                    return (
+                      <details
+                        key={pi.product_ingredient_id}
+                        className={`group px-5 py-3.5 ${
+                          isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
+                        }`}
+                      >
+                        <summary className="flex items-center gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                          <span className="label-caps text-outline w-6 text-right">
+                            {idx + 1}
+                          </span>
+                          <div className="flex-1 min-w-0 flex items-center gap-2">
+                            <span className="text-sm font-medium text-on-surface group-open:text-primary transition-colors">
+                              {pi.ingredient_display_name}
+                            </span>
+                            {pi.ingredient?.function_summary && (
+                              <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
+                                expand_more
+                              </span>
+                            )}
+                            {pi.is_below_one_percent_estimate && (
+                              <span className="label-caps text-outline">(&lt;1%)</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {isAllergen && (
+                              <span className="label-caps bg-error/10 text-error px-2 py-0.5 rounded-md">Alerjen</span>
+                            )}
+                            {isFragrance && (
+                              <span className="label-caps bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-md">Parfüm</span>
+                            )}
+                            {pi.concentration_band !== 'unknown' && (() => {
+                              const conc = concentrationLabel(pi.concentration_band);
+                              return (
+                                <span className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}>
+                                  {conc.label}
+                                </span>
+                              );
+                            })()}
+                          </div>
+                        </summary>
+                        {pi.ingredient && (
+                          <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
+                            {pi.ingredient.function_summary && (
+                              <p className="text-xs text-on-surface-variant leading-relaxed">
+                                {pi.ingredient.function_summary}
+                              </p>
+                            )}
+                            <Link
+                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                              className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
+                            >
+                              Detaylı bilgi &rarr;
+                            </Link>
+                          </div>
+                        )}
+                      </details>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-md p-8 text-on-surface-variant text-sm text-center">
               <span className="material-icon material-icon-lg text-outline-variant block mb-2" aria-hidden="true">science</span>
