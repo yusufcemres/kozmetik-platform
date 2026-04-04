@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
-  AffiliateLink, FormulaRevision,
+  AffiliateLink, FormulaRevision, PriceHistory,
 } from '@database/entities';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -29,6 +29,8 @@ export class ProductsService {
     private readonly affiliateRepo: Repository<AffiliateLink>,
     @InjectRepository(FormulaRevision)
     private readonly revisionRepo: Repository<FormulaRevision>,
+    @InjectRepository(PriceHistory)
+    private readonly priceHistoryRepo: Repository<PriceHistory>,
   ) {}
 
   async create(dto: CreateProductDto) {
@@ -100,6 +102,19 @@ export class ProductsService {
       .limit(limit)
       .getMany();
     return products;
+  }
+
+  async findByIngredient(ingredientId: number, limit = 20) {
+    return this.repo
+      .createQueryBuilder('p')
+      .innerJoin('p.ingredients', 'pi', 'pi.ingredient_id = :iid', { iid: ingredientId })
+      .leftJoinAndSelect('p.brand', 'b')
+      .leftJoinAndSelect('p.images', 'img')
+      .leftJoinAndSelect('p.category', 'cat')
+      .where('p.status = :status', { status: 'published' })
+      .orderBy('pi.inci_order_rank', 'ASC')
+      .limit(limit)
+      .getMany();
   }
 
   async findByIds(ids: number[]) {
@@ -277,5 +292,58 @@ export class ProductsService {
   async createVariant(data: { master_id: number; region?: string; size_label?: string }) {
     const entity = this.variantRepo.create(data);
     return this.variantRepo.save(entity);
+  }
+
+  // === Price History ===
+
+  async getPriceHistory(productId: number, days = 90) {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+
+    const rows = await this.priceHistoryRepo
+      .createQueryBuilder('ph')
+      .innerJoin('ph.affiliate_link', 'al')
+      .select('al.platform', 'platform')
+      .addSelect('ph.price', 'price')
+      .addSelect('ph.recorded_at', 'recorded_at')
+      .where('al.product_id = :productId', { productId })
+      .andWhere('al.is_active = true')
+      .andWhere('ph.recorded_at >= :since', { since })
+      .orderBy('ph.recorded_at', 'ASC')
+      .getRawMany();
+
+    // Group by platform
+    const byPlatform: Record<string, { date: string; price: number }[]> = {};
+    for (const row of rows) {
+      const p = row.platform;
+      if (!byPlatform[p]) byPlatform[p] = [];
+      byPlatform[p].push({
+        date: new Date(row.recorded_at).toISOString().slice(0, 10),
+        price: parseFloat(row.price),
+      });
+    }
+
+    // Compute stats per platform
+    const platforms = Object.entries(byPlatform).map(([platform, points]) => {
+      const prices = points.map((p) => p.price);
+      return {
+        platform,
+        min: Math.min(...prices),
+        max: Math.max(...prices),
+        avg: Math.round((prices.reduce((a, b) => a + b, 0) / prices.length) * 100) / 100,
+        current: prices[prices.length - 1],
+        points,
+      };
+    });
+
+    // Global stats
+    const allPrices = rows.map((r: any) => parseFloat(r.price));
+    return {
+      period_days: days,
+      global_min: allPrices.length ? Math.min(...allPrices) : 0,
+      global_max: allPrices.length ? Math.max(...allPrices) : 0,
+      global_avg: allPrices.length ? Math.round((allPrices.reduce((a: number, b: number) => a + b, 0) / allPrices.length) * 100) / 100 : 0,
+      platforms,
+    };
   }
 }

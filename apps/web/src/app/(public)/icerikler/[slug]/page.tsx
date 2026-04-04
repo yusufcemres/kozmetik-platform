@@ -37,6 +37,15 @@ interface Ingredient {
   evidence_links?: EvidenceLink[];
 }
 
+interface ProductInCarousel {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  brand?: { brand_id: number; brand_name: string; brand_slug: string };
+  category?: { category_id: number; category_name: string };
+  images?: { image_url: string; alt_text?: string }[];
+}
+
 // === Data ===
 
 async function getIngredient(slug: string): Promise<Ingredient | null> {
@@ -46,6 +55,16 @@ async function getIngredient(slug: string): Promise<Ingredient | null> {
     } as any);
   } catch {
     return null;
+  }
+}
+
+async function getProductsByIngredient(ingredientId: number): Promise<ProductInCarousel[]> {
+  try {
+    return await apiFetch<ProductInCarousel[]>(`/products/by-ingredient/${ingredientId}?limit=20`, {
+      next: { revalidate: 3600 },
+    } as any);
+  } catch {
+    return [];
   }
 }
 
@@ -161,6 +180,8 @@ export default async function IngredientDetailPage({
 }) {
   const ingredient = await getIngredient(params.slug);
   if (!ingredient) notFound();
+
+  const products = await getProductsByIngredient(ingredient.ingredient_id);
 
   const evidence = ingredient.evidence_level
     ? evidenceLabel(ingredient.evidence_level)
@@ -344,6 +365,62 @@ export default async function IngredientDetailPage({
                   </div>
                 </a>
               ))}
+            </div>
+          </section>
+        )}
+
+        {/* Products containing this ingredient */}
+        {products.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-4">
+              Bu İçeriği Barındıran Ürünler
+              <span className="text-sm font-normal text-gray-400 ml-2">
+                {products.length} ürün
+              </span>
+            </h2>
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+                {products.map((p) => {
+                  const img = p.images?.[0]?.image_url;
+                  return (
+                    <Link
+                      key={p.product_id}
+                      href={`/urunler/${p.product_slug}`}
+                      className="flex-shrink-0 w-48 snap-start bg-white border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group"
+                    >
+                      <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                        {img ? (
+                          <img
+                            src={img}
+                            alt={p.product_name}
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="text-4xl text-gray-200">📦</span>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        {p.brand && (
+                          <p className="text-[10px] text-primary font-semibold truncate">
+                            {p.brand.brand_name}
+                          </p>
+                        )}
+                        <p className="text-xs font-medium text-gray-800 line-clamp-2 mt-0.5 leading-snug">
+                          {p.product_name}
+                        </p>
+                        {p.category && (
+                          <p className="text-[10px] text-gray-400 mt-1 truncate">
+                            {p.category.category_name}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              {/* Fade edges */}
+              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none" />
             </div>
           </section>
         )}

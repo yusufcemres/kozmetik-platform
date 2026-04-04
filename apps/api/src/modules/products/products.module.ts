@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster,
-  ProductVariant, AffiliateLink, FormulaRevision,
+  ProductVariant, AffiliateLink, FormulaRevision, PriceHistory,
 } from '@database/entities';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
@@ -12,7 +12,7 @@ import { ProductsService } from './products.service';
     TypeOrmModule.forFeature([
       Product, ProductLabel, ProductImage,
       ProductMaster, ProductVariant,
-      AffiliateLink, FormulaRevision,
+      AffiliateLink, FormulaRevision, PriceHistory,
     ]),
   ],
   controllers: [ProductsController],

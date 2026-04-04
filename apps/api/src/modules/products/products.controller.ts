@@ -48,6 +48,16 @@ export class ProductsController {
     return this.service.findTopScored(limit ? parseInt(limit) : 6);
   }
 
+  @Get('by-ingredient/:ingredientId')
+  @ApiOperation({ summary: 'İçeriğe göre ürün listesi' })
+  @ApiQuery({ name: 'limit', required: false })
+  findByIngredient(
+    @Param('ingredientId', ParseIntPipe) ingredientId: number,
+    @Query('limit') limit?: string,
+  ) {
+    return this.service.findByIngredient(ingredientId, limit ? parseInt(limit) : 20);
+  }
+
   @Get('compare')
   @ApiOperation({ summary: 'Ürünleri karşılaştır (çoklu ID)' })
   @ApiQuery({ name: 'ids', required: true, description: 'Virgülle ayrılmış product ID\'leri' })
@@ -149,5 +159,15 @@ export class ProductsController {
   @ApiOperation({ summary: 'Formül değişiklik geçmişi' })
   getFormulaRevisions(@Param('id', ParseIntPipe) id: number) {
     return this.service.getFormulaRevisions(id);
+  }
+
+  @Get(':id/price-history')
+  @ApiOperation({ summary: 'Fiyat geçmişi (platform bazlı)' })
+  @ApiQuery({ name: 'days', required: false, description: 'Kaç günlük geçmiş (varsayılan 90)' })
+  getPriceHistory(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('days') days?: string,
+  ) {
+    return this.service.getPriceHistory(id, days ? parseInt(days) : 90);
   }
 }

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
+import PriceChart from '@/components/public/PriceChart';
 
 // === Types ===
 
@@ -414,7 +415,14 @@ export default async function ProductDetailPage({
         {/* Need Scores */}
         {product.need_scores && product.need_scores.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-xl font-bold mb-4">Uyumluluk Skorları</h2>
+            <h2 className="text-xl font-bold mb-2">Uyumluluk Skorları</h2>
+            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+              Skorlar, ürünün INCI listesindeki her bir etken maddenin bilimsel kanıt seviyesi,
+              konsantrasyon sıralaması ve ilgili cilt ihtiyacına katkısı analiz edilerek hesaplanır.
+              <span className="font-medium text-green-600"> %70+</span> yüksek uyum,
+              <span className="font-medium text-yellow-600"> %40-69</span> orta uyum,
+              <span className="font-medium text-red-500"> %40 altı</span> düşük uyum anlamına gelir.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {product.need_scores.map((ns) => {
                 const score = Math.round(Number(ns.compatibility_score));
@@ -590,40 +598,117 @@ export default async function ProductDetailPage({
           </section>
         )}
 
-        {/* Affiliate Links */}
-        {activeLinks.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold mb-4">Nereden Alınır?</h2>
-            <div className="bg-white border rounded-xl p-6">
-              <div className="flex flex-wrap gap-4">
-                {activeLinks.map((link) => (
-                  <a
-                    key={link.affiliate_link_id}
-                    href={link.affiliate_url}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow sponsored"
-                    className="border rounded-lg p-4 text-center min-w-[140px] hover:shadow-md hover:border-primary/30 transition-all"
-                  >
-                    <p className="font-semibold text-sm mb-1">
-                      {platformLabel(link.platform)}
-                    </p>
-                    {link.price_snapshot ? (
-                      <p className="text-lg font-bold text-primary">
-                        {formatPrice(link.price_snapshot)}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-400">Fiyat bilgisi yok</p>
-                    )}
-                    <p className="text-xs text-primary mt-1">Satın Al &rarr;</p>
-                  </a>
-                ))}
+        {/* Affiliate Links — Cimri Style */}
+        {activeLinks.length > 0 && (() => {
+          const priced = activeLinks.filter((l) => l.price_snapshot && l.price_snapshot > 0);
+          const prices = priced.map((l) => Number(l.price_snapshot));
+          const minPrice = prices.length ? Math.min(...prices) : 0;
+          const maxPrice = prices.length ? Math.max(...prices) : 0;
+          const avgPrice = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+          const cheapest = priced.find((l) => Number(l.price_snapshot) === minPrice);
+          const sorted = [...activeLinks].sort((a, b) => {
+            if (!a.price_snapshot) return 1;
+            if (!b.price_snapshot) return -1;
+            return Number(a.price_snapshot) - Number(b.price_snapshot);
+          });
+
+          return (
+            <section className="mb-12">
+              <h2 className="text-xl font-bold mb-4">Nereden Alınır?</h2>
+
+              {/* Price summary */}
+              {prices.length >= 2 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <p className="text-[10px] text-green-600 font-medium">En Ucuz</p>
+                    <p className="text-lg font-bold text-green-700">{formatPrice(minPrice)}</p>
+                    {cheapest && <p className="text-[10px] text-green-500">{platformLabel(cheapest.platform)}</p>}
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                    <p className="text-[10px] text-red-600 font-medium">En Pahalı</p>
+                    <p className="text-lg font-bold text-red-700">{formatPrice(maxPrice)}</p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                    <p className="text-[10px] text-blue-600 font-medium">Ortalama</p>
+                    <p className="text-lg font-bold text-blue-700">{formatPrice(avgPrice)}</p>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                    <p className="text-[10px] text-gray-500 font-medium">Platform Sayısı</p>
+                    <p className="text-lg font-bold text-gray-700">{priced.length}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Price tracking chart */}
+              <PriceChart productId={product.product_id} />
+
+              {/* Price bar visual */}
+              {prices.length >= 2 && minPrice !== maxPrice && (
+                <div className="bg-white border rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
+                    <span>Ucuz</span>
+                    <span>Pahalı</span>
+                  </div>
+                  <div className="relative h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full">
+                    {priced.map((link) => {
+                      const pos = ((Number(link.price_snapshot) - minPrice) / (maxPrice - minPrice)) * 100;
+                      return (
+                        <div
+                          key={link.affiliate_link_id}
+                          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-gray-700 rounded-full"
+                          style={{ left: `${Math.min(97, Math.max(3, pos))}%` }}
+                          title={`${platformLabel(link.platform)}: ${formatPrice(Number(link.price_snapshot))}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Vertical price list */}
+              <div className="bg-white border rounded-xl overflow-hidden divide-y">
+                {sorted.map((link, idx) => {
+                  const isCheapest = link.price_snapshot && Number(link.price_snapshot) === minPrice && prices.length >= 2;
+                  return (
+                    <a
+                      key={link.affiliate_link_id}
+                      href={link.affiliate_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors ${isCheapest ? 'bg-green-50/50' : ''}`}
+                    >
+                      {isCheapest && (
+                        <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded font-bold shrink-0">
+                          EN UCUZ
+                        </span>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-800">{platformLabel(link.platform)}</p>
+                      </div>
+                      {link.price_snapshot ? (
+                        <div className="text-right shrink-0">
+                          <p className="text-lg font-bold text-gray-900">{formatPrice(Number(link.price_snapshot))}</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-400 shrink-0">Fiyat bilgisi yok</p>
+                      )}
+                      <div className="shrink-0">
+                        <span className="inline-flex items-center justify-center w-10 h-10 bg-primary rounded-full text-white hover:bg-primary/90 transition-colors">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </a>
+                  );
+                })}
               </div>
-              <p className="text-xs text-gray-400 mt-4">
-                Bağımsız platformuz, komisyon alınan linkler içerebilir.
+              <p className="text-xs text-gray-400 mt-3">
+                Bağımsız platformuz, komisyon alınan linkler içerebilir. Fiyatlar son güncelleme tarihine aittir.
               </p>
-            </div>
-          </section>
-        )}
+            </section>
+          );
+        })()}
 
         {/* Compare CTA */}
         <div className="border-t pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
