@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" fill="none">
-  <rect width="120" height="32" rx="4" fill="#E91E63"/>
-  <text x="60" y="22" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="16" fill="#fff">gratis</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 36" fill="none">
+  <!-- Yellow speech bubble background -->
+  <rect width="140" height="36" rx="16" fill="#FFD700"/>
+  <text x="70" y="24" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-style="italic" font-size="18" fill="#4A0E78">gratis</text>
+  <!-- Pink underline -->
+  <rect x="38" y="26" width="64" height="3" rx="1.5" fill="#E535AB"/>
 </svg>

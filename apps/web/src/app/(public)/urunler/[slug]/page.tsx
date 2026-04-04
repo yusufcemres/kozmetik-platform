@@ -165,6 +165,16 @@ function getScoreBarColor(score: number): string {
   return 'bg-score-low';
 }
 
+const PLATFORM_INFO: Record<string, { label: string; logo: string; color: string }> = {
+  trendyol:     { label: 'Trendyol',     logo: '/logos/trendyol.svg',     color: '#F27A1A' },
+  hepsiburada:  { label: 'Hepsiburada',  logo: '/logos/hepsiburada.svg',  color: '#FF6000' },
+  amazon_tr:    { label: 'Amazon TR',    logo: '/logos/amazon_tr.svg',    color: '#232F3E' },
+  dermoeczanem: { label: 'Dermoeczanem', logo: '/logos/dermoeczanem.svg', color: '#00A99D' },
+  gratis:       { label: 'Gratis',       logo: '/logos/gratis.svg',       color: '#4A0E78' },
+  rossmann:     { label: 'Rossmann',     logo: '/logos/rossmann.svg',     color: '#D40E14' },
+  watsons:      { label: 'Watsons',      logo: '/logos/watsons.svg',      color: '#00B0A0' },
+};
+
 function platformLabel(platform: string): string {
   const map: Record<string, string> = {
     trendyol: 'Trendyol',
@@ -649,7 +659,15 @@ export default async function ProductDetailPage({
                   <div className="bg-score-high-bg border border-score-high-border rounded-md p-4 text-center">
                     <p className="label-caps text-score-high">En Ucuz</p>
                     <p className="text-lg font-bold text-score-high mt-1">{formatPrice(minPrice)}</p>
-                    {cheapest && <p className="label-caps text-score-high/60 mt-1">{platformLabel(cheapest.platform)}</p>}
+                    {cheapest && (
+                      <div className="flex items-center justify-center mt-1.5">
+                        {PLATFORM_INFO[cheapest.platform]?.logo ? (
+                          <img src={PLATFORM_INFO[cheapest.platform].logo} alt={platformLabel(cheapest.platform)} className="h-5 w-auto rounded-sm" style={{ maxWidth: '60px' }} />
+                        ) : (
+                          <p className="label-caps text-score-high/60">{platformLabel(cheapest.platform)}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="bg-score-low-bg border border-score-low-border rounded-md p-4 text-center">
                     <p className="label-caps text-score-low">En Pahalı</p>
@@ -673,28 +691,40 @@ export default async function ProductDetailPage({
               <div className="curator-card overflow-hidden divide-y divide-outline-variant/15">
                 {sorted.map((link) => {
                   const isCheapest = link.price_snapshot && Number(link.price_snapshot) === minPrice && prices.length >= 2;
+                  const pInfo = PLATFORM_INFO[link.platform];
                   return (
                     <a
                       key={link.affiliate_link_id}
                       href={link.affiliate_url}
                       target="_blank"
                       rel="noopener noreferrer nofollow sponsored"
-                      className={`flex items-center gap-4 px-6 py-5 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
+                      className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                     >
                       {isCheapest && (
                         <span className="label-caps bg-score-high text-white px-2.5 py-1 rounded-md shrink-0">
                           EN UCUZ
                         </span>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-on-surface">{platformLabel(link.platform)}</p>
+                      <div className="flex-1 min-w-0 flex items-center gap-3">
+                        {pInfo?.logo ? (
+                          <img
+                            src={pInfo.logo}
+                            alt={pInfo.label}
+                            className="h-7 w-auto shrink-0 rounded-sm"
+                            style={{ maxWidth: '80px' }}
+                          />
+                        ) : (
+                          <p className="font-semibold text-on-surface">{platformLabel(link.platform)}</p>
+                        )}
                       </div>
                       {link.price_snapshot ? (
-                        <p className="text-lg font-bold text-on-surface shrink-0">{formatPrice(Number(link.price_snapshot))}</p>
+                        <p className="text-lg font-bold shrink-0" style={{ color: pInfo?.color || '#2f3331' }}>
+                          {formatPrice(Number(link.price_snapshot))}
+                        </p>
                       ) : (
                         <p className="text-sm text-outline shrink-0">Fiyat bilgisi yok</p>
                       )}
-                      <span className="material-icon text-primary shrink-0" aria-hidden="true">arrow_forward</span>
+                      <span className="material-icon shrink-0" style={{ color: pInfo?.color || '#1a1a1a' }} aria-hidden="true">arrow_forward</span>
                     </a>
                   );
                 })}

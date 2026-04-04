@@ -69,11 +69,11 @@ const PLATFORMS: Record<string, PlatformBrand> = {
   },
   gratis: {
     label: 'Gratis',
-    color: '#E91E63',
-    bg: '#FDE8EF',
-    textOnBg: '#C2185B',
+    color: '#4A0E78',
+    bg: '#FFF8D6',
+    textOnBg: '#4A0E78',
     logo: '/logos/gratis.svg',
-    gridLine: 'rgba(233,30,99,0.12)',
+    gridLine: 'rgba(74,14,120,0.12)',
   },
   rossmann: {
     label: 'Rossmann',
