@@ -41,6 +41,28 @@ export class ProductsController {
     return this.service.findAll({ ...query, brand_id, category_id, status });
   }
 
+  @Get('top-scored')
+  @ApiOperation({ summary: 'En yüksek skorlu ürünler' })
+  @ApiQuery({ name: 'limit', required: false })
+  findTopScored(@Query('limit') limit?: string) {
+    return this.service.findTopScored(limit ? parseInt(limit) : 6);
+  }
+
+  @Get('compare')
+  @ApiOperation({ summary: 'Ürünleri karşılaştır (çoklu ID)' })
+  @ApiQuery({ name: 'ids', required: true, description: 'Virgülle ayrılmış product ID\'leri' })
+  compare(@Query('ids') ids: string) {
+    const idArr = ids.split(',').map(Number).filter(Boolean).slice(0, 4);
+    return this.service.findByIds(idArr);
+  }
+
+  @Get('popular-brands')
+  @ApiOperation({ summary: 'Popüler markalar (ürün sayısına göre)' })
+  @ApiQuery({ name: 'limit', required: false })
+  findPopularBrands(@Query('limit') limit?: string) {
+    return this.service.findPopularBrands(limit ? parseInt(limit) : 12);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Ürün detay (ID)' })
   findOne(@Param('id', ParseIntPipe) id: number) {

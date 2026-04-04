@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import FavoriteButton from '@/components/public/FavoriteButton';
 
 // === Types ===
 
@@ -291,7 +292,16 @@ export default async function ProductDetailPage({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Image */}
-          <div className="bg-gray-50 rounded-xl aspect-square flex items-center justify-center overflow-hidden">
+          <div className="relative bg-gray-50 rounded-xl aspect-square flex items-center justify-center overflow-hidden">
+            <div className="absolute top-3 right-3 z-10">
+              <FavoriteButton
+                product_id={product.product_id}
+                product_name={product.product_name}
+                product_slug={product.product_slug}
+                brand_name={product.brand?.brand_name}
+                image_url={imageUrl}
+              />
+            </div>
             {imageUrl ? (
               <Image
                 src={imageUrl}

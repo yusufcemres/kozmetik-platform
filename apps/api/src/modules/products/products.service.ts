@@ -82,6 +82,57 @@ export class ProductsService {
     };
   }
 
+  async findTopScored(limit = 6) {
+    const products = await this.repo
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.brand', 'b')
+      .leftJoinAndSelect('p.images', 'img')
+      .leftJoinAndSelect('p.category', 'cat')
+      .leftJoin('p.need_scores', 'ns')
+      .where('p.status = :status', { status: 'published' })
+      .addSelect('AVG(ns.compatibility_score)', 'avg_score')
+      .groupBy('p.product_id')
+      .addGroupBy('b.brand_id')
+      .addGroupBy('img.product_image_id')
+      .addGroupBy('cat.category_id')
+      .having('COUNT(ns.product_need_score_id) > 0')
+      .orderBy('avg_score', 'DESC')
+      .limit(limit)
+      .getMany();
+    return products;
+  }
+
+  async findByIds(ids: number[]) {
+    if (!ids.length) return [];
+    return this.repo.find({
+      where: ids.map((id) => ({ product_id: id })),
+      relations: [
+        'brand', 'category', 'images', 'affiliate_links',
+        'ingredients', 'ingredients.ingredient',
+        'need_scores', 'need_scores.need',
+      ],
+      order: { ingredients: { inci_order_rank: 'ASC' } },
+    });
+  }
+
+  async findPopularBrands(limit = 12) {
+    const brands = await this.repo
+      .createQueryBuilder('p')
+      .innerJoin('p.brand', 'b')
+      .select('b.brand_id', 'brand_id')
+      .addSelect('b.brand_name', 'brand_name')
+      .addSelect('b.brand_slug', 'brand_slug')
+      .addSelect('COUNT(p.product_id)', 'product_count')
+      .where('p.status = :status', { status: 'published' })
+      .groupBy('b.brand_id')
+      .addGroupBy('b.brand_name')
+      .addGroupBy('b.brand_slug')
+      .orderBy('product_count', 'DESC')
+      .limit(limit)
+      .getRawMany();
+    return brands;
+  }
+
   async findOne(id: number) {
     const entity = await this.repo.findOne({
       where: { product_id: id },
