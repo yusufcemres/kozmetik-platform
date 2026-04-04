@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import ListModal from '@/components/public/ListModal';
@@ -418,13 +419,14 @@ export default async function NeedDetailPage({
                       href={`/urunler/${product.product_slug}`}
                       className="curator-card overflow-hidden group"
                     >
-                      <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden">
+                      <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                         {imgUrl ? (
-                          <img
+                          <Image
                             src={imgUrl}
                             alt={product.product_name}
-                            className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-contain group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>

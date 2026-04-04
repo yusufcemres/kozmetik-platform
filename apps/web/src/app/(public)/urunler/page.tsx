@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 
 interface Product {
@@ -286,13 +287,14 @@ function ProductsListContent() {
                   href={`/urunler/${product.product_slug}`}
                   className="curator-card overflow-hidden group"
                 >
-                  <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden">
+                  <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                     {imgUrl ? (
-                      <img
+                      <Image
                         src={imgUrl}
                         alt={product.product_name}
-                        className="h-full w-full object-contain grayscale-[10%] group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-contain grayscale-[10%] group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>

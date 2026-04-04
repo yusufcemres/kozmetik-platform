@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   getFavorites, removeFavorite, FavoriteItem,
   getRoutine, addToRoutine, removeFromRoutine, reorderRoutine,
@@ -106,9 +107,9 @@ export default function FavoritesPage() {
               {favorites.map((fav) => (
                 <div key={fav.product_id} className="curator-card p-4 flex items-center gap-4 group">
                   <Link href={`/urunler/${fav.product_slug}`} className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-16 h-16 bg-surface-container-low rounded-sm overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-surface-container-low rounded-sm overflow-hidden shrink-0 flex items-center justify-center relative">
                       {fav.image_url ? (
-                        <img src={fav.image_url} alt={fav.product_name} className="w-full h-full object-contain" />
+                        <Image src={fav.image_url} alt={fav.product_name} fill sizes="64px" className="object-contain" />
                       ) : (
                         <span className="material-icon text-outline-variant" aria-hidden="true">inventory_2</span>
                       )}

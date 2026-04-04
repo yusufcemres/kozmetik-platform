@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 
 // === Types ===
@@ -102,13 +103,14 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
       href={`/urunler/${product.product_slug}`}
       className={`flex flex-col curator-card p-4 -m-0 group ${index % 2 !== 0 ? 'mt-0 lg:mt-12' : ''}`}
     >
-      <div className="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-sm">
+      <div className="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-sm relative">
         {imgUrl ? (
-          <img
+          <Image
             src={imgUrl}
             alt={product.product_name}
-            className="w-full h-full object-contain grayscale-[10%] transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            fill
+            sizes="(max-width: 640px) 50vw, 25vw"
+            className="object-contain grayscale-[10%] transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -186,12 +188,15 @@ export default async function HomePage() {
             {featuredProducts[0] ? (
               <>
                 <Link href={`/urunler/${featuredProducts[0].product_slug}`} className="block">
-                  <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-sm">
+                  <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-sm relative">
                     {featuredProducts[0].images?.[0]?.image_url ? (
-                      <img
+                      <Image
                         src={featuredProducts[0].images[0].image_url}
                         alt={featuredProducts[0].product_name}
-                        className="w-full h-full object-contain transition-transform duration-700 hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 100vw, 50vw"
+                        className="object-contain transition-transform duration-700 hover:scale-105"
+                        priority
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

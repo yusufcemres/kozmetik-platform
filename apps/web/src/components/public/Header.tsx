@@ -38,8 +38,13 @@ export default function Header() {
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="flex justify-between items-center w-full px-6 lg:px-12 py-4 max-w-full">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold tracking-tight text-on-surface">
-          REVELA
+        <Link href="/" className="flex flex-col leading-none">
+          <span className="text-3xl md:text-4xl font-extrabold tracking-tighter text-on-surface">
+            REVELA
+          </span>
+          <span className="text-[8px] md:text-[9px] uppercase tracking-[0.35em] text-outline mt-0.5">
+            Kozmetik Analiz
+          </span>
         </Link>
 
         {/* Desktop nav */}

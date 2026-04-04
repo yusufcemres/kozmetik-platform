@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 
 // === Types ===
@@ -142,9 +143,9 @@ function ProductSlot({
         >
           <span className="material-icon material-icon-sm" aria-hidden="true">close</span>
         </button>
-        <div className="h-40 bg-surface-container-low flex items-center justify-center overflow-hidden">
+        <div className="h-40 bg-surface-container-low flex items-center justify-center overflow-hidden relative">
           {imgUrl ? (
-            <img src={imgUrl} alt={product.product_name} className="h-full w-full object-contain" />
+            <Image src={imgUrl} alt={product.product_name} fill sizes="300px" className="object-contain" />
           ) : (
             <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
           )}

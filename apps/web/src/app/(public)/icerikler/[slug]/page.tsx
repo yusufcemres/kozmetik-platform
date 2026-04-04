@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 
@@ -390,13 +391,14 @@ export default async function IngredientDetailPage({
                       href={`/urunler/${p.product_slug}`}
                       className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
                     >
-                      <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden">
+                      <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                         {img ? (
-                          <img
+                          <Image
                             src={img}
                             alt={p.product_name}
-                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
+                            fill
+                            sizes="192px"
+                            className="object-contain group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
