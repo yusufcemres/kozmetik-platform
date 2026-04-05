@@ -32,13 +32,30 @@ export class ProductsController {
   @ApiQuery({ name: 'brand_id', required: false })
   @ApiQuery({ name: 'category_id', required: false })
   @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'target_area', required: false })
+  @ApiQuery({ name: 'usage_time', required: false })
+  @ApiQuery({ name: 'product_type', required: false })
+  @ApiQuery({ name: 'need_id', required: false })
   findAll(
     @Query() query: PaginationDto,
-    @Query('brand_id') brand_id?: number,
-    @Query('category_id') category_id?: number,
+    @Query('brand_id') brand_id?: string,
+    @Query('category_id') category_id?: string,
     @Query('status') status?: string,
+    @Query('target_area') target_area?: string,
+    @Query('usage_time') usage_time?: string,
+    @Query('product_type') product_type?: string,
+    @Query('need_id') need_id?: string,
   ) {
-    return this.service.findAll({ ...query, brand_id, category_id, status });
+    return this.service.findAll({
+      ...query,
+      brand_id: brand_id ? Number(brand_id) : undefined,
+      category_id: category_id ? Number(category_id) : undefined,
+      status,
+      target_area,
+      usage_time,
+      product_type,
+      need_id: need_id ? Number(need_id) : undefined,
+    });
   }
 
   @Get('top-scored')

@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster,
   ProductVariant, AffiliateLink, FormulaRevision, PriceHistory,
+  Category,
 } from '@database/entities';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
@@ -13,6 +14,7 @@ import { ProductsService } from './products.service';
       Product, ProductLabel, ProductImage,
       ProductMaster, ProductVariant,
       AffiliateLink, FormulaRevision, PriceHistory,
+      Category,
     ]),
   ],
   controllers: [ProductsController],

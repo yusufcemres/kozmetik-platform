@@ -387,26 +387,26 @@ export default async function ProductDetailPage({
               {product.product_name}
             </h1>
 
-            {/* Meta badges */}
+            {/* Meta badges — clickable filter links */}
             <div className="flex flex-wrap gap-2 mb-6">
               {product.category && (
-                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
+                <Link href={`/urunler?category=${product.category.category_slug || ''}`} className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors">
                   {product.category.category_name}
-                </span>
+                </Link>
               )}
               {product.product_type_label && (
-                <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
+                <Link href={`/urunler?type=${product.product_type_label}`} className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors">
                   {product.product_type_label}
-                </span>
+                </Link>
               )}
               {product.target_area && (
-                <span className="label-caps bg-tertiary-container px-3 py-1.5 rounded-md text-on-tertiary-container">
-                  {product.target_area === 'face' ? 'Yüz' : product.target_area === 'body' ? 'Vücut' : product.target_area === 'hair' ? 'Saç' : product.target_area === 'eye' ? 'Göz Çevresi' : product.target_area}
-                </span>
+                <Link href={`/urunler?area=${product.target_area}`} className="label-caps bg-tertiary-container px-3 py-1.5 rounded-md text-on-tertiary-container hover:opacity-80 transition-colors">
+                  {product.target_area === 'yüz' ? 'Yüz' : product.target_area === 'vücut' ? 'Vücut' : product.target_area === 'saç' ? 'Saç' : product.target_area === 'göz' ? 'Göz Çevresi' : product.target_area === 'dudak' ? 'Dudak' : product.target_area}
+                </Link>
               )}
               {product.usage_time_hint && (
                 <span className="label-caps bg-surface-container px-3 py-1.5 rounded-md text-on-surface-variant">
-                  {product.usage_time_hint === 'morning' ? 'Sabah' : product.usage_time_hint === 'evening' ? 'Akşam' : product.usage_time_hint === 'both' ? 'Sabah & Akşam' : product.usage_time_hint}
+                  {product.usage_time_hint === 'sabah' ? 'Sabah' : product.usage_time_hint === 'aksam' ? 'Akşam' : product.usage_time_hint === 'sabah_aksam' ? 'Sabah & Akşam' : product.usage_time_hint}
                 </span>
               )}
               {product.net_content_value && (

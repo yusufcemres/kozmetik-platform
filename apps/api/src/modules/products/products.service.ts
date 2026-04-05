@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, In } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
-  AffiliateLink, FormulaRevision, PriceHistory,
+  AffiliateLink, FormulaRevision, PriceHistory, Category,
 } from '@database/entities';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -31,6 +31,8 @@ export class ProductsService {
     private readonly revisionRepo: Repository<FormulaRevision>,
     @InjectRepository(PriceHistory)
     private readonly priceHistoryRepo: Repository<PriceHistory>,
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
   ) {}
 
   async create(dto: CreateProductDto) {
@@ -62,13 +64,53 @@ export class ProductsService {
     return this.findOne(saved.product_id);
   }
 
-  async findAll(query: PaginationDto & { brand_id?: number; category_id?: number; status?: string }) {
-    const { page, limit, search, brand_id, category_id, status } = query;
+  async findAll(query: PaginationDto & {
+    brand_id?: number; category_id?: number; status?: string;
+    target_area?: string; usage_time?: string; product_type?: string; need_id?: number;
+  }) {
+    const { page, limit, search, brand_id, category_id, status, target_area, usage_time, product_type, need_id } = query;
     const where: any = {};
     if (search) where.product_name = Like(`%${search}%`);
-    if (brand_id) where.brand_id = brand_id;
-    if (category_id) where.category_id = category_id;
+    if (brand_id) where.brand_id = Number(brand_id);
     if (status) where.status = status;
+    if (target_area) where.target_area = target_area;
+    if (usage_time) where.usage_time_hint = usage_time;
+    if (product_type) where.product_type_label = Like(`%${product_type}%`);
+
+    // Category filter: include child categories for parent
+    if (category_id) {
+      const catId = Number(category_id);
+      const children = await this.categoryRepo.find({
+        where: { parent_category_id: catId },
+        select: ['category_id'],
+      });
+      const ids = [catId, ...children.map(c => c.category_id)];
+      where.category_id = In(ids);
+    }
+
+    // Need filter requires a join — use QueryBuilder
+    if (need_id) {
+      const qb = this.repo.createQueryBuilder('p')
+        .innerJoin('p.need_scores', 'ns', 'ns.need_id = :nid', { nid: Number(need_id) })
+        .leftJoinAndSelect('p.brand', 'b')
+        .leftJoinAndSelect('p.category', 'cat')
+        .leftJoinAndSelect('p.label', 'lbl')
+        .leftJoinAndSelect('p.images', 'img');
+
+      if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
+      if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
+      if (category_id) qb.andWhere('p.category_id IN (:...cids)', { cids: where.category_id?.value || [Number(category_id)] });
+      if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
+      if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
+      if (product_type) qb.andWhere('p.product_type_label ILIKE :pt', { pt: `%${product_type}%` });
+
+      qb.orderBy('ns.compatibility_score', 'DESC')
+        .skip((page - 1) * limit)
+        .take(limit);
+
+      const [data, total] = await qb.getManyAndCount();
+      return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    }
 
     const [data, total] = await this.repo.findAndCount({
       where,

@@ -124,7 +124,7 @@ export default function Header() {
 
       {/* Mobile overlay menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[65px] z-40 bg-surface">
+        <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#faf9f7] overflow-y-auto">
           <nav className="px-6 py-8 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');

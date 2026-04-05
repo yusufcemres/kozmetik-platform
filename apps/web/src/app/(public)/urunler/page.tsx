@@ -11,12 +11,24 @@ interface Product {
   product_name: string;
   product_slug: string;
   product_type_label?: string;
+  target_area?: string;
+  usage_time_hint?: string;
   short_description?: string;
   brand?: { brand_id: number; brand_name: string };
-  category?: { category_id: number; category_name: string };
+  category?: { category_id: number; category_name: string; category_slug?: string };
   images?: { image_url: string; sort_order?: number }[];
-  need_scores?: { compatibility_score: number }[];
+  need_scores?: { compatibility_score: number; need?: { need_name: string } }[];
 }
+
+const TYPE_CHIPS = [
+  'serum', 'nemlendirici', 'temizleyici', 'güneş kremi', 'tonik',
+  'peeling', 'göz kremi', 'maske', 'krem', 'esans',
+];
+
+const AREA_LABELS: Record<string, string> = {
+  'yüz': 'Yüz', 'göz': 'Göz', 'vücut': 'Vücut', 'dudak': 'Dudak',
+  'saç': 'Saç', 'el': 'El', 'yüz_vücut': 'Yüz & Vücut',
+};
 
 interface PageMeta {
   total: number;
@@ -67,6 +79,8 @@ function ProductsListContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [typeFilter, setTypeFilter] = useState('');
+  const [areaFilter, setAreaFilter] = useState('');
 
   useEffect(() => {
     api.get<Category[]>('/categories/tree').then(setCategories).catch(() => {});
@@ -94,6 +108,11 @@ function ProductsListContent() {
     } else if (!brandSlug) {
       setBrandFilter('');
     }
+
+    const typeParam = searchParams.get('type');
+    if (typeParam) setTypeFilter(typeParam);
+    const areaParam = searchParams.get('area');
+    if (areaParam) setAreaFilter(areaParam);
   }, [searchParams, categories, brands]);
 
   const fetchProducts = useCallback(async () => {
@@ -105,6 +124,8 @@ function ProductsListContent() {
       if (search) params.set('search', search);
       if (brandFilter) params.set('brand_id', String(brandFilter));
       if (categoryFilter) params.set('category_id', String(categoryFilter));
+      if (typeFilter) params.set('product_type', typeFilter);
+      if (areaFilter) params.set('target_area', areaFilter);
 
       const data = await api.get<{ data: Product[]; meta: PageMeta }>(
         `/products?${params.toString()}`,
@@ -117,7 +138,7 @@ function ProductsListContent() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, brandFilter, categoryFilter]);
+  }, [page, search, brandFilter, categoryFilter, typeFilter, areaFilter]);
 
   useEffect(() => {
     fetchProducts();
@@ -134,12 +155,14 @@ function ProductsListContent() {
     setSearchInput('');
     setBrandFilter('');
     setCategoryFilter('');
+    setTypeFilter('');
+    setAreaFilter('');
     setPage(1);
     router.push('/urunler');
   };
 
   const parentCats = categories.filter((c) => !c.parent_category_id);
-  const hasFilters = !!search || !!brandFilter || !!categoryFilter;
+  const hasFilters = !!search || !!brandFilter || !!categoryFilter || !!typeFilter || !!areaFilter;
 
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
@@ -234,11 +257,30 @@ function ProductsListContent() {
         </div>
       )}
 
+      {/* Quick filter chips — Ürün Tipi */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {TYPE_CHIPS.map((type) => (
+          <button
+            key={type}
+            onClick={() => { setTypeFilter(type === typeFilter ? '' : type); setPage(1); }}
+            className={`px-3 py-1.5 rounded-sm text-xs border transition-colors ${
+              type === typeFilter
+                ? 'bg-primary text-on-primary border-primary'
+                : 'border-outline-variant/30 text-on-surface-variant hover:border-outline hover:text-on-surface'
+            }`}
+          >
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        ))}
+      </div>
+
       {/* Results info */}
       {!loading && (
         <p className="text-xs text-outline mb-6">
           {meta.total} ürün bulundu
           {search && <span> &mdash; &ldquo;{search}&rdquo; için sonuçlar</span>}
+          {typeFilter && <span> &mdash; {typeFilter}</span>}
+          {areaFilter && <span> &mdash; {AREA_LABELS[areaFilter] || areaFilter}</span>}
         </p>
       )}
 
@@ -319,11 +361,18 @@ function ProductsListContent() {
                     <h3 className="font-semibold text-sm text-on-surface line-clamp-2 tracking-tight">
                       {product.product_name}
                     </h3>
-                    {product.category && (
-                      <span className="label-caps text-outline-variant mt-1.5 block">
-                        {product.category.category_name}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {product.category && (
+                        <span className="label-caps text-outline-variant">
+                          {product.category.category_name}
+                        </span>
+                      )}
+                      {product.product_type_label && (
+                        <span className="label-caps text-primary bg-primary/5 px-1.5 py-0.5 rounded-sm">
+                          {product.product_type_label}
+                        </span>
+                      )}
+                    </div>
                     {avgScore !== null && (
                       <div className="mt-3 flex items-center gap-2">
                         <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">

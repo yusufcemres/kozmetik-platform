@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
+import ProductCarousel from '@/components/public/ProductCarousel';
 
 // === Types ===
 
@@ -102,9 +103,9 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
   return (
     <Link
       href={`/urunler/${product.product_slug}`}
-      className={`flex flex-col curator-card p-4 -m-0 group ${index % 2 !== 0 ? 'mt-0 lg:mt-12' : ''}`}
+      className="flex flex-col curator-card p-3 group min-w-[180px] w-[180px] lg:min-w-[200px] lg:w-[200px] snap-start shrink-0"
     >
-      <div className="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-sm relative">
+      <div className="aspect-[3/4] bg-surface-container-low mb-3 overflow-hidden rounded-sm relative">
         {primaryImg ? (
           <>
             <Image
@@ -130,37 +131,32 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           </div>
         )}
       </div>
-      <div className="space-y-1.5">
+      <div className="space-y-1 min-w-0">
         {product.brand && (
-          <p className="label-caps text-outline">{product.brand.brand_name}</p>
+          <p className="label-caps text-outline truncate">{product.brand.brand_name}</p>
         )}
-        {score !== null && (
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <span
-                key={i}
-                className={`text-[14px] ${i <= stars ? 'material-icon-filled' : 'material-icon'} text-outline-variant`}
-                style={{ fontSize: '14px' }}
-                aria-hidden="true"
-              >
-                {i <= stars ? 'star' : (i - 0.5 <= stars ? 'star_half' : 'star')}
-              </span>
-            ))}
-            <span className="label-caps text-outline-variant ml-1">%{score}</span>
-          </div>
-        )}
-        <h4 className="text-lg font-semibold tracking-tight text-on-surface line-clamp-2">
+        <h4 className="text-sm font-semibold tracking-tight text-on-surface line-clamp-2 leading-tight">
           {product.product_name}
         </h4>
         {product.category && (
-          <p className="text-xs text-on-surface-variant font-light">
+          <p className="text-[10px] text-on-surface-variant truncate">
             {product.category.category_name}
           </p>
         )}
+        {score !== null && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low'}`}
+                style={{ width: `${score}%` }}
+              />
+            </div>
+            <span className={`text-[10px] font-bold ${score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low'}`}>
+              %{score}
+            </span>
+          </div>
+        )}
       </div>
-      <span className="mt-4 label-caps text-primary border-b border-primary/20 hover:border-primary pb-1 self-start transition-all duration-300">
-        İncele
-      </span>
     </Link>
   );
 }
@@ -313,11 +309,11 @@ export default async function HomePage() {
             <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Bilimsel Analiz</span>
             <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {featuredProducts.slice(0, 8).map((p: Product, i: number) => (
+          <ProductCarousel>
+            {featuredProducts.slice(0, 12).map((p: Product, i: number) => (
               <ProductCard key={p.product_id} product={p} index={i} />
             ))}
-          </div>
+          </ProductCarousel>
         </section>
       )}
 
