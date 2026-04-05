@@ -137,7 +137,7 @@ export class ProductsService {
       .addSelect('AVG(ns.compatibility_score)', 'avg_score')
       .groupBy('p.product_id')
       .addGroupBy('b.brand_id')
-      .addGroupBy('img.product_image_id')
+      .addGroupBy('img.image_id')
       .addGroupBy('cat.category_id')
       .having('COUNT(ns.product_need_score_id) > 0')
       .orderBy('avg_score', 'DESC')

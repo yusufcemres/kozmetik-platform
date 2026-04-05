@@ -8,7 +8,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateAffiliateLinkDto } from './dto/create-affiliate-link.dto';
 import { UpdateAffiliateLinkDto } from './dto/update-affiliate-link.dto';
-import { PaginationDto } from '@common/dto/pagination.dto';
+import { ProductFilterDto } from './dto/product-filter.dto';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
@@ -29,32 +29,12 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Ürünleri listele' })
-  @ApiQuery({ name: 'brand_id', required: false })
-  @ApiQuery({ name: 'category_id', required: false })
-  @ApiQuery({ name: 'status', required: false })
-  @ApiQuery({ name: 'target_area', required: false })
-  @ApiQuery({ name: 'usage_time', required: false })
-  @ApiQuery({ name: 'product_type', required: false })
-  @ApiQuery({ name: 'need_id', required: false })
-  findAll(
-    @Query() query: PaginationDto,
-    @Query('brand_id') brand_id?: string,
-    @Query('category_id') category_id?: string,
-    @Query('status') status?: string,
-    @Query('target_area') target_area?: string,
-    @Query('usage_time') usage_time?: string,
-    @Query('product_type') product_type?: string,
-    @Query('need_id') need_id?: string,
-  ) {
+  findAll(@Query() query: ProductFilterDto) {
     return this.service.findAll({
       ...query,
-      brand_id: brand_id ? Number(brand_id) : undefined,
-      category_id: category_id ? Number(category_id) : undefined,
-      status,
-      target_area,
-      usage_time,
-      product_type,
-      need_id: need_id ? Number(need_id) : undefined,
+      brand_id: query.brand_id ? Number(query.brand_id) : undefined,
+      category_id: query.category_id ? Number(query.category_id) : undefined,
+      need_id: query.need_id ? Number(query.need_id) : undefined,
     });
   }
 
