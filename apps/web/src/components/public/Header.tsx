@@ -36,6 +36,7 @@ export default function Header() {
   }, [pathname]);
 
   return (
+    <>
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="flex justify-between items-center w-full px-6 lg:px-12 py-4 max-w-full">
         {/* Logo */}
@@ -122,55 +123,57 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile overlay menu */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto">
-          <nav className="px-6 py-8 space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
-                    isActive
-                      ? 'bg-primary text-on-primary font-semibold'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  <span className="uppercase tracking-widest text-xs">{item.label}</span>
-                  <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
-                    arrow_forward
-                  </span>
-                </Link>
-              );
-            })}
-
-            <div className="h-px bg-white/10 my-6" />
-
-            <Link
-              href="/favorilerim"
-              className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
-            >
-              <span className="material-icon material-icon-sm" aria-hidden="true">favorite_border</span>
-              <span className="uppercase tracking-widest text-xs">Favorilerim</span>
-              {favCount > 0 && (
-                <span className="bg-error text-on-error text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                  {favCount}
-                </span>
-              )}
-            </Link>
-
-            <Link
-              href="/profilim"
-              className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
-            >
-              <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
-              <span className="uppercase tracking-widest text-xs">Cilt Profilim</span>
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
+
+    {/* Mobile overlay menu — outside header to avoid backdrop-blur stacking context */}
+    {mobileOpen && (
+      <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto">
+        <nav className="px-6 py-8 space-y-1">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary text-on-primary font-semibold'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="uppercase tracking-widest text-xs">{item.label}</span>
+                <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
+                  arrow_forward
+                </span>
+              </Link>
+            );
+          })}
+
+          <div className="h-px bg-white/10 my-6" />
+
+          <Link
+            href="/favorilerim"
+            className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
+          >
+            <span className="material-icon material-icon-sm" aria-hidden="true">favorite_border</span>
+            <span className="uppercase tracking-widest text-xs">Favorilerim</span>
+            {favCount > 0 && (
+              <span className="bg-error text-on-error text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                {favCount}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/profilim"
+            className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
+          >
+            <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
+            <span className="uppercase tracking-widest text-xs">Cilt Profilim</span>
+          </Link>
+        </nav>
+      </div>
+    )}
+    </>
   );
 }
