@@ -192,13 +192,13 @@ export default async function NeedDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(needJsonLd(need)) }}
       />
 
-      <article className="curator-section max-w-6xl mx-auto">
+      <article className="curator-section max-w-[1600px] mx-auto">
         {/* Breadcrumb */}
-        <nav className="label-caps text-outline mb-8 flex items-center gap-2">
+        <nav className="text-outline mb-8 flex items-center gap-2 text-xs uppercase tracking-widest">
           <Link href="/ihtiyaclar" className="hover:text-primary transition-colors">
             İhtiyaçlar
           </Link>
-          <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
+          <span className="material-icon material-icon-sm normal-case" aria-hidden="true">chevron_right</span>
           <span className="text-on-surface-variant">{need.need_name}</span>
         </nav>
 

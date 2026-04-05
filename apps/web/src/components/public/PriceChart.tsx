@@ -134,7 +134,18 @@ export default function PriceChart({ productId }: { productId: number }) {
       .catch(() => setData(null));
   }, [productId, days]);
 
-  if (!data || data.platforms.length === 0) return null;
+  if (!data || data.platforms.length === 0) return (
+    <div className="curator-card p-5 mb-4">
+      <h3 className="label-caps text-on-surface-variant tracking-[0.2em] mb-4">Fiyat Takip</h3>
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <span className="material-icon text-outline-variant/40 mb-3" style={{ fontSize: '40px' }} aria-hidden="true">
+          show_chart
+        </span>
+        <p className="text-sm text-on-surface-variant">Fiyat gecmisi henuz toplanıyor...</p>
+        <p className="text-xs text-outline mt-1">Yakinda burada fiyat degisim grafigi goruntulenecek</p>
+      </div>
+    </div>
+  );
 
   // SVG chart dimensions
   const W = 700;

@@ -19,6 +19,12 @@
     @apply uppercase tracking-widest text-[10px] font-semibold;
   }
 
+  .label-caps .material-icon,
+  .label-caps .material-icon-sm,
+  .label-caps .material-icon-lg {
+    text-transform: none;
+  }
+
   .headline-tight {
     @apply font-extrabold tracking-tighter leading-none;
   }
