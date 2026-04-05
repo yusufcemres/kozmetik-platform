@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 
 // === Types ===
@@ -12,6 +13,7 @@ interface Brand {
   brand_slug: string;
   country_of_origin?: string;
   website_url?: string;
+  logo_url?: string;
   product_count?: number;
 }
 
@@ -29,20 +31,24 @@ const COUNTRY_FLAGS: Record<string, string> = {
   ES: '\u{1F1EA}\u{1F1F8}',
   SE: '\u{1F1F8}\u{1F1EA}',
   CH: '\u{1F1E8}\u{1F1ED}',
+  CA: '\u{1F1E8}\u{1F1E6}',
+  HU: '\u{1F1ED}\u{1F1FA}',
 };
 
 const COUNTRY_LABELS: Record<string, string> = {
-  TR: 'Türkiye',
+  TR: 'Turkiye',
   FR: 'Fransa',
   DE: 'Almanya',
   US: 'ABD',
-  KR: 'Güney Kore',
+  KR: 'Guney Kore',
   JP: 'Japonya',
-  UK: 'İngiltere',
-  IT: 'İtalya',
-  ES: 'İspanya',
-  SE: 'İsveç',
-  CH: 'İsviçre',
+  UK: 'Ingiltere',
+  IT: 'Italya',
+  ES: 'Ispanya',
+  SE: 'Isvec',
+  CH: 'Isvicre',
+  CA: 'Kanada',
+  HU: 'Macaristan',
 };
 
 function brandInitial(name: string): string {
@@ -86,7 +92,7 @@ export default function BrandsPage() {
   }, {});
 
   return (
-    <div className="curator-section max-w-[1600px] mx-auto">
+    <div className="curator-section max-w-[900px] mx-auto">
       {/* Header */}
       <div className="text-center mb-12">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">
@@ -96,19 +102,19 @@ export default function BrandsPage() {
           MARKALAR
         </h1>
         <p className="text-on-surface-variant text-sm mt-3 max-w-lg mx-auto">
-          Platformumuzda analiz edilen {brands.length} kozmetik markası
+          Platformumuzda analiz edilen {brands.length} kozmetik markasi
         </p>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-          {Array.from({ length: 12 }).map((_, i) => (
+        <div className="space-y-3">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="curator-card p-4 animate-pulse">
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-sm bg-surface-container" />
+                <div className="w-12 h-12 rounded-sm bg-surface-container" />
                 <div className="flex-1">
-                  <div className="h-4 bg-surface-container rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-surface-container rounded w-1/3" />
+                  <div className="h-4 bg-surface-container rounded w-1/3 mb-2" />
+                  <div className="h-3 bg-surface-container rounded w-1/5" />
                 </div>
               </div>
             </div>
@@ -124,7 +130,7 @@ export default function BrandsPage() {
             storefront
           </span>
           <p className="text-on-surface-variant">
-            Marka bilgileri yükleniyor...
+            Marka bilgileri yukleniyor...
           </p>
         </div>
       ) : (
@@ -162,12 +168,12 @@ export default function BrandsPage() {
             ))}
           </div>
 
-          {/* Brand grid grouped by letter */}
-          <div className="space-y-12">
+          {/* Brand list grouped by letter */}
+          <div className="space-y-10">
             {sortedLetters.map((letter) => (
               <div key={letter} id={`letter-${letter}`}>
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-3xl font-extrabold text-primary/20">
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-2xl font-extrabold text-primary/20">
                     {letter}
                   </span>
                   <div className="flex-1 h-px bg-outline-variant/20" />
@@ -175,22 +181,36 @@ export default function BrandsPage() {
                     {grouped[letter].length} marka
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+
+                <div className="curator-card divide-y divide-outline-variant/15 overflow-hidden">
                   {grouped[letter]
                     .sort((a, b) => a.brand_name.localeCompare(b.brand_name))
                     .map((brand) => (
                       <Link
                         key={brand.brand_id}
                         href={`/urunler?brand=${brand.brand_slug}`}
-                        className="curator-card p-4 flex items-center gap-4 group hover:border-primary/30 transition-all duration-300"
+                        className="flex items-center gap-4 px-5 py-4 group hover:bg-surface-container-low transition-colors duration-200"
                       >
-                        <div className="w-11 h-11 rounded-sm bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
-                          <span className="text-lg font-bold text-primary group-hover:text-on-primary">
-                            {brandInitial(brand.brand_name)}
-                          </span>
+                        {/* Logo / Initial */}
+                        <div className="w-12 h-12 rounded-lg bg-surface-container-low border border-outline-variant/15 flex items-center justify-center shrink-0 overflow-hidden">
+                          {brand.logo_url ? (
+                            <Image
+                              src={brand.logo_url}
+                              alt={brand.brand_name}
+                              width={40}
+                              height={40}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <span className="text-lg font-bold text-primary/60">
+                              {brandInitial(brand.brand_name)}
+                            </span>
+                          )}
                         </div>
+
+                        {/* Brand info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
+                          <p className="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors truncate">
                             {brand.brand_name}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
@@ -201,20 +221,24 @@ export default function BrandsPage() {
                                 </span>
                               )}
                             {brand.country_of_origin && (
-                              <span className="label-caps text-outline">
+                              <span className="label-caps text-outline text-[10px]">
                                 {COUNTRY_LABELS[brand.country_of_origin] ||
                                   brand.country_of_origin}
                               </span>
                             )}
-                            {brand.product_count !== undefined && brand.product_count > 0 && (
-                              <span className="text-[10px] text-outline">
-                                · {brand.product_count} ürün
-                              </span>
-                            )}
                           </div>
                         </div>
+
+                        {/* Product count */}
+                        {brand.product_count !== undefined && brand.product_count > 0 && (
+                          <span className="text-xs text-on-surface-variant whitespace-nowrap">
+                            {brand.product_count} urun
+                          </span>
+                        )}
+
+                        {/* Arrow */}
                         <span
-                          className="material-icon material-icon-sm text-outline-variant group-hover:text-primary transition-colors"
+                          className="material-icon material-icon-sm text-outline-variant/50 group-hover:text-primary transition-colors shrink-0"
                           aria-hidden="true"
                         >
                           arrow_forward
@@ -231,7 +255,7 @@ export default function BrandsPage() {
       {/* CTA */}
       <div className="text-center mt-16 border-t border-outline-variant/20 pt-10">
         <p className="text-sm text-on-surface-variant mb-4">
-          Aradığın markayı bulamadın mı?
+          Aradigin markayi bulamadin mi?
         </p>
         <Link
           href="/urunler"
@@ -243,7 +267,7 @@ export default function BrandsPage() {
           >
             search
           </span>
-          TÜM ÜRÜNLERİ ARA
+          TUM URUNLERI ARA
         </Link>
       </div>
     </div>
