@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 const NAV_ITEMS = [
   { href: '/urunler', label: 'Ürünler' },
   { href: '/onerilerimiz', label: 'Önerilerimiz', badge: 'AI' },
+  { href: '/cilt-analizi', label: 'Cilt Analizi' },
   { href: '/ihtiyaclar', label: 'İhtiyaçlar' },
   { href: '/markalar', label: 'Markalar' },
   { href: '/karsilastir', label: 'Karşılaştır' },
@@ -123,7 +124,7 @@ export default function Header() {
 
       {/* Mobile overlay menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[65px] z-40 bg-surface/95 backdrop-blur-xl">
+        <div className="md:hidden fixed inset-0 top-[65px] z-40 bg-surface">
           <nav className="px-6 py-8 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');

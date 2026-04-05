@@ -142,7 +142,7 @@ function ProductsListContent() {
   const hasFilters = !!search || !!brandFilter || !!categoryFilter;
 
   return (
-    <div className="curator-section max-w-7xl mx-auto">
+    <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="flex items-end justify-between mb-10">
         <div>
@@ -244,7 +244,7 @@ function ProductsListContent() {
 
       {/* Product grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="curator-card overflow-hidden animate-pulse">
               <div className="aspect-[4/5] bg-surface-container" />
@@ -270,7 +270,7 @@ function ProductsListContent() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             {products.map((product) => {
               const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
               const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;

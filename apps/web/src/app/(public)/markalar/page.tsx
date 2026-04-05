@@ -1,6 +1,8 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { apiFetch } from '@/lib/api';
+import { api } from '@/lib/api';
 
 // === Types ===
 
@@ -12,35 +14,6 @@ interface Brand {
   website_url?: string;
   product_count?: number;
 }
-
-// === SEO ===
-
-export const metadata: Metadata = {
-  title: 'Markalar | REVELA',
-  description:
-    'REVELA platformundaki tüm kozmetik markaları. La Roche-Posay, Vichy, Bioderma, CeraVe ve daha fazlası.',
-  openGraph: {
-    title: 'Markalar | REVELA',
-    description: 'Tüm kozmetik markaları ve ürün portföyleri.',
-    type: 'website',
-  },
-  alternates: { canonical: '/markalar' },
-};
-
-// === Data ===
-
-async function getBrands(): Promise<Brand[]> {
-  try {
-    const res = await apiFetch<{ data: Brand[] }>('/brands?limit=200', {
-      next: { revalidate: 60 },
-    } as any);
-    return res.data || [];
-  } catch {
-    return [];
-  }
-}
-
-export const dynamic = 'force-dynamic';
 
 // === Helpers ===
 
@@ -76,30 +49,25 @@ function brandInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-// === JSON-LD ===
-
-function brandsJsonLd(brands: Brand[]) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'REVELA Kozmetik Markaları',
-    numberOfItems: brands.length,
-    itemListElement: brands.map((b, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      item: {
-        '@type': 'Brand',
-        name: b.brand_name,
-        url: `/urunler?brand=${b.brand_slug}`,
-      },
-    })),
-  };
-}
-
 // === Page ===
 
-export default async function BrandsPage() {
-  const brands = await getBrands();
+export default function BrandsPage() {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get<{ data: Brand[] }>('/brands?limit=200');
+        setBrands(res.data || []);
+      } catch {
+        setBrands([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   // Group by first letter
   const grouped = brands.reduce<Record<string, Brand[]>>((acc, brand) => {
@@ -118,76 +86,83 @@ export default async function BrandsPage() {
   }, {});
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(brandsJsonLd(brands)),
-        }}
-      />
+    <div className="curator-section max-w-[1600px] mx-auto">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">
+          Koleksiyon
+        </span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">
+          MARKALAR
+        </h1>
+        <p className="text-on-surface-variant text-sm mt-3 max-w-lg mx-auto">
+          Platformumuzda analiz edilen {brands.length} kozmetik markası
+        </p>
+      </div>
 
-      <div className="curator-section max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <span className="label-caps text-outline block mb-2 tracking-[0.3em]">
-            Koleksiyon
-          </span>
-          <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">
-            MARKALAR
-          </h1>
-          <p className="text-on-surface-variant text-sm mt-3 max-w-lg mx-auto">
-            Platformumuzda analiz edilen {brands.length} kozmetik markası
-          </p>
-        </div>
-
-        {/* Country filter badges */}
-        {Object.keys(countryCounts).length > 1 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {Object.entries(countryCounts)
-              .sort((a, b) => b[1] - a[1])
-              .map(([country, count]) => (
-                <span
-                  key={country}
-                  className="inline-flex items-center gap-1.5 bg-surface-container-low border border-outline-variant/20 px-3 py-1.5 rounded-sm text-xs text-on-surface-variant"
-                >
-                  {COUNTRY_FLAGS[country] && (
-                    <span>{COUNTRY_FLAGS[country]}</span>
-                  )}
-                  <span>{COUNTRY_LABELS[country] || country}</span>
-                  <span className="text-outline">({count})</span>
-                </span>
-              ))}
-          </div>
-        )}
-
-        {/* Alphabet quick nav */}
-        <div className="flex flex-wrap justify-center gap-1 mb-10">
-          {sortedLetters.map((letter) => (
-            <a
-              key={letter}
-              href={`#letter-${letter}`}
-              className="w-8 h-8 flex items-center justify-center rounded-sm text-xs font-bold text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors"
-            >
-              {letter}
-            </a>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="curator-card p-4 animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-11 h-11 rounded-sm bg-surface-container" />
+                <div className="flex-1">
+                  <div className="h-4 bg-surface-container rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-surface-container rounded w-1/3" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
+      ) : brands.length === 0 ? (
+        <div className="text-center py-24">
+          <span
+            className="material-icon text-outline-variant mb-4 block"
+            style={{ fontSize: '64px' }}
+            aria-hidden="true"
+          >
+            storefront
+          </span>
+          <p className="text-on-surface-variant">
+            Marka bilgileri yükleniyor...
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Country filter badges */}
+          {Object.keys(countryCounts).length > 1 && (
+            <div className="flex flex-wrap justify-center gap-2 mb-10">
+              {Object.entries(countryCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([country, count]) => (
+                  <span
+                    key={country}
+                    className="inline-flex items-center gap-1.5 bg-surface-container-low border border-outline-variant/20 px-3 py-1.5 rounded-sm text-xs text-on-surface-variant"
+                  >
+                    {COUNTRY_FLAGS[country] && (
+                      <span>{COUNTRY_FLAGS[country]}</span>
+                    )}
+                    <span>{COUNTRY_LABELS[country] || country}</span>
+                    <span className="text-outline">({count})</span>
+                  </span>
+                ))}
+            </div>
+          )}
 
-        {/* Brand grid grouped by letter */}
-        {brands.length === 0 ? (
-          <div className="text-center py-24">
-            <span
-              className="material-icon text-outline-variant mb-4 block"
-              style={{ fontSize: '64px' }}
-              aria-hidden="true"
-            >
-              storefront
-            </span>
-            <p className="text-on-surface-variant">
-              Marka bilgileri yükleniyor...
-            </p>
+          {/* Alphabet quick nav */}
+          <div className="flex flex-wrap justify-center gap-1 mb-10">
+            {sortedLetters.map((letter) => (
+              <a
+                key={letter}
+                href={`#letter-${letter}`}
+                className="w-8 h-8 flex items-center justify-center rounded-sm text-xs font-bold text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors"
+              >
+                {letter}
+              </a>
+            ))}
           </div>
-        ) : (
+
+          {/* Brand grid grouped by letter */}
           <div className="space-y-12">
             {sortedLetters.map((letter) => (
               <div key={letter} id={`letter-${letter}`}>
@@ -200,7 +175,7 @@ export default async function BrandsPage() {
                     {grouped[letter].length} marka
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
                   {grouped[letter]
                     .sort((a, b) => a.brand_name.localeCompare(b.brand_name))
                     .map((brand) => (
@@ -231,6 +206,11 @@ export default async function BrandsPage() {
                                   brand.country_of_origin}
                               </span>
                             )}
+                            {brand.product_count !== undefined && brand.product_count > 0 && (
+                              <span className="text-[10px] text-outline">
+                                · {brand.product_count} ürün
+                              </span>
+                            )}
                           </div>
                         </div>
                         <span
@@ -245,27 +225,27 @@ export default async function BrandsPage() {
               </div>
             ))}
           </div>
-        )}
+        </>
+      )}
 
-        {/* CTA */}
-        <div className="text-center mt-16 border-t border-outline-variant/20 pt-10">
-          <p className="text-sm text-on-surface-variant mb-4">
-            Aradığın markayı bulamadın mı?
-          </p>
-          <Link
-            href="/urunler"
-            className="inline-flex items-center gap-2 curator-btn-primary px-8 py-3 text-xs"
+      {/* CTA */}
+      <div className="text-center mt-16 border-t border-outline-variant/20 pt-10">
+        <p className="text-sm text-on-surface-variant mb-4">
+          Aradığın markayı bulamadın mı?
+        </p>
+        <Link
+          href="/urunler"
+          className="inline-flex items-center gap-2 curator-btn-primary px-8 py-3 text-xs"
+        >
+          <span
+            className="material-icon material-icon-sm"
+            aria-hidden="true"
           >
-            <span
-              className="material-icon material-icon-sm"
-              aria-hidden="true"
-            >
-              search
-            </span>
-            TÜM ÜRÜNLERİ ARA
-          </Link>
-        </div>
+            search
+          </span>
+          TÜM ÜRÜNLERİ ARA
+        </Link>
       </div>
-    </>
+    </div>
   );
 }

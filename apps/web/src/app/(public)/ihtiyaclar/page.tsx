@@ -58,18 +58,18 @@ export default function NeedsListPage() {
   ];
 
   return (
-    <div className="curator-section max-w-7xl mx-auto">
+    <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-10">
-        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Kesfet</span>
-        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">CILT IHTIYACLARI</h1>
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Keşfet</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">CİLT İHTİYAÇLARI</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          Cilt sorunlarini ve ihtiyaclarini kesfet, her biri icin en etkili icerik maddelerini ogren
+          Cilt sorunlarını ve ihtiyaçlarını keşfet, her biri için en etkili içerik maddelerini öğren
         </p>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="curator-card p-5 animate-pulse">
               <div className="h-4 bg-surface-container rounded w-2/3 mb-3" />
@@ -80,7 +80,7 @@ export default function NeedsListPage() {
       ) : needs.length === 0 ? (
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">target</span>
-          <p className="text-on-surface-variant">Henuz ihtiyac tanimlanmamis</p>
+          <p className="text-on-surface-variant">Henüz ihtiyaç tanımlanmamış</p>
         </div>
       ) : (
         <div className="space-y-12">
@@ -95,7 +95,7 @@ export default function NeedsListPage() {
                   ({grouped[group].length})
                 </span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {grouped[group].map((need) => (
                   <Link
                     key={need.need_id}
@@ -116,7 +116,7 @@ export default function NeedsListPage() {
                       </p>
                     )}
                     <span className="inline-flex items-center gap-1 label-caps text-primary mt-3">
-                      Detaylari gor
+                      Detayları gör
                       <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
                     </span>
                   </Link>

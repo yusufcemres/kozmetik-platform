@@ -332,7 +332,7 @@ export default async function ProductDetailPage({
         image_url={imageUrl}
       />
 
-      <article className="max-w-6xl mx-auto px-6 lg:px-16 py-8 lg:py-12">
+      <article className="max-w-7xl mx-auto px-6 lg:px-12 py-8 lg:py-12">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/urunler" className="hover:text-on-surface transition-colors">
@@ -592,11 +592,9 @@ export default async function ProductDetailPage({
                             <span className="text-sm font-medium text-on-surface group-open:text-primary transition-colors">
                               {pi.ingredient_display_name}
                             </span>
-                            {pi.ingredient?.function_summary && (
-                              <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
-                                expand_more
-                              </span>
-                            )}
+                            <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
+                              expand_more
+                            </span>
                             {pi.is_below_one_percent_estimate && (
                               <span className="label-caps text-outline">(&lt;1%)</span>
                             )}
@@ -618,21 +616,27 @@ export default async function ProductDetailPage({
                             })()}
                           </div>
                         </summary>
-                        {pi.ingredient && (
-                          <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
-                            {pi.ingredient.function_summary && (
-                              <p className="text-xs text-on-surface-variant leading-relaxed">
-                                {pi.ingredient.function_summary}
-                              </p>
-                            )}
-                            <Link
-                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                              className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
-                            >
-                              Detaylı bilgi &rarr;
-                            </Link>
-                          </div>
-                        )}
+                        <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
+                          {pi.ingredient ? (
+                            <>
+                              {pi.ingredient.function_summary && (
+                                <p className="text-xs text-on-surface-variant leading-relaxed">
+                                  {pi.ingredient.function_summary}
+                                </p>
+                              )}
+                              <Link
+                                href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                                className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
+                              >
+                                Detaylı bilgi &rarr;
+                              </Link>
+                            </>
+                          ) : (
+                            <p className="text-xs text-on-surface-variant leading-relaxed">
+                              <span className="font-medium">{pi.ingredient_display_name}</span> — içerik detayları güncelleniyor.
+                            </p>
+                          )}
+                        </div>
                       </details>
                     );
                   })}

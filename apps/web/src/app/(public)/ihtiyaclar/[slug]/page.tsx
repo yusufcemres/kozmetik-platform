@@ -92,13 +92,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const need = await getNeed(params.slug);
   if (!need) {
-    return { title: 'Ihtiyac Bulunamadi' };
+    return { title: 'İhtiyaç Bulunamadı' };
   }
 
   const title = need.user_friendly_label || need.need_name;
   const description =
     need.short_description ||
-    `${need.need_name} ihtiyaci icin en etkili kozmetik icerik maddeleri ve uyumlu urunler.`;
+    `${need.need_name} ihtiyacı için en etkili kozmetik içerik maddeleri ve uyumlu ürünler.`;
 
   return {
     title,
@@ -123,9 +123,9 @@ export async function generateMetadata({
 
 function effectTypeLabel(type: string): { label: string; color: string } {
   const map: Record<string, { label: string; color: string }> = {
-    direct_support: { label: 'Dogrudan Destek', color: 'text-score-high bg-score-high/10' },
-    indirect_support: { label: 'Dolayli Destek', color: 'text-primary bg-primary/5' },
-    complementary: { label: 'Tamamlayici', color: 'text-on-surface-variant bg-surface-container-low' },
+    direct_support: { label: 'Doğrudan Destek', color: 'text-score-high bg-score-high/10' },
+    indirect_support: { label: 'Dolaylı Destek', color: 'text-primary bg-primary/5' },
+    complementary: { label: 'Tamamlayıcı', color: 'text-on-surface-variant bg-surface-container-low' },
     caution_related: { label: 'Dikkat', color: 'text-error bg-error/10' },
   };
   return map[type] || { label: type.replace(/_/g, ' '), color: 'text-outline bg-surface-container-low' };
@@ -192,11 +192,11 @@ export default async function NeedDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(needJsonLd(need)) }}
       />
 
-      <article className="curator-section max-w-4xl mx-auto">
+      <article className="curator-section max-w-6xl mx-auto">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/ihtiyaclar" className="hover:text-primary transition-colors">
-            Ihtiyaclar
+            İhtiyaçlar
           </Link>
           <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
           <span className="text-on-surface-variant">{need.need_name}</span>
@@ -229,7 +229,7 @@ export default async function NeedDetailPage({
         {/* Detailed Description */}
         {need.detailed_description && (
           <section className="mb-10">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Detayli Bilgi</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-3">Detaylı Bilgi</h2>
             <div className="bg-surface-container-low rounded-sm p-5">
               <p className="text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {need.detailed_description}
@@ -242,7 +242,7 @@ export default async function NeedDetailPage({
         <section className="mb-10">
           <div className="flex items-end justify-between mb-4">
             <h2 className="text-xl font-bold text-on-surface">
-              Bu Ihtiyac Icin Etkili Icerikler
+              Bu İhtiyaç İçin Etkili İçerikler
             </h2>
             {sortedMappings.length > 0 && (
               <span className="label-caps text-outline">
@@ -252,7 +252,7 @@ export default async function NeedDetailPage({
           </div>
           {sortedMappings.length > 0 ? (
             <ListModal
-              title="Etkili Icerikler"
+              title="Etkili İçerikler"
               count={sortedMappings.length}
               previewCount={6}
               allChildren={
@@ -357,17 +357,17 @@ export default async function NeedDetailPage({
             </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
-              Henuz icerik eslesmesi tanimlanmamis
+              Henüz içerik eşleşmesi tanımlanmamış
             </div>
           )}
         </section>
 
         {/* Compatible Products */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-on-surface mb-4">Uyumlu Urunler</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-4">Uyumlu Ürünler</h2>
           {topScores.length > 0 ? (
             <ListModal
-              title="Uyumlu Urunler"
+              title="Uyumlu Ürünler"
               count={topScores.length}
               previewCount={6}
               allChildren={
@@ -472,7 +472,7 @@ export default async function NeedDetailPage({
             </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
-              Henuz uyumlu urun bulunamadi
+              Henüz uyumlu ürün bulunamadı
             </div>
           )}
         </section>
@@ -480,16 +480,16 @@ export default async function NeedDetailPage({
         {/* Profile CTA */}
         <div className="curator-card p-8 text-center mb-8">
           <h3 className="text-xl headline-tight text-on-surface mb-2">
-            BU IHTIYAC SENINLE ILGILI MI?
+            BU İHTİYAÇ SENİNLE İLGİLİ Mİ?
           </h3>
           <p className="text-sm text-on-surface-variant mb-6">
-            Cilt profilini olustur ve her urunde sana ozel uyum skoru gor.
+            Cilt profilini oluştur ve her üründe sana özel uyum skoru gör.
           </p>
           <Link
             href="/profilim"
             className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
           >
-            PROFILIMI OLUSTUR
+            PROFİLİMİ OLUŞTUR
           </Link>
         </div>
 
@@ -500,7 +500,7 @@ export default async function NeedDetailPage({
             className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">arrow_back</span>
-            Tum Ihtiyaclar
+            Tüm İhtiyaçlar
           </Link>
         </div>
       </article>

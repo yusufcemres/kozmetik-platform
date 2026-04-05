@@ -250,10 +250,10 @@ export default function ComparePage() {
   );
 
   return (
-    <div className="curator-section max-w-7xl mx-auto">
+    <div className="curator-section max-w-[1600px] mx-auto">
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Analiz</span>
-        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">URUN KARSILASTIR</h1>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">ÜRÜN KARŞILAŞTIR</h1>
         <p className="text-on-surface-variant text-sm mt-2">
           2-3 urunu yan yana koy, icerik ve skor farklarini gor.
         </p>

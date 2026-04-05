@@ -424,7 +424,7 @@ export default async function HomePage() {
 
       {/* Quick Links */}
       <section className="py-16 px-6 lg:px-16 bg-surface">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {[
             { href: '/karsilastir', icon: 'compare', title: 'Ürün Karşılaştır', desc: '2-3 ürünü yan yana koy, ingredient farklarını gör.' },
             { href: '/rehber', icon: 'menu_book', title: 'Rehber & Blog', desc: 'Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri.' },

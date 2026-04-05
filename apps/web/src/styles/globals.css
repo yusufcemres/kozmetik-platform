@@ -48,7 +48,7 @@
   }
 
   .curator-section {
-    @apply py-24 px-6 lg:px-16;
+    @apply py-16 px-6 lg:px-12;
   }
 
   .curator-divider {

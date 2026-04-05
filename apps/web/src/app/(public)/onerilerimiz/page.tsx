@@ -34,11 +34,11 @@ interface ProductScore {
 // === SEO ===
 
 export const metadata: Metadata = {
-  title: 'Bizim Önerilerimiz | REVELA',
+  title: 'Bu Haftanın Önerileri | REVELA',
   description:
     'AI destekli haftalık ürün önerileri. Her cilt ihtiyacı için en uygun, en kaliteli ve en uygun fiyatlı kozmetik ürünleri.',
   openGraph: {
-    title: 'Bizim Önerilerimiz | REVELA',
+    title: 'Bu Haftanın Önerileri | REVELA',
     description: 'Her cilt ihtiyacı için AI destekli haftalık ürün önerileri.',
     type: 'website',
   },
@@ -155,7 +155,7 @@ export default async function RecommendationsPage() {
         }}
       />
 
-      <div className="curator-section max-w-6xl mx-auto">
+      <div className="curator-section max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase mb-4">
@@ -165,7 +165,7 @@ export default async function RecommendationsPage() {
             AI Destekli
           </div>
           <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">
-            BİZİM ÖNERİLERİMİZ
+            BU HAFTANIN ÖNERİLERİ
           </h1>
           <p className="text-on-surface-variant text-sm mt-3 max-w-lg mx-auto">
             Her cilt ihtiyacı için içerik kalitesi, fiyat performansı ve
@@ -175,11 +175,11 @@ export default async function RecommendationsPage() {
             <span className="material-icon material-icon-sm align-text-bottom mr-1" aria-hidden="true">
               update
             </span>
-            Haftalık güncelleme · {weekLabel}
+            {weekLabel} Haftası
           </p>
         </div>
 
-        {/* Recommendations Grid */}
+        {/* Recommendations List */}
         {recommendations.length === 0 ? (
           <div className="text-center py-24">
             <span
@@ -194,135 +194,84 @@ export default async function RecommendationsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {recommendations.map(({ need, topProduct }) => {
+          <div className="space-y-3 max-w-4xl mx-auto">
+            {recommendations.map(({ need, topProduct }, idx) => {
               if (!topProduct?.product) return null;
               const product = topProduct.product;
               const score = Math.round(Number(topProduct.compatibility_score));
-              const primaryImg =
+              const img =
                 product.images?.find((i) => i.sort_order === 0)?.image_url ||
                 product.images?.[0]?.image_url;
-              const hoverImg = product.images?.find(
-                (i) => i.sort_order === 1,
-              )?.image_url;
               const link = cheapestLink(product.affiliate_links);
 
               return (
                 <div
                   key={need.need_id}
-                  className="curator-card overflow-hidden flex flex-col"
+                  className="curator-card p-4 flex items-center gap-4 group"
                 >
-                  {/* Need label */}
-                  <div className="px-4 pt-4 pb-2 flex items-center gap-2">
-                    <span
-                      className="material-icon material-icon-sm text-outline-variant"
-                      aria-hidden="true"
-                    >
-                      {needGroupIcon(need.need_group)}
-                    </span>
-                    <span className="label-caps text-outline">
-                      {need.need_name}
-                    </span>
-                  </div>
-
-                  {/* Product image */}
+                  <span className="text-lg font-bold text-outline w-6 text-center shrink-0">
+                    {idx + 1}
+                  </span>
                   <Link
                     href={`/urunler/${product.product_slug}`}
-                    className="block aspect-[4/5] bg-surface-container-low overflow-hidden relative group"
+                    className="w-16 h-16 bg-surface-container-low rounded-sm overflow-hidden shrink-0 relative"
                   >
-                    {primaryImg ? (
-                      <>
-                        <Image
-                          src={primaryImg}
-                          alt={product.product_name}
-                          fill
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
-                        />
-                        {hoverImg && (
-                          <Image
-                            src={hoverImg}
-                            alt={`${product.product_name} - detay`}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
-                          />
-                        )}
-                      </>
+                    {img ? (
+                      <Image
+                        src={img}
+                        alt={product.product_name}
+                        fill
+                        sizes="64px"
+                        className="object-contain"
+                      />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-icon material-icon-lg text-outline-variant">
-                          inventory_2
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Score badge */}
-                    <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-sm rounded-sm px-2 py-1">
-                      <span
-                        className={`text-xs font-bold ${getScoreColor(score)}`}
-                      >
-                        %{score}
+                      <span className="material-icon text-outline-variant flex items-center justify-center h-full" aria-hidden="true">
+                        inventory_2
                       </span>
-                    </div>
+                    )}
                   </Link>
-
-                  {/* Product info */}
-                  <div className="p-4 flex-1 flex flex-col">
+                  <div className="flex-1 min-w-0">
                     {product.brand && (
-                      <p className="label-caps text-outline mb-1">
+                      <p className="label-caps text-outline">
                         {product.brand.brand_name}
                       </p>
                     )}
                     <Link
                       href={`/urunler/${product.product_slug}`}
-                      className="text-sm font-semibold text-on-surface line-clamp-2 tracking-tight hover:text-primary transition-colors"
+                      className="text-sm font-semibold text-on-surface truncate block group-hover:text-primary transition-colors"
                     >
                       {product.product_name}
                     </Link>
-
-                    {/* Score bar */}
-                    <div className="mt-3 flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium">
+                        {need.need_name}
+                      </span>
+                      <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden max-w-[100px]">
                         <div
                           className={`h-full rounded-full ${getScoreBarColor(score)}`}
                           style={{ width: `${Math.min(100, score)}%` }}
                         />
                       </div>
-                      <span
-                        className={`text-[10px] font-bold ${getScoreColor(score)}`}
-                      >
-                        Uyum
+                      <span className={`text-[10px] font-bold ${getScoreColor(score)}`}>
+                        %{score}
                       </span>
                     </div>
-
-                    {/* Price + CTA */}
-                    <div className="mt-auto pt-3">
-                      {link && (
-                        <a
-                          href={`${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=onerilerimiz&utm_content=${product.product_slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-between w-full bg-primary text-on-primary px-4 py-2.5 rounded-sm text-xs font-medium uppercase tracking-wider hover:bg-primary/90 transition-colors"
-                        >
-                          <span className="flex items-center gap-1.5">
-                            <span
-                              className="material-icon material-icon-sm"
-                              aria-hidden="true"
-                            >
-                              shopping_bag
-                            </span>
-                            {PLATFORM_LABELS[link.platform] || link.platform}
-                          </span>
-                          {link.price_snapshot && (
-                            <span className="font-bold">
-                              ₺{Number(link.price_snapshot).toFixed(0)}
-                            </span>
-                          )}
-                        </a>
-                      )}
-                    </div>
                   </div>
+                  {link && (
+                    <a
+                      href={`${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=onerilerimiz&utm_content=${product.product_slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 bg-primary text-on-primary px-4 py-2 rounded-sm text-xs font-medium hover:bg-primary/90 transition-colors hidden sm:flex items-center gap-1.5"
+                    >
+                      <span className="material-icon material-icon-sm" aria-hidden="true">
+                        shopping_bag
+                      </span>
+                      {link.price_snapshot
+                        ? `₺${Number(link.price_snapshot).toFixed(0)}`
+                        : PLATFORM_LABELS[link.platform] || 'Satın Al'}
+                    </a>
+                  )}
                 </div>
               );
             })}

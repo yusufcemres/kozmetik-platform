@@ -31,7 +31,7 @@ export default function SupplementsListPage() {
   }, [page]);
 
   return (
-    <div className="curator-section max-w-7xl mx-auto">
+    <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Saglik</span>

@@ -22,10 +22,10 @@ interface PageMeta {
 
 const CONTENT_TYPES: Record<string, { label: string; icon: string }> = {
   guide: { label: 'Rehber', icon: 'menu_book' },
-  ingredient_explainer: { label: 'Icerik Inceleme', icon: 'science' },
-  need_guide: { label: 'Ihtiyac Rehberi', icon: 'target' },
+  ingredient_explainer: { label: 'İçerik İnceleme', icon: 'science' },
+  need_guide: { label: 'İhtiyaç Rehberi', icon: 'target' },
   label_reading: { label: 'Etiket Okuma', icon: 'label' },
-  comparison: { label: 'Karsilastirma', icon: 'compare' },
+  comparison: { label: 'Karşılaştırma', icon: 'compare' },
   news: { label: 'Haber', icon: 'newspaper' },
 };
 
@@ -71,13 +71,13 @@ export default function GuidesListPage() {
   };
 
   return (
-    <div className="curator-section max-w-4xl mx-auto">
+    <div className="curator-section max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Bilgi</span>
         <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">REHBER</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          Cilt bakimi rehberleri, icerik incelemeleri ve uzman icerikleri
+          Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri
         </p>
       </div>
 
@@ -87,14 +87,14 @@ export default function GuidesListPage() {
           <button
             key={key}
             onClick={() => handleTypeFilter(key)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs tracking-wider uppercase transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs tracking-wider transition-colors ${
               typeFilter === key
                 ? 'bg-primary text-on-primary'
                 : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/20 hover:border-outline'
             }`}
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">{cfg.icon}</span>
-            {cfg.label}
+            <span className="uppercase">{cfg.label}</span>
           </button>
         ))}
       </div>
@@ -114,7 +114,7 @@ export default function GuidesListPage() {
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">article</span>
           <p className="text-on-surface-variant">
-            {typeFilter ? 'Bu kategoride henuz makale yok' : 'Henuz makale yayinlanmamis'}
+            {typeFilter ? 'Bu kategoride henüz makale yok' : 'Henüz makale yayınlanmamış'}
           </p>
         </div>
       ) : (

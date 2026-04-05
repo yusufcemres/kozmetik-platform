@@ -21,7 +21,7 @@ export default function ListModal({ title, count, previewCount = 6, children, al
           onClick={() => setOpen(true)}
           className="mt-4 curator-btn-outline text-[10px] px-6 py-2.5 w-full sm:w-auto"
         >
-          TUMUNU GOR ({count})
+          TÜMÜNÜ GÖR ({count})
         </button>
       )}
 
@@ -36,7 +36,7 @@ export default function ListModal({ title, count, previewCount = 6, children, al
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/20">
               <div>
                 <h3 className="text-lg font-bold text-on-surface tracking-tight">{title}</h3>
-                <p className="label-caps text-outline mt-0.5">{count} kayit</p>
+                <p className="label-caps text-outline mt-0.5">{count} kayıt</p>
               </div>
               <button
                 onClick={() => setOpen(false)}

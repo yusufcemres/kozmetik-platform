@@ -17,6 +17,7 @@ interface Need {
 interface ProductScore {
   compatibility_score: number;
   confidence_level: string;
+  needId?: number;
   product?: {
     product_id: number;
     product_name: string;
@@ -91,11 +92,11 @@ function ResultsContent() {
             const scores = await api.get<ProductScore[]>(
               `/scoring/needs/${needId}/top-products?limit=5`,
             );
-            if (scores) allProducts.push(...scores);
+            if (scores) allProducts.push(...scores.map(s => ({ ...s, needId })));
           } catch {}
         }
 
-        // Deduplicate by product_id, keep highest score
+        // Deduplicate by product_id, keep highest score + needId
         const productMap = new Map<number, ProductScore>();
         for (const ps of allProducts) {
           if (!ps.product) continue;
@@ -142,7 +143,7 @@ function ResultsContent() {
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="curator-section max-w-4xl mx-auto">
+    <div className="curator-section max-w-6xl mx-auto">
       {/* Header */}
       <div className="text-center mb-10">
         <span className="material-icon text-score-high mb-2 block" style={{ fontSize: '48px' }} aria-hidden="true">
@@ -232,8 +233,13 @@ function ResultsContent() {
                     <Link href={`/urunler/${product.product_slug}`} className="text-sm font-semibold text-on-surface truncate block group-hover:text-primary transition-colors">
                       {product.product_name}
                     </Link>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden max-w-[120px]">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      {ps.needId && (
+                        <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium">
+                          {needs.find(n => n.need_id === ps.needId)?.need_name}
+                        </span>
+                      )}
+                      <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden max-w-[100px]">
                         <div className={`h-full rounded-full ${getScoreBarColor(score)}`} style={{ width: `${score}%` }} />
                       </div>
                       <span className={`text-[10px] font-bold ${getScoreColor(score)}`}>%{score}</span>
@@ -269,13 +275,24 @@ function ResultsContent() {
               <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span>
               Sabah Rutini
             </h3>
-            <ol className="space-y-2 text-sm">
-              {MORNING_ORDER.map((cat, idx) => (
-                <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
-                  <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
-                  <span>{cat}</span>
-                </li>
-              ))}
+            <ol className="space-y-2.5 text-sm">
+              {MORNING_ORDER.map((cat, idx) => {
+                const matched = products.find(ps => {
+                  const catName = ps.product?.category?.category_name || '';
+                  return catName === cat || cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]);
+                });
+                return (
+                  <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
+                    <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
+                    <span className="flex-1">{cat}</span>
+                    {matched?.product && (
+                      <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
+                        {matched.product.brand?.brand_name} {matched.product.product_name}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           </div>
           {/* Evening */}
@@ -284,13 +301,24 @@ function ResultsContent() {
               <span className="material-icon text-primary" aria-hidden="true">dark_mode</span>
               Akşam Rutini
             </h3>
-            <ol className="space-y-2 text-sm">
-              {EVENING_ORDER.map((cat, idx) => (
-                <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
-                  <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
-                  <span>{cat}</span>
-                </li>
-              ))}
+            <ol className="space-y-2.5 text-sm">
+              {EVENING_ORDER.map((cat, idx) => {
+                const matched = products.find(ps => {
+                  const catName = ps.product?.category?.category_name || '';
+                  return catName === cat || cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]);
+                });
+                return (
+                  <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
+                    <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
+                    <span className="flex-1">{cat}</span>
+                    {matched?.product && (
+                      <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
+                        {matched.product.brand?.brand_name} {matched.product.product_name}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           </div>
         </div>

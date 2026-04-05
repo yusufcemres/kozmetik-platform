@@ -29,9 +29,9 @@ const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 function originLabel(type: string): string {
   const map: Record<string, string> = {
-    natural: 'Dogal',
+    natural: 'Doğal',
     synthetic: 'Sentetik',
-    semi_synthetic: 'Yari-sentetik',
+    semi_synthetic: 'Yarı-sentetik',
     biotechnology: 'Biyoteknoloji',
   };
   return map[type] || type;
@@ -82,13 +82,13 @@ export default function IngredientsListPage() {
   };
 
   return (
-    <div className="curator-section max-w-7xl mx-auto">
+    <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Ansiklopedi</span>
-        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">ICERIK MADDELERI</h1>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">İÇERİK MADDELERİ</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          A&apos;dan Z&apos;ye kozmetik icerik maddeleri ansiklopedisi
+          A&apos;dan Z&apos;ye kozmetik içerik maddeleri ansiklopedisi
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export default function IngredientsListPage() {
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Icerik adi ara... (orn. Niacinamide, Retinol)"
+            placeholder="İçerik adı ara... (örn. Niacinamide, Retinol)"
             className="curator-input flex-1"
           />
           <button
@@ -144,11 +144,11 @@ export default function IngredientsListPage() {
       {/* Results info */}
       {!loading && (
         <p className="text-xs text-outline mb-6">
-          {meta.total} icerik maddesi bulundu
+          {meta.total} içerik maddesi bulundu
           {search && search.length > 1 && (
             <span>
               {' '}
-              &mdash; &quot;{search}&quot; icin sonuclar
+              &mdash; &quot;{search}&quot; için sonuçlar
             </span>
           )}
         </p>
@@ -156,7 +156,7 @@ export default function IngredientsListPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="curator-card p-5 animate-pulse">
               <div className="h-4 bg-surface-container rounded w-2/3 mb-3" />
@@ -170,13 +170,13 @@ export default function IngredientsListPage() {
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">science</span>
           <p className="text-on-surface-variant">
             {search
-              ? 'Aramanizla eslesen icerik bulunamadi'
-              : 'Henuz icerik maddesi eklenmemis'}
+              ? 'Aramanızla eşleşen içerik bulunamadı'
+              : 'Henüz içerik maddesi eklenmemiş'}
           </p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {ingredients.map((ing) => (
               <Link
                 key={ing.ingredient_id}

@@ -138,7 +138,7 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="curator-section max-w-4xl mx-auto">
+    <div className="curator-section max-w-6xl mx-auto">
       {/* Search bar */}
       <form onSubmit={handleSearch} className="relative mb-8">
         <div className="flex gap-3">

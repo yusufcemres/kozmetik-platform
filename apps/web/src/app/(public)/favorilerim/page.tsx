@@ -63,7 +63,7 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="curator-section max-w-4xl mx-auto">
+    <div className="curator-section max-w-6xl mx-auto">
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Koleksiyon</span>
         <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">FAVORILERIM</h1>
