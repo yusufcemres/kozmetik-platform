@@ -29,8 +29,12 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.shevec.com' },
       { protocol: 'https', hostname: '**.creamco.com.tr' },
       { protocol: 'https', hostname: '**.urbancare.com.tr' },
+      { protocol: 'https', hostname: 'api.dicebear.com' },
     ],
     formats: ['image/avif', 'image/webp'],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // API proxy (dev ortamında CORS sorununu çözer)
