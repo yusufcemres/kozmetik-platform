@@ -124,7 +124,7 @@ export default function Header() {
 
       {/* Mobile overlay menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#faf9f7] overflow-y-auto">
+        <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto">
           <nav className="px-6 py-8 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -134,23 +134,23 @@ export default function Header() {
                   href={item.href}
                   className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
                     isActive
-                      ? 'bg-primary-container text-on-primary-container font-semibold'
-                      : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
+                      ? 'bg-primary text-on-primary font-semibold'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <span className="uppercase tracking-widest text-xs">{item.label}</span>
-                  <span className="material-icon material-icon-sm text-outline-variant" aria-hidden="true">
+                  <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
                     arrow_forward
                   </span>
                 </Link>
               );
             })}
 
-            <div className="curator-divider my-6" />
+            <div className="h-px bg-white/10 my-6" />
 
             <Link
               href="/favorilerim"
-              className="flex items-center gap-3 px-4 py-4 text-on-surface-variant hover:text-on-surface transition-colors"
+              className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
             >
               <span className="material-icon material-icon-sm" aria-hidden="true">favorite_border</span>
               <span className="uppercase tracking-widest text-xs">Favorilerim</span>
@@ -163,7 +163,7 @@ export default function Header() {
 
             <Link
               href="/profilim"
-              className="flex items-center gap-3 px-4 py-4 text-on-surface-variant hover:text-on-surface transition-colors"
+              className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
             >
               <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
               <span className="uppercase tracking-widest text-xs">Cilt Profilim</span>

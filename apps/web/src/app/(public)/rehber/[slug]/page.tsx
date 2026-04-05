@@ -105,7 +105,7 @@ export default async function GuideDetailPage({
   const cfg = CONTENT_TYPES[article.content_type] || CONTENT_TYPES.guide;
 
   return (
-    <div className="curator-section max-w-3xl mx-auto">
+    <div className="curator-section max-w-[1200px] mx-auto">
       {/* Breadcrumb */}
       <nav className="label-caps text-outline mb-8 flex items-center gap-2">
         <Link href="/rehber" className="hover:text-primary transition-colors">

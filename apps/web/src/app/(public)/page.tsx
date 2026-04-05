@@ -398,7 +398,7 @@ export default async function HomePage() {
 
       {/* Skin Profiling CTA */}
       <section className="py-32 lg:py-48 px-6 lg:px-16 text-center bg-surface-container-lowest">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <span className="label-caps text-outline mb-8 block tracking-[0.5em]">Kişiselleştirilmiş Analiz</span>
           <h2 className="text-5xl lg:text-7xl xl:text-8xl headline-tight leading-[0.9] mb-10 text-on-surface">
             CİLDİN,<br />SENİN TASARIMIN.
@@ -420,7 +420,7 @@ export default async function HomePage() {
 
       {/* Quick Links */}
       <section className="py-16 px-6 lg:px-16 bg-surface">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
           {[
             { href: '/karsilastir', icon: 'compare', title: 'Ürün Karşılaştır', desc: '2-3 ürünü yan yana koy, ingredient farklarını gör.' },
             { href: '/rehber', icon: 'menu_book', title: 'Rehber & Blog', desc: 'Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri.' },
@@ -442,7 +442,7 @@ export default async function HomePage() {
       </section>
 
       {/* Disclosure */}
-      <section className="max-w-4xl mx-auto px-6 py-8">
+      <section className="max-w-[1200px] mx-auto px-6 py-8">
         <p className="text-xs text-outline text-center leading-relaxed">
           REVELA bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
           niteliğinde değildir. Ürün sayfalarındaki satın alma linkleri komisyon içerebilir.{' '}

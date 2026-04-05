@@ -60,7 +60,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="curator-section max-w-2xl mx-auto">
+    <div className="curator-section max-w-4xl mx-auto">
       <div className="text-center mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Profil</span>
         <h1 className="text-3xl headline-tight text-on-surface">CILT PROFILI</h1>

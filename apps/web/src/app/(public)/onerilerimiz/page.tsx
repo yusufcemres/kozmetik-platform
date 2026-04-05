@@ -155,7 +155,7 @@ export default async function RecommendationsPage() {
         }}
       />
 
-      <div className="curator-section max-w-7xl mx-auto">
+      <div className="curator-section max-w-[1200px] mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase mb-4">

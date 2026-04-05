@@ -114,7 +114,7 @@ export class ProductsService {
 
     const [data, total] = await this.repo.findAndCount({
       where,
-      relations: ['brand', 'category', 'label', 'images'],
+      relations: ['brand', 'category', 'label', 'images', 'need_scores', 'need_scores.need'],
       order: { created_at: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,

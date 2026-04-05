@@ -143,7 +143,7 @@ export default function SkinAnalysisPage() {
   };
 
   return (
-    <div className="curator-section max-w-2xl mx-auto">
+    <div className="curator-section max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase mb-4">

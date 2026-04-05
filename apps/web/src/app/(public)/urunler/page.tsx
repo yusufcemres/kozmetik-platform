@@ -21,8 +21,9 @@ interface Product {
 }
 
 const TYPE_CHIPS = [
-  'serum', 'nemlendirici', 'temizleyici', 'güneş kremi', 'tonik',
-  'peeling', 'göz kremi', 'maske', 'krem', 'esans',
+  'serum', 'krem', 'temizleyici', 'nemlendirici', 'güneş kremi',
+  'tonik', 'maske', 'göz kremi', 'peeling', 'esans',
+  'dudak bakım', 'fondöten',
 ];
 
 const AREA_LABELS: Record<string, string> = {
@@ -386,6 +387,16 @@ function ProductsListContent() {
                         </span>
                       </div>
                     )}
+                    {(() => {
+                      const topNeed = product.need_scores
+                        ?.filter(ns => ns.need?.need_name)
+                        .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))[0];
+                      return topNeed ? (
+                        <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium mt-1.5 inline-block truncate">
+                          {topNeed.need.need_name}
+                        </span>
+                      ) : null;
+                    })()}
                   </div>
                 </Link>
               );

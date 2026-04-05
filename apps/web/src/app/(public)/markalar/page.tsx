@@ -92,7 +92,7 @@ export default function BrandsPage() {
   }, {});
 
   return (
-    <div className="curator-section max-w-[900px] mx-auto">
+    <div className="curator-section max-w-[1200px] mx-auto">
       {/* Header */}
       <div className="text-center mb-12">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">

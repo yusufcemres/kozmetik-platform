@@ -143,7 +143,7 @@ function ResultsContent() {
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   return (
-    <div className="curator-section max-w-6xl mx-auto">
+    <div className="curator-section max-w-[1200px] mx-auto">
       {/* Header */}
       <div className="text-center mb-10">
         <span className="material-icon text-score-high mb-2 block" style={{ fontSize: '48px' }} aria-hidden="true">

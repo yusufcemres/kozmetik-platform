@@ -199,7 +199,7 @@ export default async function SupplementDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(supplementJsonLd(product, detail)) }}
       />
 
-      <article className="curator-section max-w-4xl mx-auto">
+      <article className="curator-section max-w-[1200px] mx-auto">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/takviyeler" className="hover:text-primary transition-colors">
