@@ -32,13 +32,15 @@ export const metadata: Metadata = {
 async function getBrands(): Promise<Brand[]> {
   try {
     const res = await apiFetch<{ data: Brand[] }>('/brands?limit=200', {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
     } as any);
     return res.data || [];
   } catch {
     return [];
   }
 }
+
+export const dynamic = 'force-dynamic';
 
 // === Helpers ===
 
