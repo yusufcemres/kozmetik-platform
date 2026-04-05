@@ -6,6 +6,8 @@ import { apiFetch } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import PriceChart from '@/components/public/PriceChart';
 import ListModal from '@/components/public/ListModal';
+import RecentlyViewed from '@/components/public/RecentlyViewed';
+import ProductViewTracker from './ProductViewTracker';
 
 // === Types ===
 
@@ -256,6 +258,36 @@ function productJsonLd(product: Product) {
   };
 }
 
+// === Similar products ===
+
+interface SimilarProduct {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  brand?: { brand_name: string };
+  images?: { image_url: string; sort_order?: number }[];
+  need_scores?: { compatibility_score: number }[];
+}
+
+async function getSimilarProducts(
+  productId: number,
+  categoryId?: number,
+  brandId?: number,
+): Promise<SimilarProduct[]> {
+  if (!categoryId) return [];
+  try {
+    const res = await apiFetch<{ data: SimilarProduct[] }>(
+      `/products?category_id=${categoryId}&limit=7`,
+      { next: { revalidate: 3600 } } as any,
+    );
+    return (res.data || []).filter(
+      (p) => p.product_id !== productId && p.brand?.brand_name,
+    ).slice(0, 6);
+  } catch {
+    return [];
+  }
+}
+
 // === Page ===
 
 export default async function ProductDetailPage({
@@ -265,6 +297,12 @@ export default async function ProductDetailPage({
 }) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
+
+  const similarProducts = await getSimilarProducts(
+    product.product_id,
+    product.category?.category_id,
+    product.brand?.brand_id,
+  );
 
   const imageUrl = product.images?.[0]?.image_url;
   const sortedIngredients = [...(product.ingredients || [])].sort(
@@ -284,6 +322,14 @@ export default async function ProductDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
+      />
+
+      <ProductViewTracker
+        product_id={product.product_id}
+        product_name={product.product_name}
+        product_slug={product.product_slug}
+        brand_name={product.brand?.brand_name}
+        image_url={imageUrl}
       />
 
       <article className="max-w-6xl mx-auto px-6 lg:px-16 py-8 lg:py-12">
@@ -702,10 +748,11 @@ export default async function ProductDetailPage({
                 {sorted.map((link) => {
                   const isCheapest = link.price_snapshot && Number(link.price_snapshot) === minPrice && prices.length >= 2;
                   const pInfo = PLATFORM_INFO[link.platform];
+                  const utmUrl = `${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=urun-detay&utm_content=${product.product_slug}`;
                   return (
                     <a
                       key={link.affiliate_link_id}
-                      href={link.affiliate_url}
+                      href={utmUrl}
                       target="_blank"
                       rel="noopener noreferrer nofollow sponsored"
                       className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
@@ -745,6 +792,71 @@ export default async function ProductDetailPage({
             </section>
           );
         })()}
+
+        {/* Similar Products */}
+        {similarProducts.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">grid_view</span>
+              Benzer Ürünler
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {similarProducts.map((sp) => {
+                const spImg = sp.images?.find(i => i.sort_order === 0)?.image_url || sp.images?.[0]?.image_url;
+                const spHover = sp.images?.find(i => i.sort_order === 1)?.image_url;
+                const spScore = sp.need_scores?.length
+                  ? Math.round(sp.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) / sp.need_scores.length)
+                  : null;
+                return (
+                  <Link
+                    key={sp.product_id}
+                    href={`/urunler/${sp.product_slug}`}
+                    className="curator-card overflow-hidden group"
+                  >
+                    <div className="aspect-square bg-surface-container-low overflow-hidden relative">
+                      {spImg ? (
+                        <>
+                          <Image
+                            src={spImg}
+                            alt={sp.product_name}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                            className={`object-contain transition-all duration-500 ${spHover ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+                          />
+                          {spHover && (
+                            <Image
+                              src={spHover}
+                              alt={`${sp.product_name} - detay`}
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                              className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <span className="material-icon text-outline-variant flex items-center justify-center h-full" aria-hidden="true">inventory_2</span>
+                      )}
+                      {spScore !== null && (
+                        <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm rounded-sm px-1.5 py-0.5">
+                          <span className={`text-[10px] font-bold ${getScoreColor(spScore)}`}>%{spScore}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      {sp.brand && <p className="label-caps text-outline text-[9px]">{sp.brand.brand_name}</p>}
+                      <p className="text-xs font-semibold text-on-surface line-clamp-2 mt-0.5 group-hover:text-primary transition-colors">
+                        {sp.product_name}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Recently Viewed */}
+        <RecentlyViewed excludeProductId={product.product_id} />
 
         {/* Compare CTA */}
         <div className="border-t border-outline-variant/20 pt-10 flex flex-col sm:flex-row items-center justify-between gap-6">

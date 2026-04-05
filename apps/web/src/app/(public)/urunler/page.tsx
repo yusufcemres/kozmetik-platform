@@ -14,7 +14,7 @@ interface Product {
   short_description?: string;
   brand?: { brand_id: number; brand_name: string };
   category?: { category_id: number; category_name: string };
-  images?: { image_url: string }[];
+  images?: { image_url: string; sort_order?: number }[];
   need_scores?: { compatibility_score: number }[];
 }
 
@@ -272,7 +272,8 @@ function ProductsListContent() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => {
-              const imgUrl = product.images?.[0]?.image_url;
+              const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+              const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
               const avgScore =
                 product.need_scores && product.need_scores.length > 0
                   ? Math.round(
@@ -288,14 +289,25 @@ function ProductsListContent() {
                   className="curator-card overflow-hidden group"
                 >
                   <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden relative">
-                    {imgUrl ? (
-                      <Image
-                        src={imgUrl}
-                        alt={product.product_name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-contain grayscale-[10%] group-hover:scale-105 transition-transform duration-500"
-                      />
+                    {primaryImg ? (
+                      <>
+                        <Image
+                          src={primaryImg}
+                          alt={product.product_name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+                        />
+                        {hoverImg && (
+                          <Image
+                            src={hoverImg}
+                            alt={`${product.product_name} - detay`}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                          />
+                        )}
+                      </>
                     ) : (
                       <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
                     )}

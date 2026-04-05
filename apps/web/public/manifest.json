@@ -1,11 +1,13 @@
 {
-  "name": "Kozmetik Platform",
-  "short_name": "Kozmetik",
-  "description": "Kozmetik ürünlerin içeriklerini anla, ihtiyacına uygun ürünleri keşfet.",
+  "name": "REVELA - Kozmetik Analiz",
+  "short_name": "REVELA",
+  "description": "Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2f9468",
+  "background_color": "#fafaf8",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait-primary",
+  "categories": ["beauty", "health", "shopping"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -16,6 +18,12 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

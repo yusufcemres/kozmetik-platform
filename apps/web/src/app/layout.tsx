@@ -48,6 +48,28 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        {/* Google Analytics 4 */}
+        {process.env.NEXT_PUBLIC_GA4_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID}', {
+                    page_path: window.location.pathname,
+                    send_page_view: true
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

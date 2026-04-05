@@ -45,7 +45,7 @@ interface ProductScore {
     product_name: string;
     product_slug: string;
     brand?: { brand_name: string };
-    images?: { image_url: string }[];
+    images?: { image_url: string; sort_order?: number }[];
   };
 }
 
@@ -411,7 +411,8 @@ export default async function NeedDetailPage({
                 {topScores.slice(0, 6).map((score) => {
                   const product = score.product;
                   if (!product) return null;
-                  const imgUrl = product.images?.[0]?.image_url;
+                  const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+                  const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
                   const compat = Math.round(Number(score.compatibility_score));
                   return (
                     <Link
@@ -420,14 +421,25 @@ export default async function NeedDetailPage({
                       className="curator-card overflow-hidden group"
                     >
                       <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden relative">
-                        {imgUrl ? (
-                          <Image
-                            src={imgUrl}
-                            alt={product.product_name}
-                            fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            className="object-contain group-hover:scale-105 transition-transform duration-500"
-                          />
+                        {primaryImg ? (
+                          <>
+                            <Image
+                              src={primaryImg}
+                              alt={product.product_name}
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+                            />
+                            {hoverImg && (
+                              <Image
+                                src={hoverImg}
+                                alt={`${product.product_name} - detay`}
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                              />
+                            )}
+                          </>
                         ) : (
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
                         )}

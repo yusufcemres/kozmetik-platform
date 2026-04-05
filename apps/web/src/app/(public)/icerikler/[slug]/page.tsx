@@ -44,7 +44,7 @@ interface ProductInCarousel {
   product_slug: string;
   brand?: { brand_id: number; brand_name: string; brand_slug: string };
   category?: { category_id: number; category_name: string };
-  images?: { image_url: string; alt_text?: string }[];
+  images?: { image_url: string; alt_text?: string; sort_order?: number }[];
 }
 
 // === Data ===
@@ -384,7 +384,8 @@ export default async function IngredientDetailPage({
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
                 {products.map((p) => {
-                  const img = p.images?.[0]?.image_url;
+                  const primaryImg = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
+                  const hoverImg = p.images?.find(i => i.sort_order === 1)?.image_url;
                   return (
                     <Link
                       key={p.product_id}
@@ -392,14 +393,25 @@ export default async function IngredientDetailPage({
                       className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
                     >
                       <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden relative">
-                        {img ? (
-                          <Image
-                            src={img}
-                            alt={p.product_name}
-                            fill
-                            sizes="192px"
-                            className="object-contain group-hover:scale-105 transition-transform duration-500"
-                          />
+                        {primaryImg ? (
+                          <>
+                            <Image
+                              src={primaryImg}
+                              alt={p.product_name}
+                              fill
+                              sizes="192px"
+                              className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+                            />
+                            {hoverImg && (
+                              <Image
+                                src={hoverImg}
+                                alt={`${p.product_name} - detay`}
+                                fill
+                                sizes="192px"
+                                className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                              />
+                            )}
+                          </>
                         ) : (
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
                         )}

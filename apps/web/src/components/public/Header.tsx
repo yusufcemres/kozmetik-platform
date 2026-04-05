@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
   { href: '/urunler', label: 'Ürünler' },
-  { href: '/icerikler', label: 'İçerikler' },
+  { href: '/onerilerimiz', label: 'Önerilerimiz', badge: 'AI' },
   { href: '/ihtiyaclar', label: 'İhtiyaçlar' },
+  { href: '/markalar', label: 'Markalar' },
   { href: '/karsilastir', label: 'Karşılaştır' },
-  { href: '/rehber', label: 'Rehber' },
 ];
 
 export default function Header() {
@@ -55,13 +55,18 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`label-caps text-xs transition-colors duration-300 ${
+                className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1.5 ${
                   isActive
                     ? 'text-on-surface border-b-2 border-on-surface pb-1'
                     : 'text-outline hover:text-on-surface'
                 }`}
               >
                 {item.label}
+                {'badge' in item && item.badge && (
+                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

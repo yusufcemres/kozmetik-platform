@@ -64,6 +64,7 @@
     line-height: 1;
     display: inline-block;
     vertical-align: middle;
+    text-transform: none !important;
   }
 
   .material-icon-filled {
@@ -73,6 +74,7 @@
     line-height: 1;
     display: inline-block;
     vertical-align: middle;
+    text-transform: none !important;
   }
 
   .material-icon-sm {

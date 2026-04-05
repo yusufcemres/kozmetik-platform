@@ -10,7 +10,7 @@ interface Product {
   product_slug: string;
   brand?: { brand_name: string };
   category?: { category_name: string };
-  images?: { image_url: string }[];
+  images?: { image_url: string; sort_order?: number }[];
   need_scores?: { compatibility_score: number }[];
 }
 
@@ -94,7 +94,8 @@ const CATEGORY_ICONS: Record<string, string> = {
 // === Product Card ===
 
 function ProductCard({ product, index }: { product: Product; index: number }) {
-  const imgUrl = product.images?.[0]?.image_url;
+  const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+  const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
   const score = avgScore(product);
   const stars = score !== null ? Math.round(score / 20) : 0;
 
@@ -104,14 +105,25 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
       className={`flex flex-col curator-card p-4 -m-0 group ${index % 2 !== 0 ? 'mt-0 lg:mt-12' : ''}`}
     >
       <div className="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-sm relative">
-        {imgUrl ? (
-          <Image
-            src={imgUrl}
-            alt={product.product_name}
-            fill
-            sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-contain grayscale-[10%] transition-transform duration-500 group-hover:scale-105"
-          />
+        {primaryImg ? (
+          <>
+            <Image
+              src={primaryImg}
+              alt={product.product_name}
+              fill
+              sizes="(max-width: 640px) 50vw, 25vw"
+              className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+            />
+            {hoverImg && (
+              <Image
+                src={hoverImg}
+                alt={`${product.product_name} - detay`}
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+              />
+            )}
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="material-icon material-icon-lg text-outline-variant">inventory_2</span>
@@ -162,8 +174,26 @@ export default async function HomePage() {
   const cosmNeeds = needs.filter((n: Need) => n.need_group !== 'supplement');
   const parentCats = categories.filter((c: Category) => !c.parent_category_id);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'REVELA',
+    url: 'https://revela.com.tr',
+    description: 'Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://revela.com.tr/urunler?search={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Hero Section */}
       <section className="px-6 lg:px-16 py-16 lg:py-24 mb-16 lg:mb-24">
         <div className="editorial-grid gap-8 items-end">
