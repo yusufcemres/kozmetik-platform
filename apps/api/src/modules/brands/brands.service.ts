@@ -26,17 +26,30 @@ export class BrandsService {
 
   async findAll(query: PaginationDto) {
     const { page, limit, search } = query;
-    const where: any = {};
+
+    const qb = this.repo
+      .createQueryBuilder('b')
+      .leftJoin('products', 'p', 'p.brand_id = b.brand_id')
+      .addSelect('COUNT(p.product_id)', 'product_count')
+      .groupBy('b.brand_id')
+      .orderBy('b.brand_name', 'ASC')
+      .offset((page - 1) * limit)
+      .limit(limit);
+
     if (search) {
-      where.brand_name = Like(`%${search}%`);
+      qb.where('b.brand_name ILIKE :search', { search: `%${search}%` });
     }
 
-    const [data, total] = await this.repo.findAndCount({
-      where,
-      order: { brand_name: 'ASC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const raw = await qb.getRawAndEntities();
+    const data = raw.entities.map((brand, i) => ({
+      ...brand,
+      product_count: parseInt(raw.raw[i]?.product_count || '0', 10),
+    }));
+
+    // Total count
+    const countQb = this.repo.createQueryBuilder('b');
+    if (search) countQb.where('b.brand_name ILIKE :search', { search: `%${search}%` });
+    const total = await countQb.getCount();
 
     return {
       data,
