@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ToastProvider } from '@/components/admin/Toast';
 
@@ -33,6 +34,27 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    if (pathname === '/admin/login') {
+      setAuthed(true);
+      return;
+    }
+    const token = typeof window !== 'undefined'
+      ? localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token')
+      : null;
+    if (!token) {
+      router.replace('/admin/login');
+    } else {
+      setAuthed(true);
+    }
+  }, [pathname, router]);
+
+  if (!authed) {
+    return <div className="flex items-center justify-center min-h-screen text-gray-500">Yetkilendiriliyor...</div>;
+  }
 
   return (
     <ToastProvider>

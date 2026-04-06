@@ -30,9 +30,9 @@ interface Suggestion {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; path: string }> = {
-  product: { label: 'Urun', icon: 'inventory_2', path: '/urunler' },
-  ingredient: { label: 'Icerik', icon: 'science', path: '/icerikler' },
-  need: { label: 'Ihtiyac', icon: 'target', path: '/ihtiyaclar' },
+  product: { label: 'Ürün', icon: 'inventory_2', path: '/urunler' },
+  ingredient: { label: 'İçerik', icon: 'science', path: '/icerikler' },
+  need: { label: 'İhtiyaç', icon: 'target', path: '/ihtiyaclar' },
 };
 
 function SearchPageContent() {
@@ -150,7 +150,7 @@ function SearchPageContent() {
               onChange={(e) => handleInputChange(e.target.value)}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Urun, icerik maddesi veya cilt ihtiyaci ara..."
+              placeholder="Ürün, içerik maddesi veya cilt ihtiyacı ara..."
               className="w-full border border-outline-variant/30 rounded-sm px-6 py-4 text-lg focus:outline-none focus:border-primary bg-surface text-on-surface pr-12"
               autoFocus
             />
@@ -226,25 +226,25 @@ function SearchPageContent() {
       {!loading && !meta && !query && (
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">search</span>
-          <p className="text-on-surface-variant">Aramak istediginiz terimi yazin</p>
+          <p className="text-on-surface-variant">Aramak istediğiniz terimi yazın</p>
           <p className="text-sm text-outline mt-2">
-            Orn: &quot;niacinamide&quot;, &quot;sivilce&quot;, &quot;La Roche-Posay&quot;
+            Örn: &quot;niacinamide&quot;, &quot;sivilce&quot;, &quot;La Roche-Posay&quot;
           </p>
         </div>
       )}
 
       {/* Loading */}
       {loading && (
-        <div className="text-center py-24 text-outline">Araniyor...</div>
+        <div className="text-center py-24 text-outline">Aranıyor...</div>
       )}
 
       {/* Results */}
       {!loading && meta && (
         <>
           <p className="text-xs text-outline mb-6">
-            {meta.total} sonuc bulundu
+            {meta.total} sonuç bulundu
             {meta.intent !== 'mixed' && (
-              <span className="text-outline"> — algilanan: {meta.intent}</span>
+              <span className="text-outline"> — algılanan: {meta.intent}</span>
             )}
           </p>
 
@@ -252,10 +252,10 @@ function SearchPageContent() {
             <div className="text-center py-24">
               <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">search_off</span>
               <p className="text-on-surface-variant">
-                &quot;{query}&quot; icin sonuc bulunamadi
+                &quot;{query}&quot; için sonuç bulunamadı
               </p>
               <p className="text-sm text-outline mt-2">
-                Farkli anahtar kelimeler deneyin veya yazimi kontrol edin
+                Farklı anahtar kelimeler deneyin veya yazımı kontrol edin
               </p>
             </div>
           ) : (
@@ -356,7 +356,7 @@ export default function SearchPage() {
     <Suspense
       fallback={
         <div className="curator-section max-w-4xl mx-auto text-center text-outline">
-          Yukleniyor...
+          Yükleniyor...
         </div>
       }
     >

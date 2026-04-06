@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kozmetik-v1';
+const CACHE_NAME = 'kozmetik-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -28,8 +28,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'REVELA';
   const options = {
     body: data.body || 'Yeni bir güncelleme var!',
-    icon: '/logos/icon-192x192.png',
-    badge: '/logos/icon-72x72.png',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     data: { url: data.url || '/' },
     actions: data.actions || [],
   };

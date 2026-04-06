@@ -30,7 +30,7 @@ async function bootstrap() {
   // CORS
   const allowedOrigins = isProduction
     ? [
-        configService.get('WEB_URL', 'https://kozmetikplatform.com'),
+        configService.get('WEB_URL', 'https://kozmetik-platform.vercel.app'),
         configService.get('MOBILE_URL', ''),
         configService.get('VERCEL_URL', ''),
       ].filter(Boolean)

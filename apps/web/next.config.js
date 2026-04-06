@@ -7,28 +7,16 @@ const nextConfig = {
   // Image optimization
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '**.kozmetikplatform.com' },
+      // CDNs & marketplaces
+      { protocol: 'https', hostname: 'cdn.dsmcdn.com' },
+      { protocol: 'https', hostname: 'cdn.shopify.com' },
       { protocol: 'https', hostname: '**.trendyol.com' },
       { protocol: 'https', hostname: '**.hepsiburada.com' },
       { protocol: 'https', hostname: '**.amazon.com.tr' },
+      // Brand sites (.com.tr wildcard covers most Turkish brands)
+      { protocol: 'https', hostname: '**.com.tr' },
+      // Other
       { protocol: 'https', hostname: 'placehold.co' },
-      { protocol: 'https', hostname: 'cdn.shopify.com' },
-      { protocol: 'https', hostname: 'cdn.dsmcdn.com' },
-      { protocol: 'https', hostname: '**.cerave.com.tr' },
-      { protocol: 'https', hostname: '**.laroche-posay.com.tr' },
-      { protocol: 'https', hostname: '**.vichy.com.tr' },
-      { protocol: 'https', hostname: '**.bioderma.com.tr' },
-      { protocol: 'https', hostname: '**.mustela.com.tr' },
-      { protocol: 'https', hostname: '**.bionnex.com.tr' },
-      { protocol: 'https', hostname: '**.cosmed.com.tr' },
-      { protocol: 'https', hostname: '**.bioxcin.com.tr' },
-      { protocol: 'https', hostname: '**.sebamed.com.tr' },
-      { protocol: 'https', hostname: '**.dermoskin.com.tr' },
-      { protocol: 'https', hostname: '**.nivea.com.tr' },
-      { protocol: 'https', hostname: '**.sinoz.com.tr' },
-      { protocol: 'https', hostname: '**.shevec.com' },
-      { protocol: 'https', hostname: '**.creamco.com.tr' },
-      { protocol: 'https', hostname: '**.urbancare.com.tr' },
       { protocol: 'https', hostname: 'api.dicebear.com' },
     ],
     formats: ['image/avif', 'image/webp'],
@@ -83,16 +71,9 @@ const nextConfig = {
     ];
   },
 
-  // Redirects
+  // Redirects (admin auth handled by admin/layout.tsx client-side check)
   async redirects() {
-    return [
-      {
-        source: '/admin',
-        has: [{ type: 'cookie', key: 'admin_token', value: undefined }],
-        destination: '/admin/login',
-        permanent: false,
-      },
-    ];
+    return [];
   },
 
   // Webpack optimization

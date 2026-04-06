@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In } from 'typeorm';
+import { Repository, Like, ILike, In } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
   AffiliateLink, AffiliateClick, FormulaRevision, PriceHistory, Category,
@@ -72,12 +72,12 @@ export class ProductsService {
   }) {
     const { page, limit, search, brand_id, category_id, status, target_area, usage_time, product_type, need_id } = query;
     const where: any = {};
-    if (search) where.product_name = Like(`%${search}%`);
+    if (search) where.product_name = ILike(`%${search}%`);
     if (brand_id) where.brand_id = Number(brand_id);
     if (status) where.status = status;
     if (target_area) where.target_area = target_area;
     if (usage_time) where.usage_time_hint = usage_time;
-    if (product_type) where.product_type_label = Like(`%${product_type}%`);
+    if (product_type) where.product_type_label = ILike(`%${product_type}%`);
 
     // Category filter: include child categories for parent
     if (category_id) {

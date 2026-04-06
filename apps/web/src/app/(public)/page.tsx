@@ -42,12 +42,13 @@ interface Brand {
 // === Data Fetching (ISR) ===
 
 async function getHomeData() {
-  const [topProducts, latestRes, categories, needsRes, brands] = await Promise.allSettled([
+  const [topProducts, latestRes, categories, needsRes, brands, ingredientCountRes] = await Promise.allSettled([
     apiFetch<Product[]>('/products/top-scored?limit=8', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
     apiFetch<{ data: Need[] }>('/needs?limit=100', { next: { revalidate: 86400 } } as any),
     apiFetch<Brand[]>('/products/popular-brands?limit=12', { next: { revalidate: 3600 } } as any),
+    apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),
   ]);
 
   return {
@@ -56,6 +57,7 @@ async function getHomeData() {
     categories: categories.status === 'fulfilled' ? categories.value : [],
     needs: needsRes.status === 'fulfilled' ? needsRes.value.data || [] : [],
     brands: brands.status === 'fulfilled' ? brands.value : [],
+    ingredientCount: ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0,
   };
 }
 
@@ -164,7 +166,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, categories, needs, brands } = await getHomeData();
+  const { topProducts, latest, categories, needs, brands, ingredientCount } = await getHomeData();
   // Fallback: if top-scored fails, use latest products
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
   const cosmNeeds = needs.filter((n: Need) => n.need_group !== 'supplement');
@@ -249,10 +251,10 @@ export default async function HomePage() {
         {/* Stats row */}
         <div className="flex flex-wrap justify-start gap-12 mt-16 lg:mt-20">
           {[
-            { label: 'Ürün Analizi', value: latest.meta?.total || 1785 },
-            { label: 'İçerik Maddesi', value: 5000 },
-            { label: 'Marka', value: 113 },
-            { label: 'Kategori', value: categories.length || 57 },
+            { label: 'Ürün Analizi', value: latest.meta?.total || 0 },
+            { label: 'İçerik Maddesi', value: ingredientCount || 0 },
+            { label: 'Marka', value: brands.length || 0 },
+            { label: 'Kategori', value: categories.length || 0 },
           ].map((s) => (
             <div key={s.label}>
               <p className="text-3xl headline-tight text-on-surface">
