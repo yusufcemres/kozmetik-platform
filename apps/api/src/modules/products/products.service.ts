@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
-  AffiliateLink, FormulaRevision, PriceHistory, Category,
+  AffiliateLink, AffiliateClick, FormulaRevision, PriceHistory, Category,
 } from '@database/entities';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -33,6 +33,8 @@ export class ProductsService {
     private readonly priceHistoryRepo: Repository<PriceHistory>,
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(AffiliateClick)
+    private readonly clickRepo: Repository<AffiliateClick>,
   ) {}
 
   async create(dto: CreateProductDto) {
@@ -114,7 +116,7 @@ export class ProductsService {
 
     const [data, total] = await this.repo.findAndCount({
       where,
-      relations: ['brand', 'category', 'label', 'images', 'need_scores', 'need_scores.need'],
+      relations: ['brand', 'category', 'label', 'images'],
       order: { created_at: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
@@ -387,5 +389,36 @@ export class ProductsService {
       global_avg: allPrices.length ? Math.round((allPrices.reduce((a: number, b: number) => a + b, 0) / allPrices.length) * 100) / 100 : 0,
       platforms,
     };
+  }
+
+  // === Affiliate Click Tracking ===
+
+  async trackClick(data: { affiliate_link_id: number; source_page?: string; ip_hash?: string; user_agent?: string }) {
+    const entity = this.clickRepo.create(data);
+    return this.clickRepo.save(entity);
+  }
+
+  async getAffiliateHealth() {
+    const stats = await this.affiliateRepo
+      .createQueryBuilder('al')
+      .select('al.verification_status', 'status')
+      .addSelect('al.platform', 'platform')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('al.verification_status')
+      .addGroupBy('al.platform')
+      .getRawMany();
+
+    const total = stats.reduce((s, r) => s + parseInt(r.count), 0);
+    const byStatus: Record<string, number> = {};
+    const byPlatform: Record<string, Record<string, number>> = {};
+
+    for (const row of stats) {
+      const st = row.status || 'unverified';
+      byStatus[st] = (byStatus[st] || 0) + parseInt(row.count);
+      if (!byPlatform[row.platform]) byPlatform[row.platform] = {};
+      byPlatform[row.platform][st] = parseInt(row.count);
+    }
+
+    return { total, byStatus, byPlatform };
   }
 }

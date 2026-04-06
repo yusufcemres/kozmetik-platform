@@ -8,6 +8,8 @@ import PriceChart from '@/components/public/PriceChart';
 import ListModal from '@/components/public/ListModal';
 import RecentlyViewed from '@/components/public/RecentlyViewed';
 import ProductViewTracker from './ProductViewTracker';
+import AffiliateLink from '@/components/public/AffiliateLink';
+import PriceAlertButton from '@/components/public/PriceAlertButton';
 
 // === Types ===
 
@@ -686,6 +688,15 @@ export default async function ProductDetailPage({
         )}
 
         {/* Affiliate Links */}
+        {activeLinks.length === 0 && (
+          <section className="mb-10">
+            <div className="curator-card p-8 text-center">
+              <span className="material-icon text-outline-variant/40 mb-3 block" style={{ fontSize: '40px' }} aria-hidden="true">store</span>
+              <p className="text-sm text-on-surface-variant font-medium">Bu ürün için satış linkleri doğrulanıyor...</p>
+              <p className="text-xs text-outline mt-1.5">Yakında güncel satış noktaları burada listelenecek.</p>
+            </div>
+          </section>
+        )}
         {activeLinks.length > 0 && (() => {
           const priced = activeLinks.filter((l) => l.price_snapshot && l.price_snapshot > 0);
           const prices = priced.map((l) => Number(l.price_snapshot));
@@ -754,11 +765,10 @@ export default async function ProductDetailPage({
                   const pInfo = PLATFORM_INFO[link.platform];
                   const utmUrl = `${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=urun-detay&utm_content=${product.product_slug}`;
                   return (
-                    <a
+                    <AffiliateLink
                       key={link.affiliate_link_id}
                       href={utmUrl}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow sponsored"
+                      affiliateLinkId={link.affiliate_link_id}
                       className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                     >
                       {isCheapest && (
@@ -786,13 +796,16 @@ export default async function ProductDetailPage({
                         <p className="text-sm text-outline shrink-0">Fiyat bilgisi yok</p>
                       )}
                       <span className="material-icon shrink-0" style={{ color: pInfo?.color || '#1a1a1a' }} aria-hidden="true">arrow_forward</span>
-                    </a>
+                    </AffiliateLink>
                   );
                 })}
               </div>
-              <p className="text-xs text-outline mt-4">
-                Bağımsız platformuz, komisyon alınan linkler içerebilir. Fiyatlar son güncelleme tarihine aittir.
-              </p>
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-xs text-outline">
+                  Bağımsız platformuz, komisyon alınan linkler içerebilir. Fiyatlar son güncelleme tarihine aittir.
+                </p>
+                <PriceAlertButton productId={product.product_id} />
+              </div>
             </section>
           );
         })()}

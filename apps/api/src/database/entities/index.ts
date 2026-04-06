@@ -18,6 +18,7 @@ export { ProductLabel } from './product-label.entity';
 export { ProductImage } from './product-image.entity';
 export { FormulaRevision } from './formula-revision.entity';
 export { AffiliateLink } from './affiliate-link.entity';
+export { AffiliateClick } from './affiliate-click.entity';
 
 // Engine
 export { ProductIngredient } from './product-ingredient.entity';
@@ -34,6 +35,7 @@ export { SponsorshipDisclosure } from './sponsorship-disclosure.entity';
 
 // Fiyat Takibi (Faz 3)
 export { PriceHistory } from './price-history.entity';
+export { PriceAlert } from './price-alert.entity';
 
 // Supplement (Faz 2)
 export { SupplementDetail } from './supplement-detail.entity';

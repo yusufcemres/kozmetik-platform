@@ -74,8 +74,9 @@ async function main() {
             WHERE al.product_id = p.product_id AND al.platform = 'hepsiburada'
             LIMIT 1) as hepsiburada_url
     FROM products p
-    JOIN product_images pi ON pi.product_id = p.product_id AND pi.sort_order = 0
+    JOIN product_images pi ON pi.product_id = p.product_id
     WHERE pi.image_url LIKE '%dicebear%'
+    AND pi.image_id = (SELECT MIN(pi2.image_id) FROM product_images pi2 WHERE pi2.product_id = p.product_id AND pi2.image_url LIKE '%dicebear%')
     ORDER BY p.product_id
   `);
 

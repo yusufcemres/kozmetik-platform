@@ -22,6 +22,7 @@ import { SupplementsModule } from './modules/supplements/supplements.module';
 import { InteractionsModule } from './modules/interactions/interactions.module';
 import { AffiliateModule } from './modules/affiliate/affiliate.module';
 import { B2bModule } from './modules/b2b/b2b.module';
+import { PriceAlertsModule } from './modules/price-alerts/price-alerts.module';
 import { RedisCacheModule } from './common/cache/cache.module';
 
 // DB connection is conditional — works without Docker for initial development
@@ -54,7 +55,7 @@ const featureModules = skipDb
       AuthModule, CategoriesModule, BrandsModule, IngredientsModule, NeedsModule,
       ProductsModule, IngestionModule, MappingsModule, MethodologyModule,
       ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
-      SupplementsModule, InteractionsModule, AffiliateModule, B2bModule,
+      SupplementsModule, InteractionsModule, AffiliateModule, B2bModule, PriceAlertsModule,
     ];
 
 @Module({

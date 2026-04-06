@@ -77,6 +77,12 @@ export class Product {
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status: string; // draft, in_review, published, archived
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  top_need_name: string;
+
+  @Column({ type: 'decimal', precision: 4, scale: 2, nullable: true })
+  top_need_score: number;
+
   @OneToOne(() => ProductLabel, (label) => label.product)
   label: ProductLabel;
 

@@ -1,7 +1,9 @@
 import {
   Body, Controller, Delete, Get, Param, ParseIntPipe,
-  Post, Put, Query, UseGuards,
+  Post, Put, Query, Req, UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { createHash } from 'crypto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -68,6 +70,12 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false })
   findPopularBrands(@Query('limit') limit?: string) {
     return this.service.findPopularBrands(limit ? parseInt(limit) : 12);
+  }
+
+  @Get('affiliate-health')
+  @ApiOperation({ summary: 'Affiliate link sağlık durumu' })
+  getAffiliateHealth() {
+    return this.service.getAffiliateHealth();
   }
 
   @Get(':id')
@@ -166,5 +174,23 @@ export class ProductsController {
     @Query('days') days?: string,
   ) {
     return this.service.getPriceHistory(id, days ? parseInt(days) : 90);
+  }
+
+  // === Affiliate Click Tracking ===
+
+  @Post('affiliate-clicks')
+  @ApiOperation({ summary: 'Affiliate tıklama kaydet (fire-and-forget)' })
+  trackClick(
+    @Body() body: { affiliate_link_id: number; source_page?: string },
+    @Req() req: Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string || req.ip || '').split(',')[0].trim();
+    const ipHash = ip ? createHash('sha256').update(ip).digest('hex').slice(0, 16) : undefined;
+    return this.service.trackClick({
+      affiliate_link_id: body.affiliate_link_id,
+      source_page: body.source_page,
+      ip_hash: ipHash,
+      user_agent: req.headers['user-agent'],
+    });
   }
 }

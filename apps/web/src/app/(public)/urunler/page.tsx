@@ -14,11 +14,27 @@ interface Product {
   target_area?: string;
   usage_time_hint?: string;
   short_description?: string;
+  top_need_name?: string;
+  top_need_score?: number;
   brand?: { brand_id: number; brand_name: string };
   category?: { category_id: number; category_name: string; category_slug?: string };
   images?: { image_url: string; sort_order?: number }[];
-  need_scores?: { compatibility_score: number; need?: { need_name: string } }[];
 }
+
+const TYPE_ICONS: Record<string, string> = {
+  serum: 'science',
+  krem: 'spa',
+  temizleyici: 'water_drop',
+  nemlendirici: 'opacity',
+  'güneş kremi': 'wb_sunny',
+  tonik: 'local_drink',
+  maske: 'face_retouching_natural',
+  'göz kremi': 'visibility',
+  peeling: 'auto_fix_high',
+  esans: 'local_florist',
+  'dudak bakım': 'mood',
+  fondöten: 'palette',
+};
 
 const TYPE_CHIPS = [
   'serum', 'krem', 'temizleyici', 'nemlendirici', 'güneş kremi',
@@ -316,14 +332,9 @@ function ProductsListContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             {products.map((product) => {
               const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+              const isDiceBear = primaryImg?.includes('dicebear.com') || primaryImg?.includes('api.dicebear');
               const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
-              const avgScore =
-                product.need_scores && product.need_scores.length > 0
-                  ? Math.round(
-                      product.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) /
-                        product.need_scores.length,
-                    )
-                  : null;
+              const avgScore = product.top_need_score ? Math.round(Number(product.top_need_score)) : null;
 
               return (
                 <Link
@@ -332,7 +343,7 @@ function ProductsListContent() {
                   className="curator-card overflow-hidden group"
                 >
                   <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden relative">
-                    {primaryImg ? (
+                    {primaryImg && !isDiceBear ? (
                       <>
                         <Image
                           src={primaryImg}
@@ -352,7 +363,11 @@ function ProductsListContent() {
                         )}
                       </>
                     ) : (
-                      <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
+                      <div className="w-full h-full bg-gradient-to-br from-surface-variant/30 to-surface-variant/10 flex items-center justify-center">
+                        <span className="material-icon text-outline-variant/40 group-hover:text-outline-variant/60 transition-colors" style={{ fontSize: '48px' }} aria-hidden="true">
+                          {TYPE_ICONS[product.product_type_label || ''] || 'category'}
+                        </span>
+                      </div>
                     )}
                   </div>
                   <div className="p-4">
@@ -387,16 +402,11 @@ function ProductsListContent() {
                         </span>
                       </div>
                     )}
-                    {(() => {
-                      const topNeed = product.need_scores
-                        ?.filter(ns => ns.need?.need_name)
-                        .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))[0];
-                      return topNeed ? (
-                        <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium mt-1.5 inline-block truncate">
-                          {topNeed.need.need_name}
-                        </span>
-                      ) : null;
-                    })()}
+                    {product.top_need_name && (
+                      <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium mt-1.5 inline-block truncate">
+                        {product.top_need_name}
+                      </span>
+                    )}
                   </div>
                 </Link>
               );

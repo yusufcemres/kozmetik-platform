@@ -38,6 +38,12 @@ export class AffiliateLink {
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
+  @Column({ type: 'timestamp', nullable: true })
+  last_verified: Date;
+
+  @Column({ type: 'varchar', length: 20, default: 'unverified' })
+  verification_status: string; // unverified, valid, redirect, dead, search_only
+
   @CreateDateColumn()
   created_at: Date;
 

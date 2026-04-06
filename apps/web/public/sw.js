@@ -22,6 +22,33 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Push notification handler
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'REVELA';
+  const options = {
+    body: data.body || 'Yeni bir güncelleme var!',
+    icon: '/logos/icon-192x192.png',
+    badge: '/logos/icon-72x72.png',
+    data: { url: data.url || '/' },
+    actions: data.actions || [],
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+      const match = clients.find((c) => c.url.includes(url));
+      if (match) return match.focus();
+      return self.clients.openWindow(url);
+    })
+  );
+});
+
 // Fetch: network-first for API, stale-while-revalidate for pages/assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
