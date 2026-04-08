@@ -257,7 +257,7 @@ export class ScoringService {
   async getTopProductsByNeed(needId: number, limit = 12) {
     return this.scoreRepo.find({
       where: { need_id: needId },
-      relations: ['product', 'product.brand', 'product.images'],
+      relations: ['product', 'product.brand', 'product.category', 'product.images', 'product.affiliate_links'],
       order: { compatibility_score: 'DESC' },
       take: limit,
     });
