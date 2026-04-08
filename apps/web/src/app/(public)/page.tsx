@@ -23,15 +23,6 @@ interface Category {
   children?: Category[];
 }
 
-interface Need {
-  need_id: number;
-  need_name: string;
-  need_slug: string;
-  need_group?: string;
-  short_description?: string;
-  user_friendly_label?: string;
-}
-
 interface Brand {
   brand_id: number;
   brand_name: string;
@@ -42,11 +33,10 @@ interface Brand {
 // === Data Fetching (ISR) ===
 
 async function getHomeData() {
-  const [topProducts, latestRes, categories, needsRes, brands, ingredientCountRes] = await Promise.allSettled([
+  const [topProducts, latestRes, categories, brands, ingredientCountRes] = await Promise.allSettled([
     apiFetch<Product[]>('/products/top-scored?limit=8', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
-    apiFetch<{ data: Need[] }>('/needs?limit=100', { next: { revalidate: 86400 } } as any),
     apiFetch<Brand[]>('/products/popular-brands?limit=12', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),
   ]);
@@ -55,25 +45,12 @@ async function getHomeData() {
     topProducts: topProducts.status === 'fulfilled' ? topProducts.value : [],
     latest: latestRes.status === 'fulfilled' ? latestRes.value : { data: [], meta: { total: 0 } },
     categories: categories.status === 'fulfilled' ? categories.value : [],
-    needs: needsRes.status === 'fulfilled' ? needsRes.value.data || [] : [],
     brands: brands.status === 'fulfilled' ? brands.value : [],
     ingredientCount: ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0,
   };
 }
 
 // === Helpers ===
-
-function getScoreColor(score: number): string {
-  if (score >= 70) return 'text-score-high';
-  if (score >= 40) return 'text-score-medium';
-  return 'text-score-low';
-}
-
-function getScoreBarColor(score: number): string {
-  if (score >= 70) return 'bg-score-high';
-  if (score >= 40) return 'bg-score-medium';
-  return 'bg-score-low';
-}
 
 function avgScore(product: Product): number | null {
   if (!product.need_scores?.length) return null;
@@ -83,24 +60,12 @@ function avgScore(product: Product): number | null {
   );
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Yüz Bakım': 'spa',
-  'Temizleme': 'water_drop',
-  'Güneş Koruma': 'wb_sunny',
-  'Göz Bakım': 'visibility',
-  'Dudak Bakım': 'mood',
-  'Vücut Bakım': 'self_improvement',
-  'Saç Bakım': 'content_cut',
-  'Makyaj': 'palette',
-};
-
 // === Product Card ===
 
-function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product }: { product: Product }) {
   const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
   const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
   const score = avgScore(product);
-  const stars = score !== null ? Math.round(score / 20) : 0;
 
   return (
     <Link
@@ -166,21 +131,18 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, categories, needs, brands, ingredientCount } = await getHomeData();
-  // Fallback: if top-scored fails, use latest products
+  const { topProducts, latest, categories, brands, ingredientCount } = await getHomeData();
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
-  const cosmNeeds = needs.filter((n: Need) => n.need_group !== 'supplement');
-  const parentCats = categories.filter((c: Category) => !c.parent_category_id);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'REVELA',
-    url: 'https://revela.com.tr',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app',
     description: 'Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://revela.com.tr/urunler?search={search_term_string}',
+      target: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app'}/urunler?search={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };
@@ -192,137 +154,109 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero Section */}
-      <section className="px-6 lg:px-16 py-16 lg:py-24 mb-16 lg:mb-24">
-        <div className="editorial-grid gap-8 items-end">
-          <div className="col-span-12 lg:col-span-7 mb-12 lg:mb-0">
-            <h1 className="text-6xl lg:text-8xl xl:text-9xl headline-tight leading-[0.85] mb-8 text-on-surface">
-              CİLDİNİ<br />
-              <span className="text-outline-variant">ANLA.</span>
-            </h1>
-            <p className="max-w-md text-lg text-on-surface-variant mb-10 leading-relaxed">
-              INCI listesini analiz et, bilimsel kanıtlarla cildine en uygun ürünleri keşfet.
-              Bağımsız, Türkçe, bilime dayalı.
-            </p>
+      {/* Hero — Single CTA */}
+      <section className="px-6 lg:px-16 pt-20 lg:pt-32 pb-16 lg:pb-24">
+        <div className="max-w-3xl">
+          <h1 className="text-6xl lg:text-8xl xl:text-9xl headline-tight leading-[0.85] mb-8 text-on-surface">
+            CİLDİNİ<br />
+            <span className="text-outline-variant">ANLA.</span>
+          </h1>
+          <p className="max-w-lg text-lg lg:text-xl text-on-surface-variant mb-10 leading-relaxed">
+            30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
+            Bağımsız. Türkçe. Bilime dayalı.
+          </p>
+          <div className="flex flex-col sm:flex-row items-start gap-4">
             <Link
-              href="/ara"
-              className="curator-btn-primary"
+              href="/cilt-analizi"
+              className="curator-btn-primary text-sm px-8 py-4"
             >
-              Koleksiyonu Keşfet
-              <span className="material-icon material-icon-sm group-hover:translate-x-1 transition-transform" aria-hidden="true">arrow_forward</span>
+              Cilt Analizini Başlat
+              <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+            </Link>
+            <Link
+              href="/urunler"
+              className="text-sm text-on-surface-variant hover:text-on-surface underline underline-offset-4 transition-colors py-4"
+            >
+              veya ürünleri keşfet
             </Link>
           </div>
-          <div className="col-span-12 lg:col-span-5 relative">
-            {featuredProducts[0] ? (
-              <>
-                <Link href={`/urunler/${featuredProducts[0].product_slug}`} className="block">
-                  <div className="aspect-[4/5] bg-surface-container-low overflow-hidden rounded-sm relative">
-                    {featuredProducts[0].images?.[0]?.image_url ? (
-                      <Image
-                        src={featuredProducts[0].images[0].image_url}
-                        alt={featuredProducts[0].product_name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, 50vw"
-                        className="object-contain transition-transform duration-700 hover:scale-105"
-                        priority
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }}>spa</span>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-                <div className="absolute -bottom-6 -left-6 bg-tertiary-container p-6 hidden md:block max-w-[220px] rounded-sm">
-                  <span className="label-caps text-on-tertiary-container block mb-3">Onerilen</span>
-                  <p className="text-sm italic font-light text-on-tertiary-container">
-                    &ldquo;{featuredProducts[0].product_name}&rdquo;
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="aspect-[4/5] bg-surface-container-low rounded-sm flex items-center justify-center">
-                <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }}>spa</span>
-              </div>
-            )}
-          </div>
         </div>
+      </section>
 
-        {/* Stats row */}
-        <div className="flex flex-wrap justify-start gap-12 mt-16 lg:mt-20">
+      {/* Stats */}
+      <section className="px-6 lg:px-16 pb-16 lg:pb-24">
+        <div className="flex flex-wrap gap-8 lg:gap-16">
           {[
             { label: 'Ürün Analizi', value: latest.meta?.total || 0 },
             { label: 'İçerik Maddesi', value: ingredientCount || 0 },
             { label: 'Marka', value: brands.length || 0 },
             { label: 'Kategori', value: categories.length || 0 },
           ].map((s) => (
-            <div key={s.label}>
-              <p className="text-3xl headline-tight text-on-surface">
-                {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}
+            <div key={s.label} className="flex items-baseline gap-3">
+              <p className="text-3xl lg:text-4xl font-extrabold tracking-tight text-on-surface">
+                {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}+
               </p>
-              <p className="label-caps text-outline mt-1">{s.label}</p>
+              <p className="label-caps text-outline">{s.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Curated Categories */}
-      {parentCats.length > 0 && (
-        <section className="bg-surface-container-low py-24 lg:py-32 px-6 lg:px-16">
-          <div className="mb-16 flex justify-between items-end">
+      {/* Top Products Carousel */}
+      {featuredProducts.length > 0 && (
+        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface-container-low">
+          <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl lg:text-4xl headline-tight mb-2">KATEGORİLER</h2>
-              <p className="label-caps text-on-surface-variant">Disipline göre keşfet</p>
+              <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Bilimsel Analiz</span>
+              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
             </div>
-            <div className="h-px flex-grow mx-8 bg-outline-variant/20 hidden md:block" />
-            <Link href="/urunler" className="label-caps hover:underline underline-offset-8 transition-all text-on-surface">
+            <Link href="/urunler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
               Tümünü Gör
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {parentCats.slice(0, 8).map((cat: Category) => (
-              <Link
-                key={cat.category_id}
-                href={`/urunler?category=${cat.category_slug}`}
-                className="group relative bg-surface-container-lowest rounded-sm p-8 hover:shadow-lg transition-all duration-500 border border-outline-variant/10 hover:border-outline-variant/30"
-              >
-                <span
-                  className="material-icon material-icon-lg text-primary/60 group-hover:text-primary transition-colors duration-500 block mb-4"
-                  aria-hidden="true"
-                >
-                  {CATEGORY_ICONS[cat.category_name] || 'category'}
-                </span>
-                <h3 className="text-lg font-bold tracking-tight text-on-surface">{cat.category_name}</h3>
-                {cat.children && cat.children.length > 0 && (
-                  <p className="label-caps text-on-surface-variant mt-2">
-                    {cat.children.length} alt kategori
-                  </p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Top Scored Products — New Arrivals style */}
-      {featuredProducts.length > 0 && (
-        <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface">
-          <div className="text-center mb-16 lg:mb-20">
-            <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Bilimsel Analiz</span>
-            <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
-          </div>
           <ProductCarousel>
-            {featuredProducts.slice(0, 12).map((p: Product, i: number) => (
-              <ProductCard key={p.product_id} product={p} index={i} />
+            {featuredProducts.slice(0, 12).map((p: Product) => (
+              <ProductCard key={p.product_id} product={p} />
             ))}
           </ProductCarousel>
         </section>
       )}
 
+      {/* How It Works — 3 Steps */}
+      <section className="py-20 lg:py-28 px-6 lg:px-16 bg-surface">
+        <div className="text-center mb-14">
+          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Nasıl Çalışıyor?</span>
+          <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">3 ADIMDA KEŞFET</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-4xl mx-auto">
+          {[
+            { step: '01', icon: 'quiz', title: 'Cilt Analizi Yap', desc: '7 kısa soruyla cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.' },
+            { step: '02', icon: 'science', title: 'Sonuçları Gör', desc: 'INCI bazlı bilimsel analiz ile sana en uyumlu ürünleri keşfet.' },
+            { step: '03', icon: 'shopping_bag', title: 'Satın Al', desc: 'Güvenceli affiliate linklerle en uygun fiyatlı platformu seç.' },
+          ].map((item) => (
+            <div key={item.step} className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
+              </div>
+              <span className="label-caps text-outline block mb-2">{item.step}</span>
+              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-2">{item.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <Link href="/cilt-analizi" className="curator-btn-primary text-sm px-8 py-3">
+            Hemen Başla
+            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+          </Link>
+        </div>
+      </section>
+
       {/* Popular Brands */}
       {brands.length > 0 && (
         <section className="py-16 px-6 lg:px-16 border-t border-outline-variant/10">
-          <div className="flex flex-wrap justify-between items-center gap-8 lg:gap-12 opacity-40 grayscale hover:opacity-60 hover:grayscale-0 transition-all duration-700">
+          <p className="label-caps text-outline text-center mb-8 tracking-[0.4em]">Popüler Markalar</p>
+          <div className="flex flex-wrap justify-center gap-8 lg:gap-12 opacity-50 hover:opacity-80 transition-all duration-700">
             {brands.slice(0, 8).map((b: Brand) => (
               <Link
                 key={b.brand_id}
@@ -336,119 +270,12 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* How It Works */}
-      <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface-container-low">
-        <div className="editorial-grid gap-12 lg:gap-16">
-          <div className="col-span-12 lg:col-span-5">
-            <span className="label-caps text-outline mb-6 block tracking-[0.3em]">Sürecimiz</span>
-            <h2 className="text-4xl lg:text-5xl headline-tight leading-tight mb-8 text-on-surface">
-              BİLİMSEL<br />TİTİZLİK.
-            </h2>
-            <p className="text-on-surface-variant leading-relaxed">
-              Her ürünün INCI listesini moleküler düzeyde analiz ediyor,
-              bilimsel literatürle çapraz kontrol yapıyor ve cilt ihtiyaçlarına
-              göre uyumluluk skoru üretiyoruz.
-            </p>
-          </div>
-          <div className="col-span-12 lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-            {[
-              { icon: 'science', title: 'İçerik Laboratuvarı', desc: 'Her aktif bileşenin moleküler dökümü, etkinlik ve cilt uyumluluğu doğrulaması.' },
-              { icon: 'verified_user', title: 'Kanıt Değerlendirme', desc: 'Sistematik derleme, klinik çalışma ve uzman görüşü bazında kanıt seviyesi atanır.' },
-              { icon: 'eco', title: 'Kaynak İzleme', desc: 'Doğal, sentetik veya biyoteknoloji kaynaklı her içerik maddesinin kökeni takip edilir.' },
-              { icon: 'auto_awesome', title: 'Uyum Skoru', desc: 'Cilt tipine ve ihtiyaçlarına özel, kişiselleştirilmiş uyumluluk skoru hesaplanır.' },
-            ].map((item) => (
-              <div key={item.title} className="flex flex-col gap-4">
-                <span className="material-icon material-icon-lg text-primary" aria-hidden="true">{item.icon}</span>
-                <h4 className="text-lg font-bold tracking-tight uppercase text-on-surface">{item.title}</h4>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Skin Needs */}
-      {cosmNeeds.length > 0 && (
-        <section className="py-24 lg:py-32 px-6 lg:px-16 bg-surface">
-          <div className="text-center mb-16">
-            <span className="label-caps text-outline mb-4 block tracking-[0.4em]">Cilt Analizi</span>
-            <h2 className="text-4xl lg:text-5xl headline-tight text-on-surface">CİLT İHTİYAÇLARI</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {cosmNeeds.map((need: Need) => (
-              <Link
-                key={need.need_id}
-                href={`/ihtiyaclar/${need.need_slug}`}
-                className="curator-card p-6 group"
-              >
-                <h3 className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors tracking-tight">
-                  {need.need_name}
-                </h3>
-                {need.short_description && (
-                  <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mt-2">
-                    {need.short_description}
-                  </p>
-                )}
-                <span className="label-caps text-primary/60 group-hover:text-primary mt-3 block transition-colors">
-                  Keşfet &rarr;
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Skin Profiling CTA */}
-      <section className="py-32 lg:py-48 px-6 lg:px-16 text-center bg-surface-container-lowest">
-        <div className="max-w-[1200px] mx-auto">
-          <span className="label-caps text-outline mb-8 block tracking-[0.5em]">Kişiselleştirilmiş Analiz</span>
-          <h2 className="text-5xl lg:text-7xl xl:text-8xl headline-tight leading-[0.9] mb-10 text-on-surface">
-            CİLDİN,<br />SENİN TASARIMIN.
-          </h2>
-          <p className="text-lg text-on-surface-variant mb-12 max-w-xl mx-auto">
-            Cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.
-            Her ürün sayfasında sana özel uyumluluk skoru al.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/profilim" className="curator-btn-primary">
-              Profilimi Oluştur
-            </Link>
-            <Link href="/karsilastir" className="curator-btn-outline">
-              Ürünleri Karşılaştır
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Links */}
-      <section className="py-16 px-6 lg:px-16 bg-surface">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
-          {[
-            { href: '/karsilastir', icon: 'compare', title: 'Ürün Karşılaştır', desc: '2-3 ürünü yan yana koy, ingredient farklarını gör.' },
-            { href: '/rehber', icon: 'menu_book', title: 'Rehber & Blog', desc: 'Cilt bakımı rehberleri, içerik incelemeleri ve uzman içerikleri.' },
-            { href: '/favorilerim', icon: 'favorite_border', title: 'Favorilerim & Rutin', desc: 'Beğendiğin ürünleri kaydet, sabah/akşam rutinini oluştur.' },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="curator-card p-8 group"
-            >
-              <span className="material-icon material-icon-lg text-primary/50 group-hover:text-primary transition-colors mb-4 block" aria-hidden="true">
-                {item.icon}
-              </span>
-              <h3 className="text-lg font-bold tracking-tight mb-2 text-on-surface">{item.title}</h3>
-              <p className="text-sm text-on-surface-variant">{item.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Disclosure */}
+      {/* Disclosure — minimal */}
       <section className="max-w-[1200px] mx-auto px-6 py-8">
         <p className="text-xs text-outline text-center leading-relaxed">
           REVELA bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
           niteliğinde değildir. Ürün sayfalarındaki satın alma linkleri komisyon içerebilir.{' '}
-          <Link href="/rehber" className="underline hover:text-on-surface-variant transition-colors">
+          <Link href="/hakkimizda" className="underline hover:text-on-surface-variant transition-colors">
             Daha fazla bilgi
           </Link>
         </p>

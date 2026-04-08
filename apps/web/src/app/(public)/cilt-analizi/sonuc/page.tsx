@@ -346,8 +346,20 @@ function ResultsContent() {
         </section>
       )}
 
+      {/* Primary CTA — Bridge to filtered products */}
+      <div className="mt-10 mb-6">
+        <Link
+          href={`/urunler?concerns=${concerns.join(',')}&skin_type=${skinType}&sort=compatibility`}
+          className="curator-btn-primary w-full py-4 text-sm text-center flex items-center justify-center gap-2"
+        >
+          <span className="material-icon material-icon-sm" aria-hidden="true">grid_view</span>
+          Tüm Uyumlu Ürünleri Gör
+          <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+        </Link>
+      </div>
+
       {/* Share + Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 mt-8 border-t border-outline-variant/20 pt-8">
+      <div className="flex flex-col sm:flex-row gap-3 border-t border-outline-variant/20 pt-6">
         <a
           href={`https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`}
           target="_blank"
@@ -362,12 +374,6 @@ function ResultsContent() {
           className="flex-1 curator-btn-outline py-3 text-xs text-center"
         >
           Testi Tekrarla
-        </Link>
-        <Link
-          href="/onerilerimiz"
-          className="flex-1 curator-btn-primary py-3 text-xs text-center"
-        >
-          Tüm Önerileri Gör
         </Link>
       </div>
     </div>

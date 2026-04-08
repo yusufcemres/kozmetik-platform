@@ -1,22 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+const EXPLORE_ITEMS = [
+  { href: '/urunler', label: 'Ürünler', icon: 'inventory_2', desc: '1900+ ürünü keşfet' },
+  { href: '/onerilerimiz', label: 'Önerilerimiz', icon: 'auto_awesome', desc: 'AI destekli öneriler', badge: 'AI' },
+  { href: '/ihtiyaclar', label: 'İhtiyaçlar', icon: 'healing', desc: 'Cilt ihtiyaçlarına göre' },
+  { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
+  { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science', desc: '5000+ INCI analizi' },
+  { href: '/rehber', label: 'Rehber', icon: 'menu_book', desc: 'Cilt bakım rehberleri' },
+];
+
 const NAV_ITEMS = [
-  { href: '/urunler', label: 'Ürünler' },
-  { href: '/onerilerimiz', label: 'Önerilerimiz', badge: 'AI' },
   { href: '/cilt-analizi', label: 'Cilt Analizi' },
-  { href: '/ihtiyaclar', label: 'İhtiyaçlar' },
-  { href: '/markalar', label: 'Markalar' },
   { href: '/karsilastir', label: 'Karşılaştır' },
 ];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
   const pathname = usePathname();
+  const exploreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const update = () => {
@@ -33,7 +40,23 @@ export default function Header() {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
+    setExploreOpen(false);
   }, [pathname]);
+
+  // Close explore dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (exploreRef.current && !exploreRef.current.contains(e.target as Node)) {
+        setExploreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const isExplorePath = EXPLORE_ITEMS.some(
+    (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
+  );
 
   return (
     <>
@@ -51,24 +74,74 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
+          {/* Keşfet dropdown */}
+          <div ref={exploreRef} className="relative">
+            <button
+              onClick={() => setExploreOpen(!exploreOpen)}
+              className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
+                isExplorePath || exploreOpen
+                  ? 'text-on-surface border-b-2 border-on-surface pb-1'
+                  : 'text-outline hover:text-on-surface'
+              }`}
+            >
+              Keşfet
+              <span
+                className={`material-icon text-[16px] transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              >
+                expand_more
+              </span>
+            </button>
+
+            {/* Dropdown */}
+            {exploreOpen && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[420px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
+                {EXPLORE_ITEMS.map((item) => {
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 ${
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold">{item.label}</span>
+                          {'badge' in item && item.badge && (
+                            <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-0.5">{item.desc}</p>
+                      </div>
+                      <span className="material-icon text-[16px] text-outline-variant" aria-hidden="true">arrow_forward</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Direct nav items */}
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1.5 ${
+                className={`label-caps text-xs transition-colors duration-300 ${
                   isActive
                     ? 'text-on-surface border-b-2 border-on-surface pb-1'
                     : 'text-outline hover:text-on-surface'
                 }`}
               >
                 {item.label}
-                {'badge' in item && item.badge && (
-                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             );
           })}
@@ -101,15 +174,6 @@ export default function Header() {
             )}
           </Link>
 
-          {/* Profile */}
-          <Link
-            href="/profilim"
-            className="text-on-surface-variant hover:text-on-surface transition-colors duration-300"
-            title="Cilt Profilim"
-          >
-            <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
-          </Link>
-
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -125,10 +189,38 @@ export default function Header() {
 
     </header>
 
-    {/* Mobile overlay menu — outside header to avoid backdrop-blur stacking context */}
+    {/* Mobile overlay menu */}
     {mobileOpen && (
-      <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto">
+      <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
+          {/* Keşfet section */}
+          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Keşfet</p>
+          {EXPLORE_ITEMS.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary text-on-primary font-semibold'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
+                {'badge' in item && item.badge && (
+                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+
+          <div className="h-px bg-white/10 my-6" />
+
+          {/* Direct nav */}
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
