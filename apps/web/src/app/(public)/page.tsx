@@ -154,49 +154,41 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero — Single CTA */}
-      <section className="px-6 lg:px-16 pt-20 lg:pt-32 pb-16 lg:pb-24">
-        <div className="max-w-3xl">
-          <h1 className="text-6xl lg:text-8xl xl:text-9xl headline-tight leading-[0.85] mb-8 text-on-surface">
-            CİLDİNİ<br />
-            <span className="text-outline-variant">ANLA.</span>
-          </h1>
-          <p className="max-w-lg text-lg lg:text-xl text-on-surface-variant mb-10 leading-relaxed">
-            30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
-            Bağımsız. Türkçe. Bilime dayalı.
-          </p>
-          <div className="flex flex-col sm:flex-row items-start gap-4">
-            <Link
-              href="/cilt-analizi"
-              className="curator-btn-primary text-sm px-8 py-4"
-            >
-              Cilt Analizini Başlat
-              <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
-            </Link>
-            <Link
-              href="/urunler"
-              className="text-sm text-on-surface-variant hover:text-on-surface underline underline-offset-4 transition-colors py-4"
-            >
-              veya ürünleri keşfet
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero — Full viewport, centered like a search engine */}
+      <section className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-6 text-center">
+        <h1 className="text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-6 text-on-surface">
+          CİLDİNİ<br />
+          <span className="text-outline-variant">ANLA.</span>
+        </h1>
+        <p className="max-w-md text-base lg:text-lg text-on-surface-variant mb-10 leading-relaxed">
+          30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
+        </p>
+        <Link
+          href="/cilt-analizi"
+          className="curator-btn-primary text-sm px-10 py-4"
+        >
+          Cilt Analizini Başlat
+          <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+        </Link>
+        <Link
+          href="/urunler"
+          className="mt-4 text-sm text-on-surface-variant hover:text-on-surface underline underline-offset-4 transition-colors"
+        >
+          veya ürünleri keşfet
+        </Link>
 
-      {/* Stats */}
-      <section className="px-6 lg:px-16 pb-16 lg:pb-24">
-        <div className="flex flex-wrap gap-8 lg:gap-16">
+        {/* Stats — bottom of hero */}
+        <div className="flex flex-wrap justify-center gap-8 lg:gap-14 mt-16 lg:mt-20">
           {[
-            { label: 'Ürün Analizi', value: latest.meta?.total || 0 },
-            { label: 'İçerik Maddesi', value: ingredientCount || 0 },
+            { label: 'Ürün', value: latest.meta?.total || 0 },
+            { label: 'İçerik', value: ingredientCount || 0 },
             { label: 'Marka', value: brands.length || 0 },
-            { label: 'Kategori', value: categories.length || 0 },
           ].map((s) => (
-            <div key={s.label} className="flex items-baseline gap-3">
-              <p className="text-3xl lg:text-4xl font-extrabold tracking-tight text-on-surface">
+            <div key={s.label} className="text-center">
+              <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-on-surface">
                 {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}+
               </p>
-              <p className="label-caps text-outline">{s.label}</p>
+              <p className="label-caps text-outline mt-1">{s.label}</p>
             </div>
           ))}
         </div>
