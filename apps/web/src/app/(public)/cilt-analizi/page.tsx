@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { tracker } from '@/lib/analytics';
 
 // === Types ===
 
@@ -438,10 +439,42 @@ export default function SkinAnalysisPage() {
   const [step, setStep] = useState(1);
   const [quiz, setQuiz] = useState<QuizState>(INITIAL);
   const [needs, setNeeds] = useState<Need[]>([]);
+  const stepStartTime = useRef(Date.now());
+  const quizStartTime = useRef(Date.now());
 
   // In quick mode, map step index to actual full step
   const actualStep = quizMode === 'quick' ? QUICK_STEPS[step - 1] : step;
   const totalSteps = quizMode === 'quick' ? QUICK_TOTAL : TOTAL_STEPS;
+
+  // Analytics: track step changes
+  useEffect(() => {
+    if (quizMode === 'select') return;
+    const now = Date.now();
+    const time_ms = now - stepStartTime.current;
+    // If not first step, previous step was completed
+    if (step > 1) {
+      tracker.track('quiz_step_complete', { step: step - 1, mode: quizMode, time_ms });
+    }
+    tracker.track('quiz_step_start', { step, mode: quizMode });
+    stepStartTime.current = now;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, quizMode]);
+
+  // Analytics: track quiz abandon on page hide
+  useEffect(() => {
+    if (quizMode === 'select') return;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && step < totalSteps) {
+        tracker.track('quiz_abandon', {
+          last_step: step,
+          mode: quizMode,
+          total_time_ms: Date.now() - quizStartTime.current,
+        });
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [quizMode, step, totalSteps]);
 
   useEffect(() => {
     api.get<{ data: Need[] }>('/needs?limit=50')
@@ -493,6 +526,18 @@ export default function SkinAnalysisPage() {
   };
 
   const handleFinish = () => {
+    // Analytics: final step complete + quiz complete
+    tracker.track('quiz_step_complete', {
+      step,
+      mode: quizMode,
+      time_ms: Date.now() - stepStartTime.current,
+    });
+    tracker.track('quiz_complete', {
+      mode: quizMode,
+      total_steps: totalSteps,
+      total_time_ms: Date.now() - quizStartTime.current,
+    });
+
     const profile = {
       anonymous_id: crypto.randomUUID(),
       ...quiz,
@@ -620,7 +665,7 @@ export default function SkinAnalysisPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Quick Test Card */}
             <button
-              onClick={() => { setQuizMode('quick'); setStep(1); }}
+              onClick={() => { setQuizMode('quick'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
               className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group"
             >
               <div className="flex items-center gap-3 mb-4">
@@ -642,7 +687,7 @@ export default function SkinAnalysisPage() {
 
             {/* Detailed Test Card */}
             <button
-              onClick={() => { setQuizMode('detailed'); setStep(1); }}
+              onClick={() => { setQuizMode('detailed'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
               className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative"
             >
               <div className="absolute top-3 right-3">

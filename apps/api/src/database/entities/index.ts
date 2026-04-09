@@ -46,6 +46,9 @@ export { IngredientInteraction } from './ingredient-interaction.entity';
 export { ApiKey } from './api-key.entity';
 export { Webhook } from './webhook.entity';
 
+// Analytics
+export { AnalyticsEvent } from './analytics-event.entity';
+
 // Admin & Sistem
 export { AdminRole } from './admin-role.entity';
 export { AdminUser } from './admin-user.entity';

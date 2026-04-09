@@ -331,6 +331,7 @@ export default async function ProductDetailPage({
         product_name={product.product_name}
         product_slug={product.product_slug}
         brand_name={product.brand?.brand_name}
+        brand_id={product.brand?.brand_id}
         image_url={imageUrl}
       />
 
@@ -458,7 +459,7 @@ export default async function ProductDetailPage({
 
         {/* Need Scores */}
         {product.need_scores && product.need_scores.length > 0 && (
-          <section className="mb-16">
+          <section className="mb-16" data-analytics-section="scores">
             <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface">Uyumluluk Skorları</h2>
             <p className="text-sm text-on-surface-variant mb-6 leading-relaxed">
               Skorlar, ürünün INCI listesindeki her bir etken maddenin bilimsel kanıt seviyesi,
@@ -506,7 +507,7 @@ export default async function ProductDetailPage({
         )}
 
         {/* INCI Ingredients */}
-        <section className="mb-16">
+        <section className="mb-16" data-analytics-section="inci">
           <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">
             İçerik Listesi (INCI)
             {sortedIngredients.length > 0 && (
@@ -655,7 +656,7 @@ export default async function ProductDetailPage({
 
         {/* Label Info */}
         {product.label && (
-          <section className="mb-16">
+          <section className="mb-16" data-analytics-section="claims">
             {product.label.usage_instructions && (
               <div className="mb-6">
                 <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">Kullanım</h2>
@@ -712,7 +713,7 @@ export default async function ProductDetailPage({
           });
 
           return (
-            <section className="mb-16">
+            <section className="mb-16" data-analytics-section="prices">
               <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">Nereden Alınır?</h2>
 
               {/* Price summary */}
