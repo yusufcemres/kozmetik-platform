@@ -519,7 +519,7 @@ export default async function ProductDetailPage({
             <ListModal
               title="İçerik Listesi (INCI)"
               count={sortedIngredients.length}
-              previewCount={10}
+              previewCount={5}
               allChildren={
                 <div className="divide-y divide-outline-variant/15">
                   {sortedIngredients.map((pi, idx) => {
@@ -576,7 +576,7 @@ export default async function ProductDetailPage({
             >
               <div className="curator-card overflow-hidden">
                 <div className="divide-y divide-outline-variant/15">
-                  {sortedIngredients.slice(0, 10).map((pi, idx) => {
+                  {sortedIngredients.slice(0, 5).map((pi, idx) => {
                     const isAllergen = pi.ingredient?.allergen_flag;
                     const isFragrance = pi.ingredient?.fragrance_flag;
                     return (
@@ -771,11 +771,6 @@ export default async function ProductDetailPage({
                       affiliateLinkId={link.affiliate_link_id}
                       className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                     >
-                      {isCheapest && (
-                        <span className="label-caps bg-score-high text-white px-2.5 py-1 rounded-md shrink-0">
-                          EN UCUZ
-                        </span>
-                      )}
                       <div className="flex-1 min-w-0 flex items-center gap-3">
                         {pInfo?.logo ? (
                           <img
@@ -786,6 +781,11 @@ export default async function ProductDetailPage({
                           />
                         ) : (
                           <p className="font-semibold text-on-surface">{platformLabel(link.platform)}</p>
+                        )}
+                        {isCheapest && (
+                          <span className="label-caps bg-score-high text-white px-2.5 py-1 rounded-md shrink-0">
+                            EN UCUZ
+                          </span>
                         )}
                       </div>
                       {link.price_snapshot ? (
