@@ -23,13 +23,13 @@ export class AnalyticsService {
 
     const entities = validEvents.map((e) => ({
       visitor_id: e.visitor_id,
-      session_id: e.session_id || null,
+      session_id: e.session_id || undefined,
       event_type: e.event_type,
-      product_id: e.product_id || null,
-      brand_id: e.brand_id || null,
-      page_path: e.page_path || null,
-      properties: e.properties || null,
-      device_type: e.device_type || null,
+      product_id: e.product_id || undefined,
+      brand_id: e.brand_id || undefined,
+      page_path: e.page_path || undefined,
+      properties: e.properties || undefined,
+      device_type: e.device_type || undefined,
       ip_hash: ipHash,
     }));
 

@@ -7,7 +7,6 @@ import {
   Req,
   HttpCode,
   HttpStatus,
-  UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
@@ -22,7 +21,7 @@ export class AnalyticsController {
 
   @Post('events')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Throttle({ default: { ttl: 60000, limit: 10 } })
+  @Throttle({ public: { ttl: 60000, limit: 10 } })
   async ingestEvents(
     @Body() dto: BatchEventsDto,
     @Req() req: Request,
