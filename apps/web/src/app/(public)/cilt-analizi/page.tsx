@@ -239,6 +239,7 @@ const problemAreaOptions = [
 ];
 
 const sensitivities = [
+  { key: 'none', label: 'Hassasiyetim yok', icon: 'check_circle', desc: 'Bilinen bir hassasiyetim yok' },
   { key: 'fragrance', label: 'Parfüm / Koku', icon: 'spa', desc: 'Kokulu ürünlere kızarıklık veya kaşıntı' },
   { key: 'alcohol', label: 'Alkol', icon: 'science', desc: 'Alkol bazlı ürünlerde yanma, kurukluk' },
   { key: 'paraben', label: 'Paraben', icon: 'block', desc: 'Paraben koruyuculara reaksiyon' },
@@ -250,6 +251,7 @@ const sensitivities = [
 ];
 
 const activeIngredients = [
+  { value: 'none', label: 'Hiçbirini kullanmıyorum' },
   { value: 'retinol', label: 'Retinol / Tretinoin' },
   { value: 'vitamin_c', label: 'Vitamin C (L-Askorbik Asit)' },
   { value: 'niacinamide', label: 'Niacinamide' },
@@ -262,7 +264,6 @@ const activeIngredients = [
   { value: 'peptides', label: 'Peptit / Bakuchiol' },
   { value: 'centella', label: 'Centella Asiatica / Cica' },
   { value: 'spf', label: 'SPF (Güneş Koruma)' },
-  { value: 'none', label: 'Hiçbirini kullanmıyorum' },
 ];
 
 const goalOptions = [
@@ -991,23 +992,34 @@ export default function SkinAnalysisPage() {
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Hassasiyetlerin var mı?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Bilinen hassasiyetlerin varsa işaretle, yoksa atla.</p>
           <div className="grid grid-cols-2 gap-3">
-            {sensitivities.map((s) => (
-              <OptionCard
-                key={s.key}
-                selected={!!quiz.sensitivities[s.key]}
-                onClick={() => setQuiz((p) => ({
-                  ...p,
-                  sensitivities: { ...p.sensitivities, [s.key]: !p.sensitivities[s.key] },
-                }))}
-                className={`p-4 text-center flex flex-col items-center gap-2 ${
-                  quiz.sensitivities[s.key] ? '!border-error !ring-error !bg-error/5' : ''
-                }`}
-              >
-                <span className={`material-icon ${quiz.sensitivities[s.key] ? 'text-error' : 'text-outline-variant'}`} aria-hidden="true">{s.icon}</span>
-                <span className={`text-sm ${quiz.sensitivities[s.key] ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}`}>{s.label}</span>
-                <span className="text-[10px] text-outline">{s.desc}</span>
-              </OptionCard>
-            ))}
+            {sensitivities.map((s) => {
+              const isNone = s.key === 'none';
+              const sel = !!quiz.sensitivities[s.key];
+              return (
+                <OptionCard
+                  key={s.key}
+                  selected={sel}
+                  onClick={() => setQuiz((p) => {
+                    if (isNone) {
+                      // "Hassasiyetim yok" → tüm hassasiyetleri temizle, sadece none kalsın
+                      return { ...p, sensitivities: sel ? {} : { none: true } };
+                    }
+                    // Başka seçim → none'ı kaldır
+                    const next = { ...p.sensitivities, [s.key]: !p.sensitivities[s.key] };
+                    delete next.none;
+                    return { ...p, sensitivities: next };
+                  })}
+                  className={`p-4 text-center flex flex-col items-center gap-2 ${
+                    isNone && sel ? '!border-score-high !ring-score-high !bg-score-high/5' :
+                    sel ? '!border-error !ring-error !bg-error/5' : ''
+                  }${isNone ? ' col-span-2' : ''}`}
+                >
+                  <span className={`material-icon ${isNone && sel ? 'text-score-high' : sel ? 'text-error' : 'text-outline-variant'}`} aria-hidden="true">{s.icon}</span>
+                  <span className={`text-sm ${sel ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}`}>{s.label}</span>
+                  <span className="text-[10px] text-outline">{s.desc}</span>
+                </OptionCard>
+              );
+            })}
           </div>
 
           <div className="mt-6">
@@ -1116,7 +1128,10 @@ export default function SkinAnalysisPage() {
                   if (item.value === 'none') {
                     setQuiz((p) => ({ ...p, current_actives: sel ? [] : ['none'] }));
                   } else {
-                    toggleArrayItem('current_actives', item.value);
+                    setQuiz((p) => {
+                      const arr = p.current_actives.filter(v => v !== 'none');
+                      return { ...p, current_actives: arr.includes(item.value) ? arr.filter(v => v !== item.value) : [...arr, item.value] };
+                    });
                   }
                 }} className="p-3">
                   <div className="flex items-center gap-3">
@@ -1176,19 +1191,29 @@ export default function SkinAnalysisPage() {
                 />
               </div>
             ))}
-            <div className="curator-card p-4 flex items-center justify-between">
-              <label className="text-sm font-medium text-on-surface flex items-center gap-2">
+            <div className="curator-card p-4">
+              <label className="text-sm font-medium text-on-surface flex items-center gap-2 mb-3">
                 <span className="material-icon material-icon-sm text-outline-variant" aria-hidden="true">smoking_rooms</span>
                 Sigara kullanıyor musun?
               </label>
-              <button
-                onClick={() => setQuiz((p) => ({ ...p, lifestyle: { ...p.lifestyle, smoking: !p.lifestyle.smoking } }))}
-                className={`px-4 py-2 rounded-sm text-xs font-medium transition-colors ${
-                  quiz.lifestyle.smoking ? 'bg-error text-on-primary' : 'bg-surface-container-low text-on-surface-variant'
-                }`}
-              >
-                {quiz.lifestyle.smoking ? 'Evet' : 'Hayır'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setQuiz((p) => ({ ...p, lifestyle: { ...p.lifestyle, smoking: false } }))}
+                  className={`flex-1 py-2.5 rounded-sm text-xs font-medium transition-colors ${
+                    !quiz.lifestyle.smoking ? 'bg-on-surface text-surface' : 'bg-surface-container-low text-on-surface-variant'
+                  }`}
+                >
+                  Hayır
+                </button>
+                <button
+                  onClick={() => setQuiz((p) => ({ ...p, lifestyle: { ...p.lifestyle, smoking: true } }))}
+                  className={`flex-1 py-2.5 rounded-sm text-xs font-medium transition-colors ${
+                    quiz.lifestyle.smoking ? 'bg-error text-on-primary' : 'bg-surface-container-low text-on-surface-variant'
+                  }`}
+                >
+                  Evet
+                </button>
+              </div>
             </div>
           </div>
         </div>
