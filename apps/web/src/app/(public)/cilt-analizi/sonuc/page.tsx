@@ -303,7 +303,6 @@ function ResultsContent() {
   const [expandedProduct, setExpandedProduct] = useState<number | null>(null);
   const [dataReady, setDataReady] = useState(false);
   const [routineView, setRoutineView] = useState<'daily' | 'weekly'>('daily');
-  const [activeDay, setActiveDay] = useState(0);
 
   const skinType = searchParams.get('skin_type') || '';
   const skinFeel = searchParams.get('skin_feel') || '';
@@ -876,169 +875,90 @@ function ResultsContent() {
 
         {/* === WEEKLY PLAN === */}
         {routineView === 'weekly' && (() => {
-          const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-          const DAY_FULL = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
-
           const isSensitive = skinType === 'sensitive';
           const isOily = skinType === 'oily';
           const isDry = skinType === 'dry';
           const ageNum = ageRange ? parseInt(ageRange.split('-')[0]) || 0 : 0;
           const isMature = ageNum >= 35;
 
-          // Base morning routine (same every day)
-          const morningBase = ['Temizleme', 'Tonik', isMature ? 'C Vitamini Serum' : 'Serum', 'Göz Kremi', 'Nemlendirici', 'SPF 50+'];
-
-          // Per-day evening variations
-          type DayPlan = { evening: string[]; note: string; icon: string };
-          const weeklyPlan: DayPlan[] = [
-            // Pzt — aktif gece
+          type DayRow = { day: string; icon: string; morning: string; evening: string; tag: string; tagColor: string };
+          const week: DayRow[] = [
             {
-              evening: ['Çift Temizleme', 'Tonik', isSensitive ? 'Bakuchiol Serum' : (isMature ? 'Retinol Serum' : 'AHA/BHA Serum'), 'Göz Kremi', 'Nemlendirici'],
-              note: isSensitive
-                ? 'Hassas cildine uygun yumuşak aktif ile haftaya başla.'
-                : 'Haftaya güçlü başlangıç — aktif gece. Yarın SPF şart!',
-              icon: 'bolt',
+              day: 'Pazartesi', icon: 'bolt',
+              morning: 'Temel rutin + SPF',
+              evening: isSensitive ? 'Bakuchiol serum' : (isMature ? 'Retinol serum' : 'AHA/BHA serum'),
+              tag: 'Aktif', tagColor: 'bg-primary text-on-primary',
             },
-            // Sal — dinlenme
             {
-              evening: ['Çift Temizleme', 'Tonik', 'Nemlendirici Serum', 'Nemlendirici'],
-              note: 'Dinlenme gecesi — cildin aktiften sonra toparlanıyor.',
-              icon: 'spa',
+              day: 'Salı', icon: 'spa',
+              morning: 'Temel rutin + SPF',
+              evening: 'Sadece nemlendirici',
+              tag: 'Dinlenme', tagColor: 'bg-surface-container text-on-surface-variant',
             },
-            // Çar — orta güç
             {
-              evening: ['Çift Temizleme', 'Tonik', 'Niacinamide Serum', 'Göz Kremi', 'Nemlendirici'],
-              note: isOily
-                ? 'Niacinamide yağ kontrolü + gözenek sıkılaştırma sağlar.'
-                : 'Orta güçte bakım — leke ve gözenek desteği.',
-              icon: 'balance',
+              day: 'Çarşamba', icon: 'balance',
+              morning: 'Temel rutin + SPF',
+              evening: isOily ? 'Niacinamide (yağ kontrolü)' : 'Niacinamide serum',
+              tag: 'Orta', tagColor: 'bg-score-medium/15 text-score-medium',
             },
-            // Per — dinlenme
             {
-              evening: ['Çift Temizleme', 'Tonik', 'Hyaluronik Asit Serum', 'Nemlendirici'],
-              note: 'Dinlenme gecesi — derin nem desteği.',
-              icon: 'water_drop',
+              day: 'Perşembe', icon: 'water_drop',
+              morning: 'Temel rutin + SPF',
+              evening: 'Hyaluronik asit + nemlendirici',
+              tag: 'Dinlenme', tagColor: 'bg-surface-container text-on-surface-variant',
             },
-            // Cum — aktif gece
             {
-              evening: ['Çift Temizleme', 'Tonik', isSensitive ? 'Azelaic Asit Serum' : (isMature ? 'Retinol Serum' : 'AHA/BHA Serum'), 'Göz Kremi', 'Nemlendirici'],
-              note: isSensitive
-                ? 'Hassas cilde uygun hafif aktif — haftanın ikinci aktif gecesi.'
-                : (isMature ? 'İkinci retinol gecesi — kolajen üretimini destekler.' : 'Haftanın ikinci aktif gecesi.'),
-              icon: 'auto_awesome',
+              day: 'Cuma', icon: 'auto_awesome',
+              morning: 'Temel rutin + SPF',
+              evening: isSensitive ? 'Sadece nemlendirici' : (isMature ? 'Retinol serum' : 'AHA/BHA serum'),
+              tag: isSensitive ? 'Dinlenme' : 'Aktif',
+              tagColor: isSensitive ? 'bg-surface-container text-on-surface-variant' : 'bg-primary text-on-primary',
             },
-            // Cmt — derin bakım
             {
-              evening: ['Çift Temizleme', isSensitive ? 'Enzim Maske (5 dk)' : (isOily ? 'BHA Peeling' : 'AHA Peeling'), isDry ? 'Nem Maskesi' : 'Kil Maskesi', 'Tonik', 'Nemlendirici'],
-              note: isSensitive
-                ? 'Hassas cilt için enzim maske — yumuşak eksfoliyasyon.'
-                : 'Haftalık derin bakım günü — peeling + maske.',
-              icon: 'self_improvement',
+              day: 'Cumartesi', icon: 'self_improvement',
+              morning: 'Temel rutin + SPF',
+              evening: isSensitive ? 'Enzim maske + nemlendirici' : (isOily ? 'BHA peeling + kil maskesi' : 'AHA peeling + nem maskesi'),
+              tag: 'Derin Bakım', tagColor: 'bg-score-high/15 text-score-high',
             },
-            // Paz — onarım
             {
-              evening: ['Çift Temizleme', 'Tonik', isDry ? 'Bakım Yağı' : 'Peptit Serum', 'Göz Kremi', isDry ? 'Sleeping Mask' : 'Yoğun Nemlendirici'],
-              note: isDry
-                ? 'Onarım gecesi — bakım yağı + sleeping mask ile haftaya hazırlan.'
-                : 'Onarım ve hazırlık — cildin yeni haftaya dinlenmiş başlasın.',
-              icon: 'hotel',
+              day: 'Pazar', icon: 'hotel',
+              morning: 'Temel rutin + SPF',
+              evening: isDry ? 'Bakım yağı + sleeping mask' : 'Peptit serum + yoğun nemlendirici',
+              tag: 'Onarım', tagColor: 'bg-score-high/15 text-score-high',
             },
           ];
 
-          // Sensitive skin: reduce active nights (skip Friday active)
-          if (isSensitive) {
-            weeklyPlan[4] = {
-              evening: ['Çift Temizleme', 'Tonik', 'Nemlendirici Serum', 'Nemlendirici'],
-              note: 'Hassas cilt — haftada tek aktif gece yeterli. Bugün dinlen.',
-              icon: 'spa',
-            };
-          }
-
-          const plan = weeklyPlan[activeDay];
-
           return (
             <>
-              {/* Day selector */}
-              <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 scrollbar-hide">
-                {DAYS.map((day, idx) => (
-                  <button
-                    key={day}
-                    onClick={() => setActiveDay(idx)}
-                    className={`flex-shrink-0 w-11 h-11 rounded-full text-xs font-bold transition-all ${
-                      activeDay === idx
-                        ? 'bg-primary text-on-primary shadow-md scale-105'
-                        : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
-                    }`}
-                  >
-                    {day}
-                  </button>
+              <p className="text-xs text-on-surface-variant mb-4">
+                Sabah her gün aynı: Temizleme → Tonik → Serum → Nemlendirici → SPF. Fark akşamda.
+              </p>
+
+              <div className="space-y-2">
+                {week.map((d) => (
+                  <div key={d.day} className="curator-card p-4 flex items-center gap-3">
+                    <span className="material-icon text-primary text-lg" aria-hidden="true">{d.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-sm font-bold text-on-surface">{d.day}</span>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.tagColor}`}>{d.tag}</span>
+                      </div>
+                      <p className="text-xs text-on-surface-variant flex items-center gap-1">
+                        <span className="material-icon text-[12px]" aria-hidden="true">dark_mode</span>
+                        {d.evening}
+                      </p>
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {/* Day label */}
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-icon text-primary" aria-hidden="true">{plan.icon}</span>
-                <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">{DAY_FULL[activeDay]}</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Morning (same every day) */}
-                <div className="curator-card p-5 border-l-2 border-l-score-medium">
-                  <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
-                    <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span>
-                    Sabah
-                  </h3>
-                  <ol className="space-y-2.5 text-sm">
-                    {morningBase.map((step, idx) => (
-                      <li key={step} className="flex items-center gap-3 text-on-surface-variant">
-                        <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-
-                {/* Evening (varies by day) */}
-                <div className="curator-card p-5 border-l-2 border-l-primary">
-                  <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
-                    <span className="material-icon text-primary" aria-hidden="true">dark_mode</span>
-                    Akşam
-                  </h3>
-                  <ol className="space-y-2.5 text-sm">
-                    {plan.evening.map((step, idx) => (
-                      <li key={step} className="flex items-center gap-3 text-on-surface-variant">
-                        <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-
-              {/* Day note */}
-              <div className="mt-4 flex items-start gap-2 bg-primary/5 border border-primary/10 rounded-sm p-3">
-                <span className="material-icon text-primary text-[18px] mt-0.5" aria-hidden="true">tips_and_updates</span>
-                <p className="text-xs text-on-surface-variant leading-relaxed">{plan.note}</p>
-              </div>
-
-              {/* Weekly legend */}
-              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                <div className="flex items-center gap-1.5 text-on-surface-variant">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  Pzt, Cum — Aktif Gece
-                </div>
-                <div className="flex items-center gap-1.5 text-on-surface-variant">
-                  <span className="w-2 h-2 rounded-full bg-score-medium" />
-                  Çar — Orta Güç
-                </div>
-                <div className="flex items-center gap-1.5 text-on-surface-variant">
-                  <span className="w-2 h-2 rounded-full bg-outline-variant" />
-                  Sal, Per — Dinlenme
-                </div>
-                <div className="flex items-center gap-1.5 text-on-surface-variant">
-                  <span className="w-2 h-2 rounded-full bg-score-high" />
-                  Cmt, Paz — Derin Bakım
-                </div>
+              <div className="mt-4 bg-primary/5 border border-primary/10 rounded-sm p-3">
+                <p className="text-xs text-on-surface-variant leading-relaxed">
+                  <span className="font-semibold text-on-surface">Temel kurallar:</span> Aktif geceden sonraki gün SPF şart.
+                  Cilt tahriş olursa aktif geceyi atla, yerine nemlendirici kullan.
+                  {isSensitive && ' Hassas cildin için haftada tek aktif gece yeterli.'}
+                  {isMature && ' 35+ yaş için retinol geceleri kolajen üretimini destekler.'}
+                </p>
               </div>
             </>
           );
