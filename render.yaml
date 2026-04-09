@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: kozmetik-api
+    runtime: docker
+    region: frankfurt
+    plan: free
+    branch: master
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        value: ep-solitary-bar-al8ftlrb.c-3.eu-central-1.aws.neon.tech
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_USER
+        value: neondb_owner
+      - key: DB_PASS
+        value: npg_0KZrPGQxqH5d
+      - key: DB_NAME
+        value: neondb
+      - key: DB_SSL
+        value: "true"
+      - key: DB_SYNC
+        value: "false"
+      - key: JWT_SECRET
+        value: revela-jwt-secret-2026-04-neon
+      - key: WEB_URL
+        value: https://kozmetik-platform.vercel.app
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
