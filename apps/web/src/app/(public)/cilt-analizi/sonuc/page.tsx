@@ -648,9 +648,48 @@ function ResultsContent() {
           Sana Özel Ürün Önerileri
         </h2>
         {products.length === 0 ? (
-          <p className="text-sm text-on-surface-variant text-center py-8">
-            Henüz yeterli veri yok, yakında öneriler burada olacak.
-          </p>
+          <div>
+            <p className="text-sm text-on-surface-variant text-center mb-6">
+              Cilt profiline göre şu ürün tiplerini aramanı öneriyoruz:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(() => {
+                // Need → recommended product categories mapping
+                const needCategoryMap: Record<number, { icon: string; label: string; search: string }[]> = {
+                  1: [{ icon: 'science', label: 'Salisilik Asit Temizleyici', search: 'salicylic' }, { icon: 'healing', label: 'Sivilce Bakım Serumu', search: 'acne+serum' }],
+                  2: [{ icon: 'light_mode', label: 'C Vitamini Serum', search: 'vitamin+c+serum' }, { icon: 'auto_awesome', label: 'Leke Karşıtı Krem', search: 'brightening' }],
+                  3: [{ icon: 'fitness_center', label: 'Retinol Serum', search: 'retinol' }, { icon: 'spa', label: 'Anti-Aging Krem', search: 'anti+aging' }],
+                  4: [{ icon: 'water_drop', label: 'Hyaluronik Asit Serum', search: 'hyaluronic' }, { icon: 'opacity', label: 'Yoğun Nemlendirici', search: 'moisturizer' }],
+                  5: [{ icon: 'shield', label: 'Ceramide Krem', search: 'ceramide' }, { icon: 'water_drop', label: 'Bariyer Onarıcı', search: 'barrier+repair' }],
+                  6: [{ icon: 'blur_on', label: 'Niacinamide Serum', search: 'niacinamide' }, { icon: 'science', label: 'BHA Tonik', search: 'bha+toner' }],
+                  7: [{ icon: 'palette', label: 'Aydınlatıcı Serum', search: 'brightening+serum' }, { icon: 'light_mode', label: 'Ton Eşitleyici', search: 'tone+corrector' }],
+                  8: [{ icon: 'wb_sunny', label: 'SPF 50+ Güneş Kremi', search: 'spf+50' }, { icon: 'shield', label: 'Antioksidan Serum', search: 'antioxidant' }],
+                  9: [{ icon: 'opacity', label: 'Matlaştırıcı Krem', search: 'oil+control' }, { icon: 'science', label: 'Niacinamide Serum', search: 'niacinamide' }],
+                  10: [{ icon: 'water_drop', label: 'HA Nemlendirici', search: 'hyaluronic+moisturizer' }, { icon: 'spa', label: 'Nemlendirici Maske', search: 'hydrating+mask' }],
+                  11: [{ icon: 'healing', label: 'Centella Krem', search: 'centella' }, { icon: 'spa', label: 'Hassas Cilt Temizleyici', search: 'sensitive+cleanser' }],
+                  12: [{ icon: 'shield', label: 'Antioksidan Serum', search: 'antioxidant+serum' }, { icon: 'light_mode', label: 'C Vitamini Kremi', search: 'vitamin+c' }],
+                };
+                // Fallback for needs 17-29
+                const defaultRecs = [{ icon: 'search', label: 'Uyumlu Ürünleri Keşfet', search: '' }];
+                const recs = concerns.flatMap(id => needCategoryMap[id] || defaultRecs).slice(0, 6);
+                const unique = recs.filter((r, i, a) => a.findIndex(x => x.label === r.label) === i);
+                return unique.map((rec) => (
+                  <Link
+                    key={rec.label}
+                    href={`/urunler?search=${rec.search}&skin_type=${skinType}`}
+                    className="curator-card p-4 flex items-center gap-3 hover:border-primary transition-colors group"
+                  >
+                    <span className="material-icon text-primary text-xl" aria-hidden="true">{rec.icon}</span>
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">{rec.label}</span>
+                      <span className="text-[10px] text-on-surface-variant block">Ürünleri gör</span>
+                    </div>
+                    <span className="material-icon text-outline-variant text-sm group-hover:text-primary" aria-hidden="true">arrow_forward</span>
+                  </Link>
+                ));
+              })()}
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             {products.slice(0, 8).map((ps, idx) => {

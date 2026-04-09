@@ -156,10 +156,13 @@ export default async function HomePage() {
 
       {/* Hero — Full viewport, centered like a search engine */}
       <section className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-6 text-on-surface">
+        <h1 className="text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-4 text-on-surface">
           CİLDİNİ<br />
           <span className="text-outline-variant">ANLA.</span>
         </h1>
+        <p className="text-lg lg:text-xl text-on-surface-variant/50 font-medium tracking-wide mb-6">
+          Bilinçli alışveriş deneyimi.
+        </p>
         <p className="max-w-md text-base lg:text-lg text-on-surface-variant mb-10 leading-relaxed">
           30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
         </p>
