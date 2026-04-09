@@ -44,6 +44,9 @@ const dbModule = skipDb
           autoLoadEntities: true,
           synchronize: configService.get('DB_SYNC', 'false') === 'true',
           logging: configService.get('NODE_ENV') === 'development',
+          ssl: configService.get('DB_SSL', 'false') === 'true'
+            ? { rejectUnauthorized: false }
+            : false,
         }),
       }),
     ];
