@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kozmetik-v2';
+const CACHE_NAME = 'kozmetik-v3';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -56,6 +56,9 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET and cross-origin
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Skip Next.js dev/build assets (prevents stale JS bundles)
+  if (url.pathname.startsWith('/_next/')) return;
 
   // API calls: network-first with 3s timeout
   if (url.pathname.startsWith('/api/')) {

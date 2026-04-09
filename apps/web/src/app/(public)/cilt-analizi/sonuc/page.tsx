@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -160,13 +160,120 @@ const EVENING_ORDER = ['Makyaj Temizleyici', 'Temizleme Yağı & Balm', 'Yüz Te
 
 // === Content ===
 
+// === Analysis Loading Screen ===
+
+const ANALYSIS_STEPS = [
+  { label: 'Cilt profili oluşturuluyor', icon: 'person_search', duration: 800 },
+  { label: 'İhtiyaçlar analiz ediliyor', icon: 'analytics', duration: 700 },
+  { label: 'Hassasiyetler kontrol ediliyor', icon: 'shield', duration: 600 },
+  { label: '1900+ ürün taranıyor', icon: 'inventory_2', duration: 800 },
+  { label: 'İçerik uyumluluğu hesaplanıyor', icon: 'science', duration: 700 },
+  { label: 'Kişisel öneriler hazırlanıyor', icon: 'auto_awesome', duration: 400 },
+];
+
+function AnalysisLoadingScreen({ onComplete }: { onComplete: () => void }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let stepIdx = 0;
+    let elapsed = 0;
+    const totalDuration = ANALYSIS_STEPS.reduce((sum, s) => sum + s.duration, 0);
+
+    const interval = setInterval(() => {
+      elapsed += 50;
+      const pct = Math.min(100, (elapsed / totalDuration) * 100);
+      setProgress(pct);
+
+      // Advance step
+      let cumulative = 0;
+      for (let i = 0; i < ANALYSIS_STEPS.length; i++) {
+        cumulative += ANALYSIS_STEPS[i].duration;
+        if (elapsed < cumulative) {
+          setCurrentStep(i);
+          break;
+        }
+      }
+
+      if (elapsed >= totalDuration) {
+        clearInterval(interval);
+        setProgress(100);
+        setCurrentStep(ANALYSIS_STEPS.length - 1);
+        setTimeout(onComplete, 400);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [onComplete]);
+
+  return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6">
+      {/* Circular progress */}
+      <div className="relative w-32 h-32 mb-8">
+        <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" stroke="currentColor" strokeWidth="6" fill="none" className="text-surface-container" />
+          <circle
+            cx="60" cy="60" r="52" stroke="currentColor" strokeWidth="6" fill="none"
+            className="text-primary transition-all duration-200"
+            strokeDasharray={`${2 * Math.PI * 52}`}
+            strokeDashoffset={`${2 * Math.PI * 52 * (1 - progress / 100)}`}
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-2xl font-bold text-on-surface">{Math.round(progress)}%</span>
+        </div>
+      </div>
+
+      {/* Step indicator */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-2 text-primary mb-2">
+          <span className="material-icon animate-pulse" aria-hidden="true">
+            {ANALYSIS_STEPS[currentStep]?.icon}
+          </span>
+          <span className="text-sm font-medium">{ANALYSIS_STEPS[currentStep]?.label}</span>
+        </div>
+      </div>
+
+      {/* Step list */}
+      <div className="w-full max-w-sm space-y-2">
+        {ANALYSIS_STEPS.map((step, idx) => (
+          <div
+            key={idx}
+            className={`flex items-center gap-3 px-4 py-2 rounded-sm transition-all duration-300 ${
+              idx < currentStep
+                ? 'opacity-100'
+                : idx === currentStep
+                  ? 'opacity-100 bg-primary/5'
+                  : 'opacity-30'
+            }`}
+          >
+            <span className={`material-icon text-[18px] ${
+              idx < currentStep ? 'text-score-high' : idx === currentStep ? 'text-primary' : 'text-outline-variant'
+            }`} aria-hidden="true">
+              {idx < currentStep ? 'check_circle' : idx === currentStep ? step.icon : 'radio_button_unchecked'}
+            </span>
+            <span className={`text-xs ${idx <= currentStep ? 'text-on-surface' : 'text-on-surface-variant'}`}>
+              {step.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// === Content ===
+
 function ResultsContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(true);
   const [products, setProducts] = useState<ProductScore[]>([]);
   const [needs, setNeeds] = useState<Need[]>([]);
   const [avoidIngredients, setAvoidIngredients] = useState<string[]>([]);
   const [expandedProduct, setExpandedProduct] = useState<number | null>(null);
+  const [dataReady, setDataReady] = useState(false);
 
   const skinType = searchParams.get('skin_type') || '';
   const skinFeel = searchParams.get('skin_feel') || '';
@@ -175,10 +282,15 @@ function ResultsContent() {
   const sensitivityList = searchParams.get('sensitivities')?.split(',').filter(Boolean) || [];
   const budget = searchParams.get('budget') || '';
   const goals = searchParams.get('goals')?.split(',').filter(Boolean) || [];
+  const gender = searchParams.get('gender') || '';
   const climate = searchParams.get('climate') || '';
   const stress = searchParams.get('stress') || '';
   const sleep = searchParams.get('sleep') || '';
   const sun = searchParams.get('sun') || '';
+  const water = searchParams.get('water') || '';
+  const diet = searchParams.get('diet') || '';
+  const smoking = searchParams.get('smoking') || '';
+  const exercise = searchParams.get('exercise') || '';
 
   useEffect(() => {
     async function load() {
@@ -223,24 +335,23 @@ function ResultsContent() {
       } catch (err) {
         console.error('Failed to load results:', err);
       } finally {
-        setLoading(false);
+        setDataReady(true);
       }
     }
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Show analysis animation, then reveal results when both animation AND data are done
+  const handleAnalysisComplete = useCallback(() => {
+    setAnalyzing(false);
+  }, []);
+
+  useEffect(() => {
+    if (!analyzing && dataReady) setLoading(false);
+  }, [analyzing, dataReady]);
+
   if (loading) {
-    return (
-      <div className="text-center py-24">
-        <div className="inline-flex flex-col items-center gap-4 text-primary">
-          <span className="material-icon animate-spin" style={{ fontSize: '36px' }} aria-hidden="true">progress_activity</span>
-          <div>
-            <p className="text-sm font-medium">Analiz sonuçlarınız hazırlanıyor...</p>
-            <p className="text-xs text-on-surface-variant mt-1">Cilt profilinize uygun ürünler eşleştiriliyor</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <AnalysisLoadingScreen onComplete={handleAnalysisComplete} />;
   }
 
   const shareText = `REVELA Cilt Analizi sonucum: ${skinTypeLabels[skinType]} cilt, ${needs.map(n => n.need_name).join(', ')} ihtiyaçları. Kişisel ürün önerilerimi gör!`;
@@ -254,6 +365,91 @@ function ResultsContent() {
   if (climate === 'hot_humid') insights.push('Sıcak nemli iklimde hafif, su bazlı ürünler tercih et, ağır kremlerden kaçın.');
   if (climate === 'cold_dry') insights.push('Soğuk kuru havada nem bariyerini güçlendir — ceramide ve hyaluronik asit önemli.');
   if (skinFeel === 'reactive') insights.push('Reaktif cildinde bariyer onarımı öncelikli — centella asiatica ve panthenol yatıştırıcı etkiler sunar.');
+
+  // === Supplement Tips ===
+  const supplementTips: { icon: string; title: string; description: string; ingredients: string[]; warning?: string }[] = [];
+
+  if (sun === 'low' || climate === 'cold_dry') {
+    supplementTips.push({
+      icon: 'wb_sunny',
+      title: 'D Vitamini',
+      description: 'Düşük güneş maruziyeti D vitamini eksikliği riski oluşturur. D vitamini cilt bariyeri ve bağışıklık için kritiktir.',
+      ingredients: ['D3 Vitamini (Kolekalsiferol)', '1000-2000 IU/gün'],
+    });
+  }
+
+  if (skinType === 'dry' || skinFeel === 'flaky' || skinFeel === 'tight') {
+    supplementTips.push({
+      icon: 'water_drop',
+      title: 'Omega-3 Yağ Asitleri',
+      description: 'Kuru ve pullu ciltlerde omega-3 cilt bariyerini içeriden destekler, inflamasyonu azaltır.',
+      ingredients: ['Balık Yağı / Alg Yağı', 'EPA + DHA min 500mg/gün'],
+    });
+  }
+
+  if (skinType === 'oily' || goals.includes('acne_control')) {
+    supplementTips.push({
+      icon: 'shield',
+      title: 'Çinko',
+      description: 'Çinko sebum üretimini düzenler ve akne ile bağlantılı inflamasyonu azaltır.',
+      ingredients: ['Çinko Bisglisinat', '15-30mg/gün'],
+    });
+  }
+
+  if (ageRange && ['35-39', '40-44', '45-54', '55+'].includes(ageRange)) {
+    supplementTips.push({
+      icon: 'fitness_center',
+      title: 'Kolajen Peptitleri',
+      description: '35 yaşından itibaren kolajen üretimi azalır. Oral kolajen cilt elastikiyetini ve nemini destekler.',
+      ingredients: ['Hidrolize Kolajen Tip I & III', '5-10g/gün'],
+    });
+  }
+
+  if (stress === 'high' || diet === 'processed') {
+    supplementTips.push({
+      icon: 'psychology',
+      title: 'Probiyotik',
+      description: 'Yüksek stres ve işlenmiş gıda tüketimi bağırsak-cilt aksını bozar. Probiyotikler cilt inflamasyonunu azaltabilir.',
+      ingredients: ['Lactobacillus + Bifidobacterium', 'Min 10 milyar CFU/gün'],
+    });
+  }
+
+  if (smoking === 'yes') {
+    supplementTips.push({
+      icon: 'smoking_rooms',
+      title: 'C Vitamini Takviyesi',
+      description: 'Sigara kullanımı C vitamini depolarını hızla tüketir. C vitamini kolajen sentezi ve antioksidan savunma için şart.',
+      ingredients: ['Askorbik Asit / Ester-C', '500-1000mg/gün'],
+      warning: 'Sigara cildin en büyük düşmanı — bırakmak her takviyeden etkili.',
+    });
+  }
+
+  if (water === 'low') {
+    supplementTips.push({
+      icon: 'local_drink',
+      title: 'Oral Hyaluronik Asit',
+      description: 'Düşük su tüketimi cilt nemini direkt etkiler. Oral HA cildin nem tutma kapasitesini artırır.',
+      ingredients: ['Hyaluronik Asit', '120-240mg/gün'],
+    });
+  }
+
+  if (goals.includes('firmness') || (gender === 'male' && ageRange && ['30-34', '35-39', '40-44', '45-54', '55+'].includes(ageRange))) {
+    supplementTips.push({
+      icon: 'spa',
+      title: 'Biotin (B7)',
+      description: 'Saç, tırnak ve cilt sağlığını destekler. Özellikle sıkılaştırma hedefinde keratin üretimini artırır.',
+      ingredients: ['Biotin (D-Biotin)', '2500-5000 mcg/gün'],
+    });
+  }
+
+  if (exercise === 'none' && stress !== 'low') {
+    supplementTips.push({
+      icon: 'self_improvement',
+      title: 'Magnezyum',
+      description: 'Hareketsiz yaşam ve stres magnezyum depolarını tüketir. Magnezyum cilt onarımı ve uyku kalitesini destekler.',
+      ingredients: ['Magnezyum Bisglisinat', '200-400mg/gün (akşam)'],
+    });
+  }
 
   return (
     <div className="curator-section max-w-[1200px] mx-auto">
@@ -362,6 +558,50 @@ function ResultsContent() {
                 <p className="text-sm text-on-surface-variant leading-relaxed">{insight}</p>
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Supplement Tips */}
+      {supplementTips.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold text-on-surface mb-2 flex items-center gap-2">
+            <span className="material-icon text-primary" aria-hidden="true">medication</span>
+            Destekleyici Takviye Önerileri
+          </h2>
+          <p className="text-xs text-on-surface-variant mb-4">Yaşam tarzına göre cildini içeriden destekleyebilecek takviyeler.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {supplementTips.map((tip) => (
+              <div key={tip.title} className="curator-card p-4 border-l-2 border-l-primary/40">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-icon text-primary" aria-hidden="true">{tip.icon}</span>
+                  <h3 className="font-bold text-on-surface text-sm">{tip.title}</h3>
+                </div>
+                <p className="text-xs text-on-surface-variant leading-relaxed mb-3">{tip.description}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {tip.ingredients.map((ing) => (
+                    <span key={ing} className="bg-primary/5 text-primary px-2 py-1 rounded-sm text-[10px] font-medium">
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+                {tip.warning && (
+                  <div className="mt-2 flex items-start gap-1.5 bg-score-medium/10 rounded-sm p-2">
+                    <span className="material-icon text-score-medium text-[14px] mt-0.5 shrink-0" aria-hidden="true">warning_amber</span>
+                    <p className="text-[10px] text-score-medium leading-relaxed">{tip.warning}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 bg-surface-container-low rounded-sm p-3 flex items-start gap-2">
+            <span className="material-icon text-outline text-[14px] mt-0.5 shrink-0" aria-hidden="true">info</span>
+            <p className="text-[10px] text-outline leading-relaxed">
+              Bu öneriler genel bilgi amaçlıdır, tıbbi tavsiye niteliğinde değildir.
+              Herhangi bir takviye kullanmadan önce sağlık uzmanınıza danışın.
+            </p>
           </div>
         </section>
       )}

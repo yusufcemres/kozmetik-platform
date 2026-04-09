@@ -48,6 +48,7 @@ interface QuizState {
     sunscreen: boolean;
     makeup: boolean;
     double_cleanse: boolean;
+    aftershave: boolean;
     exfoliate_freq: string;
     mask_freq: string;
   };
@@ -101,7 +102,7 @@ const INITIAL: QuizState = {
   past_reactions: '',
   routine: {
     morning_steps: 0, evening_steps: 0, sunscreen: false, makeup: false,
-    double_cleanse: false, exfoliate_freq: 'never', mask_freq: 'never',
+    double_cleanse: false, aftershave: false, exfoliate_freq: 'never', mask_freq: 'never',
   },
   current_actives: [],
   lifestyle: {
@@ -175,17 +176,43 @@ const ageRanges = [
 const genderOptions = [
   { value: 'female', label: 'Kadın' },
   { value: 'male', label: 'Erkek' },
-  { value: 'other', label: 'Belirtmek İstemiyorum' },
+  { value: 'non_binary', label: 'Non-Binary' },
+  { value: 'prefer_not', label: 'Belirtmek İstemiyorum' },
 ];
 
-const hormonalFactors = [
+const hormonalFactorsBase = [
   { value: 'none', label: 'Yok / Fark Etmiyorum' },
+  { value: 'thyroid', label: 'Tiroid rahatsızlığı' },
+];
+
+const hormonalFactorsFemale = [
+  ...hormonalFactorsBase,
   { value: 'menstrual', label: 'Regl döneminde sivilce artıyor' },
   { value: 'pregnancy', label: 'Hamilelik / Emzirme' },
   { value: 'menopause', label: 'Menopoz dönemi' },
   { value: 'pcos', label: 'PCOS teşhisi' },
-  { value: 'thyroid', label: 'Tiroid rahatsızlığı' },
   { value: 'birth_control', label: 'Doğum kontrol hapı kullanıyorum' },
+];
+
+const hormonalFactorsMale = [
+  ...hormonalFactorsBase,
+  { value: 'testosterone', label: 'Yüksek testosteron / Yağlanma' },
+  { value: 'hair_loss', label: 'Saç dökülmesi (androgenetik)' },
+  { value: 'shaving_irritation', label: 'Tıraş sonrası tahriş / kızarıklık' },
+  { value: 'beard_acne', label: 'Sakal bölgesinde sivilce' },
+];
+
+// non_binary ve prefer_not: tüm seçenekleri cinsiyet-nötr şekilde göster
+const hormonalFactorsNeutral = [
+  ...hormonalFactorsBase,
+  { value: 'menstrual', label: 'Adet döneminde cilt değişimi' },
+  { value: 'pregnancy', label: 'Hamilelik / Emzirme' },
+  { value: 'menopause', label: 'Menopoz dönemi' },
+  { value: 'pcos', label: 'PCOS teşhisi' },
+  { value: 'birth_control', label: 'Hormon tedavisi / Doğum kontrol' },
+  { value: 'testosterone', label: 'Yüksek testosteron / Yağlanma' },
+  { value: 'hair_loss', label: 'Hormonal saç dökülmesi' },
+  { value: 'shaving_irritation', label: 'Tıraş sonrası tahriş' },
 ];
 
 const skinConditionOptions = [
@@ -291,9 +318,9 @@ const environmentOptions = {
 };
 
 const budgetOptions = [
-  { value: 'budget', label: 'Uygun Fiyatlı', desc: 'Ürün başı ₺200 altı', icon: 'savings' },
-  { value: 'mid', label: 'Orta Segment', desc: '₺200 – ₺500', icon: 'account_balance_wallet' },
-  { value: 'premium', label: 'Premium', desc: '₺500 ve üzeri', icon: 'diamond' },
+  { value: 'budget', label: 'Uygun Fiyatlı', desc: 'Ürün başı ₺500 altı', icon: 'savings' },
+  { value: 'mid', label: 'Orta Segment', desc: '₺500 – ₺1.500', icon: 'account_balance_wallet' },
+  { value: 'premium', label: 'Premium', desc: '₺1.500 ve üzeri', icon: 'diamond' },
   { value: 'mixed', label: 'Karma', desc: 'Temel ürünlere uygun, aktif ürünlere yatırım', icon: 'tune' },
 ];
 
@@ -370,11 +397,22 @@ function MultiChip({ items, selected, onToggle, max }: {
 
 // === Page ===
 
+type QuizMode = 'select' | 'quick' | 'detailed';
+
+// Quick test: maps quick step numbers → which full step to render
+const QUICK_STEPS = [1, 5, 6, 8, 11, 19] as const;
+const QUICK_TOTAL = QUICK_STEPS.length;
+
 export default function SkinAnalysisPage() {
   const router = useRouter();
+  const [quizMode, setQuizMode] = useState<QuizMode>('select');
   const [step, setStep] = useState(1);
   const [quiz, setQuiz] = useState<QuizState>(INITIAL);
   const [needs, setNeeds] = useState<Need[]>([]);
+
+  // In quick mode, map step index to actual full step
+  const actualStep = quizMode === 'quick' ? QUICK_STEPS[step - 1] : step;
+  const totalSteps = quizMode === 'quick' ? QUICK_TOTAL : TOTAL_STEPS;
 
   useEffect(() => {
     api.get<{ data: Need[] }>('/needs?limit=50')
@@ -398,7 +436,8 @@ export default function SkinAnalysisPage() {
   }, []);
 
   const canProceed = () => {
-    switch (step) {
+    const s = actualStep;
+    switch (s) {
       case 1: return !!quiz.skin_type;
       case 2: return !!quiz.skin_feel;
       case 3: return !!quiz.pore_size && !!quiz.tzone_behavior;
@@ -436,6 +475,7 @@ export default function SkinAnalysisPage() {
       .join(',');
 
     const params = new URLSearchParams({
+      quiz_mode: quizMode,
       skin_type: quiz.skin_type,
       skin_feel: quiz.skin_feel,
       pore_size: quiz.pore_size,
@@ -489,7 +529,7 @@ export default function SkinAnalysisPage() {
       const has = prev.concerns.includes(id);
       const newConcerns = has
         ? prev.concerns.filter((c) => c !== id)
-        : prev.concerns.length < 5 ? [...prev.concerns, id] : prev.concerns;
+        : prev.concerns.length < (quizMode === 'quick' ? 3 : 5) ? [...prev.concerns, id] : prev.concerns;
       const newSeverity = { ...prev.concern_severity };
       if (!has && !newSeverity[id]) newSeverity[id] = 'moderate';
       if (has) delete newSeverity[id];
@@ -497,15 +537,17 @@ export default function SkinAnalysisPage() {
     });
   };
 
-  const stepLabels = [
+  const stepLabelsDetailed = [
     'Cilt Tipi', 'Cilt Hissi', 'Gözenek & T-Bölge', 'Yanak Durumu', 'Yaş',
     'Cinsiyet & Hormonal', 'Cilt Rahatsızlıkları', 'İhtiyaçlar', 'Şiddet Seviyesi', 'Sorun Bölgeleri',
     'Hassasiyetler', 'Bakım Rutini', 'Kullanılan Aktifler', 'Yaşam Tarzı', 'Çevresel Faktörler',
     'Bakım Hedefleri', 'Doku & Koku', 'Marka & İçerik Tercihi', 'Bütçe',
   ];
 
+  const stepLabelsQuick = ['Cilt Tipi', 'Yaş', 'Cinsiyet', 'İhtiyaçlar', 'Hassasiyetler', 'Bütçe'];
+
   // Step grouping for visual progress
-  const stepGroups = [
+  const stepGroupsDetailed = [
     { label: 'Cilt Analizi', steps: [1, 2, 3, 4] },
     { label: 'Profil', steps: [5, 6, 7] },
     { label: 'İhtiyaçlar', steps: [8, 9, 10] },
@@ -513,32 +555,112 @@ export default function SkinAnalysisPage() {
     { label: 'Yaşam & Çevre', steps: [14, 15] },
     { label: 'Tercihler', steps: [16, 17, 18, 19] },
   ];
+
+  const stepGroupsQuick = [
+    { label: 'Temel Analiz', steps: [1, 2, 3] },
+    { label: 'İhtiyaç & Bütçe', steps: [4, 5, 6] },
+  ];
+
+  const stepLabels = quizMode === 'quick' ? stepLabelsQuick : stepLabelsDetailed;
+  const stepGroups = quizMode === 'quick' ? stepGroupsQuick : stepGroupsDetailed;
   const currentGroup = stepGroups.find((g) => g.steps.includes(step));
+
+  // Gender-aware hormonal factors
+  const activeHormonalFactors = quiz.gender === 'male'
+    ? hormonalFactorsMale
+    : quiz.gender === 'female'
+      ? hormonalFactorsFemale
+      : hormonalFactorsNeutral;
 
   return (
     <div className="curator-section max-w-3xl mx-auto">
+
+      {/* === MODE SELECTION SCREEN === */}
+      {quizMode === 'select' && (
+        <div className="animate-slide-up">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl headline-tight text-on-surface mb-3">CİLT ANALİZİ</h1>
+            <p className="text-on-surface-variant text-sm">Nasıl bir analiz istersin?</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Quick Test Card */}
+            <button
+              onClick={() => { setQuizMode('quick'); setStep(1); }}
+              className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="material-icon text-score-medium text-3xl" aria-hidden="true">bolt</span>
+                <div>
+                  <h2 className="text-xl font-bold text-on-surface">Hızlı Test</h2>
+                  <span className="text-xs text-outline font-medium">~1 dk</span>
+                </div>
+              </div>
+              <p className="text-sm text-on-surface-variant italic mb-4">&ldquo;Asansörde bile yetişir.&rdquo;</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed mb-6">
+                6 soru — cilt tipini ve temel ihtiyaçlarını belirle, hızlıca öneri al.
+              </p>
+              <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline">
+                Hızlı Başla
+                <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+              </span>
+            </button>
+
+            {/* Detailed Test Card */}
+            <button
+              onClick={() => { setQuizMode('detailed'); setStep(1); }}
+              className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative"
+            >
+              <div className="absolute top-3 right-3">
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Önerilen</span>
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="material-icon text-primary text-3xl" aria-hidden="true">biotech</span>
+                <div>
+                  <h2 className="text-xl font-bold text-on-surface">Detaylı Test</h2>
+                  <span className="text-xs text-outline font-medium">~4 dk</span>
+                </div>
+              </div>
+              <p className="text-sm text-on-surface-variant italic mb-4">&ldquo;Bir kahve koy, cildini baştan sona tanıyalım.&rdquo;</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed mb-6">
+                19 soru — hormon, rutin, yaşam tarzı, çevresel faktörler dahil eksiksiz analiz.
+              </p>
+              <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline">
+                Detaylı Başla
+                <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* === QUIZ CONTENT (both modes) === */}
+      {quizMode !== 'select' && (
+        <>
       {/* Header */}
       <div className="text-center mb-6">
         <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase mb-4">
-          <span className="material-icon material-icon-sm" aria-hidden="true">auto_awesome</span>
-          Kapsamlı Analiz
+          <span className="material-icon material-icon-sm" aria-hidden="true">{quizMode === 'quick' ? 'bolt' : 'auto_awesome'}</span>
+          {quizMode === 'quick' ? 'Hızlı Analiz' : 'Kapsamlı Analiz'}
         </div>
         <h1 className="text-3xl headline-tight text-on-surface">CİLT ANALİZİ</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          19 soruluk derinlemesine analiz — bilimsel ürün önerisi al.
+          {quizMode === 'quick'
+            ? '6 soruluk hızlı analiz — temel ürün önerisi al.'
+            : '19 soruluk derinlemesine analiz — bilimsel ürün önerisi al.'}
         </p>
       </div>
 
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          <span className="label-caps text-outline">{currentGroup?.label} — {step}/{TOTAL_STEPS}</span>
-          <span className="label-caps text-primary">{Math.round((step / TOTAL_STEPS) * 100)}%</span>
+          <span className="label-caps text-outline">{currentGroup?.label} — {step}/{totalSteps}</span>
+          <span className="label-caps text-primary">{Math.round((step / totalSteps) * 100)}%</span>
         </div>
         <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+            style={{ width: `${(step / totalSteps) * 100}%` }}
           />
         </div>
         {/* Step dots */}
@@ -559,7 +681,7 @@ export default function SkinAnalysisPage() {
       </div>
 
       {/* === STEP 1: Skin Type === */}
-      {step === 1 && (
+      {actualStep === 1 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Cilt tipin ne?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Genel cilt tipini seç — emin değilsen en yakın olanı işaretle.</p>
@@ -580,7 +702,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 2: Skin Feel === */}
-      {step === 2 && (
+      {actualStep === 2 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Cildin gün içinde nasıl hissettiriyor?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Cilt tipi doğrulaması ve ürün doku önerisi için.</p>
@@ -601,7 +723,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 3: Pores + T-Zone === */}
-      {step === 3 && (
+      {actualStep === 3 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Gözenek & T-Bölge</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Bu bilgiler cilt tipi doğrulaması ve özelleştirilmiş öneri için kullanılır.</p>
@@ -632,7 +754,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 4: Cheeks === */}
-      {step === 4 && (
+      {actualStep === 4 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Yanakların durumu</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">T-bölge ile yanak arasındaki fark karma cilt teşhisinde önemlidir.</p>
@@ -647,7 +769,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 5: Age === */}
-      {step === 5 && (
+      {actualStep === 5 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Yaş aralığın</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Yaşa göre farklı aktif maddeler ve stratejiler öne çıkar.</p>
@@ -665,7 +787,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 6: Gender + Hormonal === */}
-      {step === 6 && (
+      {actualStep === 6 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Cinsiyet & hormonal faktörler</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Hormonal değişimler cilt sağlığını doğrudan etkiler.</p>
@@ -676,7 +798,7 @@ export default function SkinAnalysisPage() {
               {genderOptions.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => setQuiz((p) => ({ ...p, gender: opt.value }))}
+                  onClick={() => setQuiz((p) => ({ ...p, gender: opt.value, hormonal_factor: '' }))}
                   className={`flex-1 py-3 rounded-sm text-sm font-medium transition-colors ${
                     quiz.gender === opt.value ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
                   }`}
@@ -687,21 +809,23 @@ export default function SkinAnalysisPage() {
             </div>
           </div>
 
+          {quizMode === 'detailed' && quiz.gender && (
           <div>
             <p className="text-sm font-medium text-on-surface mb-3">Hormonal faktör var mı?</p>
             <div className="grid grid-cols-1 gap-2">
-              {hormonalFactors.map((opt) => (
+              {activeHormonalFactors.map((opt) => (
                 <OptionCard key={opt.value} selected={quiz.hormonal_factor === opt.value} onClick={() => setQuiz((p) => ({ ...p, hormonal_factor: opt.value }))} className="p-3">
                   <span className={`text-sm ${quiz.hormonal_factor === opt.value ? 'font-semibold text-on-surface' : 'text-on-surface-variant'}`}>{opt.label}</span>
                 </OptionCard>
               ))}
             </div>
           </div>
+          )}
         </div>
       )}
 
       {/* === STEP 7: Skin Conditions === */}
-      {step === 7 && (
+      {actualStep === 7 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Bilinen cilt rahatsızlığın var mı?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Doktor teşhisi koymuş rahatsızlıkları işaretle. Yoksa &quot;Hiçbiri&quot; seç.</p>
@@ -737,10 +861,10 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 8: Concerns === */}
-      {step === 8 && (
+      {actualStep === 8 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Cilt ihtiyaçların neler?</h2>
-          <p className="text-sm text-on-surface-variant text-center mb-8">En fazla 5 ihtiyaç seçebilirsin. ({quiz.concerns.length}/5)</p>
+          <p className="text-sm text-on-surface-variant text-center mb-8">En fazla {quizMode === 'quick' ? 3 : 5} ihtiyaç seçebilirsin. ({quiz.concerns.length}/{quizMode === 'quick' ? 3 : 5})</p>
           <div className="grid grid-cols-2 gap-3">
             {needs.map((need) => (
               <button
@@ -766,7 +890,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 9: Concern Severity === */}
-      {step === 9 && (
+      {actualStep === 9 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">İhtiyaçlarının şiddeti</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Her ihtiyaç için şiddet belirle — daha doğru ürün önerisi için.</p>
@@ -806,12 +930,12 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 10: Problem Areas === */}
-      {step === 10 && (
+      {actualStep === 10 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Sorunlar en çok nerede?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Problemlerin yoğunlaştığı bölgeleri seç.</p>
           <div className="grid grid-cols-3 gap-2">
-            {problemAreaOptions.map((opt) => {
+            {[...problemAreaOptions, ...(quiz.gender !== 'female' ? [{ value: 'beard_area', label: 'Sakal Bölgesi' }] : [])].map((opt) => {
               const sel = quiz.problem_areas.includes(opt.value);
               return (
                 <OptionCard
@@ -829,7 +953,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 11: Sensitivities === */}
-      {step === 11 && (
+      {actualStep === 11 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Hassasiyetlerin var mı?</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Bilinen hassasiyetlerin varsa işaretle, yoksa atla.</p>
@@ -866,7 +990,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 12: Routine === */}
-      {step === 12 && (
+      {actualStep === 12 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Mevcut bakım rutinin</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Şu anki rutinin başlangıç noktamız.</p>
@@ -894,22 +1018,27 @@ export default function SkinAnalysisPage() {
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { key: 'sunscreen' as const, icon: 'wb_sunny', label: 'Güneş kremi', color: 'score-high' },
-                { key: 'makeup' as const, icon: 'face_retouching_natural', label: 'Düzenli makyaj', color: 'primary' },
-                { key: 'double_cleanse' as const, icon: 'water_drop', label: 'Çift temizleme', color: 'primary' },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => setQuiz((p) => ({ ...p, routine: { ...p.routine, [item.key]: !p.routine[item.key] } }))}
-                  className={`curator-card p-3 text-center text-xs transition-all ${
-                    quiz.routine[item.key] ? `border-${item.color} ring-1 ring-${item.color} bg-${item.color}/5` : ''
-                  }`}
-                >
-                  <span className={`material-icon block mb-1 ${quiz.routine[item.key] ? `text-${item.color}` : 'text-outline-variant'}`} aria-hidden="true">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
+              {(() => {
+                const g = quiz.gender;
+                const items: { key: keyof typeof quiz.routine; icon: string; label: string; color: string }[] = [
+                  { key: 'sunscreen', icon: 'wb_sunny', label: 'Güneş kremi', color: 'score-high' },
+                  ...(g !== 'male' ? [{ key: 'makeup' as const, icon: 'face_retouching_natural', label: 'Düzenli makyaj', color: 'primary' }] : []),
+                  { key: 'double_cleanse', icon: 'water_drop', label: 'Çift temizleme', color: 'primary' },
+                  ...(g !== 'female' ? [{ key: 'aftershave' as const, icon: 'content_cut', label: 'Tıraş sonrası bakım', color: 'primary' }] : []),
+                ];
+                return items.map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => setQuiz((p) => ({ ...p, routine: { ...p.routine, [item.key]: !p.routine[item.key as keyof typeof p.routine] } }))}
+                    className={`curator-card p-3 text-center text-xs transition-all ${
+                      quiz.routine[item.key as keyof typeof quiz.routine] ? `border-${item.color} ring-1 ring-${item.color} bg-${item.color}/5` : ''
+                    }`}
+                  >
+                    <span className={`material-icon block mb-1 ${quiz.routine[item.key as keyof typeof quiz.routine] ? `text-${item.color}` : 'text-outline-variant'}`} aria-hidden="true">{item.icon}</span>
+                    {item.label}
+                  </button>
+                ));
+              })()}
             </div>
             <div className="curator-card p-4">
               <label className="text-sm font-medium text-on-surface mb-2 block">Peeling / Eksfolyan sıklığı</label>
@@ -942,7 +1071,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 13: Current Actives === */}
-      {step === 13 && (
+      {actualStep === 13 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Şu an kullandığın aktif bileşenler</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Hangi aktifleri kullanıyorsun? Çakışma ve sinerjileri değerlendireceğiz.</p>
@@ -971,7 +1100,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 14: Lifestyle === */}
-      {step === 14 && (
+      {actualStep === 14 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Yaşam tarzın</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Cilt sağlığını etkileyen günlük alışkanlıklar.</p>
@@ -1033,7 +1162,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 15: Environment === */}
-      {step === 15 && (
+      {actualStep === 15 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Çevresel faktörler</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Yaşadığın ortam cilt bariyerini doğrudan etkiler.</p>
@@ -1099,7 +1228,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 16: Goals === */}
-      {step === 16 && (
+      {actualStep === 16 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Bakım hedeflerin</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">En fazla 3 hedef seç. ({quiz.goals.length}/3)</p>
@@ -1118,7 +1247,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 17: Texture + Fragrance === */}
-      {step === 17 && (
+      {actualStep === 17 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Ürün doku & koku tercihin</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Hangi dokuyu tercih edersin?</p>
@@ -1144,7 +1273,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 18: Ingredient / Brand preference === */}
-      {step === 18 && (
+      {actualStep === 18 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Marka & içerik tercihin</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Özel bir tercihin var mı?</p>
@@ -1153,7 +1282,7 @@ export default function SkinAnalysisPage() {
       )}
 
       {/* === STEP 19: Budget === */}
-      {step === 19 && (
+      {actualStep === 19 && (
         <div className="animate-slide-up">
           <h2 className="text-xl font-bold text-on-surface mb-2 text-center">Bütçe tercihin</h2>
           <p className="text-sm text-on-surface-variant text-center mb-8">Ürün başına harcama beklentin.</p>
@@ -1184,7 +1313,16 @@ export default function SkinAnalysisPage() {
             GERİ
           </button>
         )}
-        {step < TOTAL_STEPS ? (
+        {step === 1 && (
+          <button
+            onClick={() => { setQuizMode('select'); setStep(1); }}
+            className="flex-1 curator-btn-outline py-3.5 text-xs"
+          >
+            <span className="material-icon material-icon-sm mr-1 align-text-bottom" aria-hidden="true">arrow_back</span>
+            TEST SEÇİMİ
+          </button>
+        )}
+        {step < totalSteps ? (
           <button
             onClick={() => setStep((s) => s + 1)}
             disabled={!canProceed()}
@@ -1204,6 +1342,8 @@ export default function SkinAnalysisPage() {
           </button>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }
