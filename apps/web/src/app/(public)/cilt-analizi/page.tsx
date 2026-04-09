@@ -454,11 +454,10 @@ export default function SkinAnalysisPage() {
       const stored = localStorage.getItem('skin_profile');
       if (stored) {
         const p = JSON.parse(stored);
+        // Only restore basic profile info, NOT concerns/severity (user should pick fresh)
         setQuiz((prev) => ({
           ...prev,
           skin_type: p.skin_type || '',
-          concerns: p.concerns || [],
-          sensitivities: p.sensitivities || {},
           age_range: p.age_range || '',
           budget: p.budget || '',
         }));
