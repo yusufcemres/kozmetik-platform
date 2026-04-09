@@ -403,6 +403,34 @@ type QuizMode = 'select' | 'quick' | 'detailed';
 const QUICK_STEPS = [1, 5, 6, 8, 11, 19] as const;
 const QUICK_TOTAL = QUICK_STEPS.length;
 
+const NEEDS_FALLBACK: Need[] = [
+  { need_id: 1, need_name: 'Sivilce / Akne', need_slug: 'sivilce-akne', need_group: 'Cilt Sorunları' },
+  { need_id: 2, need_name: 'Leke / Hiperpigmentasyon', need_slug: 'leke-hiperpigmentasyon', need_group: 'Cilt Sorunları' },
+  { need_id: 3, need_name: 'Kırışıklık / Yaşlanma', need_slug: 'kirisiklik-yaslanma', need_group: 'Cilt Sorunları' },
+  { need_id: 4, need_name: 'Kuruluk / Dehidrasyon', need_slug: 'kuruluk-dehidrasyon', need_group: 'Nem' },
+  { need_id: 5, need_name: 'Bariyer Desteği', need_slug: 'bariyer-destegi', need_group: 'Bakım' },
+  { need_id: 6, need_name: 'Gözenek Sıkılaştırma', need_slug: 'gozenek-sikalastirma', need_group: 'Cilt Sorunları' },
+  { need_id: 7, need_name: 'Cilt Tonu Eşitleme', need_slug: 'cilt-tonu-esitleme', need_group: 'Bakım' },
+  { need_id: 8, need_name: 'Güneş Koruması', need_slug: 'gunes-korumasi', need_group: 'Koruma' },
+  { need_id: 9, need_name: 'Yağ Kontrolü', need_slug: 'yag-kontrolu', need_group: 'Cilt Sorunları' },
+  { need_id: 10, need_name: 'Nemlendirme', need_slug: 'nemlendirme', need_group: 'Nem' },
+  { need_id: 11, need_name: 'Hassasiyet', need_slug: 'hassasiyet', need_group: 'Bakım' },
+  { need_id: 12, need_name: 'Anti-Oksidan Koruma', need_slug: 'anti-oksidan-koruma', need_group: 'Koruma' },
+  { need_id: 17, need_name: 'Koyu Halka / Göz Altı Morluk', need_slug: 'koyu-halka-goz-alti-morluk', need_group: 'Cilt Sorunları' },
+  { need_id: 18, need_name: 'Cilt Sarkması / Elastikiyet Kaybı', need_slug: 'cilt-sarkmasi-elastikiyet-kaybi', need_group: 'Cilt Sorunları' },
+  { need_id: 19, need_name: 'Kızarıklık / Rozasea', need_slug: 'kizariklik-rozasea', need_group: 'Cilt Sorunları' },
+  { need_id: 20, need_name: 'İnce Çizgi / Erken Kırışıklık', need_slug: 'ince-cizgi-erken-kirisiklik', need_group: 'Cilt Sorunları' },
+  { need_id: 21, need_name: 'Cilt Doku Düzensizliği', need_slug: 'cilt-doku-duzensizligi', need_group: 'Cilt Sorunları' },
+  { need_id: 22, need_name: 'Sivilce İzi / Akne Skarı', need_slug: 'sivilce-izi-akne-skari', need_group: 'Cilt Sorunları' },
+  { need_id: 23, need_name: 'Göz Çevresi Bakımı', need_slug: 'goz-cevresi-bakimi', need_group: 'Bakım' },
+  { need_id: 24, need_name: 'Dudak Bakımı', need_slug: 'dudak-bakimi', need_group: 'Bakım' },
+  { need_id: 25, need_name: 'Boyun & Dekolte Bakımı', need_slug: 'boyun-dekolte-bakimi', need_group: 'Bakım' },
+  { need_id: 26, need_name: 'Detoks / Arındırma', need_slug: 'detoks-arindirma', need_group: 'Bakım' },
+  { need_id: 27, need_name: 'Parlaklık / Glow', need_slug: 'parlaklik-glow', need_group: 'Bakım' },
+  { need_id: 28, need_name: 'Mavi Işık / Ekran Koruması', need_slug: 'mavi-isik-ekran-korumasi', need_group: 'Koruma' },
+  { need_id: 29, need_name: 'Kirlilik / Çevre Koruması', need_slug: 'kirlilik-cevre-korumasi', need_group: 'Koruma' },
+];
+
 export default function SkinAnalysisPage() {
   const router = useRouter();
   const [quizMode, setQuizMode] = useState<QuizMode>('select');
@@ -416,8 +444,11 @@ export default function SkinAnalysisPage() {
 
   useEffect(() => {
     api.get<{ data: Need[] }>('/needs?limit=50')
-      .then((res) => setNeeds((res.data || []).filter(n => n.need_group !== 'supplement')))
-      .catch(() => {});
+      .then((res) => {
+        const fetched = (res.data || []).filter(n => n.need_group !== 'supplement');
+        setNeeds(fetched.length > 0 ? fetched : NEEDS_FALLBACK);
+      })
+      .catch(() => setNeeds(NEEDS_FALLBACK));
 
     try {
       const stored = localStorage.getItem('skin_profile');
@@ -580,7 +611,10 @@ export default function SkinAnalysisPage() {
         <div className="animate-slide-up">
           <div className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl headline-tight text-on-surface mb-3">CİLT ANALİZİ</h1>
-            <p className="text-on-surface-variant text-sm">Nasıl bir analiz istersin?</p>
+            <p className="text-on-surface-variant text-sm leading-relaxed max-w-md mx-auto mb-4">
+              Sana en uygun ürünleri önerebilmemiz için cildini ve alışkanlıklarını yakından tanıyalım.
+            </p>
+            <p className="text-on-surface-variant/70 text-xs font-medium">Nasıl bir analiz istersin?</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

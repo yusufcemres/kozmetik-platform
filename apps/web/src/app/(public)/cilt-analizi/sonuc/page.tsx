@@ -16,6 +16,34 @@ interface Need {
   user_friendly_label?: string;
 }
 
+const NEEDS_FALLBACK: Need[] = [
+  { need_id: 1, need_name: 'Sivilce / Akne', need_slug: 'sivilce-akne' },
+  { need_id: 2, need_name: 'Leke / Hiperpigmentasyon', need_slug: 'leke-hiperpigmentasyon' },
+  { need_id: 3, need_name: 'Kırışıklık / Yaşlanma', need_slug: 'kirisiklik-yaslanma' },
+  { need_id: 4, need_name: 'Kuruluk / Dehidrasyon', need_slug: 'kuruluk-dehidrasyon' },
+  { need_id: 5, need_name: 'Bariyer Desteği', need_slug: 'bariyer-destegi' },
+  { need_id: 6, need_name: 'Gözenek Sıkılaştırma', need_slug: 'gozenek-sikalastirma' },
+  { need_id: 7, need_name: 'Cilt Tonu Eşitleme', need_slug: 'cilt-tonu-esitleme' },
+  { need_id: 8, need_name: 'Güneş Koruması', need_slug: 'gunes-korumasi' },
+  { need_id: 9, need_name: 'Yağ Kontrolü', need_slug: 'yag-kontrolu' },
+  { need_id: 10, need_name: 'Nemlendirme', need_slug: 'nemlendirme' },
+  { need_id: 11, need_name: 'Hassasiyet', need_slug: 'hassasiyet' },
+  { need_id: 12, need_name: 'Anti-Oksidan Koruma', need_slug: 'anti-oksidan-koruma' },
+  { need_id: 17, need_name: 'Koyu Halka / Göz Altı Morluk', need_slug: 'koyu-halka-goz-alti-morluk' },
+  { need_id: 18, need_name: 'Cilt Sarkması / Elastikiyet Kaybı', need_slug: 'cilt-sarkmasi-elastikiyet-kaybi' },
+  { need_id: 19, need_name: 'Kızarıklık / Rozasea', need_slug: 'kizariklik-rozasea' },
+  { need_id: 20, need_name: 'İnce Çizgi / Erken Kırışıklık', need_slug: 'ince-cizgi-erken-kirisiklik' },
+  { need_id: 21, need_name: 'Cilt Doku Düzensizliği', need_slug: 'cilt-doku-duzensizligi' },
+  { need_id: 22, need_name: 'Sivilce İzi / Akne Skarı', need_slug: 'sivilce-izi-akne-skari' },
+  { need_id: 23, need_name: 'Göz Çevresi Bakımı', need_slug: 'goz-cevresi-bakimi' },
+  { need_id: 24, need_name: 'Dudak Bakımı', need_slug: 'dudak-bakimi' },
+  { need_id: 25, need_name: 'Boyun & Dekolte Bakımı', need_slug: 'boyun-dekolte-bakimi' },
+  { need_id: 26, need_name: 'Detoks / Arındırma', need_slug: 'detoks-arindirma' },
+  { need_id: 27, need_name: 'Parlaklık / Glow', need_slug: 'parlaklik-glow' },
+  { need_id: 28, need_name: 'Mavi Işık / Ekran Koruması', need_slug: 'mavi-isik-ekran-korumasi' },
+  { need_id: 29, need_name: 'Kirlilik / Çevre Koruması', need_slug: 'kirlilik-cevre-korumasi' },
+];
+
 interface ProductScore {
   compatibility_score: number;
   confidence_level: string;
@@ -274,6 +302,8 @@ function ResultsContent() {
   const [avoidIngredients, setAvoidIngredients] = useState<string[]>([]);
   const [expandedProduct, setExpandedProduct] = useState<number | null>(null);
   const [dataReady, setDataReady] = useState(false);
+  const [routineView, setRoutineView] = useState<'daily' | 'weekly'>('daily');
+  const [activeDay, setActiveDay] = useState(0);
 
   const skinType = searchParams.get('skin_type') || '';
   const skinFeel = searchParams.get('skin_feel') || '';
@@ -295,8 +325,14 @@ function ResultsContent() {
   useEffect(() => {
     async function load() {
       try {
-        const needsRes = await api.get<{ data: Need[] }>('/needs?limit=50');
-        const allNeeds = needsRes.data || [];
+        let allNeeds: Need[] = [];
+        try {
+          const needsRes = await api.get<{ data: Need[] }>('/needs?limit=50');
+          allNeeds = needsRes.data || [];
+        } catch {
+          allNeeds = NEEDS_FALLBACK;
+        }
+        if (allNeeds.length === 0) allNeeds = NEEDS_FALLBACK;
         const selectedNeeds = allNeeds.filter((n) => concerns.includes(n.need_id));
         setNeeds(selectedNeeds);
 
@@ -738,66 +774,275 @@ function ResultsContent() {
         )}
       </section>
 
-      {/* Morning & Evening Routine */}
+      {/* Two-Tier Routine: Daily + Weekly */}
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
           <span className="material-icon text-primary" aria-hidden="true">schedule</span>
-          Önerilen Bakım Rutini
+          Önerilen Bakım Rutinin
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Morning */}
-          <div className="curator-card p-5 border-l-2 border-l-score-medium">
-            <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span>
-              Sabah Rutini
-            </h3>
-            <ol className="space-y-2.5 text-sm">
-              {MORNING_ORDER.map((cat, idx) => {
-                const matched = products.find(ps => {
-                  const catName = ps.product?.category?.category_name || '';
-                  return catName === cat || (cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]));
-                });
-                return (
-                  <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
-                    <span className="flex-1">{cat}</span>
-                    {matched?.product && (
-                      <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
-                        {matched.product.brand?.brand_name} {matched.product.product_name}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-          {/* Evening */}
-          <div className="curator-card p-5 border-l-2 border-l-primary">
-            <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span>
-              Akşam Rutini
-            </h3>
-            <ol className="space-y-2.5 text-sm">
-              {EVENING_ORDER.map((cat, idx) => {
-                const matched = products.find(ps => {
-                  const catName = ps.product?.category?.category_name || '';
-                  return catName === cat || (cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]));
-                });
-                return (
-                  <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
-                    <span className="flex-1">{cat}</span>
-                    {matched?.product && (
-                      <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
-                        {matched.product.brand?.brand_name} {matched.product.product_name}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
+
+        {/* Tab bar */}
+        <div className="flex bg-surface-container rounded-sm p-1 mb-6">
+          {(['daily', 'weekly'] as const).map((view) => (
+            <button
+              key={view}
+              onClick={() => setRoutineView(view)}
+              className={`flex-1 py-2.5 px-4 rounded-sm text-xs font-semibold transition-all ${
+                routineView === view
+                  ? 'bg-surface text-on-surface shadow-sm'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              {view === 'daily' ? 'Günlük Plan' : 'Haftalık Plan'}
+            </button>
+          ))}
         </div>
+
+        {/* === DAILY PLAN === */}
+        {routineView === 'daily' && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Morning */}
+              <div className="curator-card p-5 border-l-2 border-l-score-medium">
+                <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span>
+                  Sabah Rutini
+                </h3>
+                <ol className="space-y-2.5 text-sm">
+                  {MORNING_ORDER.map((cat, idx) => {
+                    const matched = products.find(ps => {
+                      const catName = ps.product?.category?.category_name || '';
+                      return catName === cat || (cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]));
+                    });
+                    return (
+                      <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
+                        <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
+                        <span className="flex-1">{cat}</span>
+                        {matched?.product && (
+                          <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
+                            {matched.product.brand?.brand_name} {matched.product.product_name}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+              {/* Evening */}
+              <div className="curator-card p-5 border-l-2 border-l-primary">
+                <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span className="material-icon text-primary" aria-hidden="true">dark_mode</span>
+                  Akşam Rutini
+                </h3>
+                <ol className="space-y-2.5 text-sm">
+                  {EVENING_ORDER.map((cat, idx) => {
+                    const matched = products.find(ps => {
+                      const catName = ps.product?.category?.category_name || '';
+                      return catName === cat || (cat.split(' ')[0].length > 3 && catName.includes(cat.split(' ')[0]));
+                    });
+                    return (
+                      <li key={cat} className="flex items-center gap-3 text-on-surface-variant">
+                        <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
+                        <span className="flex-1">{cat}</span>
+                        {matched?.product && (
+                          <Link href={`/urunler/${matched.product.product_slug}`} className="text-[10px] text-primary truncate max-w-[160px] hover:underline">
+                            {matched.product.brand?.brand_name} {matched.product.product_name}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+            </div>
+
+            {/* "Can't do this daily?" banner */}
+            <div className="mt-5 bg-primary/5 border border-primary/15 rounded-sm p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <span className="material-icon text-primary text-xl" aria-hidden="true">tips_and_updates</span>
+              <div className="flex-1">
+                <p className="text-sm text-on-surface font-medium">Buna her gün uyamam diyorsan?</p>
+                <p className="text-xs text-on-surface-variant mt-0.5">Haftalık plan daha esnek — aynı sonucu daha rahat bir tempoda yakala.</p>
+              </div>
+              <button
+                onClick={() => setRoutineView('weekly')}
+                className="text-xs font-semibold text-primary hover:underline whitespace-nowrap flex items-center gap-1"
+              >
+                Haftalık Plana Geç
+                <span className="material-icon text-[14px]" aria-hidden="true">arrow_forward</span>
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* === WEEKLY PLAN === */}
+        {routineView === 'weekly' && (() => {
+          const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+          const DAY_FULL = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+
+          const isSensitive = skinType === 'sensitive';
+          const isOily = skinType === 'oily';
+          const isDry = skinType === 'dry';
+          const ageNum = ageRange ? parseInt(ageRange.split('-')[0]) || 0 : 0;
+          const isMature = ageNum >= 35;
+
+          // Base morning routine (same every day)
+          const morningBase = ['Temizleme', 'Tonik', isMature ? 'C Vitamini Serum' : 'Serum', 'Göz Kremi', 'Nemlendirici', 'SPF 50+'];
+
+          // Per-day evening variations
+          type DayPlan = { evening: string[]; note: string; icon: string };
+          const weeklyPlan: DayPlan[] = [
+            // Pzt — aktif gece
+            {
+              evening: ['Çift Temizleme', 'Tonik', isSensitive ? 'Bakuchiol Serum' : (isMature ? 'Retinol Serum' : 'AHA/BHA Serum'), 'Göz Kremi', 'Nemlendirici'],
+              note: isSensitive
+                ? 'Hassas cildine uygun yumuşak aktif ile haftaya başla.'
+                : 'Haftaya güçlü başlangıç — aktif gece. Yarın SPF şart!',
+              icon: 'bolt',
+            },
+            // Sal — dinlenme
+            {
+              evening: ['Çift Temizleme', 'Tonik', 'Nemlendirici Serum', 'Nemlendirici'],
+              note: 'Dinlenme gecesi — cildin aktiften sonra toparlanıyor.',
+              icon: 'spa',
+            },
+            // Çar — orta güç
+            {
+              evening: ['Çift Temizleme', 'Tonik', 'Niacinamide Serum', 'Göz Kremi', 'Nemlendirici'],
+              note: isOily
+                ? 'Niacinamide yağ kontrolü + gözenek sıkılaştırma sağlar.'
+                : 'Orta güçte bakım — leke ve gözenek desteği.',
+              icon: 'balance',
+            },
+            // Per — dinlenme
+            {
+              evening: ['Çift Temizleme', 'Tonik', 'Hyaluronik Asit Serum', 'Nemlendirici'],
+              note: 'Dinlenme gecesi — derin nem desteği.',
+              icon: 'water_drop',
+            },
+            // Cum — aktif gece
+            {
+              evening: ['Çift Temizleme', 'Tonik', isSensitive ? 'Azelaic Asit Serum' : (isMature ? 'Retinol Serum' : 'AHA/BHA Serum'), 'Göz Kremi', 'Nemlendirici'],
+              note: isSensitive
+                ? 'Hassas cilde uygun hafif aktif — haftanın ikinci aktif gecesi.'
+                : (isMature ? 'İkinci retinol gecesi — kolajen üretimini destekler.' : 'Haftanın ikinci aktif gecesi.'),
+              icon: 'auto_awesome',
+            },
+            // Cmt — derin bakım
+            {
+              evening: ['Çift Temizleme', isSensitive ? 'Enzim Maske (5 dk)' : (isOily ? 'BHA Peeling' : 'AHA Peeling'), isDry ? 'Nem Maskesi' : 'Kil Maskesi', 'Tonik', 'Nemlendirici'],
+              note: isSensitive
+                ? 'Hassas cilt için enzim maske — yumuşak eksfoliyasyon.'
+                : 'Haftalık derin bakım günü — peeling + maske.',
+              icon: 'self_improvement',
+            },
+            // Paz — onarım
+            {
+              evening: ['Çift Temizleme', 'Tonik', isDry ? 'Bakım Yağı' : 'Peptit Serum', 'Göz Kremi', isDry ? 'Sleeping Mask' : 'Yoğun Nemlendirici'],
+              note: isDry
+                ? 'Onarım gecesi — bakım yağı + sleeping mask ile haftaya hazırlan.'
+                : 'Onarım ve hazırlık — cildin yeni haftaya dinlenmiş başlasın.',
+              icon: 'hotel',
+            },
+          ];
+
+          // Sensitive skin: reduce active nights (skip Friday active)
+          if (isSensitive) {
+            weeklyPlan[4] = {
+              evening: ['Çift Temizleme', 'Tonik', 'Nemlendirici Serum', 'Nemlendirici'],
+              note: 'Hassas cilt — haftada tek aktif gece yeterli. Bugün dinlen.',
+              icon: 'spa',
+            };
+          }
+
+          const plan = weeklyPlan[activeDay];
+
+          return (
+            <>
+              {/* Day selector */}
+              <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 scrollbar-hide">
+                {DAYS.map((day, idx) => (
+                  <button
+                    key={day}
+                    onClick={() => setActiveDay(idx)}
+                    className={`flex-shrink-0 w-11 h-11 rounded-full text-xs font-bold transition-all ${
+                      activeDay === idx
+                        ? 'bg-primary text-on-primary shadow-md scale-105'
+                        : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+
+              {/* Day label */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-icon text-primary" aria-hidden="true">{plan.icon}</span>
+                <h3 className="text-sm font-bold text-on-surface uppercase tracking-wide">{DAY_FULL[activeDay]}</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Morning (same every day) */}
+                <div className="curator-card p-5 border-l-2 border-l-score-medium">
+                  <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span>
+                    Sabah
+                  </h3>
+                  <ol className="space-y-2.5 text-sm">
+                    {morningBase.map((step, idx) => (
+                      <li key={step} className="flex items-center gap-3 text-on-surface-variant">
+                        <span className="text-xs font-bold text-score-medium w-5">{idx + 1}</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                {/* Evening (varies by day) */}
+                <div className="curator-card p-5 border-l-2 border-l-primary">
+                  <h3 className="font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-icon text-primary" aria-hidden="true">dark_mode</span>
+                    Akşam
+                  </h3>
+                  <ol className="space-y-2.5 text-sm">
+                    {plan.evening.map((step, idx) => (
+                      <li key={step} className="flex items-center gap-3 text-on-surface-variant">
+                        <span className="text-xs font-bold text-primary w-5">{idx + 1}</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+
+              {/* Day note */}
+              <div className="mt-4 flex items-start gap-2 bg-primary/5 border border-primary/10 rounded-sm p-3">
+                <span className="material-icon text-primary text-[18px] mt-0.5" aria-hidden="true">tips_and_updates</span>
+                <p className="text-xs text-on-surface-variant leading-relaxed">{plan.note}</p>
+              </div>
+
+              {/* Weekly legend */}
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  Pzt, Cum — Aktif Gece
+                </div>
+                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                  <span className="w-2 h-2 rounded-full bg-score-medium" />
+                  Çar — Orta Güç
+                </div>
+                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                  <span className="w-2 h-2 rounded-full bg-outline-variant" />
+                  Sal, Per — Dinlenme
+                </div>
+                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                  <span className="w-2 h-2 rounded-full bg-score-high" />
+                  Cmt, Paz — Derin Bakım
+                </div>
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {/* Ingredients to Avoid */}
