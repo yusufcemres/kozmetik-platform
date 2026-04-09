@@ -41,12 +41,25 @@ async function getHomeData() {
     apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),
   ]);
 
+  // Fallback stats when API is down (last known values)
+  const FALLBACK_PRODUCT_COUNT = 1903;
+  const FALLBACK_INGREDIENT_COUNT = 5200;
+  const FALLBACK_BRAND_COUNT = 113;
+
+  const latestData = latestRes.status === 'fulfilled' ? latestRes.value : { data: [], meta: { total: 0 } };
+  const brandsData = brands.status === 'fulfilled' ? brands.value : [];
+  const ingredientData = ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0;
+
   return {
     topProducts: topProducts.status === 'fulfilled' ? topProducts.value : [],
-    latest: latestRes.status === 'fulfilled' ? latestRes.value : { data: [], meta: { total: 0 } },
+    latest: {
+      ...latestData,
+      meta: { total: latestData.meta?.total || FALLBACK_PRODUCT_COUNT },
+    },
     categories: categories.status === 'fulfilled' ? categories.value : [],
-    brands: brands.status === 'fulfilled' ? brands.value : [],
-    ingredientCount: ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0,
+    brands: brandsData,
+    brandCount: brandsData.length || FALLBACK_BRAND_COUNT,
+    ingredientCount: ingredientData || FALLBACK_INGREDIENT_COUNT,
   };
 }
 
@@ -131,7 +144,7 @@ function ProductCard({ product }: { product: Product }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, categories, brands, ingredientCount } = await getHomeData();
+  const { topProducts, latest, categories, brands, brandCount, ingredientCount } = await getHomeData();
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
 
   const jsonLd = {
@@ -185,7 +198,7 @@ export default async function HomePage() {
           {[
             { label: 'Ürün', value: latest.meta?.total || 0 },
             { label: 'İçerik', value: ingredientCount || 0 },
-            { label: 'Marka', value: brands.length || 0 },
+            { label: 'Marka', value: brandCount || 0 },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-on-surface">
