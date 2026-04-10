@@ -52,7 +52,7 @@ async function fetchOgImage(url, timeout = 15000) {
 async function main() {
   const limit = parseInt(process.argv[2]) || 200;
 
-  const client = new Client({ connectionString: DB_URL });
+  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
   await client.connect();
   console.log(`DB bağlantısı kuruldu. Limit: ${limit}`);
 
@@ -63,7 +63,7 @@ async function main() {
       al.affiliate_url, al.platform,
       pi.image_id
     FROM products p
-    JOIN product_images pi ON pi.product_id = p.product_id AND pi.image_url LIKE '%dicebear%'
+    JOIN product_images pi ON pi.product_id = p.product_id AND (pi.image_url LIKE '%dicebear%' OR pi.image_url LIKE '%placehold.co%')
     JOIN affiliate_links al ON al.product_id = p.product_id AND al.verification_status = 'valid'
     ORDER BY p.product_id,
       CASE al.platform
@@ -106,8 +106,8 @@ async function main() {
   // Güncel image dağılımı
   const stats = await client.query(`
     SELECT
-      COUNT(*) FILTER (WHERE image_url LIKE '%dicebear%') AS dicebear,
-      COUNT(*) FILTER (WHERE image_url NOT LIKE '%dicebear%') AS real_images,
+      COUNT(*) FILTER (WHERE image_url LIKE '%dicebear%' OR image_url LIKE '%placehold.co%') AS placeholder,
+      COUNT(*) FILTER (WHERE image_url NOT LIKE '%dicebear%' AND image_url NOT LIKE '%placehold.co%') AS real_images,
       COUNT(*) AS total
     FROM product_images
   `);

@@ -72,7 +72,7 @@ async function main() {
     process.exit(1);
   }
 
-  const client = new Client({ connectionString: DB_URL });
+  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
   await client.connect();
   console.log(`DB bağlantısı kuruldu. Platform: ${config.label}, Limit: ${limit}`);
 
