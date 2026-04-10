@@ -102,14 +102,18 @@ function ProductSlot({
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchSuggestions = useCallback(async (q: string) => {
     if (q.length < 2) { setSuggestions([]); return; }
+    setLoading(true);
     try {
       const data = await api.get<Suggestion[]>(`/search/suggest?q=${encodeURIComponent(q)}`);
       setSuggestions((data || []).filter((s) => s.type === 'product'));
     } catch { setSuggestions([]); }
+    setLoading(false);
   }, []);
 
   const handleChange = (val: string) => {
@@ -169,19 +173,28 @@ function ProductSlot({
   }
 
   return (
-    <div className="border-2 border-dashed border-outline-variant/30 rounded-sm p-6 flex flex-col items-center justify-center min-h-[280px] relative">
-      <span className="material-icon text-outline-variant mb-3" style={{ fontSize: '40px' }} aria-hidden="true">add_circle_outline</span>
-      <p className="label-caps text-outline-variant mb-3">Urun Ekle</p>
+    <div
+      onClick={() => inputRef.current?.focus()}
+      className="border-2 border-dashed border-outline-variant/30 rounded-sm p-6 flex flex-col items-center justify-center min-h-[280px] relative cursor-pointer hover:border-primary/40 hover:bg-primary/[0.02] transition-colors group"
+    >
+      <span className="material-icon text-outline-variant mb-3 group-hover:text-primary transition-colors" style={{ fontSize: '40px' }} aria-hidden="true">add_circle_outline</span>
+      <p className="label-caps text-outline-variant mb-3 group-hover:text-primary transition-colors">Ürün Ekle</p>
       <div className="w-full relative">
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => suggestions.length > 0 && setShowSuggest(true)}
           onBlur={() => setTimeout(() => setShowSuggest(false), 200)}
-          placeholder="Urun adi ara..."
+          placeholder="Ürün adı ara..."
           className="curator-input w-full"
         />
+        {loading && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="w-4 h-4 border-2 border-outline-variant/30 border-t-primary rounded-full animate-spin" />
+          </div>
+        )}
         {showSuggest && suggestions.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-outline-variant/20 rounded-sm shadow-lg z-50 max-h-60 overflow-y-auto">
             {suggestions.map((s, i) => (
@@ -194,6 +207,11 @@ function ProductSlot({
                 {s.name}
               </button>
             ))}
+          </div>
+        )}
+        {showSuggest && !loading && suggestions.length === 0 && query.length >= 2 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-outline-variant/20 rounded-sm shadow-lg z-50 px-3 py-3 text-sm text-outline">
+            Sonuç bulunamadı
           </div>
         )}
       </div>
@@ -272,9 +290,10 @@ export default function ComparePage() {
         {products.length < 3 && (
           <button
             onClick={addSlot}
-            className="border-2 border-dashed border-outline-variant/30 rounded-sm p-6 flex items-center justify-center min-h-[280px] text-outline-variant hover:text-primary hover:border-primary/30 transition-colors"
+            className="border-2 border-dashed border-outline-variant/30 rounded-sm p-6 flex flex-col items-center justify-center min-h-[280px] text-outline-variant hover:text-primary hover:border-primary/40 hover:bg-primary/[0.02] transition-colors group"
           >
-            <span className="material-icon" style={{ fontSize: '40px' }} aria-hidden="true">add_circle_outline</span>
+            <span className="material-icon group-hover:scale-110 transition-transform" style={{ fontSize: '40px' }} aria-hidden="true">add_circle_outline</span>
+            <p className="label-caps mt-3">3. Ürün Ekle</p>
           </button>
         )}
       </div>
@@ -425,7 +444,7 @@ export default function ComparePage() {
                           {(p.affiliate_links || []).filter((l) => l.is_active).map((l) => (
                             <a
                               key={l.affiliate_link_id}
-                              href={l.affiliate_url}
+                              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'}/r/${l.affiliate_link_id}`}
                               target="_blank"
                               rel="noopener noreferrer nofollow sponsored"
                               className="label-caps bg-primary/5 text-primary px-2 py-0.5 rounded-sm hover:bg-primary/10 transition-colors"
