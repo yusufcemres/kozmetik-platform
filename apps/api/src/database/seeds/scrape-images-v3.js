@@ -7,7 +7,7 @@
 const { Client } = require('pg');
 const https = require('https');
 
-const DB = 'postgresql://postgres:RRJzwtttqiHAAwjfvNOvNpXXHiXuIxce@tramway.proxy.rlwy.net:23262/railway';
+const DB = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_0KZrPGQxqH5d@ep-solitary-bar-al8ftlrb.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require';
 
 // ─── Rotate User-Agents ───
 const USER_AGENTS = [

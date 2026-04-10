@@ -7,7 +7,7 @@
 const { Client } = require('pg');
 const path = require('path');
 
-const DB = 'postgresql://postgres:RRJzwtttqiHAAwjfvNOvNpXXHiXuIxce@tramway.proxy.rlwy.net:23262/railway';
+const DB = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_0KZrPGQxqH5d@ep-solitary-bar-al8ftlrb.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require';
 
 // ─── Normalize text for comparison ───
 function normalize(text) {
@@ -89,7 +89,7 @@ async function main() {
   const scrapedData = require(path.join(__dirname, 'scraped-images.json'));
   console.log(`Loaded ${scrapedData.length} scraped images\n`);
 
-  const client = new Client(DB);
+  const client = new Client({ connectionString: DB, ssl: { rejectUnauthorized: false } });
   await client.connect();
 
   // Get all products with DiceBear images + brand
@@ -99,10 +99,10 @@ async function main() {
     FROM products p
     JOIN brands b ON b.brand_id = p.brand_id
     JOIN product_images pi ON pi.product_id = p.product_id
-    WHERE pi.image_url LIKE '%dicebear%'
+    WHERE (pi.image_url LIKE '%dicebear%' OR pi.image_url LIKE '%placehold.co%')
     AND pi.image_id = (
       SELECT MIN(pi2.image_id) FROM product_images pi2
-      WHERE pi2.product_id = p.product_id AND pi2.image_url LIKE '%dicebear%'
+      WHERE pi2.product_id = p.product_id AND (pi2.image_url LIKE '%dicebear%' OR pi2.image_url LIKE '%placehold.co%')
     )
     ORDER BY b.brand_name, p.product_id
   `);

@@ -15,24 +15,15 @@ export default function AffiliateLink({
   className?: string;
   children: React.ReactNode;
 }) {
-  const handleClick = () => {
-    fetch(`${API_BASE}/products/affiliate-clicks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        affiliate_link_id: affiliateLinkId,
-        source_page: sourcePage,
-      }),
-    }).catch(() => {}); // fire-and-forget
-  };
+  // Redirect endpoint: click tracking + tracking param injection + 302
+  const redirectUrl = `${API_BASE}/r/${affiliateLinkId}`;
 
   return (
     <a
-      href={href}
+      href={redirectUrl}
       target="_blank"
       rel="noopener noreferrer nofollow sponsored"
       className={className}
-      onClick={handleClick}
     >
       {children}
     </a>

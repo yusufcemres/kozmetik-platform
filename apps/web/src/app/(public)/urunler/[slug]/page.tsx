@@ -325,6 +325,23 @@ export default async function ProductDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kozmetik-platform.vercel.app' },
+              { '@type': 'ListItem', position: 2, name: 'Ürünler', item: 'https://kozmetik-platform.vercel.app/urunler' },
+              ...(product.category
+                ? [{ '@type': 'ListItem', position: 3, name: product.category.category_name }]
+                : []),
+              { '@type': 'ListItem', position: product.category ? 4 : 3, name: product.product_name },
+            ],
+          }),
+        }}
+      />
 
       <ProductViewTracker
         product_id={product.product_id}
