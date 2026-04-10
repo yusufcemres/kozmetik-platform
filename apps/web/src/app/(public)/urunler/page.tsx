@@ -332,7 +332,7 @@ function ProductsListContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             {products.map((product) => {
               const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
-              const isDiceBear = primaryImg?.includes('dicebear.com') || primaryImg?.includes('api.dicebear');
+              const isDiceBear = primaryImg?.includes('dicebear') || primaryImg?.includes('placehold.co');
               const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
               const avgScore = product.top_need_score ? Math.round(Number(product.top_need_score)) : null;
 

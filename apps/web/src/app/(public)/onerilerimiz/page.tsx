@@ -199,9 +199,10 @@ export default async function RecommendationsPage() {
               if (!topProduct?.product) return null;
               const product = topProduct.product;
               const score = Math.round(Number(topProduct.compatibility_score));
-              const img =
+              const rawImg =
                 product.images?.find((i) => i.sort_order === 0)?.image_url ||
                 product.images?.[0]?.image_url;
+              const img = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
               const link = cheapestLink(product.affiliate_links);
 
               return (

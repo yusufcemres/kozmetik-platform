@@ -137,7 +137,8 @@ function ProductSlot({
   };
 
   if (product) {
-    const imgUrl = product.images?.[0]?.image_url;
+    const rawImgUrl = product.images?.[0]?.image_url;
+    const imgUrl = rawImgUrl?.includes('placehold.co') || rawImgUrl?.includes('dicebear') ? undefined : rawImgUrl;
     const score = avgScore(product);
     return (
       <div className="curator-card overflow-hidden relative">

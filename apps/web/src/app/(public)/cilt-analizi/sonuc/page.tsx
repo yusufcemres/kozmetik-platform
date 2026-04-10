@@ -695,7 +695,8 @@ function ResultsContent() {
             {products.slice(0, 8).map((ps, idx) => {
               const product = ps.product!;
               const score = Math.round(Number(ps.compatibility_score));
-              const img = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+              const rawImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+              const img = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
               const cheapest = product.affiliate_links?.reduce((min, l) =>
                 l.price_snapshot && (!min.price_snapshot || l.price_snapshot < min.price_snapshot) ? l : min,
                 product.affiliate_links?.[0],

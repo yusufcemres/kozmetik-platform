@@ -306,7 +306,8 @@ export default async function ProductDetailPage({
     product.brand?.brand_id,
   );
 
-  const imageUrl = product.images?.[0]?.image_url;
+  const rawImageUrl = product.images?.[0]?.image_url;
+  const imageUrl = rawImageUrl?.includes('placehold.co') || rawImageUrl?.includes('dicebear') ? undefined : rawImageUrl;
   const sortedIngredients = [...(product.ingredients || [])].sort(
     (a, b) => a.inci_order_rank - b.inci_order_rank,
   );
@@ -836,8 +837,10 @@ export default async function ProductDetailPage({
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {similarProducts.map((sp) => {
-                const spImg = sp.images?.find(i => i.sort_order === 0)?.image_url || sp.images?.[0]?.image_url;
-                const spHover = sp.images?.find(i => i.sort_order === 1)?.image_url;
+                const rawSpImg = sp.images?.find(i => i.sort_order === 0)?.image_url || sp.images?.[0]?.image_url;
+                const spImg = rawSpImg?.includes('placehold.co') || rawSpImg?.includes('dicebear') ? undefined : rawSpImg;
+                const rawSpHover = sp.images?.find(i => i.sort_order === 1)?.image_url;
+                const spHover = rawSpHover?.includes('placehold.co') || rawSpHover?.includes('dicebear') ? undefined : rawSpHover;
                 const spScore = sp.need_scores?.length
                   ? Math.round(sp.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) / sp.need_scores.length)
                   : null;

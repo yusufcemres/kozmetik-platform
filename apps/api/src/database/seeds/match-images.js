@@ -119,7 +119,7 @@ async function main() {
 
   let updated = 0, noMatch = 0;
   const matches = [];
-  const THRESHOLD = 0.25; // Minimum similarity to accept
+  const THRESHOLD = 0.15; // Lowered from 0.25 for broader matching
 
   for (const product of products) {
     const brandKey = normalize(product.brand_name);
@@ -179,9 +179,9 @@ async function main() {
   // Verify final stats
   const verify = await client.query(`
     SELECT
-      COUNT(*) FILTER (WHERE image_url LIKE '%dicebear%') as dicebear,
+      COUNT(*) FILTER (WHERE image_url LIKE '%dicebear%' OR image_url LIKE '%placehold.co%') as placeholder,
       COUNT(*) FILTER (WHERE image_url LIKE '%dsmcdn%') as trendyol_cdn,
-      COUNT(*) FILTER (WHERE image_url NOT LIKE '%dicebear%') as real_total,
+      COUNT(*) FILTER (WHERE image_url NOT LIKE '%dicebear%' AND image_url NOT LIKE '%placehold.co%') as real_total,
       COUNT(*) as total
     FROM product_images
   `);
