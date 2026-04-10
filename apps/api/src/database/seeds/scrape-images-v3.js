@@ -119,7 +119,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function rand(min, max) { return min + Math.random() * (max - min); }
 
 async function main() {
-  const client = new Client(DB);
+  const client = new Client({ connectionString: DB, ssl: { rejectUnauthorized: false } });
   await client.connect();
   console.log('Connected.\n');
 
@@ -129,10 +129,10 @@ async function main() {
     FROM products p
     JOIN brands b ON b.brand_id = p.brand_id
     JOIN product_images pi ON pi.product_id = p.product_id
-    WHERE pi.image_url LIKE '%dicebear%'
+    WHERE (pi.image_url LIKE '%dicebear%' OR pi.image_url LIKE '%placehold.co%')
     AND pi.image_id = (
       SELECT MIN(pi2.image_id) FROM product_images pi2
-      WHERE pi2.product_id = p.product_id AND pi2.image_url LIKE '%dicebear%'
+      WHERE pi2.product_id = p.product_id AND (pi2.image_url LIKE '%dicebear%' OR pi2.image_url LIKE '%placehold.co%')
     )
     ORDER BY b.brand_name, p.product_id
   `);
