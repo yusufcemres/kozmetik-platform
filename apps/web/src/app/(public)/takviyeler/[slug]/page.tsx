@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, API_BASE_URL } from '@/lib/api';
 
 // === Types ===
 
@@ -372,7 +372,7 @@ export default async function SupplementDetailPage({
                 {activeLinks.map((link) => (
                   <a
                     key={link.affiliate_link_id}
-                    href={link.affiliate_url}
+                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
                     className="border border-outline-variant/30 rounded-sm p-4 text-center min-w-[140px] hover:border-primary hover:bg-primary/5 transition-all"

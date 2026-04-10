@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, API_BASE_URL } from '@/lib/api';
 
 // === Types ===
 
@@ -259,9 +259,9 @@ export default async function RecommendationsPage() {
                   </div>
                   {link && (
                     <a
-                      href={`${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=onerilerimiz&utm_content=${product.product_slug}`}
+                      href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noopener noreferrer nofollow sponsored"
                       className="shrink-0 bg-primary text-on-primary px-4 py-2 rounded-sm text-xs font-medium hover:bg-primary/90 transition-colors hidden sm:flex items-center gap-1.5"
                     >
                       <span className="material-icon material-icon-sm" aria-hidden="true">

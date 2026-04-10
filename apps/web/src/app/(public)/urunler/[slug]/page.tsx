@@ -781,11 +781,10 @@ export default async function ProductDetailPage({
                 {sorted.map((link) => {
                   const isCheapest = link.price_snapshot && Number(link.price_snapshot) === minPrice && prices.length >= 2;
                   const pInfo = PLATFORM_INFO[link.platform];
-                  const utmUrl = `${link.affiliate_url}${link.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=urun-detay&utm_content=${product.product_slug}`;
                   return (
                     <AffiliateLink
                       key={link.affiliate_link_id}
-                      href={utmUrl}
+                      href={link.affiliate_url}
                       affiliateLinkId={link.affiliate_link_id}
                       className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                     >

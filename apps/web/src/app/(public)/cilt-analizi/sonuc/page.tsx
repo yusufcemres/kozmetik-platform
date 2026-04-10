@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { api } from '@/lib/api';
+import { api, API_BASE_URL } from '@/lib/api';
 
 // === Types ===
 
@@ -746,9 +746,9 @@ function ResultsContent() {
                     <div className="flex items-center gap-2 shrink-0">
                       {cheapest && (
                         <a
-                          href={`${cheapest.affiliate_url}${cheapest.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=cilt-analizi`}
+                          href={`${API_BASE_URL}/r/${cheapest.affiliate_link_id}`}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          rel="noopener noreferrer nofollow sponsored"
                           className="bg-primary text-on-primary px-4 py-2 rounded-sm text-xs font-medium hover:bg-primary/90 transition-colors hidden sm:block"
                         >
                           {cheapest.price_snapshot ? `₺${Number(cheapest.price_snapshot).toFixed(0)}` : 'Satın Al'}
@@ -794,9 +794,9 @@ function ResultsContent() {
                       {/* Mobile buy button */}
                       {cheapest && (
                         <a
-                          href={`${cheapest.affiliate_url}${cheapest.affiliate_url.includes('?') ? '&' : '?'}utm_source=revela&utm_medium=affiliate&utm_campaign=cilt-analizi`}
+                          href={`${API_BASE_URL}/r/${cheapest.affiliate_link_id}`}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          rel="noopener noreferrer nofollow sponsored"
                           className="sm:hidden mt-3 w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-2.5 rounded-sm text-xs font-medium"
                         >
                           {cheapest.price_snapshot ? `₺${Number(cheapest.price_snapshot).toFixed(0)} — ` : ''}Satın Al
