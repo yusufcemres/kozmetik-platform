@@ -187,6 +187,8 @@ function effectTypeLabel(type: string): string {
     indirect_support: 'Dolaylı Destek',
     complementary: 'Tamamlayıcı',
     caution_related: 'Dikkat',
+    positive: 'Olumlu Etki',
+    negative: 'Olumsuz Etki',
   };
   return map[type] || type.replace(/_/g, ' ');
 }
