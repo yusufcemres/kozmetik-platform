@@ -180,11 +180,13 @@
   }
 
   .curator-card {
-    @apply bg-surface-container-lowest border border-outline-variant/30 rounded-md transition-all duration-500;
+    @apply bg-surface-container-lowest border rounded-md transition-all duration-500;
+    border-color: color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
   }
 
   .curator-card:hover {
-    @apply shadow-lg shadow-black/5 border-outline/40;
+    @apply shadow-lg shadow-black/5;
+    border-color: color-mix(in srgb, var(--color-outline) 40%, transparent);
   }
 
   .curator-btn {
@@ -200,7 +202,12 @@
   }
 
   .curator-input {
-    @apply w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-md text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors;
+    @apply w-full px-4 py-3 bg-surface-container-lowest border rounded-md text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-1 transition-colors;
+    border-color: color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+  }
+  .curator-input:focus {
+    border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+    --tw-ring-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
 
   .curator-section {
@@ -208,7 +215,8 @@
   }
 
   .curator-divider {
-    @apply h-px bg-outline-variant/20;
+    @apply h-px;
+    background-color: color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
   }
 }
 
