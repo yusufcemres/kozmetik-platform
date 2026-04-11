@@ -43,6 +43,7 @@ interface NutritionFact {
     inci_name: string;
     ingredient_slug: string;
     common_name?: string;
+    function_summary?: string;
     food_sources?: FoodSource[];
     daily_recommended_value?: number;
     daily_recommended_unit?: string;
@@ -403,6 +404,45 @@ export default async function SupplementDetailPage({
             </div>
           )}
         </section>
+
+        {/* Ingredient Functions */}
+        {nutritionFacts.some(nf => nf.ingredient?.function_summary) && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">science</span>
+              Bu Bileşenler Ne İşe Yarar?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {nutritionFacts
+                .filter(nf => nf.ingredient?.function_summary)
+                .map((nf) => {
+                  const ing = nf.ingredient!;
+                  return (
+                    <Link
+                      key={nf.supplement_ingredient_id}
+                      href={`/icerikler/${ing.ingredient_slug}`}
+                      className="curator-card p-4 group hover:border-primary/30 transition-all"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="material-icon text-primary text-[16px]" aria-hidden="true">biotech</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors">
+                            {ing.common_name || ing.inci_name}
+                          </p>
+                          <p className="text-xs text-on-surface-variant leading-relaxed mt-1">
+                            {ing.function_summary}
+                          </p>
+                        </div>
+                        <span className="material-icon text-outline-variant text-[16px] shrink-0 group-hover:text-primary transition-colors" aria-hidden="true">arrow_forward</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+            </div>
+          </section>
+        )}
 
         {/* Food Sources */}
         {nutritionFacts.some(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0) && (
