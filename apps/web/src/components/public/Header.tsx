@@ -20,6 +20,7 @@ const EXPLORE_ITEMS = [
 ];
 
 const NAV_ITEMS = [
+  { href: '/takviyeler', label: 'Takviyeler' },
   { href: '/cilt-analizi', label: 'Cilt Analizi' },
   { href: '/karsilastir', label: 'Karşılaştır' },
 ];

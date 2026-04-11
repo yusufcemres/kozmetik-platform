@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
@@ -110,10 +111,10 @@ export async function generateMetadata({
 function formLabel(form: string): string {
   const map: Record<string, string> = {
     tablet: 'Tablet',
-    capsule: 'Kapsul',
+    capsule: 'Kapsül',
     softgel: 'Softgel',
     powder: 'Toz',
-    liquid: 'Sivi',
+    liquid: 'Sıvı',
     gummy: 'Gummy',
     spray: 'Sprey',
     drop: 'Damla',
@@ -128,7 +129,7 @@ function platformLabel(p: string): string {
     amazon_tr: 'Amazon TR',
     dermoeczanem: 'Dermoeczanem',
     gratis: 'Gratis',
-    other: 'Diger',
+    other: 'Diğer',
   };
   return map[p] || p;
 }
@@ -209,26 +210,67 @@ export default async function SupplementDetailPage({
           <span className="text-on-surface-variant">{product.product_name}</span>
         </nav>
 
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <span className="material-icon text-primary" style={{ fontSize: '40px' }} aria-hidden="true">medication</span>
-          <div>
+        {/* Header with Image */}
+        <div className="flex flex-col md:flex-row gap-8 mb-8">
+          {/* Product Image */}
+          <div className="w-full md:w-[300px] shrink-0">
+            <div className="curator-card overflow-hidden aspect-square flex items-center justify-center bg-surface-container-low p-4">
+              {product.images?.[0]?.image_url ? (
+                <Image
+                  src={product.images[0].image_url}
+                  alt={product.product_name}
+                  width={280}
+                  height={280}
+                  className="object-contain w-full h-full"
+                  unoptimized
+                />
+              ) : (
+                <span className="material-icon text-outline-variant" style={{ fontSize: '80px' }} aria-hidden="true">medication</span>
+              )}
+            </div>
+          </div>
+
+          {/* Product Info */}
+          <div className="flex-1">
             {product.brand && (
-              <p className="label-caps text-outline">
+              <p className="label-caps text-outline mb-1">
                 {product.brand.brand_name}
               </p>
             )}
-            <h1 className="text-2xl md:text-3xl headline-tight text-on-surface">
+            <h1 className="text-2xl md:text-3xl headline-tight text-on-surface mb-3">
               {product.product_name}
             </h1>
+
+            {product.short_description && (
+              <p className="text-on-surface-variant leading-relaxed mb-4">
+                {product.short_description}
+              </p>
+            )}
+
+            {/* Quick price section */}
+            {activeLinks.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-4">
+                {activeLinks.map((link) => (
+                  <a
+                    key={link.affiliate_link_id}
+                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow sponsored"
+                    className="inline-flex items-center gap-2 border border-outline-variant/30 rounded-sm px-4 py-2.5 hover:border-primary hover:bg-primary/5 transition-all"
+                  >
+                    <span className="font-semibold text-sm text-on-surface">{platformLabel(link.platform)}</span>
+                    {link.price_snapshot ? (
+                      <span className="text-lg font-bold text-primary">{formatPrice(link.price_snapshot)}</span>
+                    ) : (
+                      <span className="text-sm text-outline">Fiyat bilgisi yok</span>
+                    )}
+                    <span className="material-icon text-primary text-[16px]" aria-hidden="true">arrow_forward</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {product.short_description && (
-          <p className="text-on-surface-variant leading-relaxed mb-8">
-            {product.short_description}
-          </p>
-        )}
 
         {/* Supplement Info */}
         {detail && (
@@ -260,7 +302,7 @@ export default async function SupplementDetailPage({
             </div>
             {detail.recommended_use && (
               <div className="mt-4 pt-4 border-t border-outline-variant/20">
-                <span className="label-caps text-outline">Onerilen Kullanim</span>
+                <span className="label-caps text-outline">Önerilen Kullanım</span>
                 <p className="text-sm font-medium text-on-surface mt-0.5">
                   {detail.recommended_use}
                 </p>
@@ -268,12 +310,12 @@ export default async function SupplementDetailPage({
             )}
             {detail.manufacturer_country && (
               <p className="label-caps text-outline mt-3">
-                Uretim: {detail.manufacturer_country}
+                Üretim: {detail.manufacturer_country}
               </p>
             )}
             {detail.requires_prescription && (
               <div className="mt-3 label-caps text-error bg-error/10 px-3 py-1.5 rounded-sm inline-block">
-                Recete gerektirebilir
+                Reçete gerektirebilir
               </div>
             )}
           </section>
@@ -282,14 +324,14 @@ export default async function SupplementDetailPage({
         {/* Nutrition Facts */}
         <section className="mb-8">
           <h2 className="text-xl font-bold text-on-surface mb-4">
-            Besin Degerleri (Nutrition Facts)
+            Besin Değerleri (Nutrition Facts)
           </h2>
           {nutritionFacts.length > 0 ? (
             <div className="curator-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-surface-container-low">
                   <tr>
-                    <th className="text-left px-4 py-3 label-caps text-on-surface-variant">Icerik</th>
+                    <th className="text-left px-4 py-3 label-caps text-on-surface-variant">İçerik</th>
                     <th className="text-right px-4 py-3 label-caps text-on-surface-variant">Miktar</th>
                     <th className="text-right px-4 py-3 label-caps text-on-surface-variant">% GRD</th>
                   </tr>
@@ -341,12 +383,12 @@ export default async function SupplementDetailPage({
                 </tbody>
               </table>
               <div className="px-4 py-2 bg-surface-container-low label-caps text-outline">
-                * GRD (Günlük Referans Değer) belirtilmemiş
+                * GRD (Günlük Referans Değer) belirtilmemiş.
               </div>
             </div>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
-              Besin bilgileri henüz eklenmemiş
+              Besin bilgileri henüz eklenmemiş.
             </div>
           )}
         </section>
@@ -354,7 +396,7 @@ export default async function SupplementDetailPage({
         {/* Warnings */}
         {detail?.warnings && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Uyarilar</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-3">Uyarılar</h2>
             <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-4">
               <p className="text-sm text-on-surface-variant leading-relaxed">
                 {detail.warnings}
@@ -366,7 +408,7 @@ export default async function SupplementDetailPage({
         {/* Affiliate Links */}
         {activeLinks.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4">Nereden Alinir?</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-4">Nereden Alınır?</h2>
             <div className="curator-card p-6">
               <div className="flex flex-wrap gap-4">
                 {activeLinks.map((link) => (
@@ -388,13 +430,13 @@ export default async function SupplementDetailPage({
                       <p className="text-sm text-outline">Fiyat bilgisi yok</p>
                     )}
                     <p className="label-caps text-primary mt-1 flex items-center justify-center gap-1">
-                      Satin Al <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                      Satın Al <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
                     </p>
                   </a>
                 ))}
               </div>
               <p className="text-xs text-outline mt-4">
-                Bagimsiz platformuz, komisyon alinan linkler icerebilir.
+                Bağımsız platformuz, komisyon alınan linkler içerebilir.
               </p>
             </div>
           </section>
@@ -407,7 +449,7 @@ export default async function SupplementDetailPage({
             className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">arrow_back</span>
-            Tum Takviyeler
+            Tüm Takviyeler
           </Link>
         </div>
       </article>
