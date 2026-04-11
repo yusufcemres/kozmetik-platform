@@ -34,8 +34,8 @@ interface Brand {
 
 async function getHomeData() {
   const [topProducts, latestRes, categories, brands, ingredientCountRes] = await Promise.allSettled([
-    apiFetch<Product[]>('/products/top-scored?limit=8', { next: { revalidate: 3600 } } as any),
-    apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1', { next: { revalidate: 1800 } } as any),
+    apiFetch<Product[]>('/products/top-scored?limit=8&domain_type=cosmetic', { next: { revalidate: 3600 } } as any),
+    apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=cosmetic', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
     apiFetch<Brand[]>('/products/popular-brands?limit=12', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),

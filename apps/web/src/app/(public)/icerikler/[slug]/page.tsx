@@ -147,25 +147,25 @@ function evidenceLabel(level: string): { label: string; color: string } {
   const map: Record<string, { label: string; color: string }> = {
     systematic_review: { label: 'Sistematik Derleme', color: 'text-score-high' },
     randomized_controlled: { label: 'Randomize Kontrollu', color: 'text-score-high' },
-    cohort_study: { label: 'Kohort Calisma', color: 'text-primary' },
+    cohort_study: { label: 'Kohort Çalışma', color: 'text-primary' },
     case_control: { label: 'Vaka-Kontrol', color: 'text-primary' },
-    expert_opinion: { label: 'Uzman Gorusu', color: 'text-score-medium' },
+    expert_opinion: { label: 'Uzman Görüşü', color: 'text-score-medium' },
     in_vitro: { label: 'In Vitro', color: 'text-on-surface-variant' },
-    traditional_use: { label: 'Geleneksel Kullanim', color: 'text-on-surface-variant' },
+    traditional_use: { label: 'Geleneksel Kullanım', color: 'text-on-surface-variant' },
     anecdotal: { label: 'Anekdotal', color: 'text-outline' },
-    strong: { label: 'Guclu Kanit', color: 'text-score-high' },
-    moderate: { label: 'Orta Kanit', color: 'text-primary' },
-    limited: { label: 'Sinirli Kanit', color: 'text-score-medium' },
-    insufficient: { label: 'Yetersiz Kanit', color: 'text-outline' },
+    strong: { label: 'Güçlü Kanıt', color: 'text-score-high' },
+    moderate: { label: 'Orta Kanıt', color: 'text-primary' },
+    limited: { label: 'Sınırlı Kanıt', color: 'text-score-medium' },
+    insufficient: { label: 'Yetersiz Kanıt', color: 'text-outline' },
   };
   return map[level] || { label: level.replace(/_/g, ' '), color: 'text-outline' };
 }
 
 function originLabel(type: string): string {
   const map: Record<string, string> = {
-    natural: 'Dogal',
+    natural: 'Doğal',
     synthetic: 'Sentetik',
-    semi_synthetic: 'Yari-sentetik',
+    semi_synthetic: 'Yarı-sentetik',
     biotechnology: 'Biyoteknoloji',
   };
   return map[type] || type;
@@ -173,9 +173,9 @@ function originLabel(type: string): string {
 
 function safetyClassLabel(cls: string): { label: string; color: string; icon: string } {
   const map: Record<string, { label: string; color: string; icon: string }> = {
-    beneficial: { label: 'Faydali', color: 'text-score-high bg-score-high/10', icon: 'verified' },
-    neutral: { label: 'Notr', color: 'text-on-surface-variant bg-surface-container-low', icon: 'remove_circle_outline' },
-    questionable: { label: 'Tartismali', color: 'text-score-medium bg-score-medium/10', icon: 'help_outline' },
+    beneficial: { label: 'Faydalı', color: 'text-score-high bg-score-high/10', icon: 'verified' },
+    neutral: { label: 'Nötr', color: 'text-on-surface-variant bg-surface-container-low', icon: 'remove_circle_outline' },
+    questionable: { label: 'Tartışmalı', color: 'text-score-medium bg-score-medium/10', icon: 'help_outline' },
     harmful: { label: 'Riskli', color: 'text-error bg-error/10', icon: 'dangerous' },
   };
   return map[cls] || { label: cls, color: 'text-outline', icon: 'info' };
@@ -183,9 +183,9 @@ function safetyClassLabel(cls: string): { label: string; color: string; icon: st
 
 function effectTypeLabel(type: string): string {
   const map: Record<string, string> = {
-    direct_support: 'Dogrudan Destek',
-    indirect_support: 'Dolayli Destek',
-    complementary: 'Tamamlayici',
+    direct_support: 'Doğrudan Destek',
+    indirect_support: 'Dolaylı Destek',
+    complementary: 'Tamamlayıcı',
     caution_related: 'Dikkat',
   };
   return map[type] || type.replace(/_/g, ' ');
@@ -197,7 +197,7 @@ function sourceTypeLabel(type: string): string {
     journal: 'Bilimsel Dergi',
     book: 'Kitap',
     fda: 'FDA',
-    eu_regulation: 'AB Regulasyonu',
+    eu_regulation: 'AB Regülasyonu',
   };
   return map[type] || type;
 }
@@ -268,7 +268,7 @@ export default async function IngredientDetailPage({
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/icerikler" className="hover:text-primary transition-colors">
-            Icerikler
+            İçerikler
           </Link>
           <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
           <span className="text-on-surface-variant">{ingredient.inci_name}</span>
@@ -288,7 +288,7 @@ export default async function IngredientDetailPage({
           {/* Aliases */}
           {ingredient.aliases && ingredient.aliases.length > 0 && (
             <p className="text-sm text-outline mt-2">
-              Diger adlari:{' '}
+              Diğer adları:{' '}
               {ingredient.aliases.map((a) => a.alias_name).join(', ')}
             </p>
           )}
@@ -351,7 +351,7 @@ export default async function IngredientDetailPage({
         {/* Function Summary */}
         {ingredient.function_summary && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Ne Ise Yarar?</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-3">Ne İşe Yarar?</h2>
             <p className="text-on-surface-variant leading-relaxed">
               {ingredient.function_summary}
             </p>
@@ -361,7 +361,7 @@ export default async function IngredientDetailPage({
         {/* Detailed Description */}
         {ingredient.detailed_description && (
           <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Detayli Bilgi</h2>
+            <h2 className="text-xl font-bold text-on-surface mb-3">Detaylı Bilgi</h2>
             <div className="bg-surface-container-low rounded-sm p-5">
               <p className="text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {ingredient.detailed_description}
@@ -373,21 +373,21 @@ export default async function IngredientDetailPage({
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="curator-card p-4">
-            <p className="label-caps text-outline mb-1">Kanit Seviyesi</p>
+            <p className="label-caps text-outline mb-1">Kanıt Seviyesi</p>
             <p className={`text-lg font-bold ${evidence ? evidence.color : 'text-outline'}`}>
-              {evidence ? evidence.label : 'Belirtilmemis'}
+              {evidence ? evidence.label : 'Belirtilmemiş'}
             </p>
           </div>
           <div className="curator-card p-4">
             <p className="label-caps text-outline mb-1">Grup</p>
             <p className="text-lg font-bold text-on-surface">
-              {ingredient.ingredient_group || 'Belirtilmemis'}
+              {ingredient.ingredient_group || 'Belirtilmemiş'}
             </p>
           </div>
           <div className="curator-card p-4">
             <p className="label-caps text-outline mb-1">Kaynak</p>
             <p className="text-lg font-bold text-on-surface">
-              {ingredient.origin_type ? originLabel(ingredient.origin_type) : 'Belirtilmemis'}
+              {ingredient.origin_type ? originLabel(ingredient.origin_type) : 'Belirtilmemiş'}
             </p>
           </div>
         </div>
@@ -444,7 +444,7 @@ export default async function IngredientDetailPage({
           <section className="mb-8">
             <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
               <span className="material-icon text-primary" aria-hidden="true">target</span>
-              Hangi Ihtiyaclara Iyi Gelir?
+              Hangi İhtiyaçlara İyi Gelir?
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {sortedMappings.slice(0, 8).map((m) => {
@@ -481,7 +481,7 @@ export default async function IngredientDetailPage({
           <div className="bg-surface-container-low border border-outline-variant/20 rounded-sm p-4 mb-8">
             <p className="text-sm font-semibold text-on-surface mb-1 flex items-center gap-1.5">
               <span className="material-icon text-[16px]" aria-hidden="true">shield</span>
-              Guvenlik Notu
+              Güvenlik Notu
             </p>
             <p className="text-sm text-on-surface-variant leading-relaxed">{ingredient.safety_note}</p>
           </div>
@@ -492,20 +492,20 @@ export default async function IngredientDetailPage({
           <section className="mb-8">
             <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
               <span className="material-icon text-primary" aria-hidden="true">restaurant</span>
-              Dogal Kaynaklar
+              Doğal Kaynaklar
             </h2>
             {ingredient.daily_recommended_value && (
               <p className="text-sm text-on-surface-variant mb-4">
-                Gunluk onerilen miktar: <strong>{ingredient.daily_recommended_value} {ingredient.daily_recommended_unit || 'mg'}</strong>
+                Günlük önerilen miktar: <strong>{ingredient.daily_recommended_value} {ingredient.daily_recommended_unit || 'mg'}</strong>
               </p>
             )}
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-outline-variant/20">
-                    <th className="text-left py-2 px-3 label-caps text-outline">Gida</th>
+                    <th className="text-left py-2 px-3 label-caps text-outline">Gıda</th>
                     <th className="text-right py-2 px-3 label-caps text-outline">100g&apos;da</th>
-                    <th className="text-right py-2 px-3 label-caps text-outline">Biyoyararlanim</th>
+                    <th className="text-right py-2 px-3 label-caps text-outline">Biyoyararlanım</th>
                     <th className="text-left py-2 px-3 label-caps text-outline">Not</th>
                   </tr>
                 </thead>
@@ -530,7 +530,7 @@ export default async function IngredientDetailPage({
               </table>
             </div>
             <p className="text-xs text-outline mt-3">
-              Gidalardan alinan vitaminlerin biyoyararlanimi genellikle takviyelerden daha yuksektir. Dengeli beslenme takviyeye tercih edilmelidir.
+              Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir. Dengeli beslenme takviyeye tercih edilmelidir.
             </p>
           </section>
         )}
@@ -540,10 +540,10 @@ export default async function IngredientDetailPage({
           <section className="mb-8">
             <div className="flex items-end justify-between mb-4">
               <h2 className="text-xl font-bold text-on-surface">
-                Bu Icerigi Barindiran Urunler
+                Bu İçeriği Barındıran Ürünler
               </h2>
               <span className="label-caps text-outline">
-                {products.length} urun
+                {products.length} ürün
               </span>
             </div>
             <div className="relative">
@@ -608,7 +608,7 @@ export default async function IngredientDetailPage({
                 href={`/urunler?ingredient=${ingredient.ingredient_slug}`}
                 className="inline-flex items-center gap-1 label-caps text-primary mt-3 hover:underline underline-offset-4"
               >
-                Tum {products.length} urunu gor <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                Tüm {products.length} ürünü gör <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
               </Link>
             )}
           </section>
@@ -621,7 +621,7 @@ export default async function IngredientDetailPage({
             className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">arrow_back</span>
-            Tum Icerik Maddeleri
+            Tüm İçerik Maddeleri
           </Link>
         </div>
       </article>

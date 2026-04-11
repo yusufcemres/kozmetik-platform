@@ -23,6 +23,14 @@ interface Product {
   }[];
 }
 
+interface FoodSource {
+  food_name: string;
+  amount_per_100g: number;
+  unit: string;
+  bioavailability?: string;
+  note?: string;
+}
+
 interface NutritionFact {
   supplement_ingredient_id: number;
   amount_per_serving: number | null;
@@ -35,6 +43,9 @@ interface NutritionFact {
     inci_name: string;
     ingredient_slug: string;
     common_name?: string;
+    food_sources?: FoodSource[];
+    daily_recommended_value?: number;
+    daily_recommended_unit?: string;
   };
 }
 
@@ -358,7 +369,7 @@ export default async function SupplementDetailPage({
                       </td>
                       <td className="px-4 py-3 text-right text-on-surface-variant">
                         {nf.amount_per_serving != null
-                          ? `${nf.amount_per_serving} ${nf.unit || ''}`
+                          ? `${Number.isInteger(Number(nf.amount_per_serving)) ? Math.round(Number(nf.amount_per_serving)) : Number(nf.amount_per_serving).toFixed(1)} ${nf.unit || ''}`
                           : '-'}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -393,6 +404,103 @@ export default async function SupplementDetailPage({
           )}
         </section>
 
+        {/* Food Sources */}
+        {nutritionFacts.some(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0) && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">restaurant</span>
+              Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?
+            </h2>
+            <p className="text-sm text-on-surface-variant mb-6">
+              Takviye yerine veya yanında tüketebileceğiniz doğal gıda kaynakları.
+            </p>
+
+            <div className="space-y-6">
+              {nutritionFacts
+                .filter(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0)
+                .map((nf) => {
+                  const ing = nf.ingredient!;
+                  const dose = Number(nf.amount_per_serving) || 0;
+                  const doseUnit = nf.unit || '';
+                  return (
+                    <div key={nf.supplement_ingredient_id} className="curator-card overflow-hidden">
+                      <div className="bg-surface-container-low px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="material-icon text-primary text-[18px]" aria-hidden="true">eco</span>
+                          <h3 className="font-semibold text-on-surface text-sm">
+                            {ing.common_name || ing.inci_name}
+                            {dose > 0 && <span className="text-on-surface-variant font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
+                          </h3>
+                        </div>
+                        {ing.daily_recommended_value && (
+                          <span className="label-caps text-outline">
+                            Günlük önerilen: {ing.daily_recommended_value} {ing.daily_recommended_unit || 'mg'}
+                          </span>
+                        )}
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-outline-variant/20">
+                              <th className="text-left px-4 py-2 label-caps text-outline">Gıda</th>
+                              <th className="text-right px-4 py-2 label-caps text-outline">100g&apos;da</th>
+                              {dose > 0 && (
+                                <th className="text-right px-4 py-2 label-caps text-outline">
+                                  {Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit} için
+                                </th>
+                              )}
+                              <th className="text-center px-4 py-2 label-caps text-outline">Biyoyararlanım</th>
+                              <th className="text-left px-4 py-2 label-caps text-outline hidden sm:table-cell">Not</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-outline-variant/10">
+                            {ing.food_sources!.map((fs, i) => {
+                              const neededGrams = dose > 0 && fs.amount_per_100g > 0
+                                ? Math.round((dose / fs.amount_per_100g) * 100)
+                                : null;
+                              return (
+                                <tr key={i} className="hover:bg-surface-container-low/50 transition-colors">
+                                  <td className="px-4 py-2.5 font-medium text-on-surface">{fs.food_name}</td>
+                                  <td className="px-4 py-2.5 text-right text-on-surface-variant">
+                                    {fs.amount_per_100g > 0 ? `${fs.amount_per_100g} ${fs.unit}` : '-'}
+                                  </td>
+                                  {dose > 0 && (
+                                    <td className="px-4 py-2.5 text-right">
+                                      {neededGrams !== null ? (
+                                        <span className={`font-semibold ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                          ~{neededGrams}g
+                                        </span>
+                                      ) : '-'}
+                                    </td>
+                                  )}
+                                  <td className="px-4 py-2.5 text-center">
+                                    {fs.bioavailability && (
+                                      <span className={`label-caps px-2 py-0.5 rounded-sm ${
+                                        fs.bioavailability === 'Yüksek' ? 'text-score-high bg-score-high/10' :
+                                        fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
+                                        'text-outline bg-surface-container-low'
+                                      }`}>{fs.bioavailability}</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-2.5 text-xs text-on-surface-variant hidden sm:table-cell">{fs.note || ''}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <p className="text-xs text-outline mt-4 flex items-start gap-1.5">
+              <span className="material-icon text-[14px] mt-0.5" aria-hidden="true">info</span>
+              Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir. Dengeli beslenme takviyeye tercih edilmelidir.
+            </p>
+          </section>
+        )}
+
         {/* Warnings */}
         {detail?.warnings && (
           <section className="mb-8">
@@ -400,43 +508,6 @@ export default async function SupplementDetailPage({
             <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-4">
               <p className="text-sm text-on-surface-variant leading-relaxed">
                 {detail.warnings}
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* Affiliate Links */}
-        {activeLinks.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4">Nereden Alınır?</h2>
-            <div className="curator-card p-6">
-              <div className="flex flex-wrap gap-4">
-                {activeLinks.map((link) => (
-                  <a
-                    key={link.affiliate_link_id}
-                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow sponsored"
-                    className="border border-outline-variant/30 rounded-sm p-4 text-center min-w-[140px] hover:border-primary hover:bg-primary/5 transition-all"
-                  >
-                    <p className="font-semibold text-sm text-on-surface mb-1">
-                      {platformLabel(link.platform)}
-                    </p>
-                    {link.price_snapshot ? (
-                      <p className="text-lg font-bold text-primary">
-                        {formatPrice(link.price_snapshot)}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-outline">Fiyat bilgisi yok</p>
-                    )}
-                    <p className="label-caps text-primary mt-1 flex items-center justify-center gap-1">
-                      Satın Al <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
-                    </p>
-                  </a>
-                ))}
-              </div>
-              <p className="text-xs text-outline mt-4">
-                Bağımsız platformuz, komisyon alınan linkler içerebilir.
               </p>
             </div>
           </section>
