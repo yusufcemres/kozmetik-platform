@@ -16,10 +16,10 @@ interface Need {
 }
 
 const CATEGORY_META: Record<string, { label: string; icon: string; desc: string }> = {
-  skin: { label: 'Cilt Ihtiyaclari', icon: 'face', desc: 'Cilt bakim ve koruma ihtiyaclari' },
-  body: { label: 'Beden Ihtiyaclari', icon: 'self_improvement', desc: 'Sindirim, eklem ve vücut sagligi' },
-  hair: { label: 'Sac Ihtiyaclari', icon: 'content_cut', desc: 'Sac ve sac derisi bakimi' },
-  general_health: { label: 'Genel Saglik', icon: 'health_and_safety', desc: 'Bagisiklik, enerji ve genel saglik' },
+  skin: { label: 'Cilt İhtiyaçları', icon: 'face', desc: 'Cilt bakım ve koruma ihtiyaçları' },
+  body: { label: 'Beden İhtiyaçları', icon: 'self_improvement', desc: 'Sindirim, eklem ve vücut sağlığı' },
+  hair: { label: 'Saç İhtiyaçları', icon: 'content_cut', desc: 'Saç ve saç derisi bakımı' },
+  general_health: { label: 'Genel Sağlık', icon: 'health_and_safety', desc: 'Bağışıklık, enerji ve genel sağlık' },
 };
 
 const CATEGORY_ORDER = ['skin', 'body', 'hair', 'general_health'];
@@ -58,10 +58,10 @@ export default function NeedsListPage() {
     <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Kesfet</span>
-        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">IHTIYACLAR</h1>
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Keşfet</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">İHTİYAÇLAR</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          Cilt, beden ve genel saglik ihtiyaclarini kesfet — her biri icin en etkili urun ve icerikleri ogren
+          Cilt, beden ve genel sağlık ihtiyaçlarını keşfet — her biri için en etkili ürün ve içerikleri öğren
         </p>
       </div>
 
@@ -109,7 +109,7 @@ export default function NeedsListPage() {
       ) : needs.length === 0 ? (
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">target</span>
-          <p className="text-on-surface-variant">Henuz ihtiyac tanimlanmamis</p>
+          <p className="text-on-surface-variant">Henüz ihtiyaç tanımlanmamış</p>
         </div>
       ) : (
         <div className="space-y-14">
@@ -165,16 +165,16 @@ export default function NeedsListPage() {
       {/* Profile CTA */}
       <div className="mt-16 curator-card p-8 text-center">
         <h3 className="text-xl headline-tight text-on-surface mb-2">
-          HANGI IHTIYACLAR SENINLE ILGILI?
+          HANGİ İHTİYAÇLAR SENİNLE İLGİLİ?
         </h3>
         <p className="text-sm text-on-surface-variant mb-6">
-          Cilt profilini olustur, sana ozel ihtiyac ve urun onerileri al.
+          Cilt profilini oluştur, sana özel ihtiyaç ve ürün önerileri al.
         </p>
         <Link
           href="/profilim"
           className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
         >
-          PROFILIMI OLUSTUR
+          PROFİLİMİ OLUŞTUR
         </Link>
       </div>
     </div>

@@ -67,7 +67,7 @@ export default function FavoritesPage() {
       <div className="mb-10">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Koleksiyon</span>
         <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">FAVORILERIM</h1>
-        <p className="text-on-surface-variant text-sm mt-2">Begendigi urunleri kaydet ve cilt bakim rutinini olustur.</p>
+        <p className="text-on-surface-variant text-sm mt-2">Beğendiğin ürünleri kaydet ve cilt bakım rutinini oluştur.</p>
       </div>
 
       {/* Tabs */}
@@ -96,10 +96,10 @@ export default function FavoritesPage() {
           {favorites.length === 0 ? (
             <div className="text-center py-24">
               <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">favorite_border</span>
-              <p className="text-on-surface-variant">Henuz favorin yok</p>
-              <p className="text-sm text-outline mt-2">Urun sayfalarindaki kalp ikonuna tiklayarak favori ekle</p>
+              <p className="text-on-surface-variant">Henüz favorin yok</p>
+              <p className="text-sm text-outline mt-2">Ürün sayfalarındaki kalp ikonuna tıklayarak favori ekle</p>
               <Link href="/urunler" className="inline-flex items-center gap-1 mt-4 label-caps text-primary hover:underline underline-offset-4">
-                Urunleri Kesfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                Ürünleri Keşfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
               </Link>
             </div>
           ) : (
@@ -139,7 +139,7 @@ export default function FavoritesPage() {
                           onClick={() => handleAddToRoutine('evening', fav)}
                           className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low whitespace-nowrap transition-colors"
                         >
-                          <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
+                          <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span> Akşam Rutini
                         </button>
                       </div>
                     </div>
@@ -168,7 +168,7 @@ export default function FavoritesPage() {
             </h3>
             {routine.morning.length === 0 ? (
               <p className="text-sm text-outline py-4 text-center">
-                Favori urunlerinden sabah rutinine ekle
+                Favori ürünlerinden sabah rutinine ekle
               </p>
             ) : (
               <div className="space-y-2">
@@ -210,11 +210,11 @@ export default function FavoritesPage() {
           {/* Evening */}
           <div className="curator-card p-5 border-l-2 border-l-primary">
             <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
+              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span> Akşam Rutini
             </h3>
             {routine.evening.length === 0 ? (
               <p className="text-sm text-outline py-4 text-center">
-                Favori urunlerinden aksam rutinine ekle
+                Favori ürünlerinden akşam rutinine ekle
               </p>
             ) : (
               <div className="space-y-2">
@@ -255,7 +255,7 @@ export default function FavoritesPage() {
 
           {/* Routine tips */}
           <div className="md:col-span-2 bg-surface-container-low border border-outline-variant/20 rounded-sm p-5">
-            <h3 className="font-semibold text-sm text-on-surface mb-3">Rutin Siralama Onerileri</h3>
+            <h3 className="font-semibold text-sm text-on-surface mb-3">Rutin Sıralama Önerileri</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-on-surface-variant">
               <div>
                 <p className="font-semibold text-score-medium mb-1 flex items-center gap-1">
@@ -265,22 +265,22 @@ export default function FavoritesPage() {
                   <li>Temizleyici</li>
                   <li>Tonik</li>
                   <li>Serum (C Vitamini)</li>
-                  <li>Goz Kremi</li>
+                  <li>Göz Kremi</li>
                   <li>Nemlendirici</li>
-                  <li>Gunes Kremi (SPF 30+)</li>
+                  <li>Güneş Kremi (SPF 30+)</li>
                 </ol>
               </div>
               <div>
                 <p className="font-semibold text-primary mb-1 flex items-center gap-1">
-                  <span className="material-icon material-icon-sm" aria-hidden="true">dark_mode</span> Aksam
+                  <span className="material-icon material-icon-sm" aria-hidden="true">dark_mode</span> Akşam
                 </p>
                 <ol className="list-decimal list-inside space-y-0.5">
-                  <li>Makyaj Temizleyici / Yag</li>
-                  <li>Yuz Temizleyici</li>
+                  <li>Makyaj Temizleyici / Yağ</li>
+                  <li>Yüz Temizleyici</li>
                   <li>Tonik</li>
                   <li>Aktif (Retinol / AHA-BHA)</li>
                   <li>Serum</li>
-                  <li>Goz Kremi</li>
+                  <li>Göz Kremi</li>
                   <li>Nemlendirici / Gece Kremi</li>
                 </ol>
               </div>

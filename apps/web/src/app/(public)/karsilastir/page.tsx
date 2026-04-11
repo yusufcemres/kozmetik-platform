@@ -579,8 +579,8 @@ export default function ComparePage() {
       {selected.length < 2 && (
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">compare</span>
-          <p className="text-on-surface-variant">Karsilastirmak istedigin en az 2 urunu sec</p>
-          <p className="text-sm text-outline mt-2">Yukaridaki kutulardan urun ara ve ekle</p>
+          <p className="text-on-surface-variant">Karşılaştırmak istediğin en az 2 ürünü seç</p>
+          <p className="text-sm text-outline mt-2">Yukarıdaki kutulardan ürün ara ve ekle</p>
         </div>
       )}
     </div>

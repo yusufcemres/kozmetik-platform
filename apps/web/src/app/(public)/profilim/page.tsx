@@ -334,14 +334,14 @@ function ProfilePageInner() {
               </div>
 
               <p className="text-xs text-outline mt-4">
-                Son guncelleme: {new Date(profile.updated_at).toLocaleDateString('tr-TR')}
+                Son güncelleme: {new Date(profile.updated_at).toLocaleDateString('tr-TR')}
               </p>
             </div>
           ) : (
             <div className="curator-card p-8 text-center">
               <span className="material-icon text-outline-variant mb-3 block" style={{ fontSize: '48px' }} aria-hidden="true">face</span>
-              <h2 className="text-lg font-bold text-on-surface mb-2">Cilt Profilini Olustur</h2>
-              <p className="text-sm text-on-surface-variant mb-6">Cilt tipini, ihtiyaclarini ve hassasiyetlerini belirle — sana ozel oneriler al.</p>
+              <h2 className="text-lg font-bold text-on-surface mb-2">Cilt Profilini Oluştur</h2>
+              <p className="text-sm text-on-surface-variant mb-6">Cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle — sana özel öneriler al.</p>
               <button onClick={startEditing} className="curator-btn-primary text-[10px] px-8 py-3">
                 PROFIL OLUSTUR
               </button>
@@ -353,10 +353,10 @@ function ProfilePageInner() {
             <div className="curator-card p-6">
               <h2 className="text-lg font-bold text-on-surface flex items-center gap-2 mb-4">
                 <span className="material-icon text-primary" aria-hidden="true">analytics</span>
-                Son Analiz Sonuclari
+                Son Analiz Sonuçları
               </h2>
               <p className="text-sm text-on-surface-variant mb-3">
-                {new Date(profile.last_analysis.date).toLocaleDateString('tr-TR')} tarihli analiz — {profile.last_analysis.recommended_products.length} urun onerildi
+                {new Date(profile.last_analysis.date).toLocaleDateString('tr-TR')} tarihli analiz — {profile.last_analysis.recommended_products.length} ürün önerildi
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {profile.last_analysis.recommended_products.slice(0, 3).map((p) => (
@@ -442,15 +442,15 @@ function ProfilePageInner() {
             <Link href="/onerilerimiz" className="curator-card p-5 group flex items-center gap-3">
               <span className="material-icon text-primary text-[28px]" aria-hidden="true">auto_awesome</span>
               <div>
-                <p className="font-semibold text-on-surface group-hover:text-primary transition-colors">Onerilerimiz</p>
-                <p className="text-xs text-on-surface-variant">AI destekli secimler</p>
+                <p className="font-semibold text-on-surface group-hover:text-primary transition-colors">Önerilerimiz</p>
+                <p className="text-xs text-on-surface-variant">AI destekli seçimler</p>
               </div>
             </Link>
             <Link href="/karsilastir" className="curator-card p-5 group flex items-center gap-3">
               <span className="material-icon text-primary text-[28px]" aria-hidden="true">compare_arrows</span>
               <div>
-                <p className="font-semibold text-on-surface group-hover:text-primary transition-colors">Karsilastir</p>
-                <p className="text-xs text-on-surface-variant">Urunleri yan yana gor</p>
+                <p className="font-semibold text-on-surface group-hover:text-primary transition-colors">Karşılaştır</p>
+                <p className="text-xs text-on-surface-variant">Ürünleri yan yana gör</p>
               </div>
             </Link>
           </div>
@@ -544,9 +544,9 @@ function ProfilePageInner() {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-on-surface-variant text-center mt-3">Bu bilgi sana uygun urun onerileri icin kullanilir</p>
+              <p className="text-xs text-on-surface-variant text-center mt-3">Bu bilgi sana uygun ürün önerileri için kullanılır</p>
               <div className="flex gap-3 mt-8">
-                <button onClick={() => setEditing(false)} className="flex-1 curator-btn-outline py-3 text-sm">IPTAL</button>
+                <button onClick={() => setEditing(false)} className="flex-1 curator-btn-outline py-3 text-sm">İPTAL</button>
                 <button onClick={() => setEditStep(2)} className="flex-1 curator-btn-primary py-3 text-sm">DEVAM</button>
               </div>
             </div>
@@ -627,10 +627,10 @@ function ProfilePageInner() {
           {favorites.length === 0 ? (
             <div className="text-center py-24">
               <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">favorite_border</span>
-              <p className="text-on-surface-variant">Henuz favorin yok</p>
-              <p className="text-sm text-outline mt-2">Urun sayfalarindaki kalp ikonuna tiklayarak favori ekle</p>
+              <p className="text-on-surface-variant">Henüz favorin yok</p>
+              <p className="text-sm text-outline mt-2">Ürün sayfalarındaki kalp ikonuna tıklayarak favori ekle</p>
               <Link href="/urunler" className="inline-flex items-center gap-1 mt-4 label-caps text-primary hover:underline underline-offset-4">
-                Urunleri Kesfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                Ürünleri Keşfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
               </Link>
             </div>
           ) : (
@@ -663,7 +663,7 @@ function ProfilePageInner() {
                         </button>
                         <button onClick={() => handleAddToRoutine('evening', fav)}
                           className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low whitespace-nowrap transition-colors">
-                          <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
+                          <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span> Akşam Rutini
                         </button>
                       </div>
                     </div>
@@ -687,7 +687,7 @@ function ProfilePageInner() {
               <span className="material-icon text-score-medium" aria-hidden="true">light_mode</span> Sabah Rutini
             </h3>
             {routine.morning.length === 0 ? (
-              <p className="text-sm text-outline py-4 text-center">Favori urunlerinden sabah rutinine ekle</p>
+              <p className="text-sm text-outline py-4 text-center">Favori ürünlerinden sabah rutinine ekle</p>
             ) : (
               <div className="space-y-2">
                 {routine.morning.map((item, idx) => (
@@ -717,10 +717,10 @@ function ProfilePageInner() {
           {/* Evening */}
           <div className="curator-card p-5 border-l-2 border-l-primary">
             <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span> Aksam Rutini
+              <span className="material-icon text-primary" aria-hidden="true">dark_mode</span> Akşam Rutini
             </h3>
             {routine.evening.length === 0 ? (
-              <p className="text-sm text-outline py-4 text-center">Favori urunlerinden aksam rutinine ekle</p>
+              <p className="text-sm text-outline py-4 text-center">Favori ürünlerinden akşam rutinine ekle</p>
             ) : (
               <div className="space-y-2">
                 {routine.evening.map((item, idx) => (
@@ -781,7 +781,7 @@ function ProfilePageInner() {
                   <div key={`e-${w.interaction_id}`} className="bg-surface rounded-sm p-3 border border-error/10">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="material-icon material-icon-sm text-primary" aria-hidden="true">dark_mode</span>
-                      <span className="text-xs font-bold text-on-surface">Aksam Rutini</span>
+                      <span className="text-xs font-bold text-on-surface">Akşam Rutini</span>
                       <span className={`label-caps px-1.5 py-0.5 rounded-sm ${
                         w.severity === 'severe' ? 'bg-error/10 text-error' :
                         w.severity === 'moderate' ? 'bg-score-medium-bg text-score-medium' :
@@ -805,22 +805,22 @@ function ProfilePageInner() {
 
           {/* Routine tips */}
           <div className="md:col-span-2 bg-surface-container-low border border-outline-variant/20 rounded-sm p-5">
-            <h3 className="font-semibold text-sm text-on-surface mb-3">Rutin Siralama Onerileri</h3>
+            <h3 className="font-semibold text-sm text-on-surface mb-3">Rutin Sıralama Önerileri</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-on-surface-variant">
               <div>
                 <p className="font-semibold text-score-medium mb-1 flex items-center gap-1">
                   <span className="material-icon material-icon-sm" aria-hidden="true">light_mode</span> Sabah
                 </p>
                 <ol className="list-decimal list-inside space-y-0.5">
-                  <li>Temizleyici</li><li>Tonik</li><li>Serum (C Vitamini)</li><li>Goz Kremi</li><li>Nemlendirici</li><li>Gunes Kremi (SPF 30+)</li>
+                  <li>Temizleyici</li><li>Tonik</li><li>Serum (C Vitamini)</li><li>Göz Kremi</li><li>Nemlendirici</li><li>Güneş Kremi (SPF 30+)</li>
                 </ol>
               </div>
               <div>
                 <p className="font-semibold text-primary mb-1 flex items-center gap-1">
-                  <span className="material-icon material-icon-sm" aria-hidden="true">dark_mode</span> Aksam
+                  <span className="material-icon material-icon-sm" aria-hidden="true">dark_mode</span> Akşam
                 </p>
                 <ol className="list-decimal list-inside space-y-0.5">
-                  <li>Makyaj Temizleyici / Yag</li><li>Yuz Temizleyici</li><li>Tonik</li><li>Aktif (Retinol / AHA-BHA)</li><li>Serum</li><li>Goz Kremi</li><li>Nemlendirici / Gece Kremi</li>
+                  <li>Makyaj Temizleyici / Yağ</li><li>Yüz Temizleyici</li><li>Tonik</li><li>Aktif (Retinol / AHA-BHA)</li><li>Serum</li><li>Göz Kremi</li><li>Nemlendirici / Gece Kremi</li>
                 </ol>
               </div>
             </div>
@@ -834,9 +834,9 @@ function ProfilePageInner() {
           {recentItems.length === 0 ? (
             <div className="text-center py-24">
               <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">history</span>
-              <p className="text-on-surface-variant">Henuz urun incelemedin</p>
+              <p className="text-on-surface-variant">Henüz ürün incelemedin</p>
               <Link href="/urunler" className="inline-flex items-center gap-1 mt-4 label-caps text-primary hover:underline underline-offset-4">
-                Urunleri Kesfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                Ürünleri Keşfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
               </Link>
             </div>
           ) : (

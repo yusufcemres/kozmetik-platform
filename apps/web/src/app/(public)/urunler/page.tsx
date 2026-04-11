@@ -147,6 +147,7 @@ function ProductsListContent() {
       if (typeFilter) params.set('product_type', typeFilter);
       if (areaFilter) params.set('target_area', areaFilter);
       if (ingredientSlug) params.set('ingredient_slug', ingredientSlug);
+      params.set('domain_type', 'cosmetic');
 
       const data = await api.get<{ data: Product[]; meta: PageMeta }>(
         `/products?${params.toString()}`,

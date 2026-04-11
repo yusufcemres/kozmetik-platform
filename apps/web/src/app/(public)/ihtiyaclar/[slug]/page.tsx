@@ -163,7 +163,7 @@ function needJsonLd(need: Need) {
     alternateName: need.user_friendly_label || undefined,
     description:
       need.short_description ||
-      `${need.need_name} cilt ihtiyaci icin bilimsel bilgi ve urun onerileri.`,
+      `${need.need_name} cilt ihtiyacı için bilimsel bilgi ve ürün önerileri.`,
   };
 }
 
@@ -485,7 +485,7 @@ export default async function NeedDetailPage({
           <section className="mb-10">
             <h2 className="text-xl font-bold text-on-surface mb-4">
               <span className="material-icon text-primary align-middle mr-2" aria-hidden="true">medication</span>
-              Takviye Onerileri
+              Takviye Önerileri
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {supplementScores.slice(0, 6).map((score) => {

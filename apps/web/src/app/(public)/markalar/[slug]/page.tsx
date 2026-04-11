@@ -83,10 +83,10 @@ async function getTopScoredByBrand(brandId: number): Promise<Product[]> {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const brand = await getBrand(slug);
-  if (!brand) return { title: 'Marka Bulunamadi — REVELA' };
+  if (!brand) return { title: 'Marka Bulunamadı — REVELA' };
 
-  const title = `${brand.brand_name} Urunleri — REVELA`;
-  const description = `${brand.brand_name} markasinin tum kozmetik urunleri, icerik analizleri ve fiyat karsilastirmalari.`;
+  const title = `${brand.brand_name} Ürünleri — REVELA`;
+  const description = `${brand.brand_name} markasının tüm kozmetik ürünleri, içerik analizleri ve fiyat karşılaştırmaları.`;
 
   return {
     title,
@@ -249,7 +249,7 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '48px' }} aria-hidden="true">
             search_off
           </span>
-          <p className="text-on-surface-variant">Bu markaya ait urun bulunamadi.</p>
+          <p className="text-on-surface-variant">Bu markaya ait ürün bulunamadı.</p>
         </div>
       ) : (
         <div className="space-y-10">

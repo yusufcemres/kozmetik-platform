@@ -20,20 +20,20 @@ interface Question {
 const QUESTIONS: Question[] = [
   {
     id: 'q1',
-    question: 'Niacinamide (Vitamin B3) ne ise yarar?',
+    question: 'Niacinamide (Vitamin B3) ne işe yarar?',
     options: [
-      { value: 'a', label: 'Gunesten koruma' },
-      { value: 'b', label: 'Gozenek kucultme ve leke giderme' },
-      { value: 'c', label: 'Sac guclendirme' },
-      { value: 'd', label: 'Kas gevsetme' },
+      { value: 'a', label: 'Güneşten koruma' },
+      { value: 'b', label: 'Gözenek küçültme ve leke giderme' },
+      { value: 'c', label: 'Saç güçlendirme' },
+      { value: 'd', label: 'Kas gevşetme' },
     ],
     correct: 'b',
-    explanation: 'Niacinamide gozenekleri sikistiran, leke ve ton esitsizligini azaltan guclu bir aktiftir.',
+    explanation: 'Niacinamide gözenekleri sıkıştıran, leke ve ton eşitsizliğini azaltan güçlü bir aktiftir.',
     topic: 'Aktif Maddeler',
   },
   {
     id: 'q2',
-    question: 'Retinol ile hangisi birlikte kullanilMAMALI?',
+    question: 'Retinol ile hangisi birlikte kullanılMAMALI?',
     options: [
       { value: 'a', label: 'Hyaluronik Asit' },
       { value: 'b', label: 'Ceramide' },
@@ -41,12 +41,12 @@ const QUESTIONS: Question[] = [
       { value: 'd', label: 'Niacinamide' },
     ],
     correct: 'c',
-    explanation: 'Retinol + AHA/BHA birlikte asiri eksfoliasyona ve tahrise neden olabilir. Farkli saatlerde kullanin.',
-    topic: 'Icerik Etkilesimleri',
+    explanation: 'Retinol + AHA/BHA birlikte aşırı eksfoliasyona ve tahrişe neden olabilir. Farklı saatlerde kullanın.',
+    topic: 'İçerik Etkileşimleri',
   },
   {
     id: 'q3',
-    question: 'SPF 30 gunes isinlarinin yuzde kacini engeller?',
+    question: 'SPF 30 güneş ışınlarının yüzde kaçını engeller?',
     options: [
       { value: 'a', label: '%30' },
       { value: 'b', label: '%97' },
@@ -54,25 +54,25 @@ const QUESTIONS: Question[] = [
       { value: 'd', label: '%100' },
     ],
     correct: 'b',
-    explanation: 'SPF 30, UVB isinlarinin %97\'sini engeller. SPF 50 ise %98. Aradaki fark sanildigindan kucuktur.',
-    topic: 'Gunes Koruma',
+    explanation: 'SPF 30, UVB ışınlarının %97\'sini engeller. SPF 50 ise %98. Aradaki fark sanıldığından küçüktür.',
+    topic: 'Güneş Koruma',
   },
   {
     id: 'q4',
     question: 'Hyaluronik Asit ne yapar?',
     options: [
-      { value: 'a', label: 'Yag uretimini kontrol eder' },
-      { value: 'b', label: 'Agirliginin 1000 kati su tutar' },
-      { value: 'c', label: 'Kollajen uretimini arttirir' },
-      { value: 'd', label: 'Olup hucreleri yok eder' },
+      { value: 'a', label: 'Yağ üretimini kontrol eder' },
+      { value: 'b', label: 'Ağırlığının 1000 katı su tutar' },
+      { value: 'c', label: 'Kollajen üretimini artırır' },
+      { value: 'd', label: 'Ölü hücreleri yok eder' },
     ],
     correct: 'b',
-    explanation: 'Hyaluronik Asit guclu bir nemlendiricidirr. Agirliginin 1000 katina kadar su tutabilir.',
+    explanation: 'Hyaluronik Asit güçlü bir nemlendiricidir. Ağırlığının 1000 katına kadar su tutabilir.',
     topic: 'Aktif Maddeler',
   },
   {
     id: 'q5',
-    question: 'Hangisi bir AHA (Alpha Hydroxy Acid) degildir?',
+    question: 'Hangisi bir AHA (Alpha Hydroxy Acid) değildir?',
     options: [
       { value: 'a', label: 'Glikolik Asit' },
       { value: 'b', label: 'Laktik Asit' },
@@ -80,12 +80,12 @@ const QUESTIONS: Question[] = [
       { value: 'd', label: 'Mandelik Asit' },
     ],
     correct: 'c',
-    explanation: 'Salisilik Asit bir BHA\'dir (Beta Hydroxy Acid). Yag cozunurlugu sayesinde gozeneklerin icine nufuz eder.',
+    explanation: 'Salisilik Asit bir BHA\'dır (Beta Hydroxy Acid). Yağ çözünürlüğü sayesinde gözeneklerin içine nüfuz eder.',
     topic: 'Asitler',
   },
   {
     id: 'q6',
-    question: 'Cilt bariyerinin ana yapitasi hangisidir?',
+    question: 'Cilt bariyerinin ana yapıtaşı hangisidir?',
     options: [
       { value: 'a', label: 'Retinol' },
       { value: 'b', label: 'Ceramide' },
@@ -93,51 +93,51 @@ const QUESTIONS: Question[] = [
       { value: 'd', label: 'Benzoyl Peroxide' },
     ],
     correct: 'b',
-    explanation: 'Ceramideler cilt bariyerinin %50\'sini olusturur. Bariyer hasar gordugunde ceramide takviyesi onarimda yardimci olur.',
+    explanation: 'Ceramideler cilt bariyerinin %50\'sini oluşturur. Bariyer hasar gördüğünde ceramide takviyesi onarımda yardımcı olur.',
     topic: 'Cilt Bariyeri',
   },
   {
     id: 'q7',
-    question: 'Vitamin C serumlari icin ideal pH araligi nedir?',
+    question: 'Vitamin C serumları için ideal pH aralığı nedir?',
     options: [
       { value: 'a', label: 'pH 2.5-3.5' },
       { value: 'b', label: 'pH 5.5-6.5' },
-      { value: 'c', label: 'pH 7.0 (notr)' },
+      { value: 'c', label: 'pH 7.0 (nötr)' },
       { value: 'd', label: 'pH 8.0-9.0' },
     ],
     correct: 'a',
-    explanation: 'L-Askorbik Asit formu pH 2.5-3.5 arasinda en etkilidir. Daha yuksek pH\'da stabilite ve etkinlik duser.',
+    explanation: 'L-Askorbik Asit formu pH 2.5-3.5 arasında en etkilidir. Daha yüksek pH\'da stabilite ve etkinlik düşer.',
     topic: 'Asitler',
   },
   {
     id: 'q8',
-    question: 'Hangisi ciltte kollajen uretimini ARTTIRIR?',
+    question: 'Hangisi ciltte kollajen üretimini ARTTIRIR?',
     options: [
       { value: 'a', label: 'Mineral Oil' },
       { value: 'b', label: 'Retinol (Vitamin A)' },
-      { value: 'c', label: 'Parfum' },
+      { value: 'c', label: 'Parfüm' },
       { value: 'd', label: 'Silikon' },
     ],
     correct: 'b',
-    explanation: 'Retinol hucre yenilenmesini hizlandirir ve kollajen sentezini uyarir. Anti-aging icin altin standart.',
+    explanation: 'Retinol hücre yenilenmesini hızlandırır ve kollajen sentezini uyarır. Anti-aging için altın standart.',
     topic: 'Anti-Aging',
   },
   {
     id: 'q9',
-    question: '"Fragrance-free" ve "unscented" ayni anlama gelir mi?',
+    question: '"Fragrance-free" ve "unscented" aynı anlama gelir mi?',
     options: [
-      { value: 'a', label: 'Evet, ayni sey' },
-      { value: 'b', label: 'Hayir — unscented maskeleme kokusu icerebilir' },
-      { value: 'c', label: 'Hayir — fragrance-free daha tehlikeli' },
-      { value: 'd', label: 'Sadece Avrupa\'da farkli' },
+      { value: 'a', label: 'Evet, aynı şey' },
+      { value: 'b', label: 'Hayır — unscented maskeleme kokusu içerebilir' },
+      { value: 'c', label: 'Hayır — fragrance-free daha tehlikeli' },
+      { value: 'd', label: 'Sadece Avrupa\'da farklı' },
     ],
     correct: 'b',
-    explanation: '"Unscented" urunler kokuyu notralize eden kimyasallar icerebilir. "Fragrance-free" hic koku bileseni icermez.',
-    topic: 'Guvenlik',
+    explanation: '"Unscented" ürünler kokuyu nötralize eden kimyasallar içerebilir. "Fragrance-free" hiç koku bileşeni içermez.',
+    topic: 'Güvenlik',
   },
   {
     id: 'q10',
-    question: 'Hangi vitamin gunes isigiyla ciltte sentezlenir?',
+    question: 'Hangi vitamin güneş ışığıyla ciltte sentezlenir?',
     options: [
       { value: 'a', label: 'Vitamin A' },
       { value: 'b', label: 'Vitamin C' },
@@ -145,7 +145,7 @@ const QUESTIONS: Question[] = [
       { value: 'd', label: 'Vitamin E' },
     ],
     correct: 'c',
-    explanation: 'UVB isinlari ciltte D vitamini sentezini tetikler. Gunes kremi kullanimi D vitamini uretimini azaltabilir — takviye onemlidir.',
+    explanation: 'UVB ışınları ciltte D vitamini sentezini tetikler. Güneş kremi kullanımı D vitamini üretimini azaltabilir — takviye önemlidir.',
     topic: 'Vitaminler',
   },
 ];
@@ -153,13 +153,15 @@ const QUESTIONS: Question[] = [
 // === Component ===
 
 export default function IngredientQuizPage() {
+  const [mode, setMode] = useState<'intro' | 'quick' | 'detailed'>('intro');
   const [currentQ, setCurrentQ] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [showExplanation, setShowExplanation] = useState(false);
   const [finished, setFinished] = useState(false);
 
-  const q = QUESTIONS[currentQ];
-  const totalQ = QUESTIONS.length;
+  const activeQuestions = mode === 'quick' ? QUESTIONS.slice(0, 5) : QUESTIONS;
+  const q = activeQuestions[currentQ];
+  const totalQ = activeQuestions.length;
 
   const handleAnswer = (value: string) => {
     if (showExplanation) return;
@@ -177,29 +179,29 @@ export default function IngredientQuizPage() {
   };
 
   if (finished) {
-    const correct = QUESTIONS.filter((qq) => userAnswers[qq.id] === qq.correct).length;
+    const correct = activeQuestions.filter((qq) => userAnswers[qq.id] === qq.correct).length;
     const pct = Math.round((correct / totalQ) * 100);
 
-    const wrongTopics = QUESTIONS
+    const wrongTopics = activeQuestions
       .filter((qq) => userAnswers[qq.id] !== qq.correct)
       .map((qq) => qq.topic);
     const uniqueWrongTopics = [...new Set(wrongTopics)];
 
     let level: string;
     let levelMessage: string;
-    if (pct >= 90) { level = 'UZMAN'; levelMessage = 'Sen bu isi biliyorsun! Neredeyse bize is kalmadi.'; }
-    else if (pct >= 70) { level = 'ILERI'; levelMessage = 'Guzel bilgi birikimin var. Birkac detayi tamamla.'; }
-    else if (pct >= 50) { level = 'ORTA'; levelMessage = 'Iyi baslangic! Biraz daha ogrenmeye devam.'; }
-    else { level = 'BASLANGIC'; levelMessage = 'Endiselenme, herkes bir yerden baslar. Iste sana ozel okuma listesi:'; }
+    if (pct >= 90) { level = 'UZMAN'; levelMessage = 'Sen bu işi biliyorsun! Neredeyse bize iş kalmadı.'; }
+    else if (pct >= 70) { level = 'İLERİ'; levelMessage = 'Güzel bilgi birikimin var. Birkaç detayı tamamla.'; }
+    else if (pct >= 50) { level = 'ORTA'; levelMessage = 'İyi başlangıç! Biraz daha öğrenmeye devam.'; }
+    else { level = 'BAŞLANGIÇ'; levelMessage = 'Endişelenme, herkes bir yerden başlar. İşte sana özel okuma listesi:'; }
 
     const resultData: QuizResultData = {
       headline: `Bilgi Seviyen: ${level}`,
       subheadline: levelMessage,
-      score: { value: correct, max: totalQ, label: `%${pct} basari` },
+      score: { value: correct, max: totalQ, label: `%${pct} başarı` },
       sections: [
         ...(uniqueWrongTopics.length > 0
           ? [{
-              title: 'Eksik Kaldigin Konular',
+              title: 'Eksik Kaldığın Konular',
               icon: 'menu_book',
               items: uniqueWrongTopics.map((t) => ({
                 label: t,
@@ -209,10 +211,10 @@ export default function IngredientQuizPage() {
             }]
           : []),
         {
-          title: 'Dogru Bildigin Konular',
+          title: 'Doğru Bildiğin Konular',
           icon: 'check_circle',
           items: [...new Set(
-            QUESTIONS.filter((qq) => userAnswers[qq.id] === qq.correct).map((qq) => qq.topic),
+            activeQuestions.filter((qq) => userAnswers[qq.id] === qq.correct).map((qq) => qq.topic),
           )].map((t) => ({
             label: t,
             type: 'positive' as const,
@@ -221,7 +223,7 @@ export default function IngredientQuizPage() {
       ],
       cta: { label: 'Rehberleri Oku', href: '/rehber' },
       secondaryCta: { label: 'Tekrar Dene', href: '/icerik-testi' },
-      shareText: `REVELA Icerik Bilgi Testi: ${correct}/${totalQ} dogru! Seviye: ${level}`,
+      shareText: `REVELA İçerik Bilgi Testi: ${correct}/${totalQ} doğru! Seviye: ${level}`,
     };
 
     return (
@@ -229,7 +231,7 @@ export default function IngredientQuizPage() {
         <nav className="flex items-center gap-2 text-xs text-on-surface-variant mb-8">
           <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
           <span className="text-outline">/</span>
-          <span className="text-on-surface font-medium">Icerik Testi</span>
+          <span className="text-on-surface font-medium">İçerik Testi</span>
         </nav>
         <QuizResult data={resultData} />
       </div>
@@ -240,12 +242,45 @@ export default function IngredientQuizPage() {
   const isCorrect = selected === q.correct;
   const pctDone = Math.round(((currentQ + 1) / totalQ) * 100);
 
+  if (mode === 'intro') {
+    return (
+      <div className="curator-section max-w-[1200px] mx-auto">
+        <nav className="flex items-center gap-2 text-xs text-on-surface-variant mb-8">
+          <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
+          <span className="text-outline">/</span>
+          <span className="text-on-surface font-medium">İçerik Testi</span>
+        </nav>
+
+        <div className="max-w-2xl mx-auto text-center py-8">
+          <span className="material-icon text-primary mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">quiz</span>
+          <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface mb-2">İÇERİK BİLGİ TESTİ</h1>
+          <p className="text-on-surface-variant text-sm mb-10">Ne kadar biliyorsun? Hazırlan, sınav var.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+            <button onClick={() => setMode('quick')} className="curator-card p-6 text-left group hover:border-primary/30 transition-all">
+              <span className="material-icon text-primary text-[28px] mb-3 block" aria-hidden="true">bolt</span>
+              <p className="font-semibold text-on-surface">Hızlı Test</p>
+              <p className="text-xs text-on-surface-variant mt-1">5 soru, ~2 dakika</p>
+              <p className="text-xs text-outline mt-2">Anında sonuç al</p>
+            </button>
+            <button onClick={() => setMode('detailed')} className="curator-card p-6 text-left group hover:border-primary/30 transition-all">
+              <span className="material-icon text-primary text-[28px] mb-3 block" aria-hidden="true">science</span>
+              <p className="font-semibold text-on-surface">Detaylı Test</p>
+              <p className="text-xs text-on-surface-variant mt-1">10 soru, ~4 dakika</p>
+              <p className="text-xs text-outline mt-2">Kapsamlı analiz</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="curator-section max-w-[1200px] mx-auto">
       <nav className="flex items-center gap-2 text-xs text-on-surface-variant mb-8">
         <Link href="/" className="hover:text-primary transition-colors">Ana Sayfa</Link>
         <span className="text-outline">/</span>
-        <span className="text-on-surface font-medium">Icerik Testi</span>
+        <span className="text-on-surface font-medium">İçerik Testi</span>
       </nav>
 
       {currentQ === 0 && !showExplanation && (
@@ -255,7 +290,7 @@ export default function IngredientQuizPage() {
             İÇERİK BİLGİ TESTİ
           </h1>
           <p className="text-on-surface-variant max-w-md mx-auto">
-            Ne kadar biliyorsun? Hazirlan, sinav var. 10 soruda kozmetik bilgini olc.
+            {mode === 'quick' ? '5 soruda kozmetik bilgini ölç.' : '10 soruda kozmetik bilgini ölç.'}
           </p>
         </div>
       )}
@@ -332,7 +367,7 @@ export default function IngredientQuizPage() {
         {showExplanation && (
           <div className={`p-4 rounded-sm border mb-8 ${isCorrect ? 'border-score-high/30 bg-score-high/5' : 'border-score-low/30 bg-score-low/5'}`}>
             <p className={`text-sm font-bold mb-1 ${isCorrect ? 'text-score-high' : 'text-score-low'}`}>
-              {isCorrect ? 'Dogru!' : 'Yanlis!'}
+              {isCorrect ? 'Doğru!' : 'Yanlış!'}
             </p>
             <p className="text-sm text-on-surface-variant">{q.explanation}</p>
           </div>
@@ -346,7 +381,7 @@ export default function IngredientQuizPage() {
               onClick={handleNext}
               className="curator-btn-primary text-sm px-8 py-3"
             >
-              {currentQ === totalQ - 1 ? 'Sonuclari Gor' : 'Sonraki Soru'}
+              {currentQ === totalQ - 1 ? 'Sonuçları Gör' : 'Sonraki Soru'}
               <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
             </button>
           </div>

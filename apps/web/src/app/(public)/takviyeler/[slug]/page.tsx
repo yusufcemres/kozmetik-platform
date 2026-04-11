@@ -83,14 +83,14 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const product = await getProduct(params.slug);
-  if (!product) return { title: 'Takviye Bulunamadi' };
+  if (!product) return { title: 'Takviye Bulunamadı' };
 
   const title = product.brand
     ? `${product.brand.brand_name} ${product.product_name}`
     : product.product_name;
   const description =
     product.short_description ||
-    `${title} takviye gida — besin degerleri, icerikler, kullanim ve fiyat karsilastirmasi.`;
+    `${title} takviye gıda — besin değerleri, içerikler, kullanım ve fiyat karşılaştırması.`;
 
   return {
     title,
@@ -310,7 +310,7 @@ export default async function SupplementDetailPage({
                         )}
                         {nf.is_proprietary_blend && (
                           <span className="label-caps ml-1.5 text-on-surface-variant bg-surface-container-low px-1.5 py-0.5 rounded-sm">
-                            Ozel Karisim
+                            Özel Karışım
                           </span>
                         )}
                       </td>
@@ -341,12 +341,12 @@ export default async function SupplementDetailPage({
                 </tbody>
               </table>
               <div className="px-4 py-2 bg-surface-container-low label-caps text-outline">
-                * GRD (Gunluk Referans Deger) belirtilmemis
+                * GRD (Günlük Referans Değer) belirtilmemiş
               </div>
             </div>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
-              Besin bilgileri henuz eklenmemis
+              Besin bilgileri henüz eklenmemiş
             </div>
           )}
         </section>

@@ -41,12 +41,12 @@ interface ProductScore {
 // === SEO ===
 
 export const metadata: Metadata = {
-  title: 'Bu Haftanin Onerileri | REVELA',
+  title: 'Bu Haftanın Önerileri | REVELA',
   description:
-    'AI destekli haftalik urun onerileri. Her cilt ihtiyaci icin en uygun, en kaliteli ve en uygun fiyatli kozmetik urunleri.',
+    'AI destekli haftalık ürün önerileri. Her cilt ihtiyacı için en uygun, en kaliteli ve en uygun fiyatlı kozmetik ürünleri.',
   openGraph: {
-    title: 'Bu Haftanin Onerileri | REVELA',
-    description: 'Her cilt ihtiyaci icin AI destekli haftalik urun onerileri.',
+    title: 'Bu Haftanın Önerileri | REVELA',
+    description: 'Her cilt ihtiyacı için AI destekli haftalık ürün önerileri.',
     type: 'website',
   },
   alternates: { canonical: '/onerilerimiz' },
@@ -133,12 +133,12 @@ function buildReasonBullets(need: Need, topProduct: ProductScore): string[] {
   // Price
   const link = cheapestLink(product.affiliate_links);
   if (link?.price_snapshot) {
-    bullets.push(`${PLATFORM_LABELS[link.platform] || link.platform} uzerinde ₺${Number(link.price_snapshot).toFixed(0)}`);
+    bullets.push(`${PLATFORM_LABELS[link.platform] || link.platform} üzerinde ₺${Number(link.price_snapshot).toFixed(0)}`);
   }
 
   // Product type
   if (product.product_type_label) {
-    bullets.push(`Urun tipi: ${product.product_type_label}`);
+    bullets.push(`Ürün tipi: ${product.product_type_label}`);
   }
 
   return bullets;
@@ -152,8 +152,8 @@ function recommendationsJsonLd(
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'REVELA Haftalik Urun Onerileri',
-    description: 'AI destekli kozmetik urun onerileri',
+    name: 'REVELA Haftalık Ürün Önerileri',
+    description: 'AI destekli kozmetik ürün önerileri',
     numberOfItems: recommendations.length,
     itemListElement: recommendations.map((r, idx) => ({
       '@type': 'ListItem',

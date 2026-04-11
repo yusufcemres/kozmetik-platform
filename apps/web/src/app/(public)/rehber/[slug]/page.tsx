@@ -27,7 +27,7 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const article = await getArticle(params.slug);
-  if (!article) return { title: 'Makale bulunamadi' };
+  if (!article) return { title: 'Makale bulunamadı' };
 
   return {
     title: article.title,
@@ -43,10 +43,10 @@ export async function generateMetadata({
 
 const CONTENT_TYPES: Record<string, { label: string; icon: string }> = {
   guide: { label: 'Rehber', icon: 'menu_book' },
-  ingredient_explainer: { label: 'Icerik Inceleme', icon: 'science' },
-  need_guide: { label: 'Ihtiyac Rehberi', icon: 'target' },
+  ingredient_explainer: { label: 'İçerik İnceleme', icon: 'science' },
+  need_guide: { label: 'İhtiyaç Rehberi', icon: 'target' },
   label_reading: { label: 'Etiket Okuma', icon: 'label' },
-  comparison: { label: 'Karsilastirma', icon: 'compare' },
+  comparison: { label: 'Karşılaştırma', icon: 'compare' },
   news: { label: 'Haber', icon: 'newspaper' },
 };
 
@@ -155,7 +155,7 @@ export default async function GuideDetailPage({
       ) : (
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">article</span>
-          <p className="text-on-surface-variant">Makale icerigi henuz eklenmemis</p>
+          <p className="text-on-surface-variant">Makale içeriği henüz eklenmemiş</p>
         </div>
       )}
 

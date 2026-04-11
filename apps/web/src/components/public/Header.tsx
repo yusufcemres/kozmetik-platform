@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 const EXPLORE_ITEMS = [
-  { href: '/urunler', label: 'Ürünler', icon: 'inventory_2', desc: '1900+ ürünü keşfet' },
+  { href: '/urunler', label: 'Kozmetik Ürünler', icon: 'spa', desc: '1900+ kozmetik ürünü' },
+  { href: '/takviyeler', label: 'Takviye Ürünler', icon: 'medication', desc: 'Vitamin, mineral & takviyeler' },
   { href: '/onerilerimiz', label: 'Önerilerimiz', icon: 'auto_awesome', desc: 'AI destekli öneriler', badge: 'AI' },
   { href: '/ihtiyaclar', label: 'İhtiyaçlar', icon: 'healing', desc: 'Cilt ihtiyaçlarına göre' },
   { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
@@ -18,16 +19,6 @@ const EXPLORE_ITEMS = [
   { href: '/icerik-testi', label: 'İçerik Testi', icon: 'quiz', desc: 'Kozmetik bilgini ölç', badge: 'YENİ' },
 ];
 
-const SUPPLEMENT_ITEMS = [
-  { href: '/takviyeler?kategori=vitamin-mineral', label: 'Vitaminler & Mineraller', icon: 'medication' },
-  { href: '/takviyeler?kategori=probiyotik', label: 'Probiyotikler', icon: 'bacteria' },
-  { href: '/takviyeler?kategori=bitkisel-takviye', label: 'Bitkisel Takviyeler', icon: 'spa' },
-  { href: '/takviyeler?kategori=omega-yag-asitleri', label: 'Omega & Yağ Asitleri', icon: 'water_drop' },
-  { href: '/takviyeler?kategori=sporcu-besinleri', label: 'Sporcu Besinleri', icon: 'fitness_center' },
-  { href: '/takviyeler?kategori=kolajen-guzellik', label: 'Kolajen & Güzellik', icon: 'face_retouching_natural' },
-  { href: '/takviyeler', label: 'Tüm Takviyeler', icon: 'grid_view' },
-];
-
 const NAV_ITEMS = [
   { href: '/cilt-analizi', label: 'Cilt Analizi' },
   { href: '/karsilastir', label: 'Karşılaştır' },
@@ -36,11 +27,9 @@ const NAV_ITEMS = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
-  const [supplementOpen, setSupplementOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
   const pathname = usePathname();
   const exploreRef = useRef<HTMLDivElement>(null);
-  const supplementRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -59,7 +48,6 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setExploreOpen(false);
-    setSupplementOpen(false);
   }, [pathname]);
 
   // Close dropdowns on outside click
@@ -67,9 +55,6 @@ export default function Header() {
     function handleClick(e: MouseEvent) {
       if (exploreRef.current && !exploreRef.current.contains(e.target as Node)) {
         setExploreOpen(false);
-      }
-      if (supplementRef.current && !supplementRef.current.contains(e.target as Node)) {
-        setSupplementOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -79,7 +64,6 @@ export default function Header() {
   const isExplorePath = EXPLORE_ITEMS.some(
     (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
   );
-  const isSupplementPath = pathname === '/takviyeler' || pathname.startsWith('/takviyeler/');
 
   return (
     <>
@@ -100,7 +84,7 @@ export default function Header() {
           {/* Keşfet dropdown */}
           <div ref={exploreRef} className="relative">
             <button
-              onClick={() => { setExploreOpen(!exploreOpen); setSupplementOpen(false); }}
+              onClick={() => setExploreOpen(!exploreOpen)}
               className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
                 isExplorePath || exploreOpen
                   ? 'text-on-surface border-b-2 border-on-surface pb-1'
@@ -144,49 +128,6 @@ export default function Header() {
                         <p className="text-[11px] text-on-surface-variant mt-0.5">{item.desc}</p>
                       </div>
                       <span className="material-icon text-[16px] text-outline-variant" aria-hidden="true">arrow_forward</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Takviyeler dropdown */}
-          <div ref={supplementRef} className="relative">
-            <button
-              onClick={() => { setSupplementOpen(!supplementOpen); setExploreOpen(false); }}
-              className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
-                isSupplementPath || supplementOpen
-                  ? 'text-on-surface border-b-2 border-on-surface pb-1'
-                  : 'text-outline hover:text-on-surface'
-              }`}
-            >
-              Takviyeler
-              <span
-                className={`material-icon text-[16px] transition-transform duration-200 ${supplementOpen ? 'rotate-180' : ''}`}
-                aria-hidden="true"
-              >
-                expand_more
-              </span>
-            </button>
-
-            {supplementOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[320px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
-                {SUPPLEMENT_ITEMS.map((item) => {
-                  const itemPath = item.href.split('?')[0];
-                  const isActive = pathname === itemPath || pathname.startsWith(itemPath + '/');
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-md transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
-                      }`}
-                    >
-                      <span className="material-icon text-[18px]" aria-hidden="true">{item.icon}</span>
-                      <span className="text-sm font-medium">{item.label}</span>
                     </Link>
                   );
                 })}
@@ -289,29 +230,6 @@ export default function Header() {
                     {item.badge}
                   </span>
                 )}
-              </Link>
-            );
-          })}
-
-          <div className="h-px bg-white/10 my-6" />
-
-          {/* Takviyeler section */}
-          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Takviyeler</p>
-          {SUPPLEMENT_ITEMS.map((item) => {
-            const itemPath = item.href.split('?')[0];
-            const isActive = pathname === itemPath || pathname.startsWith(itemPath + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ${
-                  isActive
-                    ? 'bg-primary text-on-primary font-semibold'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
               </Link>
             );
           })}

@@ -73,6 +73,16 @@ function avgScore(product: Product): number | null {
   );
 }
 
+// === Quiz Cards ===
+
+const QUIZ_CARDS = [
+  { href: '/cilt-analizi', icon: 'water_drop', title: 'Cilt Analizi', motto: 'Cildini tanı, doğruyu bul.', duration: '~2 dk', badge: null },
+  { href: '/beslenme-analizi', icon: 'nutrition', title: 'Beslenme Analizi', motto: 'Eksik olan ne? Beden konuşuyor.', duration: '~3 dk', badge: 'YENİ' },
+  { href: '/sac-analizi', icon: 'face_retouching_natural', title: 'Saç Analizi', motto: 'Saçın sana bir şeyler anlatıyor.', duration: '~2 dk', badge: 'YENİ' },
+  { href: '/cilt-yasi-testi', icon: 'timer', title: 'Cilt Yaşı Testi', motto: 'Ayna yalan söyler, biz söylemeyiz.', duration: '~1 dk', badge: 'VİRAL' },
+  { href: '/icerik-testi', icon: 'quiz', title: 'İçerik Bilgi Testi', motto: 'Ne kadar biliyorsun?', duration: '~2 dk', badge: null },
+];
+
 // === Product Card ===
 
 function ProductCard({ product }: { product: Product }) {
@@ -174,7 +184,7 @@ export default async function HomePage() {
           <span className="text-outline-variant">ANLA.</span>
         </h1>
         <p className="text-lg lg:text-xl text-on-surface-variant/50 font-medium tracking-wide mb-6">
-          Bilinçli alışveriş deneyimi.
+          Markaların foyalarını ortaya çıkarmaya geldik.
         </p>
         <p className="max-w-md text-base lg:text-lg text-on-surface-variant mb-10 leading-relaxed">
           30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
@@ -206,6 +216,52 @@ export default async function HomePage() {
               </p>
               <p className="label-caps text-outline mt-1">{s.label}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Seni Tanıyalım — Quiz/Analiz Kartları */}
+      <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface">
+        <div className="text-center mb-12">
+          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Seni Tanıyalım</span>
+          <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">
+            KİŞİSEL ANALİZLERLE<br />
+            <span className="text-outline-variant">İHTİYACINI KEŞFet.</span>
+          </h2>
+          <p className="text-on-surface-variant text-sm mt-4 max-w-lg mx-auto">
+            Kişisel testlerle ihtiyaçlarını keşfet, sana özel önerilere ulaş.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {QUIZ_CARDS.map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="curator-card p-6 group hover:border-primary/30 transition-all duration-300"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="material-icon text-primary text-[24px]" aria-hidden="true">{card.icon}</span>
+                </div>
+                {card.badge && (
+                  <span className="bg-primary text-on-primary text-[9px] px-2 py-0.5 rounded-full font-bold tracking-wide">
+                    {card.badge}
+                  </span>
+                )}
+              </div>
+              <h3 className="font-bold text-on-surface text-base mb-1 group-hover:text-primary transition-colors">
+                {card.title}
+              </h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed mb-4">
+                {card.motto}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-outline">{card.duration}</span>
+                <span className="material-icon text-outline-variant text-[18px] group-hover:text-primary group-hover:translate-x-1 transition-all" aria-hidden="true">
+                  arrow_forward
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>

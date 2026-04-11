@@ -16,13 +16,13 @@ interface SupplementProduct {
 }
 
 const CATEGORIES = [
-  { slug: '', label: 'Tumu', icon: 'grid_view' },
+  { slug: '', label: 'Tümü', icon: 'grid_view' },
   { slug: 'vitamin-mineral', label: 'Vitamin & Mineral', icon: 'medication' },
   { slug: 'probiyotik', label: 'Probiyotik', icon: 'bacteria' },
   { slug: 'bitkisel-takviye', label: 'Bitkisel', icon: 'spa' },
-  { slug: 'omega-yag-asitleri', label: 'Omega & Yag Asitleri', icon: 'water_drop' },
+  { slug: 'omega-yag-asitleri', label: 'Omega & Yağ Asitleri', icon: 'water_drop' },
   { slug: 'sporcu-besinleri', label: 'Sporcu', icon: 'fitness_center' },
-  { slug: 'kolajen-guzellik', label: 'Kolajen & Guzellik', icon: 'face_retouching_natural' },
+  { slug: 'kolajen-guzellik', label: 'Kolajen & Güzellik', icon: 'face_retouching_natural' },
 ];
 
 export default function SupplementsListPage() {
@@ -51,10 +51,10 @@ function SupplementsListInner() {
     params.set('limit', '12');
     if (search) params.set('search', search);
 
-    // Use products endpoint with domain_type=supplement for category filtering
-    const endpoint = kategori
-      ? `/products?${params.toString()}&domain_type=supplement&category_slug=${kategori}`
-      : `/supplements?${params.toString()}`;
+    // Always use products endpoint with domain_type=supplement
+    params.set('domain_type', 'supplement');
+    if (kategori) params.set('category_slug', kategori);
+    const endpoint = `/products?${params.toString()}`;
 
     api
       .get<{ data: SupplementProduct[]; meta: { totalPages: number } }>(endpoint)
@@ -80,10 +80,10 @@ function SupplementsListInner() {
     <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Saglik</span>
-        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">TAKVIYE GIDALAR</h1>
+        <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Sağlık</span>
+        <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">TAKVİYE GIDALAR</h1>
         <p className="text-on-surface-variant text-sm mt-2">
-          Vitamin, mineral ve besin takviyelerini karsilastir, iceriklerini analiz et
+          Vitamin, mineral ve besin takviyelerini karşılaştır, içeriklerini analiz et
         </p>
       </div>
 
@@ -92,7 +92,7 @@ function SupplementsListInner() {
         <span className="material-icon absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]" aria-hidden="true">search</span>
         <input
           type="text"
-          placeholder="Takviye ara... (ornegin: omega-3, d vitamini)"
+          placeholder="Takviye ara... (örneğin: omega-3, d vitamini)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/50 transition-colors"
@@ -131,7 +131,7 @@ function SupplementsListInner() {
         <div className="text-center py-24">
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">medication</span>
           <p className="text-on-surface-variant">
-            {search ? `"${search}" icin sonuc bulunamadi` : 'Bu kategoride henuz urun yok'}
+            {search ? `"${search}" için sonuç bulunamadı` : 'Bu kategoride henüz ürün yok'}
           </p>
           {(search || kategori) && (
             <button

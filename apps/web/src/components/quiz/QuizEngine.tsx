@@ -121,7 +121,7 @@ function MultiSelect({
     <div>
       {step.maxSelections && (
         <p className="text-xs text-on-surface-variant mb-3">
-          En fazla {step.maxSelections} secim yapabilirsiniz ({value.length}/{step.maxSelections})
+          En fazla {step.maxSelections} seçim yapabilirsiniz ({value.length}/{step.maxSelections})
         </p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -316,7 +316,7 @@ export default function QuizEngine({ config }: { config: QuizConfig }) {
               disabled={!canProceed()}
               className="curator-btn-primary text-sm px-8 py-3 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {isLast ? 'Sonuclari Gor' : 'Devam'}
+              {isLast ? 'Sonuçları Gör' : 'Devam'}
               <span className="material-icon material-icon-sm ml-1" aria-hidden="true">
                 {isLast ? 'check' : 'arrow_forward'}
               </span>

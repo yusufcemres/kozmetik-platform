@@ -203,6 +203,41 @@ function getScoreBarColor(score: number): string {
   return 'bg-score-low';
 }
 
+function getLowScoreExplanation(product: Product, avgScore: number): string[] {
+  const reasons: string[] = [];
+  const needScores = product.need_scores || [];
+
+  // Düşük skorlu ihtiyaçları bul
+  const lowNeeds = needScores
+    .filter(ns => Number(ns.compatibility_score) < 50)
+    .map(ns => ns.need?.need_name || '');
+  if (lowNeeds.length > 0)
+    reasons.push(`${lowNeeds.join(', ')} ihtiyaçlarında düşük uyumluluk gösteriyor.`);
+
+  // Aktif madde azlığı
+  const keyIngredients = (product.ingredients || [])
+    .filter(i => i.inci_order_rank <= 5 && !i.is_below_one_percent_estimate);
+  if (keyIngredients.length < 3)
+    reasons.push('Formülde yeterli sayıda aktif madde tespit edilemedi.');
+
+  // Tartışmalı maddeler
+  const questionable = (product.ingredients || [])
+    .filter(i => i.ingredient?.fragrance_flag || i.ingredient?.allergen_flag);
+  if (questionable.length > 0)
+    reasons.push(`${questionable.length} adet alerjen/parfüm bileşeni içeriyor.`);
+
+  // Genel düşük ortalamalı need'ler
+  const mediumNeeds = needScores
+    .filter(ns => Number(ns.compatibility_score) >= 50 && Number(ns.compatibility_score) < 70);
+  if (mediumNeeds.length > 2)
+    reasons.push('Birden fazla kategoride orta seviye uyumluluk gösteriyor.');
+
+  if (reasons.length === 0)
+    reasons.push('Bu ürünün genel uyum skoru, ihtiyaç bazlı skorların ortalamasına göre hesaplanmıştır.');
+
+  return reasons;
+}
+
 const PLATFORM_INFO: Record<string, { label: string; logo: string; color: string }> = {
   trendyol:     { label: 'Trendyol',     logo: '/logos/trendyol.svg',     color: '#F27A1A' },
   hepsiburada:  { label: 'Hepsiburada',  logo: '/logos/hepsiburada.svg',  color: '#FF6000' },
@@ -505,6 +540,26 @@ export default async function ProductDetailPage({
                     className={`h-full rounded-full ${getScoreBarColor(avgScore)}`}
                     style={{ width: getScoreBarWidth(avgScore) }}
                   />
+                </div>
+              </div>
+            )}
+
+            {/* Low Score Explanation */}
+            {avgScore !== null && avgScore < 70 && (
+              <div className="rounded-md border border-score-medium-border bg-score-medium-bg p-5 mb-6">
+                <div className="flex items-start gap-3">
+                  <span className="material-icon text-score-medium text-[20px] mt-0.5" aria-hidden="true">info</span>
+                  <div>
+                    <p className="text-sm font-semibold text-on-surface mb-2">Neden bu skoru aldı?</p>
+                    <ul className="space-y-1.5">
+                      {getLowScoreExplanation(product, avgScore).map((reason, i) => (
+                        <li key={i} className="text-xs text-on-surface-variant flex items-start gap-2">
+                          <span className="text-score-medium mt-0.5">&bull;</span>
+                          {reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
@@ -1011,10 +1066,10 @@ export default async function ProductDetailPage({
           <section className="mb-16">
             <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
               <span className="material-icon text-primary" aria-hidden="true">swap_horiz</span>
-              Benzer Urunler
+              Benzer Ürünler
             </h2>
             <p className="text-sm text-on-surface-variant mb-6">
-              Kategori, aktif icerikler, ihtiyac uyumu ve fiyat araligi bazinda hesaplanan benzerlik.
+              Kategori, aktif içerikler, ihtiyaç uyumu ve fiyat aralığı bazında hesaplanan benzerlik.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {similarProducts.map((sp) => {

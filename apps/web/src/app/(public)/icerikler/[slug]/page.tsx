@@ -112,7 +112,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const ingredient = await getIngredient(params.slug);
   if (!ingredient) {
-    return { title: 'Icerik Bulunamadi' };
+    return { title: 'İçerik Bulunamadı' };
   }
 
   const title = ingredient.common_name

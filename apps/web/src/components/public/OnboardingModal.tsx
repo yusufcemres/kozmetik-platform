@@ -48,10 +48,10 @@ export default function OnboardingModal() {
             <span className="material-icon text-primary text-[32px]" aria-hidden="true">waving_hand</span>
           </div>
 
-          <h2 className="text-xl font-bold text-on-surface mb-2">Hos geldin!</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-2">Hoş geldin!</h2>
           <p className="text-sm text-on-surface-variant mb-6 leading-relaxed">
-            REVELA, kozmetik ve gida takviyesi urunlerinin gercek yuzunu gosterir.
-            Markalarin degil, iceriklerin konustugu tek platform.
+            REVELA, kozmetik ve gıda takviyesi ürünlerinin gerçek yüzünü gösterir.
+            Markaların değil, içeriklerin konuştuğu tek platform.
           </p>
 
           {/* CTAs */}
@@ -62,7 +62,7 @@ export default function OnboardingModal() {
               className="curator-btn-primary text-sm px-6 py-3 w-full flex items-center justify-center gap-2"
             >
               <span className="material-icon material-icon-sm" aria-hidden="true">bolt</span>
-              Hizli Cilt Analizi (1dk)
+              Hızlı Cilt Analizi (1dk)
             </Link>
             <Link
               href="/urunler"
@@ -70,7 +70,7 @@ export default function OnboardingModal() {
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm hover:bg-surface-container-low transition-colors"
             >
               <span className="material-icon material-icon-sm" aria-hidden="true">search</span>
-              Urunleri Kesfet
+              Ürünleri Keşfet
             </Link>
             <button
               onClick={dismiss}

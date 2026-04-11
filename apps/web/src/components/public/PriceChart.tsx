@@ -141,8 +141,8 @@ export default function PriceChart({ productId }: { productId: number }) {
         <span className="material-icon text-outline-variant/40 mb-3" style={{ fontSize: '40px' }} aria-hidden="true">
           show_chart
         </span>
-        <p className="text-sm text-on-surface-variant">Fiyat gecmisi henuz toplanıyor...</p>
-        <p className="text-xs text-outline mt-1">Yakinda burada fiyat degisim grafigi goruntulenecek</p>
+        <p className="text-sm text-on-surface-variant">Fiyat geçmişi henüz toplanıyor...</p>
+        <p className="text-xs text-outline mt-1">Yakında burada fiyat değişim grafiği görüntülenecek</p>
       </div>
     </div>
   );
