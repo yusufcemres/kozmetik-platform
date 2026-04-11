@@ -15,6 +15,8 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.amazon.com.tr' },
       // Brand sites (.com.tr wildcard covers most Turkish brands)
       { protocol: 'https', hostname: '**.com.tr' },
+      // Brand logos (Google Favicon API)
+      { protocol: 'https', hostname: 'www.google.com' },
       // Other
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'api.dicebear.com' },
