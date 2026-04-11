@@ -43,8 +43,12 @@ export class ProductsController {
   @Get('top-scored')
   @ApiOperation({ summary: 'En yüksek skorlu ürünler' })
   @ApiQuery({ name: 'limit', required: false })
-  findTopScored(@Query('limit') limit?: string) {
-    return this.service.findTopScored(limit ? parseInt(limit) : 6);
+  @ApiQuery({ name: 'brand_id', required: false })
+  findTopScored(@Query('limit') limit?: string, @Query('brand_id') brandId?: string) {
+    return this.service.findTopScored(
+      limit ? parseInt(limit) : 6,
+      brandId ? parseInt(brandId) : undefined,
+    );
   }
 
   @Get('by-ingredient/:ingredientId')
@@ -76,6 +80,18 @@ export class ProductsController {
   @ApiOperation({ summary: 'Affiliate link sağlık durumu' })
   getAffiliateHealth() {
     return this.service.getAffiliateHealth();
+  }
+
+  @Get(':id/similar')
+  @ApiOperation({ summary: 'Benzer ürünler' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Sonuç limiti (varsayılan 4)' })
+  @ApiQuery({ name: 'domain_type', required: false, description: 'cosmetic veya supplement' })
+  findSimilar(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('limit') limit?: string,
+    @Query('domain_type') domainType?: string,
+  ) {
+    return this.service.findSimilar(id, limit ? parseInt(limit) : 4, domainType || undefined);
   }
 
   @Get(':id')

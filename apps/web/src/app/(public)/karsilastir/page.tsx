@@ -40,16 +40,24 @@ interface AffiliateLink {
   is_active: boolean;
 }
 
+interface SupplementDetail {
+  form?: string;
+  serving_size?: string;
+  servings_per_container?: number;
+}
+
 interface Product {
   product_id: number;
   product_name: string;
   product_slug: string;
+  domain_type?: string;
   brand?: { brand_name: string };
   category?: { category_name: string };
   images?: { image_url: string }[];
   ingredients?: ProductIngredient[];
   need_scores?: NeedScore[];
   affiliate_links?: AffiliateLink[];
+  supplement_detail?: SupplementDetail;
 }
 
 interface Suggestion {
@@ -412,6 +420,109 @@ export default function ComparePage() {
               ))}
             </div>
           </section>
+
+          {/* Price comparison */}
+          {(() => {
+            const hasPrices = selected.some((p) => p.affiliate_links?.some((l) => l.is_active && l.price_snapshot && l.price_snapshot > 0));
+            if (!hasPrices) return null;
+
+            const getMinPrice = (p: Product) => {
+              const prices = (p.affiliate_links || [])
+                .filter((l) => l.is_active && l.price_snapshot && l.price_snapshot > 0)
+                .map((l) => Number(l.price_snapshot));
+              return prices.length ? Math.min(...prices) : null;
+            };
+
+            const getServingCost = (p: Product) => {
+              const price = getMinPrice(p);
+              const servings = p.supplement_detail?.servings_per_container;
+              if (!price || !servings || servings <= 0) return null;
+              return price / servings;
+            };
+
+            const minPrices = selected.map(getMinPrice);
+            const servingCosts = selected.map(getServingCost);
+            const lowestPrice = Math.min(...minPrices.filter(Boolean) as number[]);
+            const lowestServing = servingCosts.filter(Boolean).length
+              ? Math.min(...servingCosts.filter(Boolean) as number[])
+              : null;
+            const isSupplementCompare = selected.some((p) => p.domain_type === 'supplement');
+            const fmt = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n);
+
+            return (
+              <section>
+                <h2 className="text-xl font-bold text-on-surface mb-4">Fiyat Karsilastirmasi</h2>
+                <div className="curator-card overflow-hidden">
+                  <table className="w-full text-sm">
+                    <tbody className="divide-y divide-outline-variant/20">
+                      <tr className="hover:bg-surface-container-low/50 transition-colors">
+                        <td className="px-4 py-3 text-on-surface-variant font-medium w-40">En Dusuk Fiyat</td>
+                        {selected.map((p, idx) => {
+                          const price = minPrices[idx];
+                          const isCheapest = price === lowestPrice;
+                          return (
+                            <td key={p.product_id} className="px-4 py-3 text-center">
+                              {price ? (
+                                <span className={`text-lg font-bold ${isCheapest ? 'text-score-high' : 'text-on-surface'}`}>
+                                  {fmt(price)}
+                                  {isCheapest && selected.length > 1 && minPrices.filter((pp) => pp === lowestPrice).length === 1 && (
+                                    <span className="block text-[10px] font-medium text-score-high mt-0.5">En ucuz</span>
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="text-outline">-</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {isSupplementCompare && (
+                        <>
+                          <tr className="hover:bg-surface-container-low/50 transition-colors">
+                            <td className="px-4 py-3 text-on-surface-variant font-medium">Form</td>
+                            {selected.map((p) => (
+                              <td key={p.product_id} className="px-4 py-3 text-on-surface text-center">
+                                {p.supplement_detail?.form || '-'}
+                              </td>
+                            ))}
+                          </tr>
+                          <tr className="hover:bg-surface-container-low/50 transition-colors">
+                            <td className="px-4 py-3 text-on-surface-variant font-medium">Porsiyon Sayisi</td>
+                            {selected.map((p) => (
+                              <td key={p.product_id} className="px-4 py-3 text-on-surface text-center">
+                                {p.supplement_detail?.servings_per_container || '-'}
+                              </td>
+                            ))}
+                          </tr>
+                          <tr className="bg-primary/5 hover:bg-primary/10 transition-colors">
+                            <td className="px-4 py-3 text-on-surface font-semibold">Porsiyon Maliyeti</td>
+                            {selected.map((p, idx) => {
+                              const cost = servingCosts[idx];
+                              const isCheapest = cost !== null && lowestServing !== null && cost === lowestServing;
+                              return (
+                                <td key={p.product_id} className="px-4 py-3 text-center">
+                                  {cost ? (
+                                    <span className={`text-lg font-bold ${isCheapest ? 'text-score-high' : 'text-on-surface'}`}>
+                                      {fmt(cost)}
+                                      {isCheapest && servingCosts.filter((c) => c === lowestServing).length === 1 && (
+                                        <span className="block text-[10px] font-medium text-score-high mt-0.5">En degerli</span>
+                                      )}
+                                    </span>
+                                  ) : (
+                                    <span className="text-outline text-xs">Veri yok</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            );
+          })()}
 
           {/* Quick info comparison */}
           <section>

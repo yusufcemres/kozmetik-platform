@@ -72,10 +72,11 @@ async function getMappings(needId: number): Promise<IngredientMapping[]> {
   }
 }
 
-async function getTopProducts(needId: number): Promise<ProductScore[]> {
+async function getTopProducts(needId: number, domainType?: string): Promise<ProductScore[]> {
   try {
+    const dt = domainType ? `&domain_type=${domainType}` : '';
     return await apiFetch<ProductScore[]>(
-      `/scoring/needs/${needId}/top-products?limit=12`,
+      `/scoring/needs/${needId}/top-products?limit=12${dt}`,
       { next: { revalidate: 3600 } } as any,
     );
   } catch {
@@ -176,10 +177,12 @@ export default async function NeedDetailPage({
   const need = await getNeed(params.slug);
   if (!need) notFound();
 
-  const [mappings, topScores] = await Promise.all([
+  const [mappings, cosmeticScores, supplementScores] = await Promise.all([
     getMappings(need.need_id),
-    getTopProducts(need.need_id),
+    getTopProducts(need.need_id, 'cosmetic'),
+    getTopProducts(need.need_id, 'supplement'),
   ]);
+  const topScores = cosmeticScores;
 
   const sortedMappings = [...mappings].sort(
     (a, b) => (b.relevance_score || 0) - (a.relevance_score || 0),
@@ -362,9 +365,9 @@ export default async function NeedDetailPage({
           )}
         </section>
 
-        {/* Compatible Products */}
+        {/* Compatible Products — Cosmetics */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-on-surface mb-4">Uyumlu Ürünler</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-4">Kozmetik Oneriler</h2>
           {topScores.length > 0 ? (
             <ListModal
               title="Uyumlu Ürünler"
@@ -476,6 +479,64 @@ export default async function NeedDetailPage({
             </div>
           )}
         </section>
+
+        {/* Compatible Products — Supplements */}
+        {supplementScores.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-on-surface mb-4">
+              <span className="material-icon text-primary align-middle mr-2" aria-hidden="true">medication</span>
+              Takviye Onerileri
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {supplementScores.slice(0, 6).map((score) => {
+                const product = score.product;
+                if (!product) return null;
+                const primaryImg = product.images?.[0]?.image_url;
+                const compat = Math.round(Number(score.compatibility_score));
+                return (
+                  <Link
+                    key={score.product_need_score_id}
+                    href={`/takviyeler/${product.product_slug}`}
+                    className="curator-card overflow-hidden group"
+                  >
+                    <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden relative">
+                      {primaryImg ? (
+                        <Image
+                          src={primaryImg}
+                          alt={product.product_name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <span className="material-icon text-outline-variant" style={{ fontSize: '48px' }} aria-hidden="true">medication</span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      {product.brand && (
+                        <p className="label-caps text-outline">{product.brand.brand_name}</p>
+                      )}
+                      <p className="text-sm font-medium text-on-surface line-clamp-2 tracking-tight">
+                        {product.product_name}
+                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${getScoreBarColor(compat)}`}
+                            style={{ width: `${Math.min(100, compat)}%` }}
+                          />
+                        </div>
+                        <span className={`text-[10px] font-bold ${getScoreColor(compat)}`}>
+                          %{compat}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Profile CTA */}
         <div className="curator-card p-8 text-center mb-8">

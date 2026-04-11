@@ -53,6 +53,27 @@ export class Ingredient {
   @Column({ type: 'varchar', length: 50, nullable: true })
   evidence_level: string;
 
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  safety_class: string; // 'harmful' | 'questionable' | 'neutral' | 'beneficial'
+
+  @Column({ type: 'text', nullable: true })
+  safety_note: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  food_sources: {
+    food_name: string;
+    amount_per_100g: number;
+    unit: string;
+    bioavailability?: string;
+    note?: string;
+  }[];
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  daily_recommended_value: number;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  daily_recommended_unit: string; // 'mg', 'mcg', 'IU'
+
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 

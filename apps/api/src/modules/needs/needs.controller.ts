@@ -2,7 +2,7 @@ import {
   Body, Controller, Delete, Get, Param, ParseIntPipe,
   Post, Put, Query, UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NeedsService } from './needs.service';
 import { CreateNeedDto } from './dto/create-need.dto';
 import { UpdateNeedDto } from './dto/update-need.dto';
@@ -27,8 +27,14 @@ export class NeedsController {
 
   @Get()
   @ApiOperation({ summary: 'İhtiyaçları listele' })
-  findAll(@Query() query: PaginationDto) {
-    return this.service.findAll(query);
+  @ApiQuery({ name: 'need_category', required: false, description: 'skin | body | hair | general_health' })
+  @ApiQuery({ name: 'domain_type', required: false, description: 'cosmetic | supplement' })
+  findAll(
+    @Query() query: PaginationDto,
+    @Query('need_category') need_category?: string,
+    @Query('domain_type') domain_type?: string,
+  ) {
+    return this.service.findAll({ ...query, need_category, domain_type });
   }
 
   @Get(':id')

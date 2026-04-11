@@ -104,6 +104,40 @@ async function getProduct(slug: string): Promise<Product | null> {
   }
 }
 
+interface IngredientInteraction {
+  interaction_id: number;
+  severity: string;
+  description: string;
+  recommendation: string;
+  ingredient_a: { inci_name: string; ingredient_slug: string };
+  ingredient_b: { inci_name: string; ingredient_slug: string };
+}
+
+async function getIngredientInteractions(ingredientIds: number[]): Promise<IngredientInteraction[]> {
+  if (ingredientIds.length === 0) return [];
+  try {
+    const results: IngredientInteraction[] = [];
+    // Fetch interactions for each key ingredient (max 5 to avoid too many requests)
+    const idsToCheck = ingredientIds.slice(0, 5);
+    for (const id of idsToCheck) {
+      const data = await apiFetch<IngredientInteraction[]>(
+        `/interactions/by-ingredient/${id}`,
+        { next: { revalidate: 3600 } } as any,
+      );
+      if (data?.length) results.push(...data);
+    }
+    // Deduplicate by interaction_id
+    const seen = new Set<number>();
+    return results.filter((r) => {
+      if (seen.has(r.interaction_id)) return false;
+      seen.add(r.interaction_id);
+      return true;
+    });
+  } catch {
+    return [];
+  }
+}
+
 // === SEO ===
 
 export async function generateMetadata({
@@ -262,29 +296,29 @@ function productJsonLd(product: Product) {
 
 // === Similar products ===
 
-interface SimilarProduct {
-  product_id: number;
-  product_name: string;
-  product_slug: string;
-  brand?: { brand_name: string };
-  images?: { image_url: string; sort_order?: number }[];
-  need_scores?: { compatibility_score: number }[];
+interface SimilarProductResult {
+  product: {
+    product_id: number;
+    product_name: string;
+    product_slug: string;
+    domain_type: string;
+    brand_name: string;
+    brand_slug: string;
+    image_url: string | null;
+    price: number | null;
+  };
+  similarity_score: number;
+  shared_ingredients: string[];
+  shared_needs: string[];
+  price_comparison: 'cheaper' | 'similar' | 'expensive' | null;
 }
 
-async function getSimilarProducts(
-  productId: number,
-  categoryId?: number,
-  brandId?: number,
-): Promise<SimilarProduct[]> {
-  if (!categoryId) return [];
+async function getSimilarProducts(productId: number): Promise<SimilarProductResult[]> {
   try {
-    const res = await apiFetch<{ data: SimilarProduct[] }>(
-      `/products?category_id=${categoryId}&limit=7`,
+    return await apiFetch<SimilarProductResult[]>(
+      `/products/${productId}/similar?limit=4`,
       { next: { revalidate: 3600 } } as any,
     );
-    return (res.data || []).filter(
-      (p) => p.product_id !== productId && p.brand?.brand_name,
-    ).slice(0, 6);
   } catch {
     return [];
   }
@@ -300,10 +334,26 @@ export default async function ProductDetailPage({
   const product = await getProduct(params.slug);
   if (!product) notFound();
 
-  const similarProducts = await getSimilarProducts(
-    product.product_id,
-    product.category?.category_id,
-    product.brand?.brand_id,
+  const keyIngredientIds = (product.ingredients || [])
+    .filter((pi: any) => pi.is_key_ingredient || pi.inci_order_rank <= 5)
+    .map((pi: any) => pi.ingredient_id)
+    .filter(Boolean);
+
+  const [similarProducts, interactions] = await Promise.all([
+    getSimilarProducts(product.product_id),
+    getIngredientInteractions(keyIngredientIds),
+  ]);
+
+  // Filter interactions to only those where BOTH ingredients are in this product
+  const productIngredientIds = new Set(
+    (product.ingredients || []).map((pi) => pi.ingredient_id).filter(Boolean),
+  );
+  const relevantInteractions = interactions.filter(
+    (inter) =>
+      inter.severity !== 'none' &&
+      // At least one ingredient is in this product — show as educational info
+      (productIngredientIds.has((inter.ingredient_a as any)?.ingredient_id) ||
+       productIngredientIds.has((inter.ingredient_b as any)?.ingredient_id)),
   );
 
   const rawImageUrl = product.images?.[0]?.image_url;
@@ -524,6 +574,78 @@ export default async function ProductDetailPage({
           </section>
         )}
 
+        {/* Safety Score */}
+        {sortedIngredients.length > 0 && (() => {
+          const allergenCount = sortedIngredients.filter(pi => pi.ingredient?.allergen_flag).length;
+          const fragranceCount = sortedIngredients.filter(pi => pi.ingredient?.fragrance_flag).length;
+          const totalCount = sortedIngredients.length;
+          const flaggedCount = allergenCount + fragranceCount;
+          const cleanPct = totalCount > 0 ? Math.round(((totalCount - flaggedCount) / totalCount) * 100) : 100;
+
+          let safetyScore = 100;
+          safetyScore -= allergenCount * 12;
+          safetyScore -= fragranceCount * 5;
+          safetyScore = Math.max(0, Math.min(100, safetyScore));
+
+          const grade = safetyScore >= 85 ? 'A' : safetyScore >= 70 ? 'B' : safetyScore >= 50 ? 'C' : safetyScore >= 30 ? 'D' : 'F';
+          const gradeColor = { A: 'text-score-high', B: 'text-score-high', C: 'text-score-medium', D: 'text-score-low', F: 'text-error' }[grade];
+          const gradeLabel = { A: 'Cok Guvenli', B: 'Guvenli', C: 'Orta', D: 'Dikkatli Ol', F: 'Riskli' }[grade];
+          const barColor = { A: 'bg-score-high', B: 'bg-score-high', C: 'bg-score-medium', D: 'bg-score-low', F: 'bg-error' }[grade];
+
+          const highlights: string[] = [];
+          if (allergenCount === 0) highlights.push('Alerjen icermiyor');
+          if (fragranceCount === 0) highlights.push('Parfumsuz');
+
+          const warnings: string[] = [];
+          if (allergenCount > 0) warnings.push(`${allergenCount} alerjen icerik`);
+          if (fragranceCount > 0) warnings.push(`${fragranceCount} parfum/koku bileseni`);
+
+          return (
+            <section className="mb-16" data-analytics-section="safety">
+              <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary" aria-hidden="true">shield</span>
+                Guvenlik Skoru
+              </h2>
+              <div className="curator-card p-6">
+                <div className="flex items-center gap-6 mb-4">
+                  <div className="text-center">
+                    <div className={`text-4xl font-extrabold ${gradeColor}`}>{safetyScore}</div>
+                    <div className="text-xs text-on-surface-variant">/100</div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-sm font-bold ${gradeColor}`}>Sinif {grade}</span>
+                      <span className="text-xs text-on-surface-variant">— {gradeLabel}</span>
+                    </div>
+                    <div className="h-2 bg-surface-container rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${safetyScore}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {highlights.map((h) => (
+                    <span key={h} className="inline-flex items-center gap-1 text-xs bg-score-high/10 text-score-high px-2 py-1 rounded-sm">
+                      <span className="material-icon text-sm" aria-hidden="true">check_circle</span>
+                      {h}
+                    </span>
+                  ))}
+                  {warnings.map((w) => (
+                    <span key={w} className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm">
+                      <span className="material-icon text-sm" aria-hidden="true">warning</span>
+                      {w}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="text-xs text-on-surface-variant">
+                  {totalCount} madde analiz edildi · %{cleanPct} temiz icerik
+                </p>
+              </div>
+            </section>
+          );
+        })()}
+
         {/* INCI Ingredients */}
         <section className="mb-16" data-analytics-section="inci">
           <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">
@@ -671,6 +793,56 @@ export default async function ProductDetailPage({
             </div>
           )}
         </section>
+
+        {/* Ingredient Interactions */}
+        {relevantInteractions.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
+              <span className="material-icon text-score-medium" aria-hidden="true">sync_alt</span>
+              Icerik Etkilesimleri
+            </h2>
+            <p className="text-sm text-on-surface-variant mb-4">
+              Bu urundeki aktif maddelerin bilinen etkilesimleri.
+            </p>
+            <div className="space-y-3">
+              {relevantInteractions.slice(0, 5).map((inter) => {
+                const severityConfig = inter.severity === 'severe'
+                  ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kacinilmali' }
+                  : inter.severity === 'moderate'
+                  ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli Kullanin' }
+                  : { icon: 'info', color: 'border-outline-variant/20 bg-surface-container-low', badge: 'bg-surface-container text-on-surface-variant', label: 'Bilgi' };
+                return (
+                  <div key={inter.interaction_id} className={`rounded-sm border p-4 ${severityConfig.color}`}>
+                    <div className="flex items-start gap-3">
+                      <span className="material-icon text-on-surface-variant mt-0.5" style={{ fontSize: '20px' }} aria-hidden="true">{severityConfig.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold text-on-surface">
+                            {inter.ingredient_a?.inci_name || '?'}
+                          </span>
+                          <span className="text-xs text-outline">+</span>
+                          <span className="text-sm font-semibold text-on-surface">
+                            {inter.ingredient_b?.inci_name || '?'}
+                          </span>
+                          <span className={`label-caps px-1.5 py-0.5 rounded-sm ${severityConfig.badge}`}>
+                            {severityConfig.label}
+                          </span>
+                        </div>
+                        <p className="text-xs text-on-surface-variant leading-relaxed">{inter.description}</p>
+                        {inter.recommendation && (
+                          <p className="text-xs text-primary mt-1.5 flex items-center gap-1">
+                            <span className="material-icon material-icon-sm" aria-hidden="true">lightbulb</span>
+                            {inter.recommendation}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Label Info */}
         {product.label && (
@@ -822,7 +994,13 @@ export default async function ProductDetailPage({
                 <p className="text-xs text-outline">
                   Bağımsız platformuz, komisyon alınan linkler içerebilir. Fiyatlar son güncelleme tarihine aittir.
                 </p>
-                <PriceAlertButton productId={product.product_id} />
+                <PriceAlertButton
+                  productId={product.product_id}
+                  productName={product.product_name}
+                  productSlug={product.product_slug}
+                  brandName={product.brand?.brand_name}
+                  currentPrice={minPrice || undefined}
+                />
               </div>
             </section>
           );
@@ -831,59 +1009,87 @@ export default async function ProductDetailPage({
         {/* Similar Products */}
         {similarProducts.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">grid_view</span>
-              Benzer Ürünler
+            <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">swap_horiz</span>
+              Benzer Urunler
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <p className="text-sm text-on-surface-variant mb-6">
+              Kategori, aktif icerikler, ihtiyac uyumu ve fiyat araligi bazinda hesaplanan benzerlik.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {similarProducts.map((sp) => {
-                const rawSpImg = sp.images?.find(i => i.sort_order === 0)?.image_url || sp.images?.[0]?.image_url;
-                const spImg = rawSpImg?.includes('placehold.co') || rawSpImg?.includes('dicebear') ? undefined : rawSpImg;
-                const rawSpHover = sp.images?.find(i => i.sort_order === 1)?.image_url;
-                const spHover = rawSpHover?.includes('placehold.co') || rawSpHover?.includes('dicebear') ? undefined : rawSpHover;
-                const spScore = sp.need_scores?.length
-                  ? Math.round(sp.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) / sp.need_scores.length)
-                  : null;
+                const spImg = sp.product.image_url?.includes('placehold.co') || sp.product.image_url?.includes('dicebear')
+                  ? null : sp.product.image_url;
+                const priceLabel = sp.price_comparison === 'cheaper'
+                  ? 'Daha Uygun' : sp.price_comparison === 'expensive'
+                  ? 'Daha Pahali' : sp.price_comparison === 'similar'
+                  ? 'Benzer Fiyat' : null;
+                const priceColor = sp.price_comparison === 'cheaper'
+                  ? 'text-score-high bg-score-high-bg' : sp.price_comparison === 'expensive'
+                  ? 'text-score-low bg-score-low-bg' : 'text-on-surface-variant bg-surface-container';
                 return (
                   <Link
-                    key={sp.product_id}
-                    href={`/urunler/${sp.product_slug}`}
+                    key={sp.product.product_id}
+                    href={`/urunler/${sp.product.product_slug}`}
                     className="curator-card overflow-hidden group"
                   >
-                    <div className="aspect-square bg-surface-container-low overflow-hidden relative">
+                    <div className="aspect-[4/3] bg-surface-container-low overflow-hidden relative">
                       {spImg ? (
-                        <>
-                          <Image
-                            src={spImg}
-                            alt={sp.product_name}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                            className={`object-contain transition-all duration-500 ${spHover ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
-                          />
-                          {spHover && (
-                            <Image
-                              src={spHover}
-                              alt={`${sp.product_name} - detay`}
-                              fill
-                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                              className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
-                            />
-                          )}
-                        </>
+                        <Image
+                          src={spImg}
+                          alt={sp.product.product_name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-contain transition-transform duration-500 group-hover:scale-105"
+                        />
                       ) : (
-                        <span className="material-icon text-outline-variant flex items-center justify-center h-full" aria-hidden="true">inventory_2</span>
+                        <span className="material-icon text-outline-variant flex items-center justify-center h-full" style={{ fontSize: '48px' }} aria-hidden="true">inventory_2</span>
                       )}
-                      {spScore !== null && (
-                        <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm rounded-sm px-1.5 py-0.5">
-                          <span className={`text-[10px] font-bold ${getScoreColor(spScore)}`}>%{spScore}</span>
+                      {/* Similarity badge */}
+                      <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm rounded-sm px-2 py-1">
+                        <span className="text-xs font-bold text-primary">%{sp.similarity_score}</span>
+                      </div>
+                      {/* Price comparison badge */}
+                      {priceLabel && (
+                        <div className={`absolute bottom-2 left-2 rounded-sm px-2 py-0.5 ${priceColor}`}>
+                          <span className="text-[10px] font-bold">{priceLabel}</span>
                         </div>
                       )}
                     </div>
-                    <div className="p-3">
-                      {sp.brand && <p className="label-caps text-outline text-[9px]">{sp.brand.brand_name}</p>}
-                      <p className="text-xs font-semibold text-on-surface line-clamp-2 mt-0.5 group-hover:text-primary transition-colors">
-                        {sp.product_name}
+                    <div className="p-4">
+                      <p className="label-caps text-outline text-[9px]">{sp.product.brand_name}</p>
+                      <p className="text-sm font-semibold text-on-surface line-clamp-2 mt-0.5 group-hover:text-primary transition-colors">
+                        {sp.product.product_name}
                       </p>
+                      {/* Shared ingredients */}
+                      {sp.shared_ingredients.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {sp.shared_ingredients.slice(0, 3).map((ing) => (
+                            <span key={ing} className="label-caps bg-primary/5 text-primary px-1.5 py-0.5 rounded-sm text-[9px]">
+                              {ing}
+                            </span>
+                          ))}
+                          {sp.shared_ingredients.length > 3 && (
+                            <span className="label-caps text-outline text-[9px] px-1">+{sp.shared_ingredients.length - 3}</span>
+                          )}
+                        </div>
+                      )}
+                      {/* Shared needs */}
+                      {sp.shared_needs.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {sp.shared_needs.slice(0, 2).map((need) => (
+                            <span key={need} className="label-caps bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-sm text-[9px]">
+                              {need}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {/* Price */}
+                      {sp.product.price && (
+                        <p className="text-sm font-bold text-on-surface mt-2">
+                          {formatPrice(sp.product.price)}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 );

@@ -6,9 +6,10 @@ import { usePathname } from 'next/navigation';
 
 const TABS = [
   { href: '/urunler', icon: 'search', activeIcon: 'search', label: 'Keşfet' },
+  { href: '/takviyeler', icon: 'medication', activeIcon: 'medication', label: 'Takviye' },
   { href: '/cilt-analizi', icon: 'water_drop', activeIcon: 'water_drop', label: 'Analiz' },
   { href: '/karsilastir', icon: 'compare_arrows', activeIcon: 'compare_arrows', label: 'Karşılaştır' },
-  { href: '/favorilerim', icon: 'favorite_border', activeIcon: 'favorite', label: 'Favoriler' },
+  { href: '/profilim', icon: 'person_outline', activeIcon: 'person', label: 'Profil' },
 ];
 
 export default function BottomNav() {
@@ -32,7 +33,7 @@ export default function BottomNav() {
       <div className="flex items-center justify-around h-16 px-2">
         {TABS.map((tab) => {
           const isActive = pathname === tab.href || pathname.startsWith(tab.href + '/');
-          const isFav = tab.href === '/favorilerim';
+          const isProfile = tab.href === '/profilim';
           return (
             <Link
               key={tab.href}
@@ -45,7 +46,7 @@ export default function BottomNav() {
                 {isActive ? tab.activeIcon : tab.icon}
               </span>
               <span className="text-[10px] font-medium tracking-wide">{tab.label}</span>
-              {isFav && favCount > 0 && (
+              {isProfile && favCount > 0 && (
                 <span className="absolute top-1.5 right-1/2 translate-x-4 bg-error text-on-error text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                   {favCount > 9 ? '9+' : favCount}
                 </span>

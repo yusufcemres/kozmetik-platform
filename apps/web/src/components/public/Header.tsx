@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 const EXPLORE_ITEMS = [
   { href: '/urunler', label: 'Ürünler', icon: 'inventory_2', desc: '1900+ ürünü keşfet' },
@@ -11,6 +12,20 @@ const EXPLORE_ITEMS = [
   { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
   { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science', desc: '5000+ INCI analizi' },
   { href: '/rehber', label: 'Rehber', icon: 'menu_book', desc: 'Cilt bakım rehberleri' },
+  { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', desc: 'Takviye ihtiyacını öğren', badge: 'YENİ' },
+  { href: '/sac-analizi', label: 'Saç Analizi', icon: 'face_retouching_natural', desc: 'Kişisel saç bakım planı', badge: 'YENİ' },
+  { href: '/cilt-yasi-testi', label: 'Cilt Yaşı Testi', icon: 'timer', desc: 'Cildinin gerçek yaşını öğren', badge: 'YENİ' },
+  { href: '/icerik-testi', label: 'İçerik Testi', icon: 'quiz', desc: 'Kozmetik bilgini ölç', badge: 'YENİ' },
+];
+
+const SUPPLEMENT_ITEMS = [
+  { href: '/takviyeler?kategori=vitamin-mineral', label: 'Vitaminler & Mineraller', icon: 'medication' },
+  { href: '/takviyeler?kategori=probiyotik', label: 'Probiyotikler', icon: 'bacteria' },
+  { href: '/takviyeler?kategori=bitkisel-takviye', label: 'Bitkisel Takviyeler', icon: 'spa' },
+  { href: '/takviyeler?kategori=omega-yag-asitleri', label: 'Omega & Yağ Asitleri', icon: 'water_drop' },
+  { href: '/takviyeler?kategori=sporcu-besinleri', label: 'Sporcu Besinleri', icon: 'fitness_center' },
+  { href: '/takviyeler?kategori=kolajen-guzellik', label: 'Kolajen & Güzellik', icon: 'face_retouching_natural' },
+  { href: '/takviyeler', label: 'Tüm Takviyeler', icon: 'grid_view' },
 ];
 
 const NAV_ITEMS = [
@@ -21,9 +36,12 @@ const NAV_ITEMS = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
+  const [supplementOpen, setSupplementOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
   const pathname = usePathname();
   const exploreRef = useRef<HTMLDivElement>(null);
+  const supplementRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     const update = () => {
@@ -41,13 +59,17 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setExploreOpen(false);
+    setSupplementOpen(false);
   }, [pathname]);
 
-  // Close explore dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (exploreRef.current && !exploreRef.current.contains(e.target as Node)) {
         setExploreOpen(false);
+      }
+      if (supplementRef.current && !supplementRef.current.contains(e.target as Node)) {
+        setSupplementOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -57,6 +79,7 @@ export default function Header() {
   const isExplorePath = EXPLORE_ITEMS.some(
     (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
   );
+  const isSupplementPath = pathname === '/takviyeler' || pathname.startsWith('/takviyeler/');
 
   return (
     <>
@@ -77,7 +100,7 @@ export default function Header() {
           {/* Keşfet dropdown */}
           <div ref={exploreRef} className="relative">
             <button
-              onClick={() => setExploreOpen(!exploreOpen)}
+              onClick={() => { setExploreOpen(!exploreOpen); setSupplementOpen(false); }}
               className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
                 isExplorePath || exploreOpen
                   ? 'text-on-surface border-b-2 border-on-surface pb-1'
@@ -128,6 +151,49 @@ export default function Header() {
             )}
           </div>
 
+          {/* Takviyeler dropdown */}
+          <div ref={supplementRef} className="relative">
+            <button
+              onClick={() => { setSupplementOpen(!supplementOpen); setExploreOpen(false); }}
+              className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
+                isSupplementPath || supplementOpen
+                  ? 'text-on-surface border-b-2 border-on-surface pb-1'
+                  : 'text-outline hover:text-on-surface'
+              }`}
+            >
+              Takviyeler
+              <span
+                className={`material-icon text-[16px] transition-transform duration-200 ${supplementOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              >
+                expand_more
+              </span>
+            </button>
+
+            {supplementOpen && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[320px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
+                {SUPPLEMENT_ITEMS.map((item) => {
+                  const itemPath = item.href.split('?')[0];
+                  const isActive = pathname === itemPath || pathname.startsWith(itemPath + '/');
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-md transition-all duration-200 ${
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      <span className="material-icon text-[18px]" aria-hidden="true">{item.icon}</span>
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Direct nav items */}
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -149,6 +215,17 @@ export default function Header() {
 
         {/* Right icons */}
         <div className="flex items-center gap-5">
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="text-on-surface-variant hover:text-on-surface transition-colors duration-300"
+            title={resolvedTheme === 'dark' ? 'Aydınlık mod' : 'Karanlık mod'}
+          >
+            <span className="material-icon material-icon-sm" aria-hidden="true">
+              {resolvedTheme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
+
           {/* Search */}
           <Link
             href="/ara"
@@ -158,17 +235,15 @@ export default function Header() {
             <span className="material-icon material-icon-sm" aria-hidden="true">search</span>
           </Link>
 
-          {/* Favorites */}
+          {/* Profile */}
           <Link
-            href="/favorilerim"
-            className="relative text-on-surface-variant hover:text-error transition-colors duration-300"
-            title="Favorilerim"
+            href="/profilim"
+            className="relative text-on-surface-variant hover:text-on-surface transition-colors duration-300"
+            title="Profilim"
           >
-            <span className="material-icon material-icon-sm" aria-hidden="true">
-              {favCount > 0 ? 'favorite' : 'favorite_border'}
-            </span>
+            <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
             {favCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-error text-on-error text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-primary text-on-primary text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                 {favCount > 9 ? '9+' : favCount}
               </span>
             )}
@@ -220,6 +295,29 @@ export default function Header() {
 
           <div className="h-px bg-white/10 my-6" />
 
+          {/* Takviyeler section */}
+          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Takviyeler</p>
+          {SUPPLEMENT_ITEMS.map((item) => {
+            const itemPath = item.href.split('?')[0];
+            const isActive = pathname === itemPath || pathname.startsWith(itemPath + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary text-on-primary font-semibold'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          <div className="h-px bg-white/10 my-6" />
+
           {/* Direct nav */}
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -244,25 +342,31 @@ export default function Header() {
           <div className="h-px bg-white/10 my-6" />
 
           <Link
-            href="/favorilerim"
+            href="/profilim"
             className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
           >
-            <span className="material-icon material-icon-sm" aria-hidden="true">favorite_border</span>
-            <span className="uppercase tracking-widest text-xs">Favorilerim</span>
+            <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
+            <span className="uppercase tracking-widest text-xs">Profilim</span>
             {favCount > 0 && (
-              <span className="bg-error text-on-error text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="bg-primary text-on-primary text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                 {favCount}
               </span>
             )}
           </Link>
 
-          <Link
-            href="/profilim"
-            className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
+          <div className="h-px bg-white/10 my-4" />
+
+          <button
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white transition-colors w-full"
           >
-            <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
-            <span className="uppercase tracking-widest text-xs">Cilt Profilim</span>
-          </Link>
+            <span className="material-icon material-icon-sm" aria-hidden="true">
+              {resolvedTheme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+            <span className="uppercase tracking-widest text-xs">
+              {resolvedTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}
+            </span>
+          </button>
         </nav>
       </div>
     )}

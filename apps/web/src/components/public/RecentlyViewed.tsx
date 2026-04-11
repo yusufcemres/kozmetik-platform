@@ -14,7 +14,7 @@ interface RecentProduct {
 }
 
 const STORAGE_KEY = 'recently_viewed';
-const MAX_ITEMS = 10;
+const MAX_ITEMS = 50;
 
 export function trackRecentlyViewed(product: Omit<RecentProduct, 'viewed_at'>) {
   try {

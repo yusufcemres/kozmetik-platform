@@ -49,6 +49,12 @@ export { Webhook } from './webhook.entity';
 // Analytics
 export { AnalyticsEvent } from './analytics-event.entity';
 
+// Brand Portal (Faz 22)
+export { BrandAccount } from './brand-account.entity';
+export { BrandQuestion } from './brand-question.entity';
+export { BrandCertificate } from './brand-certificate.entity';
+export { BrandProductEdit } from './brand-product-edit.entity';
+
 // Admin & Sistem
 export { AdminRole } from './admin-role.entity';
 export { AdminUser } from './admin-user.entity';

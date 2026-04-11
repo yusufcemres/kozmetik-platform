@@ -230,6 +230,65 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Son Eklenenler — Grid */}
+      {latest.data && latest.data.length > 0 && (
+        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Yeni Keşifler</span>
+              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">SON EKLENENLER</h2>
+            </div>
+            <Link href="/urunler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
+              Tümünü Gör
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {latest.data.slice(0, 6).map((p: Product) => {
+              const img = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
+              const score = avgScore(p);
+              return (
+                <Link
+                  key={p.product_id}
+                  href={`/urunler/${p.product_slug}`}
+                  className="curator-card p-3 group"
+                >
+                  <div className="aspect-square bg-surface-container-low mb-2 overflow-hidden rounded-sm relative">
+                    {img ? (
+                      <Image
+                        src={img}
+                        alt={p.product_name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="material-icon text-outline-variant/30" style={{ fontSize: '32px' }} aria-hidden="true">spa</span>
+                      </div>
+                    )}
+                    {score !== null && (
+                      <div className="absolute top-1.5 right-1.5 bg-surface/90 backdrop-blur-sm rounded-sm px-1.5 py-0.5">
+                        <span className={`text-[10px] font-bold ${score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low'}`}>
+                          %{score}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-0.5">
+                    {p.brand && (
+                      <p className="label-caps text-outline truncate text-[9px]">{p.brand.brand_name}</p>
+                    )}
+                    <h4 className="text-xs font-semibold text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                      {p.product_name}
+                    </h4>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* How It Works — 3 Steps */}
       <section className="py-20 lg:py-28 px-6 lg:px-16 bg-surface">
         <div className="text-center mb-14">

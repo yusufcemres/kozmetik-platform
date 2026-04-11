@@ -28,6 +28,7 @@ interface Product {
   category?: { category_name: string; category_slug?: string };
   images?: ProductImage[];
   affiliate_links?: { affiliate_link_id: number; platform: string; affiliate_url: string }[];
+  need_scores?: { compatibility_score: number; need?: { need_name: string; need_slug: string } }[];
 }
 
 // === Country Maps ===
@@ -66,6 +67,17 @@ async function getBrandProducts(brandId: number): Promise<{ data: Product[]; met
   }
 }
 
+async function getTopScoredByBrand(brandId: number): Promise<Product[]> {
+  try {
+    return await apiFetch<Product[]>(
+      `/products/top-scored?brand_id=${brandId}&limit=3`,
+      { next: { revalidate: 3600 } } as RequestInit,
+    );
+  } catch {
+    return [];
+  }
+}
+
 // === Metadata ===
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -90,7 +102,10 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
   const brand = await getBrand(slug);
   if (!brand) notFound();
 
-  const { data: products, meta } = await getBrandProducts(brand.brand_id);
+  const [{ data: products, meta }, topProducts] = await Promise.all([
+    getBrandProducts(brand.brand_id),
+    getTopScoredByBrand(brand.brand_id),
+  ]);
 
   // Group products by category
   const grouped = products.reduce<Record<string, Product[]>>((acc, p) => {
@@ -159,6 +174,74 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
       </div>
+
+      {/* Top Scored Highlight */}
+      {topProducts.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span className="material-icon text-primary" aria-hidden="true">star</span>
+            Bu Markadan En Iyiler
+          </h2>
+          <p className="text-xs text-on-surface-variant mb-4">
+            Skorlar en yuksek ihtiyac uyumuna gore hesaplanmistir.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {topProducts.map((tp, rank) => {
+              const rawImg = tp.images?.[0]?.image_url;
+              const tpImg = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
+              const topNeed = tp.need_scores?.sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))?.[0];
+              const avgScore = tp.need_scores?.length
+                ? Math.round(tp.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) / tp.need_scores.length)
+                : null;
+              return (
+                <Link
+                  key={tp.product_id}
+                  href={`/urunler/${tp.product_slug}`}
+                  className="curator-card overflow-hidden group border-primary/10"
+                >
+                  <div className="aspect-[4/3] bg-surface-container-low relative overflow-hidden">
+                    {tpImg ? (
+                      <Image
+                        src={tpImg}
+                        alt={tp.product_name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 33vw"
+                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="material-icon text-outline-variant/30" style={{ fontSize: '48px' }} aria-hidden="true">spa</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold">
+                      #{rank + 1}
+                    </div>
+                    {avgScore !== null && (
+                      <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-sm rounded-sm px-2 py-1">
+                        <span className="text-xs font-bold text-primary">%{avgScore}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
+                      {tp.product_name}
+                    </h3>
+                    {topNeed?.need && (
+                      <p className="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1">
+                        <span className="material-icon material-icon-sm text-primary" aria-hidden="true">target</span>
+                        {topNeed.need.need_name} — %{Math.round(Number(topNeed.compatibility_score))}
+                      </p>
+                    )}
+                    {tp.category && (
+                      <p className="label-caps text-outline mt-1">{tp.category.category_name}</p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Products by Category */}
       {categoryNames.length === 0 ? (

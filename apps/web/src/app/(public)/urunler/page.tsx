@@ -98,6 +98,7 @@ function ProductsListContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [typeFilter, setTypeFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState('');
+  const [ingredientSlug, setIngredientSlug] = useState('');
 
   useEffect(() => {
     api.get<Category[]>('/categories/tree').then(setCategories).catch(() => {});
@@ -130,6 +131,8 @@ function ProductsListContent() {
     if (typeParam) setTypeFilter(typeParam);
     const areaParam = searchParams.get('area');
     if (areaParam) setAreaFilter(areaParam);
+    const ingParam = searchParams.get('ingredient');
+    if (ingParam) setIngredientSlug(ingParam);
   }, [searchParams, categories, brands]);
 
   const fetchProducts = useCallback(async () => {
@@ -143,6 +146,7 @@ function ProductsListContent() {
       if (categoryFilter) params.set('category_id', String(categoryFilter));
       if (typeFilter) params.set('product_type', typeFilter);
       if (areaFilter) params.set('target_area', areaFilter);
+      if (ingredientSlug) params.set('ingredient_slug', ingredientSlug);
 
       const data = await api.get<{ data: Product[]; meta: PageMeta }>(
         `/products?${params.toString()}`,
@@ -155,7 +159,7 @@ function ProductsListContent() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, brandFilter, categoryFilter, typeFilter, areaFilter]);
+  }, [page, search, brandFilter, categoryFilter, typeFilter, areaFilter, ingredientSlug]);
 
   useEffect(() => {
     fetchProducts();
@@ -174,12 +178,13 @@ function ProductsListContent() {
     setCategoryFilter('');
     setTypeFilter('');
     setAreaFilter('');
+    setIngredientSlug('');
     setPage(1);
     router.push('/urunler');
   };
 
   const parentCats = categories.filter((c) => !c.parent_category_id);
-  const hasFilters = !!search || !!brandFilter || !!categoryFilter || !!typeFilter || !!areaFilter;
+  const hasFilters = !!search || !!brandFilter || !!categoryFilter || !!typeFilter || !!areaFilter || !!ingredientSlug;
 
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
@@ -298,6 +303,15 @@ function ProductsListContent() {
           {search && <span> &mdash; &ldquo;{search}&rdquo; için sonuçlar</span>}
           {typeFilter && <span> &mdash; {typeFilter}</span>}
           {areaFilter && <span> &mdash; {AREA_LABELS[areaFilter] || areaFilter}</span>}
+          {ingredientSlug && (
+            <span className="ml-2 inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <span className="material-icon text-[12px]" aria-hidden="true">science</span>
+              {ingredientSlug.replace(/-/g, ' ')}
+              <button onClick={() => { setIngredientSlug(''); setPage(1); }} className="ml-1 hover:text-error">
+                <span className="material-icon text-[12px]" aria-hidden="true">close</span>
+              </button>
+            </span>
+          )}
         </p>
       )}
 

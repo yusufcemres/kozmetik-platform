@@ -40,11 +40,19 @@ export class ScoringController {
   @Get('scoring/needs/:needId/top-products')
   @ApiOperation({ summary: 'İhtiyaç için en uyumlu ürünler' })
   @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'gender', required: false, description: 'female | male' })
+  @ApiQuery({ name: 'domain_type', required: false, description: 'cosmetic | supplement | all' })
   getTopProductsByNeed(
     @Param('needId', ParseIntPipe) needId: number,
     @Query('limit') limit?: string,
+    @Query('gender') gender?: string,
+    @Query('domain_type') domain_type?: string,
   ) {
-    return this.service.getTopProductsByNeed(needId, limit ? parseInt(limit) : 12);
+    return this.service.getTopProductsByNeed(
+      needId,
+      limit ? parseInt(limit) : 12,
+      { gender, domain_type },
+    );
   }
 
   @Get('products/:id/personal-score')

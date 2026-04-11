@@ -20,6 +20,25 @@ interface EvidenceLink {
   summary_note?: string;
 }
 
+interface FoodSource {
+  food_name: string;
+  amount_per_100g: number;
+  unit: string;
+  bioavailability?: string;
+  note?: string;
+}
+
+interface NeedMapping {
+  mapping_id: number;
+  relevance_score: number;
+  effect_type: string;
+  need?: {
+    need_id: number;
+    need_name: string;
+    need_slug: string;
+  };
+}
+
 interface Ingredient {
   ingredient_id: number;
   inci_name: string;
@@ -34,6 +53,11 @@ interface Ingredient {
   fragrance_flag: boolean;
   preservative_flag: boolean;
   evidence_level?: string;
+  safety_class?: string;
+  safety_note?: string;
+  food_sources?: FoodSource[];
+  daily_recommended_value?: number;
+  daily_recommended_unit?: string;
   aliases?: IngredientAlias[];
   evidence_links?: EvidenceLink[];
 }
@@ -56,6 +80,16 @@ async function getIngredient(slug: string): Promise<Ingredient | null> {
     } as any);
   } catch {
     return null;
+  }
+}
+
+async function getNeedMappings(ingredientId: number): Promise<NeedMapping[]> {
+  try {
+    return await apiFetch<NeedMapping[]>(`/ingredient-need-mappings/by-ingredient/${ingredientId}`, {
+      next: { revalidate: 3600 },
+    } as any);
+  } catch {
+    return [];
   }
 }
 
@@ -137,6 +171,26 @@ function originLabel(type: string): string {
   return map[type] || type;
 }
 
+function safetyClassLabel(cls: string): { label: string; color: string; icon: string } {
+  const map: Record<string, { label: string; color: string; icon: string }> = {
+    beneficial: { label: 'Faydali', color: 'text-score-high bg-score-high/10', icon: 'verified' },
+    neutral: { label: 'Notr', color: 'text-on-surface-variant bg-surface-container-low', icon: 'remove_circle_outline' },
+    questionable: { label: 'Tartismali', color: 'text-score-medium bg-score-medium/10', icon: 'help_outline' },
+    harmful: { label: 'Riskli', color: 'text-error bg-error/10', icon: 'dangerous' },
+  };
+  return map[cls] || { label: cls, color: 'text-outline', icon: 'info' };
+}
+
+function effectTypeLabel(type: string): string {
+  const map: Record<string, string> = {
+    direct_support: 'Dogrudan Destek',
+    indirect_support: 'Dolayli Destek',
+    complementary: 'Tamamlayici',
+    caution_related: 'Dikkat',
+  };
+  return map[type] || type.replace(/_/g, ' ');
+}
+
 function sourceTypeLabel(type: string): string {
   const map: Record<string, string> = {
     pubmed: 'PubMed',
@@ -182,7 +236,16 @@ export default async function IngredientDetailPage({
   const ingredient = await getIngredient(params.slug);
   if (!ingredient) notFound();
 
-  const products = await getProductsByIngredient(ingredient.ingredient_id);
+  const [products, needMappings] = await Promise.all([
+    getProductsByIngredient(ingredient.ingredient_id),
+    getNeedMappings(ingredient.ingredient_id),
+  ]);
+
+  const sortedMappings = [...needMappings]
+    .filter((m) => m.need)
+    .sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0));
+
+  const safety = ingredient.safety_class ? safetyClassLabel(ingredient.safety_class) : null;
 
   const evidence = ingredient.evidence_level
     ? evidenceLabel(ingredient.evidence_level)
@@ -245,6 +308,12 @@ export default async function IngredientDetailPage({
             {evidence && (
               <span className={`label-caps px-2.5 py-1 rounded-sm bg-surface-container-low border border-outline-variant/20 ${evidence.color}`}>
                 {evidence.label}
+              </span>
+            )}
+            {safety && (
+              <span className={`label-caps px-2.5 py-1 rounded-sm flex items-center gap-1 ${safety.color}`}>
+                <span className="material-icon text-[12px]" aria-hidden="true">{safety.icon}</span>
+                {safety.label}
               </span>
             )}
           </div>
@@ -370,6 +439,102 @@ export default async function IngredientDetailPage({
           </section>
         )}
 
+        {/* Need Mappings — which needs does this ingredient help? */}
+        {sortedMappings.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">target</span>
+              Hangi Ihtiyaclara Iyi Gelir?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {sortedMappings.slice(0, 8).map((m) => {
+                const score = Math.round(m.relevance_score || 0);
+                const scoreColor = score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low';
+                const barColor = score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low';
+                return (
+                  <Link
+                    key={m.mapping_id}
+                    href={`/ihtiyaclar/${m.need!.need_slug}`}
+                    className="curator-card p-4 group flex items-center gap-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-on-surface group-hover:text-primary transition-colors">
+                        {m.need!.need_name}
+                      </p>
+                      <p className="label-caps text-outline mt-0.5">{effectTypeLabel(m.effect_type)}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="w-16 h-1 bg-surface-container rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${Math.min(100, score)}%` }} />
+                      </div>
+                      <span className={`text-sm font-bold ${scoreColor}`}>%{score}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Safety Note (from new field) */}
+        {ingredient.safety_note && (
+          <div className="bg-surface-container-low border border-outline-variant/20 rounded-sm p-4 mb-8">
+            <p className="text-sm font-semibold text-on-surface mb-1 flex items-center gap-1.5">
+              <span className="material-icon text-[16px]" aria-hidden="true">shield</span>
+              Guvenlik Notu
+            </p>
+            <p className="text-sm text-on-surface-variant leading-relaxed">{ingredient.safety_note}</p>
+          </div>
+        )}
+
+        {/* Food Sources */}
+        {ingredient.food_sources && ingredient.food_sources.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">restaurant</span>
+              Dogal Kaynaklar
+            </h2>
+            {ingredient.daily_recommended_value && (
+              <p className="text-sm text-on-surface-variant mb-4">
+                Gunluk onerilen miktar: <strong>{ingredient.daily_recommended_value} {ingredient.daily_recommended_unit || 'mg'}</strong>
+              </p>
+            )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-outline-variant/20">
+                    <th className="text-left py-2 px-3 label-caps text-outline">Gida</th>
+                    <th className="text-right py-2 px-3 label-caps text-outline">100g&apos;da</th>
+                    <th className="text-right py-2 px-3 label-caps text-outline">Biyoyararlanim</th>
+                    <th className="text-left py-2 px-3 label-caps text-outline">Not</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ingredient.food_sources.map((fs, i) => (
+                    <tr key={i} className="border-b border-outline-variant/10">
+                      <td className="py-2.5 px-3 font-medium text-on-surface">{fs.food_name}</td>
+                      <td className="py-2.5 px-3 text-right text-on-surface-variant">{fs.amount_per_100g} {fs.unit}</td>
+                      <td className="py-2.5 px-3 text-right">
+                        {fs.bioavailability && (
+                          <span className={`label-caps px-2 py-0.5 rounded-sm ${
+                            fs.bioavailability === 'Yuksek' ? 'text-score-high bg-score-high/10' :
+                            fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
+                            'text-outline bg-surface-container-low'
+                          }`}>{fs.bioavailability}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-xs text-on-surface-variant">{fs.note || ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-outline mt-3">
+              Gidalardan alinan vitaminlerin biyoyararlanimi genellikle takviyelerden daha yuksektir. Dengeli beslenme takviyeye tercih edilmelidir.
+            </p>
+          </section>
+        )}
+
         {/* Products containing this ingredient */}
         {products.length > 0 && (
           <section className="mb-8">
@@ -438,6 +603,14 @@ export default async function IngredientDetailPage({
               {/* Fade edge */}
               <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
             </div>
+            {products.length > 6 && (
+              <Link
+                href={`/urunler?ingredient=${ingredient.ingredient_slug}`}
+                className="inline-flex items-center gap-1 label-caps text-primary mt-3 hover:underline underline-offset-4"
+              >
+                Tum {products.length} urunu gor <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+              </Link>
+            )}
           </section>
         )}
 

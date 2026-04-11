@@ -26,6 +26,7 @@ const navItems = [
   { href: '/admin/audit-log', label: 'Audit Log', icon: '📋' },
   { href: '/admin/corrections', label: 'Düzeltmeler', icon: '🔧' },
   { href: '/admin/batch-imports', label: 'Import', icon: '📥' },
+  { href: '/admin/brand-portal', label: 'Marka Portal', icon: '🏢' },
 ];
 
 export default function AdminLayout({

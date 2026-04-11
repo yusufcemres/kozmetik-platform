@@ -69,8 +69,9 @@ export class ProductsService {
   async findAll(query: PaginationDto & {
     brand_id?: number; category_id?: number; status?: string;
     target_area?: string; usage_time?: string; product_type?: string; need_id?: number;
+    domain_type?: string; ingredient_slug?: string; target_gender?: string;
   }) {
-    const { page, limit, search, brand_id, category_id, status, target_area, usage_time, product_type, need_id } = query;
+    const { page, limit, search, brand_id, category_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
     const where: any = {};
     if (search) where.product_name = ILike(`%${search}%`);
     if (brand_id) where.brand_id = Number(brand_id);
@@ -78,6 +79,8 @@ export class ProductsService {
     if (target_area) where.target_area = target_area;
     if (usage_time) where.usage_time_hint = usage_time;
     if (product_type) where.product_type_label = ILike(`%${product_type}%`);
+    if (domain_type) where.domain_type = domain_type;
+    if (target_gender) where.target_gender = target_gender;
 
     // Category filter: include child categories for parent
     if (category_id) {
@@ -88,6 +91,29 @@ export class ProductsService {
       });
       const ids = [catId, ...children.map(c => c.category_id)];
       where.category_id = In(ids);
+    }
+
+    // Ingredient slug filter requires a join — use QueryBuilder
+    if (ingredient_slug) {
+      const qb = this.repo.createQueryBuilder('p')
+        .innerJoin('p.ingredients', 'pi')
+        .innerJoin('pi.ingredient', 'ing', 'ing.ingredient_slug = :slug', { slug: ingredient_slug })
+        .leftJoinAndSelect('p.brand', 'b')
+        .leftJoinAndSelect('p.category', 'cat')
+        .leftJoinAndSelect('p.label', 'lbl')
+        .leftJoinAndSelect('p.images', 'img');
+
+      if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
+      if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
+      if (domain_type) qb.andWhere('p.domain_type = :dt', { dt: domain_type });
+      if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
+
+      qb.orderBy('pi.inci_order_rank', 'ASC')
+        .skip((page - 1) * limit)
+        .take(limit);
+
+      const [data, total] = await qb.getManyAndCount();
+      return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
     }
 
     // Need filter requires a join — use QueryBuilder
@@ -128,8 +154,8 @@ export class ProductsService {
     };
   }
 
-  async findTopScored(limit = 6) {
-    const products = await this.repo
+  async findTopScored(limit = 6, brandId?: number) {
+    const qb = this.repo
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.brand', 'b')
       .leftJoinAndSelect('p.images', 'img')
@@ -143,9 +169,13 @@ export class ProductsService {
       .addGroupBy('cat.category_id')
       .having('COUNT(ns.product_need_score_id) > 0')
       .orderBy('avg_score', 'DESC')
-      .limit(limit)
-      .getMany();
-    return products;
+      .limit(limit);
+
+    if (brandId) {
+      qb.andWhere('p.brand_id = :brandId', { brandId });
+    }
+
+    return qb.getMany();
   }
 
   async findByIngredient(ingredientId: number, limit = 20) {
@@ -266,6 +296,206 @@ export class ProductsService {
     const entity = await this.findOne(id);
     entity.status = 'archived';
     return this.repo.save(entity);
+  }
+
+  // === Similar Products ===
+
+  async findSimilar(productId: number, limit = 4, domainType?: string) {
+    // Get source product with relations
+    const source = await this.repo.findOne({
+      where: { product_id: productId },
+      relations: ['ingredients', 'ingredients.ingredient', 'need_scores', 'need_scores.need', 'affiliate_links'],
+    });
+    if (!source) throw new NotFoundException('Ürün bulunamadı');
+
+    const sourceKeyIngredients = (source.ingredients || [])
+      .filter((pi: any) => pi.is_key_ingredient)
+      .map((pi: any) => ({
+        ingredient_id: pi.ingredient_id,
+        name: pi.ingredient?.inci_name || pi.ingredient?.ingredient_name || '',
+      }));
+
+    const sourceNeeds = (source.need_scores || []).map((ns: any) => ({
+      need_id: ns.need_id,
+      name: ns.need?.need_name || '',
+      score: Number(ns.compatibility_score) || 0,
+    }));
+
+    const sourcePrice = this.getLowestPrice(source);
+
+    // Find candidates: same domain_type, not archived, not self
+    let candidateQuery = `
+      SELECT p.product_id, p.product_name, p.product_slug, p.category_id,
+             p.domain_type, p.product_type_label,
+             b.brand_name, b.brand_slug
+      FROM products p
+      JOIN brands b ON b.brand_id = p.brand_id
+      WHERE p.product_id != $1
+        AND p.status != 'archived'
+    `;
+    const params: any[] = [productId];
+    let paramIdx = 2;
+
+    if (domainType) {
+      candidateQuery += ` AND p.domain_type = $${paramIdx++}`;
+      params.push(domainType);
+    } else if (source.domain_type) {
+      candidateQuery += ` AND p.domain_type = $${paramIdx++}`;
+      params.push(source.domain_type);
+    }
+
+    candidateQuery += ` LIMIT 200`;
+    const candidates: any[] = await this.repo.manager.query(candidateQuery, params);
+    if (!candidates.length) return [];
+
+    const candidateIds = candidates.map((c) => c.product_id);
+
+    // Batch fetch key ingredients for all candidates
+    const candidateIngredients: any[] = await this.repo.manager.query(
+      `SELECT pi.product_id, pi.ingredient_id, i.inci_name
+       FROM product_ingredients pi
+       JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
+       WHERE pi.product_id = ANY($1) AND pi.is_key_ingredient = true`,
+      [candidateIds],
+    );
+
+    // Batch fetch need scores for all candidates
+    const candidateNeedScores: any[] = await this.repo.manager.query(
+      `SELECT pns.product_id, pns.need_id, n.need_name, pns.compatibility_score
+       FROM product_need_scores pns
+       JOIN needs n ON n.need_id = pns.need_id
+       WHERE pns.product_id = ANY($1)`,
+      [candidateIds],
+    );
+
+    // Batch fetch lowest prices
+    const candidatePrices: any[] = await this.repo.manager.query(
+      `SELECT DISTINCT ON (al.product_id) al.product_id, al.price_snapshot
+       FROM affiliate_links al
+       WHERE al.product_id = ANY($1) AND al.is_active = true AND al.price_snapshot IS NOT NULL
+       ORDER BY al.product_id, al.price_snapshot ASC`,
+      [candidateIds],
+    );
+
+    // Batch fetch images
+    const candidateImages: any[] = await this.repo.manager.query(
+      `SELECT DISTINCT ON (pi.product_id) pi.product_id, pi.image_url
+       FROM product_images pi
+       WHERE pi.product_id = ANY($1)
+       ORDER BY pi.product_id, pi.sort_order ASC`,
+      [candidateIds],
+    );
+
+    // Index by product_id
+    const ingByProduct = new Map<number, { ingredient_id: number; name: string }[]>();
+    for (const row of candidateIngredients) {
+      if (!ingByProduct.has(row.product_id)) ingByProduct.set(row.product_id, []);
+      ingByProduct.get(row.product_id)!.push({ ingredient_id: row.ingredient_id, name: row.inci_name });
+    }
+
+    const needByProduct = new Map<number, { need_id: number; name: string; score: number }[]>();
+    for (const row of candidateNeedScores) {
+      if (!needByProduct.has(row.product_id)) needByProduct.set(row.product_id, []);
+      needByProduct.get(row.product_id)!.push({
+        need_id: row.need_id,
+        name: row.need_name,
+        score: Number(row.compatibility_score) || 0,
+      });
+    }
+
+    const priceByProduct = new Map<number, number>();
+    for (const row of candidatePrices) {
+      priceByProduct.set(row.product_id, Number(row.price_snapshot));
+    }
+
+    const imageByProduct = new Map<number, string>();
+    for (const row of candidateImages) {
+      imageByProduct.set(row.product_id, row.image_url);
+    }
+
+    // Calculate similarity scores
+    const sourceIngIds = new Set(sourceKeyIngredients.map((i) => i.ingredient_id));
+    const sourceNeedIds = new Set(sourceNeeds.map((n) => n.need_id));
+
+    const scored = candidates.map((c) => {
+      const cIngredients = ingByProduct.get(c.product_id) || [];
+      const cNeeds = needByProduct.get(c.product_id) || [];
+      const cPrice = priceByProduct.get(c.product_id);
+
+      // Category similarity (0.3)
+      const categoryScore = (source.category_id && c.category_id === source.category_id) ? 1 : 0;
+
+      // Shared ingredients (0.4) — Jaccard-like
+      const cIngIds = new Set(cIngredients.map((i) => i.ingredient_id));
+      const sharedIngIds = [...sourceIngIds].filter((id) => cIngIds.has(id));
+      const unionSize = new Set([...sourceIngIds, ...cIngIds]).size;
+      const ingredientScore = unionSize > 0 ? sharedIngIds.length / unionSize : 0;
+
+      // Shared needs (0.2) — cosine-like on top needs
+      const cNeedIds = new Set(cNeeds.map((n) => n.need_id));
+      const sharedNeedIds = [...sourceNeedIds].filter((id) => cNeedIds.has(id));
+      const needUnion = new Set([...sourceNeedIds, ...cNeedIds]).size;
+      const needScore = needUnion > 0 ? sharedNeedIds.length / needUnion : 0;
+
+      // Price similarity (0.1) — within ±30%
+      let priceScore = 0.5; // default if no price data
+      if (sourcePrice && cPrice) {
+        const ratio = Math.min(sourcePrice, cPrice) / Math.max(sourcePrice, cPrice);
+        priceScore = ratio >= 0.7 ? ratio : ratio * 0.5;
+      }
+
+      const totalScore = Math.round(
+        (categoryScore * 0.3 + ingredientScore * 0.4 + needScore * 0.2 + priceScore * 0.1) * 100,
+      );
+
+      // Shared ingredient names
+      const sharedIngredients = sourceKeyIngredients
+        .filter((i) => cIngIds.has(i.ingredient_id))
+        .map((i) => i.name);
+
+      // Shared need names
+      const sharedNeeds = sourceNeeds
+        .filter((n) => cNeedIds.has(n.need_id))
+        .map((n) => n.name);
+
+      // Price comparison
+      let priceComparison: 'cheaper' | 'similar' | 'expensive' | null = null;
+      if (sourcePrice && cPrice) {
+        const diff = (cPrice - sourcePrice) / sourcePrice;
+        if (diff < -0.1) priceComparison = 'cheaper';
+        else if (diff > 0.1) priceComparison = 'expensive';
+        else priceComparison = 'similar';
+      }
+
+      return {
+        product: {
+          product_id: c.product_id,
+          product_name: c.product_name,
+          product_slug: c.product_slug,
+          domain_type: c.domain_type,
+          brand_name: c.brand_name,
+          brand_slug: c.brand_slug,
+          image_url: imageByProduct.get(c.product_id) || null,
+          price: cPrice || null,
+        },
+        similarity_score: totalScore,
+        shared_ingredients: sharedIngredients,
+        shared_needs: sharedNeeds,
+        price_comparison: priceComparison,
+      };
+    });
+
+    // Sort by similarity desc, take top N
+    scored.sort((a, b) => b.similarity_score - a.similarity_score);
+    return scored.slice(0, limit);
+  }
+
+  private getLowestPrice(product: any): number | null {
+    const links = product.affiliate_links || [];
+    const prices = links
+      .filter((l: any) => l.is_active && l.price_snapshot)
+      .map((l: any) => Number(l.price_snapshot));
+    return prices.length ? Math.min(...prices) : null;
   }
 
   // === Affiliate Links ===

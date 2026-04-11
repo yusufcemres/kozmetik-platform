@@ -24,16 +24,22 @@ export class NeedsService {
     return this.repo.save(entity);
   }
 
-  async findAll(query: PaginationDto) {
-    const { page, limit, search } = query;
+  async findAll(query: PaginationDto & { need_category?: string; domain_type?: string }) {
+    const { page, limit, search, need_category, domain_type } = query;
     const where: any = {};
     if (search) {
       where.need_name = Like(`%${search}%`);
     }
+    if (need_category) {
+      where.need_category = need_category;
+    }
+    if (domain_type) {
+      where.domain_type = domain_type;
+    }
 
     const [data, total] = await this.repo.findAndCount({
       where,
-      order: { need_group: 'ASC', need_name: 'ASC' },
+      order: { need_category: 'ASC', need_group: 'ASC', need_name: 'ASC' },
       skip: (page - 1) * limit,
       take: limit,
     });

@@ -31,6 +31,9 @@ export class UserSkinProfile {
   @Column({ type: 'varchar', length: 10, nullable: true })
   age_range: string; // '18-24', '25-34', '35-44', '45+'
 
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  gender: string; // 'female', 'male'
+
   @CreateDateColumn()
   created_at: Date;
 

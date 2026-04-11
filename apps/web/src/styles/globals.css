@@ -2,12 +2,162 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========== REVELA THEME — CSS Variables ========== */
+
+:root {
+  /* Primary */
+  --color-primary: #1a1a1a;
+  --color-primary-dim: #111111;
+  --color-primary-container: #e5e2e1;
+  --color-primary-fixed: #e5e2e1;
+  --color-primary-fixed-dim: #d7d4d3;
+  --color-on-primary: #faf7f6;
+  --color-on-primary-container: #525151;
+
+  /* Secondary */
+  --color-secondary: #605f5e;
+  --color-secondary-dim: #545352;
+  --color-secondary-container: #e5e2e0;
+  --color-secondary-fixed: #e5e2e0;
+  --color-secondary-fixed-dim: #d7d4d2;
+  --color-on-secondary: #fbf8f7;
+  --color-on-secondary-container: #525151;
+
+  /* Tertiary */
+  --color-tertiary: #625f55;
+  --color-tertiary-dim: #56534a;
+  --color-tertiary-container: #faf3e6;
+  --color-tertiary-fixed: #faf3e6;
+  --color-tertiary-fixed-dim: #ebe5d8;
+  --color-on-tertiary: #fff8ec;
+  --color-on-tertiary-container: #5f5b52;
+
+  /* Surface */
+  --color-surface: #faf9f7;
+  --color-surface-bright: #faf9f7;
+  --color-surface-dim: #d6dbd7;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f4f1;
+  --color-surface-container: #edeeeb;
+  --color-surface-container-high: #e6e9e6;
+  --color-surface-container-highest: #e0e3e0;
+  --color-surface-tint: #1a1a1a;
+  --color-surface-variant: #e0e3e0;
+
+  /* On Surface */
+  --color-on-surface: #2f3331;
+  --color-on-surface-variant: #5c605d;
+  --color-on-background: #2f3331;
+  --color-background: #faf9f7;
+
+  /* Outline */
+  --color-outline: #777c79;
+  --color-outline-variant: #afb3b0;
+
+  /* Error */
+  --color-error: #9f403d;
+  --color-error-dim: #4e0309;
+  --color-error-container: #fe8983;
+  --color-on-error: #fff7f6;
+  --color-on-error-container: #752121;
+
+  /* Inverse */
+  --color-inverse-surface: #0d0e0e;
+  --color-inverse-on-surface: #9d9d9b;
+  --color-inverse-primary: #ffffff;
+
+  /* Score backgrounds */
+  --color-score-high-bg: #f0fdf4;
+  --color-score-high-border: #bbf7d0;
+  --color-score-medium-bg: #fefce8;
+  --color-score-medium-border: #fef08a;
+  --color-score-low-bg: #fef2f2;
+  --color-score-low-border: #fecaca;
+}
+
+/* ========== DARK THEME ========== */
+
+.dark {
+  /* Primary — inverted: light on dark */
+  --color-primary: #e8e4e3;
+  --color-primary-dim: #d4d0cf;
+  --color-primary-container: #3a3838;
+  --color-primary-fixed: #e5e2e1;
+  --color-primary-fixed-dim: #d7d4d3;
+  --color-on-primary: #1a1a1a;
+  --color-on-primary-container: #c8c5c4;
+
+  /* Secondary */
+  --color-secondary: #c8c6c5;
+  --color-secondary-dim: #b5b3b2;
+  --color-secondary-container: #3a3938;
+  --color-secondary-fixed: #e5e2e0;
+  --color-secondary-fixed-dim: #d7d4d2;
+  --color-on-secondary: #1e1e1d;
+  --color-on-secondary-container: #c8c5c4;
+
+  /* Tertiary */
+  --color-tertiary: #cbc7bc;
+  --color-tertiary-dim: #b5b1a7;
+  --color-tertiary-container: #3c3a33;
+  --color-tertiary-fixed: #faf3e6;
+  --color-tertiary-fixed-dim: #ebe5d8;
+  --color-on-tertiary: #1e1c17;
+  --color-on-tertiary-container: #c5c1b7;
+
+  /* Surface — dark tones */
+  --color-surface: #121212;
+  --color-surface-bright: #1e1e1e;
+  --color-surface-dim: #0e0e0e;
+  --color-surface-container-lowest: #0a0a0a;
+  --color-surface-container-low: #1a1a1a;
+  --color-surface-container: #1e1e1e;
+  --color-surface-container-high: #252525;
+  --color-surface-container-highest: #2c2c2c;
+  --color-surface-tint: #e8e4e3;
+  --color-surface-variant: #2c2c2c;
+
+  /* On Surface — light tones */
+  --color-on-surface: #e4e2e0;
+  --color-on-surface-variant: #a0a4a1;
+  --color-on-background: #e4e2e0;
+  --color-background: #121212;
+
+  /* Outline */
+  --color-outline: #8a8e8b;
+  --color-outline-variant: #454845;
+
+  /* Error */
+  --color-error: #ffb4ab;
+  --color-error-dim: #930009;
+  --color-error-container: #73261f;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffb4ab;
+
+  /* Inverse */
+  --color-inverse-surface: #e4e2e0;
+  --color-inverse-on-surface: #2f3331;
+  --color-inverse-primary: #1a1a1a;
+
+  /* Score backgrounds (dark) */
+  --color-score-high-bg: #052e16;
+  --color-score-high-border: #166534;
+  --color-score-medium-bg: #422006;
+  --color-score-medium-border: #854d0e;
+  --color-score-low-bg: #450a0a;
+  --color-score-low-border: #991b1b;
+}
+
+/* ========== BASE LAYER ========== */
+
 @layer base {
   body {
     @apply bg-surface text-on-background antialiased;
     font-feature-settings: 'liga' 1, 'calt' 1;
   }
 }
+
+/* ========== COMPONENT LAYER ========== */
 
 @layer components {
   .editorial-grid {
@@ -62,6 +212,8 @@
   }
 }
 
+/* ========== UTILITY LAYER ========== */
+
 @layer utilities {
   .material-icon {
     font-family: 'Material Symbols Outlined';
@@ -92,7 +244,8 @@
   }
 }
 
-/* Existing keyframes */
+/* ========== ANIMATIONS ========== */
+
 @keyframes slide-up {
   from {
     opacity: 0;

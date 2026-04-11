@@ -6,7 +6,7 @@ import { CacheService } from '@common/cache/cache.service';
 type SearchIntent = 'product' | 'ingredient' | 'need' | 'mixed';
 
 export interface SearchResultItem {
-  type: 'product' | 'ingredient' | 'need';
+  type: 'product' | 'ingredient' | 'need' | 'brand';
   id: number;
   name: string;
   slug: string;
@@ -51,6 +51,10 @@ export class SearchService {
       const needs = await this.searchNeeds(q, limit);
       results.push(...needs);
     }
+
+    // Always search brands
+    const brands = await this.searchBrands(q, Math.min(5, limit));
+    results.push(...brands);
 
     // Sort by composite score and paginate
     results.sort((a, b) => b.score - a.score);
@@ -114,9 +118,20 @@ export class SearchService {
        WHERE is_active = true AND (need_name ILIKE $1 OR user_friendly_label ILIKE $1)
        ORDER BY need_name ASC
        LIMIT $2`,
-      [`%${term}%`, Math.ceil(limit / 3)],
+      [`%${term}%`, Math.ceil(limit / 4)],
     );
     suggestions.push(...needs.map((n: any) => ({ type: 'need', ...n })));
+
+    // Brands
+    const brands = await this.dataSource.query(
+      `SELECT brand_name as name, brand_slug as slug
+       FROM brands
+       WHERE brand_name ILIKE $1
+       ORDER BY brand_name ASC
+       LIMIT $2`,
+      [`%${term}%`, Math.ceil(limit / 4)],
+    );
+    suggestions.push(...brands.map((b: any) => ({ type: 'brand', ...b })));
 
     const result = suggestions.slice(0, limit);
     await this.cache.set(cacheKey, result, SUGGEST_CACHE_TTL);
@@ -244,6 +259,33 @@ export class SearchService {
         slug: r.ingredient_slug,
         score: parseFloat(r.sim) || 0.5,
         extra: { common_name: r.common_name },
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  private async searchBrands(q: string, limit: number): Promise<SearchResultItem[]> {
+    try {
+      const rows = await this.dataSource.query(
+        `SELECT b.brand_id, b.brand_name, b.brand_slug,
+                similarity(LOWER(b.brand_name), LOWER($1)) as sim,
+                COUNT(p.product_id) as product_count
+         FROM brands b
+         LEFT JOIN products p ON p.brand_id = b.brand_id AND p.status != 'archived'
+         WHERE b.brand_name ILIKE $2
+         GROUP BY b.brand_id, b.brand_name, b.brand_slug
+         ORDER BY sim DESC
+         LIMIT $3`,
+        [q, `%${q}%`, limit],
+      );
+      return rows.map((r: any) => ({
+        type: 'brand' as const,
+        id: r.brand_id,
+        name: r.brand_name,
+        slug: r.brand_slug,
+        score: parseFloat(r.sim) || 0.5,
+        extra: { product_count: parseInt(r.product_count) || 0 },
       }));
     } catch {
       return [];

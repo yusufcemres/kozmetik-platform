@@ -254,13 +254,36 @@ export class ScoringService {
     });
   }
 
-  async getTopProductsByNeed(needId: number, limit = 12) {
-    return this.scoreRepo.find({
-      where: { need_id: needId },
-      relations: ['product', 'product.brand', 'product.category', 'product.images', 'product.affiliate_links'],
-      order: { compatibility_score: 'DESC' },
-      take: limit,
-    });
+  async getTopProductsByNeed(
+    needId: number,
+    limit = 12,
+    options?: { gender?: string; domain_type?: string },
+  ) {
+    const qb = this.scoreRepo
+      .createQueryBuilder('s')
+      .leftJoinAndSelect('s.product', 'p')
+      .leftJoinAndSelect('p.brand', 'brand')
+      .leftJoinAndSelect('p.category', 'category')
+      .leftJoinAndSelect('p.images', 'images')
+      .leftJoinAndSelect('p.affiliate_links', 'affiliate_links')
+      .where('s.need_id = :needId', { needId })
+      .andWhere('p.status = :status', { status: 'published' });
+
+    // Gender filter: exclude opposite gender products
+    if (options?.gender === 'female') {
+      qb.andWhere("(p.target_gender IS NULL OR p.target_gender != 'male')");
+    } else if (options?.gender === 'male') {
+      qb.andWhere("(p.target_gender IS NULL OR p.target_gender != 'female')");
+    }
+
+    // Domain type filter
+    if (options?.domain_type && options.domain_type !== 'all') {
+      qb.andWhere('p.domain_type = :domainType', { domainType: options.domain_type });
+    }
+
+    qb.orderBy('s.compatibility_score', 'DESC').take(limit);
+
+    return qb.getMany();
   }
 
   async recalculateAll() {

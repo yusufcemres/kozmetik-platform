@@ -57,7 +57,7 @@ interface ProductScore {
     brand?: { brand_name: string };
     category?: { category_name: string };
     images?: { image_url: string; sort_order?: number }[];
-    affiliate_links?: { platform: string; affiliate_url: string; price_snapshot?: number }[];
+    affiliate_links?: { affiliate_link_id: number; platform: string; affiliate_url: string; price_snapshot?: number }[];
   };
 }
 
@@ -358,6 +358,24 @@ function ResultsContent() {
           .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
           .slice(0, 10);
         setProducts(sorted);
+
+        // Save analysis results to profile
+        try {
+          const storedProfile = localStorage.getItem('skin_profile');
+          if (storedProfile) {
+            const prof = JSON.parse(storedProfile);
+            prof.last_analysis = {
+              date: new Date().toISOString(),
+              recommended_products: sorted.slice(0, 5).map((s) => ({
+                product_id: s.product!.product_id,
+                product_name: s.product!.product_name,
+                score: Number(s.compatibility_score),
+                slug: s.product!.product_slug,
+              })),
+            };
+            localStorage.setItem('skin_profile', JSON.stringify(prof));
+          }
+        } catch {}
 
         const avoid: string[] = [];
         if (sensitivityList.includes('fragrance')) avoid.push('Parfum (Fragrance)', 'Linalool', 'Limonene', 'Citronellol');

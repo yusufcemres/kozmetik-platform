@@ -38,4 +38,19 @@ export class ProductFilterDto extends PaginationDto {
   @IsOptional()
   @IsString()
   need_id?: string;
+
+  @ApiPropertyOptional({ description: 'cosmetic | supplement' })
+  @IsOptional()
+  @IsString()
+  domain_type?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by ingredient slug' })
+  @IsOptional()
+  @IsString()
+  ingredient_slug?: string;
+
+  @ApiPropertyOptional({ description: 'null | female | male' })
+  @IsOptional()
+  @IsString()
+  target_gender?: string;
 }

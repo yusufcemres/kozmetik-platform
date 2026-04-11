@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 
 interface SearchResult {
-  type: 'product' | 'ingredient' | 'need';
+  type: 'product' | 'ingredient' | 'need' | 'brand';
   id: number;
   name: string;
   slug: string;
@@ -23,16 +23,17 @@ interface SearchMeta {
 }
 
 interface Suggestion {
-  type: 'product' | 'ingredient' | 'need';
-  id: number;
+  type: 'product' | 'ingredient' | 'need' | 'brand';
+  id?: number;
   name: string;
   slug: string;
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; path: string }> = {
-  product: { label: 'Ürün', icon: 'inventory_2', path: '/urunler' },
-  ingredient: { label: 'İçerik', icon: 'science', path: '/icerikler' },
-  need: { label: 'İhtiyaç', icon: 'target', path: '/ihtiyaclar' },
+  product: { label: 'Urun', icon: 'inventory_2', path: '/urunler' },
+  ingredient: { label: 'Icerik', icon: 'science', path: '/icerikler' },
+  need: { label: 'Ihtiyac', icon: 'target', path: '/ihtiyaclar' },
+  brand: { label: 'Marka', icon: 'storefront', path: '/markalar' },
 };
 
 function SearchPageContent() {
@@ -283,6 +284,9 @@ function SearchPageContent() {
                       )}
                       {r.extra?.common_name && (
                         <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.common_name}</p>
+                      )}
+                      {r.extra?.product_count != null && (
+                        <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.product_count} urun</p>
                       )}
                       {r.extra?.description && (
                         <p className="text-xs text-outline mt-1 line-clamp-1">{r.extra.description}</p>

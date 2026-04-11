@@ -20,6 +20,9 @@ export class Need {
   @Column({ type: 'varchar', length: 150, unique: true })
   need_slug: string;
 
+  @Column({ type: 'varchar', length: 50, default: 'skin' })
+  need_category: string; // 'skin' | 'body' | 'hair' | 'general_health'
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   need_group: string; // e.g. 'skin_concern', 'skin_goal', 'sensitivity'
 

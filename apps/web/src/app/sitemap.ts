@@ -24,6 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/ihtiyaclar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/markalar`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/cilt-analizi`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/takviyeler`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE_URL}/profilim`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/karsilastir`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/ara`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/hakkimizda`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
@@ -33,11 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/kullanim-kosullari`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
   ];
 
-  const [productSlugs, ingredientSlugs, needSlugs, brandSlugs] = await Promise.all([
+  const [productSlugs, ingredientSlugs, needSlugs, brandSlugs, supplementSlugs] = await Promise.all([
     fetchSlugs('/products', 'product_slug'),
     fetchSlugs('/ingredients', 'ingredient_slug'),
     fetchSlugs('/needs', 'need_slug'),
     fetchSlugs('/brands', 'brand_slug'),
+    fetchSlugs('/supplements', 'product_slug'),
   ]);
 
   const productPages: MetadataRoute.Sitemap = productSlugs.map((slug) => ({
@@ -68,5 +71,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...ingredientPages, ...needPages, ...brandPages];
+  const supplementPages: MetadataRoute.Sitemap = supplementSlugs.map((slug) => ({
+    url: `${BASE_URL}/takviyeler/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages];
 }

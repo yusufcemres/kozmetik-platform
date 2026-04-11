@@ -21,12 +21,19 @@ interface ProductScore {
     product_id: number;
     product_name: string;
     product_slug: string;
+    product_type_label?: string;
+    short_description?: string;
     brand?: { brand_name: string };
     images?: { image_url: string; sort_order?: number }[];
     affiliate_links?: {
+      affiliate_link_id: number;
       platform: string;
       affiliate_url: string;
       price_snapshot?: number;
+    }[];
+    ingredients?: {
+      is_key_ingredient: boolean;
+      ingredient: { inci_name: string; common_name?: string };
     }[];
   };
 }
@@ -34,12 +41,12 @@ interface ProductScore {
 // === SEO ===
 
 export const metadata: Metadata = {
-  title: 'Bu Haftanın Önerileri | REVELA',
+  title: 'Bu Haftanin Onerileri | REVELA',
   description:
-    'AI destekli haftalık ürün önerileri. Her cilt ihtiyacı için en uygun, en kaliteli ve en uygun fiyatlı kozmetik ürünleri.',
+    'AI destekli haftalik urun onerileri. Her cilt ihtiyaci icin en uygun, en kaliteli ve en uygun fiyatli kozmetik urunleri.',
   openGraph: {
-    title: 'Bu Haftanın Önerileri | REVELA',
-    description: 'Her cilt ihtiyacı için AI destekli haftalık ürün önerileri.',
+    title: 'Bu Haftanin Onerileri | REVELA',
+    description: 'Her cilt ihtiyaci icin AI destekli haftalik urun onerileri.',
     type: 'website',
   },
   alternates: { canonical: '/onerilerimiz' },
@@ -88,14 +95,7 @@ function getScoreBarColor(score: number): string {
   return 'bg-score-low';
 }
 
-function needGroupIcon(group?: string): string {
-  if (group === 'skin_concern') return 'error_outline';
-  if (group === 'skin_goal') return 'auto_awesome';
-  if (group === 'sensitivity') return 'warning_amber';
-  return 'category';
-}
-
-function cheapestLink(links?: { platform: string; affiliate_url: string; price_snapshot?: number }[]) {
+function cheapestLink(links?: { affiliate_link_id: number; platform: string; affiliate_url: string; price_snapshot?: number }[]) {
   if (!links || links.length === 0) return null;
   const active = links.filter((l) => l.price_snapshot && l.price_snapshot > 0);
   if (active.length === 0) return links[0];
@@ -112,6 +112,38 @@ const PLATFORM_LABELS: Record<string, string> = {
   dermoeczanem: 'Dermoeczanem',
 };
 
+function buildReasonBullets(need: Need, topProduct: ProductScore): string[] {
+  const bullets: string[] = [];
+  const product = topProduct.product;
+  if (!product) return bullets;
+
+  const score = Math.round(Number(topProduct.compatibility_score));
+  bullets.push(`${need.need_name} icin %${score} uyumluluk skoru`);
+
+  // Key ingredients
+  const keyIngs = product.ingredients
+    ?.filter((i) => i.is_key_ingredient)
+    .map((i) => i.ingredient?.common_name || i.ingredient?.inci_name)
+    .filter(Boolean)
+    .slice(0, 3);
+  if (keyIngs && keyIngs.length > 0) {
+    bullets.push(`Aktif maddeler: ${keyIngs.join(', ')}`);
+  }
+
+  // Price
+  const link = cheapestLink(product.affiliate_links);
+  if (link?.price_snapshot) {
+    bullets.push(`${PLATFORM_LABELS[link.platform] || link.platform} uzerinde ₺${Number(link.price_snapshot).toFixed(0)}`);
+  }
+
+  // Product type
+  if (product.product_type_label) {
+    bullets.push(`Urun tipi: ${product.product_type_label}`);
+  }
+
+  return bullets;
+}
+
 // === JSON-LD ===
 
 function recommendationsJsonLd(
@@ -120,8 +152,8 @@ function recommendationsJsonLd(
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'REVELA Haftalık Ürün Önerileri',
-    description: 'AI destekli kozmetik ürün önerileri',
+    name: 'REVELA Haftalik Urun Onerileri',
+    description: 'AI destekli kozmetik urun onerileri',
     numberOfItems: recommendations.length,
     itemListElement: recommendations.map((r, idx) => ({
       '@type': 'ListItem',
@@ -155,46 +187,33 @@ export default async function RecommendationsPage() {
         }}
       />
 
-      <div className="curator-section max-w-[1200px] mx-auto">
+      <div className="curator-section max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-4 py-1.5 rounded-full text-xs font-medium tracking-wider uppercase mb-4">
-            <span className="material-icon material-icon-sm" aria-hidden="true">
-              auto_awesome
-            </span>
+            <span className="material-icon material-icon-sm" aria-hidden="true">auto_awesome</span>
             AI Destekli
           </div>
           <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">
-            BU HAFTANIN ÖNERİLERİ
+            BU HAFTANIN ONERILERI
           </h1>
           <p className="text-on-surface-variant text-sm mt-3 max-w-lg mx-auto">
-            Her cilt ihtiyacı için içerik kalitesi, fiyat performansı ve
-            bilimsel kanıt düzeyine göre seçtiğimiz en iyi ürünler.
+            Guc seninle olsun. Ve dogru serum da. Her ihtiyac icin icerik kalitesi, fiyat performansi ve bilimsel kanita gore sectik.
           </p>
           <p className="label-caps text-outline mt-4">
-            <span className="material-icon material-icon-sm align-text-bottom mr-1" aria-hidden="true">
-              update
-            </span>
-            {weekLabel} Haftası
+            <span className="material-icon material-icon-sm align-text-bottom mr-1" aria-hidden="true">update</span>
+            {weekLabel} Haftasi
           </p>
         </div>
 
-        {/* Recommendations List */}
+        {/* Recommendations Grid */}
         {recommendations.length === 0 ? (
           <div className="text-center py-24">
-            <span
-              className="material-icon text-outline-variant mb-4 block"
-              style={{ fontSize: '64px' }}
-              aria-hidden="true"
-            >
-              recommend
-            </span>
-            <p className="text-on-surface-variant">
-              Öneriler hesaplanıyor, birazdan burada olacak.
-            </p>
+            <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">recommend</span>
+            <p className="text-on-surface-variant">Oneriler hesaplaniyor, birazdan burada olacak.</p>
           </div>
         ) : (
-          <div className="space-y-3 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {recommendations.map(({ need, topProduct }, idx) => {
               if (!topProduct?.product) return null;
               const product = topProduct.product;
@@ -204,149 +223,139 @@ export default async function RecommendationsPage() {
                 product.images?.[0]?.image_url;
               const img = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
               const link = cheapestLink(product.affiliate_links);
+              const reasons = buildReasonBullets(need, topProduct);
 
               return (
-                <div
-                  key={need.need_id}
-                  className="curator-card p-4 flex items-center gap-4 group"
-                >
-                  <span className="text-lg font-bold text-outline w-6 text-center shrink-0">
-                    {idx + 1}
-                  </span>
-                  <Link
-                    href={`/urunler/${product.product_slug}`}
-                    className="w-16 h-16 bg-surface-container-low rounded-sm overflow-hidden shrink-0 relative"
-                  >
-                    {img ? (
-                      <Image
-                        src={img}
-                        alt={product.product_name}
-                        fill
-                        sizes="64px"
-                        className="object-contain"
-                      />
-                    ) : (
-                      <span className="material-icon text-outline-variant flex items-center justify-center h-full" aria-hidden="true">
-                        inventory_2
+                <div key={need.need_id} className="curator-card overflow-hidden group">
+                  {/* Image */}
+                  <Link href={`/urunler/${product.product_slug}`} className="block">
+                    <div className="aspect-[4/3] bg-surface-container-low overflow-hidden relative">
+                      {img ? (
+                        <Image
+                          src={img}
+                          alt={product.product_name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-contain p-6 group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <span className="material-icon text-outline-variant flex items-center justify-center h-full" style={{ fontSize: '64px' }} aria-hidden="true">inventory_2</span>
+                      )}
+                      {/* Rank badge */}
+                      <span className="absolute top-3 left-3 bg-on-surface text-surface w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                        {idx + 1}
                       </span>
-                    )}
-                  </Link>
-                  <div className="flex-1 min-w-0">
-                    {product.brand && (
-                      <p className="label-caps text-outline">
-                        {product.brand.brand_name}
-                      </p>
-                    )}
-                    <Link
-                      href={`/urunler/${product.product_slug}`}
-                      className="text-sm font-semibold text-on-surface truncate block group-hover:text-primary transition-colors"
-                    >
-                      {product.product_name}
-                    </Link>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium">
+                      {/* Need badge */}
+                      <span className="absolute top-3 right-3 bg-primary/90 text-on-primary px-3 py-1 rounded-full text-[10px] font-medium backdrop-blur-sm">
                         {need.need_name}
                       </span>
-                      <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden max-w-[100px]">
+                    </div>
+                  </Link>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    {product.brand && (
+                      <p className="label-caps text-outline mb-0.5">{product.brand.brand_name}</p>
+                    )}
+                    <Link href={`/urunler/${product.product_slug}`}>
+                      <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors tracking-tight line-clamp-2">
+                        {product.product_name}
+                      </h3>
+                    </Link>
+
+                    {/* Score bar */}
+                    <div className="flex items-center gap-3 mt-3">
+                      <span className="label-caps text-outline shrink-0">{need.need_name}</span>
+                      <div className="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full ${getScoreBarColor(score)}`}
+                          className={`h-full rounded-full transition-all duration-500 ${getScoreBarColor(score)}`}
                           style={{ width: `${Math.min(100, score)}%` }}
                         />
                       </div>
-                      <span className={`text-[10px] font-bold ${getScoreColor(score)}`}>
-                        %{score}
-                      </span>
+                      <span className={`text-sm font-bold ${getScoreColor(score)}`}>%{score}</span>
+                    </div>
+
+                    {/* Why this product */}
+                    {reasons.length > 0 && (
+                      <div className="mt-4 bg-surface-container-low rounded-sm p-4">
+                        <p className="label-caps text-primary mb-2 flex items-center gap-1.5">
+                          <span className="material-icon text-[14px]" aria-hidden="true">lightbulb</span>
+                          Neden bu urun?
+                        </p>
+                        <ul className="space-y-1">
+                          {reasons.map((r, i) => (
+                            <li key={i} className="text-xs text-on-surface-variant flex items-start gap-1.5">
+                              <span className="text-primary mt-0.5">•</span>
+                              {r}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 mt-4">
+                      <Link
+                        href={`/urunler/${product.product_slug}`}
+                        className="flex-1 curator-btn-outline text-[10px] py-2.5 text-center"
+                      >
+                        Detaylar
+                      </Link>
+                      {link && (
+                        <a
+                          href={link.affiliate_url}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow sponsored"
+                          className="flex-1 curator-btn-primary text-[10px] py-2.5 text-center flex items-center justify-center gap-1.5"
+                        >
+                          <span className="material-icon text-[14px]" aria-hidden="true">shopping_bag</span>
+                          {link.price_snapshot
+                            ? `₺${Number(link.price_snapshot).toFixed(0)} — ${PLATFORM_LABELS[link.platform] || 'Satin Al'}`
+                            : PLATFORM_LABELS[link.platform] || 'Satin Al'}
+                        </a>
+                      )}
                     </div>
                   </div>
-                  {link && (
-                    <a
-                      href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow sponsored"
-                      className="shrink-0 bg-primary text-on-primary px-4 py-2 rounded-sm text-xs font-medium hover:bg-primary/90 transition-colors hidden sm:flex items-center gap-1.5"
-                    >
-                      <span className="material-icon material-icon-sm" aria-hidden="true">
-                        shopping_bag
-                      </span>
-                      {link.price_snapshot
-                        ? `₺${Number(link.price_snapshot).toFixed(0)}`
-                        : PLATFORM_LABELS[link.platform] || 'Satın Al'}
-                    </a>
-                  )}
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Info section */}
-        <div className="mt-16 bg-surface-container-low border border-outline-variant/20 rounded-sm p-6 md:p-8">
+        {/* How we choose */}
+        <div className="mt-16 bg-surface-container-low border border-outline-variant/20 rounded-sm p-6 md:p-8 max-w-5xl mx-auto">
           <h2 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span className="material-icon text-primary" aria-hidden="true">
-              info
-            </span>
-            Nasıl Seçiyoruz?
+            <span className="material-icon text-primary" aria-hidden="true">info</span>
+            Nasil Seciyoruz?
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm text-on-surface-variant">
             <div>
               <p className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-                <span
-                  className="material-icon material-icon-sm text-score-high"
-                  aria-hidden="true"
-                >
-                  science
-                </span>
-                İçerik Kalitesi
+                <span className="material-icon material-icon-sm text-score-high" aria-hidden="true">science</span>
+                Icerik Kalitesi
               </p>
-              <p>
-                İçerik maddelerinin bilimsel kanıt düzeyi ve ihtiyaca uygunluk
-                skoru analiz edilir.
-              </p>
+              <p>Icerik maddelerinin bilimsel kanit duzeyi ve ihtiyaca uygunluk skoru analiz edilir.</p>
             </div>
             <div>
               <p className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-                <span
-                  className="material-icon material-icon-sm text-primary"
-                  aria-hidden="true"
-                >
-                  trending_down
-                </span>
-                Fiyat Performansı
+                <span className="material-icon material-icon-sm text-primary" aria-hidden="true">trending_down</span>
+                Fiyat Performansi
               </p>
-              <p>
-                Fiyat geçmişi takip edilir, fiyatı düşen ve uygun fiyatlı
-                ürünler öne çıkar.
-              </p>
+              <p>Fiyat gecmisi takip edilir, fiyati dusen ve uygun fiyatli urunler one cikar.</p>
             </div>
             <div>
               <p className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-                <span
-                  className="material-icon material-icon-sm text-score-medium"
-                  aria-hidden="true"
-                >
-                  verified
-                </span>
+                <span className="material-icon material-icon-sm text-score-medium" aria-hidden="true">verified</span>
                 Fonksiyonel Fayda
               </p>
-              <p>
-                Ürünün hedef ihtiyaca uyum skoru, aktif madde konsantrasyonu ve
-                formül gücü değerlendirilir.
-              </p>
+              <p>Urunun hedef ihtiyaca uyum skoru, aktif madde konsantrasyonu ve formul gucu degerlendirilir.</p>
             </div>
             <div>
               <p className="font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-                <span
-                  className="material-icon material-icon-sm text-error"
-                  aria-hidden="true"
-                >
-                  shield
-                </span>
-                Güvenlik Profili
+                <span className="material-icon material-icon-sm text-error" aria-hidden="true">shield</span>
+                Guvenlik Profili
               </p>
-              <p>
-                Alerjen, parfüm ve koruyucu bayrakları kontrol edilir, hassas
-                ciltler için risk analizi yapılır.
-              </p>
+              <p>Alerjen, parfum ve koruyucu bayraklari kontrol edilir, hassas ciltler icin risk analizi yapilir.</p>
             </div>
           </div>
         </div>
@@ -354,16 +363,11 @@ export default async function RecommendationsPage() {
         {/* CTA */}
         <div className="text-center mt-12">
           <p className="text-sm text-on-surface-variant mb-4">
-            Kişiselleştirilmiş öneriler için cilt analizini tamamla
+            Kisisellestirilmis oneriler icin cilt analizini tamamla
           </p>
-          <Link
-            href="/cilt-analizi"
-            className="inline-flex items-center gap-2 curator-btn-primary px-8 py-3 text-xs"
-          >
-            <span className="material-icon material-icon-sm" aria-hidden="true">
-              quiz
-            </span>
-            CİLT ANALİZİ YAP
+          <Link href="/cilt-analizi" className="inline-flex items-center gap-2 curator-btn-primary px-8 py-3 text-xs">
+            <span className="material-icon material-icon-sm" aria-hidden="true">quiz</span>
+            CILT ANALIZI YAP
           </Link>
         </div>
       </div>

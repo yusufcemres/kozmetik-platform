@@ -74,8 +74,17 @@ export class Product {
   @Column({ type: 'varchar', length: 50, nullable: true })
   usage_time_hint: string; // 'morning', 'evening', 'both'
 
+  @Column({ type: 'varchar', length: 20, nullable: true, default: null })
+  target_gender: string; // null=unisex, 'female', 'male'
+
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status: string; // draft, in_review, published, archived
+
+  @Column({ type: 'int', default: 0 })
+  view_count: number;
+
+  @Column({ type: 'int', default: 0 })
+  favorite_count: number;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   top_need_name: string;
