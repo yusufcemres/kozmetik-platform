@@ -21,7 +21,7 @@ export const useTheme = () => useContext(ThemeContext);
 const STORAGE_KEY = 'revela_theme';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('system');
+  const [theme, setThemeState] = useState<Theme>('light');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   // Initialize from localStorage
@@ -31,6 +31,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       if (stored && ['light', 'dark', 'system'].includes(stored)) {
         setThemeState(stored);
       }
+      // If no stored preference, default to light (not system)
     } catch {}
   }, []);
 
