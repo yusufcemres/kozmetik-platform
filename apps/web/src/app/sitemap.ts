@@ -33,10 +33,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/kullanim-kosullari`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
   ];
 
-  const [productSlugs, ingredientSlugs, needSlugs] = await Promise.all([
+  const [productSlugs, ingredientSlugs, needSlugs, brandSlugs] = await Promise.all([
     fetchSlugs('/products', 'product_slug'),
     fetchSlugs('/ingredients', 'ingredient_slug'),
     fetchSlugs('/needs', 'need_slug'),
+    fetchSlugs('/brands', 'brand_slug'),
   ]);
 
   const productPages: MetadataRoute.Sitemap = productSlugs.map((slug) => ({
@@ -60,5 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...productPages, ...ingredientPages, ...needPages];
+  const brandPages: MetadataRoute.Sitemap = brandSlugs.map((slug) => ({
+    url: `${BASE_URL}/markalar/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...productPages, ...ingredientPages, ...needPages, ...brandPages];
 }
