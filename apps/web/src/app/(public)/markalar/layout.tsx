@@ -2,10 +2,10 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Markalar — REVELA',
-  description: '113 kozmetik markası, ürün sayıları ve detaylı bilgi. En popüler markalar ve ürün analizleri.',
+  description: '113 kozmetik markasi, urun sayilari ve detayli bilgi. En populer markalar ve urun analizleri.',
   openGraph: {
     title: 'Markalar — REVELA',
-    description: '113 kozmetik markası, ürün sayıları ve detaylı bilgi.',
+    description: '113 kozmetik markasi, urun sayilari ve detayli bilgi.',
   },
 };
 

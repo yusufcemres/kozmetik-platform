@@ -188,7 +188,7 @@ export default function BrandsPage() {
                     .map((brand) => (
                       <Link
                         key={brand.brand_id}
-                        href={`/urunler?brand=${brand.brand_slug}`}
+                        href={`/markalar/${brand.brand_slug}`}
                         className="flex items-center gap-4 px-5 py-4 group hover:bg-surface-container-low transition-colors duration-200"
                       >
                         {/* Logo / Initial */}
