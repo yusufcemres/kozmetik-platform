@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -94,6 +94,14 @@ const GENDER_OPTIONS = [
 // === Main Component ===
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>}>
+      <ProfilePageInner />
+    </Suspense>
+  );
+}
+
+function ProfilePageInner() {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get('tab') as Tab) || 'genel';
 
