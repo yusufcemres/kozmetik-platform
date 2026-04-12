@@ -73,25 +73,49 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('revela_theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
-        {/* Google Analytics 4 */}
+        {/* Google Analytics 4 with Consent Mode v2 */}
         {process.env.NEXT_PUBLIC_GA4_ID && (
           <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID}`}
-            />
             <script
               dangerouslySetInnerHTML={{
                 __html: `
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
+                  window.gtag = gtag;
+                  // Consent Mode v2 — default denied (KVKK)
+                  gtag('consent', 'default', {
+                    ad_storage: 'denied',
+                    ad_user_data: 'denied',
+                    ad_personalization: 'denied',
+                    analytics_storage: 'denied',
+                    functionality_storage: 'granted',
+                    security_storage: 'granted',
+                    wait_for_update: 500
+                  });
+                  // Apply stored consent if present
+                  try {
+                    var c = localStorage.getItem('revela_consent');
+                    if (c === 'granted') {
+                      gtag('consent', 'update', {
+                        ad_storage: 'granted',
+                        ad_user_data: 'granted',
+                        ad_personalization: 'granted',
+                        analytics_storage: 'granted'
+                      });
+                    }
+                  } catch(e){}
                   gtag('js', new Date());
                   gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID}', {
                     page_path: window.location.pathname,
-                    send_page_view: true
+                    send_page_view: true,
+                    anonymize_ip: true
                   });
                 `,
               }}
+            />
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID}`}
             />
           </>
         )}

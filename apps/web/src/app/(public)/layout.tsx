@@ -4,6 +4,7 @@ import BottomNav from '@/components/public/BottomNav';
 import AnalyticsProvider from '@/components/providers/AnalyticsProvider';
 import OnboardingModal from '@/components/public/OnboardingModal';
 import InstallPWAButton from '@/components/public/InstallPWAButton';
+import CookieConsent from '@/components/public/CookieConsent';
 
 export default function PublicLayout({
   children,
@@ -18,6 +19,7 @@ export default function PublicLayout({
       <BottomNav />
       <OnboardingModal />
       <InstallPWAButton />
+      <CookieConsent />
     </AnalyticsProvider>
   );
 }
