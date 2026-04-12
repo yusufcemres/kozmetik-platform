@@ -61,7 +61,7 @@ async function getHomeData() {
     supplementCount: supplementData.meta?.total || 0,
     categories: categories.status === 'fulfilled' ? categories.value : [],
     brands: brandsData,
-    brandCount: brandsData.length || FALLBACK_BRAND_COUNT,
+    brandCount: brandsData.length > 12 ? brandsData.length : FALLBACK_BRAND_COUNT,
     ingredientCount: ingredientData || FALLBACK_INGREDIENT_COUNT,
   };
 }
@@ -79,11 +79,11 @@ function avgScore(product: Product): number | null {
 // === Quiz Cards ===
 
 const QUIZ_CARDS = [
-  { href: '/cilt-analizi', icon: 'water_drop', title: 'Cilt Analizi', motto: 'Cildini tanı, doğruyu bul.', duration: '~2 dk', badge: null },
-  { href: '/beslenme-analizi', icon: 'nutrition', title: 'Beslenme Analizi', motto: 'Eksik olan ne? Beden konuşuyor.', duration: '~3 dk', badge: 'YENİ' },
-  { href: '/sac-analizi', icon: 'face_retouching_natural', title: 'Saç Analizi', motto: 'Saçın sana bir şeyler anlatıyor.', duration: '~2 dk', badge: 'YENİ' },
-  { href: '/cilt-yasi-testi', icon: 'timer', title: 'Cilt Yaşı Testi', motto: 'Ayna yalan söyler, biz söylemeyiz.', duration: '~1 dk', badge: 'VİRAL' },
-  { href: '/icerik-testi', icon: 'quiz', title: 'İçerik Bilgi Testi', motto: 'Ne kadar biliyorsun?', duration: '~2 dk', badge: null },
+  { href: '/cilt-analizi', icon: 'water_drop', title: 'Cilt Analizi', motto: 'Cildini tanı, doğruyu bul. Cilt tipini, ihtiyaçlarını ve hassasiyetlerini analiz ederiz.', detail: '7 soru · AI destekli', duration: '~2 dk', badge: 'AI' },
+  { href: '/beslenme-analizi', icon: 'nutrition', title: 'Beslenme Analizi', motto: 'Eksik olan ne? Beden konuşuyor. Takviye ihtiyacını bilimsel yaklaşımla belirle.', detail: '8 soru · Kişiselleştirilmiş', duration: '~3 dk', badge: 'YENİ' },
+  { href: '/sac-analizi', icon: 'face_retouching_natural', title: 'Saç Analizi', motto: 'Saçın sana bir şeyler anlatıyor. Kişisel saç bakım planını oluştur.', detail: '6 soru · Kişiselleştirilmiş', duration: '~2 dk', badge: 'YENİ' },
+  { href: '/cilt-yasi-testi', icon: 'timer', title: 'Cilt Yaşı Testi', motto: 'Ayna yalan söyler, biz söylemeyiz. Cildinin gerçek yaşını öğren.', detail: '5 soru · 1 dakikada sonuç', duration: '~1 dk', badge: 'VİRAL' },
+  { href: '/icerik-testi', icon: 'quiz', title: 'İçerik Bilgi Testi', motto: 'Ne kadar biliyorsun? Kozmetik içerik bilgini eğlenceli bir testle ölç.', detail: '10 soru · Bilgi yarışması', duration: '~2 dk', badge: null },
 ];
 
 // === Product Card ===
@@ -180,32 +180,33 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* 1. Hero */}
+      {/* 1. Hero — Google style */}
       <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 text-center">
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-4 text-on-surface">
-          {'\u0130\u00C7ER\u0130\u011E\u0130 OKU.'}<br />
-          <span className="text-outline-variant">{'DO\u011ERUYU BUL.'}</span>
-        </h1>
-        <p className="max-w-lg text-sm sm:text-base lg:text-lg text-on-surface-variant mb-8 sm:mb-10 leading-relaxed px-2">
-          Kozmetik ve takviye ürünlerinin INCI içeriğini analiz et,
-          fiyatları karşılaştır, sana en uygun olanı bul.
-        </p>
+        {/* Logo */}
+        <div className="mb-2">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-on-surface leading-none">
+            REVELA
+          </h1>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-outline mt-2">
+            Kozmetik · Takviye · Bakım Analizi
+          </p>
+        </div>
 
         {/* Search bar */}
-        <form action="/ara" className="w-full max-w-lg mb-4">
+        <form action="/ara" className="w-full max-w-xl mt-10">
           <div className="relative">
-            <span className="material-icon text-outline absolute left-4 top-1/2 -translate-y-1/2 text-[20px]" aria-hidden="true">search</span>
+            <span className="material-icon text-outline absolute left-5 top-1/2 -translate-y-1/2 text-[22px]" aria-hidden="true">search</span>
             <input
               type="text"
               name="q"
               placeholder="Ürün, marka veya içerik ara..."
-              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-12 pr-4 py-3.5 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
+              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-14 pr-5 py-4 text-sm sm:text-base text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 focus:shadow-lg transition-all"
             />
           </div>
         </form>
 
         {/* Popular searches */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-10">
+        <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 mt-5">
           <span className="text-xs text-outline">Popüler:</span>
           {['Retinol', 'Niacinamide', 'Vitamin C', 'Hyaluronic Acid', 'SPF'].map((term) => (
             <Link
@@ -218,107 +219,25 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/urunler" className="curator-btn-primary text-sm px-10 py-4">
-            Ürünleri Keşfet
-            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
-          </Link>
-          <a
-            href="#seni-taniyalim"
-            className="text-sm px-8 py-4 border border-outline-variant/30 rounded-md text-on-surface-variant hover:text-on-surface hover:border-on-surface/30 transition-all"
-          >
-            Analizlere Başla
-          </a>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-14 mt-12 sm:mt-16 lg:mt-20 w-full max-w-2xl">
+        {/* Stats — compact inline */}
+        <div className="flex flex-wrap justify-center items-center gap-x-6 sm:gap-x-10 gap-y-3 mt-16 text-center">
           {[
             { label: 'Kozmetik', value: latest.meta?.total || 0 },
             { label: 'Takviye', value: supplementCount || 0 },
             { label: 'İçerik', value: ingredientCount || 0 },
             { label: 'Marka', value: brandCount || 0 },
           ].map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-on-surface">
+            <div key={s.label} className="flex items-baseline gap-1.5">
+              <span className="text-base sm:text-lg font-extrabold tracking-tight text-on-surface">
                 {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}+
-              </p>
-              <p className="label-caps text-outline mt-1">{s.label}</p>
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-outline">{s.label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 2. REVELA Nedir? */}
-      <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
-        <div className="text-center mb-10 sm:mb-14">
-          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden REVELA?</span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
-            BAKIM DÜNYASINDA<br />
-            <span className="text-outline-variant">REHBERİN.</span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
-          {[
-            {
-              icon: 'science',
-              title: 'INCI Analizi',
-              desc: 'Her ürünün içerik listesini bilimsel verilere dayanarak analiz ediyoruz. Hangi madde ne işe yarar, hangisinden uzak durmalısın — hepsini açıklıyoruz.',
-            },
-            {
-              icon: 'compare_arrows',
-              title: 'Fiyat Karşılaştırma',
-              desc: 'Aynı ürünü Trendyol, Hepsiburada, Amazon ve daha fazlasında karşılaştır. En uygun fiyatı tek ekranda gör, affiliate linklerle güvenle satın al.',
-            },
-            {
-              icon: 'fingerprint',
-              title: 'Kişisel Eşleştirme',
-              desc: 'Cilt tipini, ihtiyaçlarını ve hassasiyetlerini analiz ediyoruz. Sana özel skor ile hangi ürünün sana en uygun olduğunu gösteriyoruz.',
-            },
-          ].map((item) => (
-            <div key={item.title} className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
-              </div>
-              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-3">{item.title}</h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Nasil Calisiyor? */}
-      <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-16 bg-surface">
-        <div className="text-center mb-10 sm:mb-14">
-          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Nasıl Çalışıyor?</span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">3 ADIMDA KEŞFET</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
-          {[
-            { step: '01', icon: 'search', title: 'Ara veya Analiz Yap', desc: 'Ürün adı, marka veya içerik maddesi ile ara. Veya kişisel analizlerle ihtiyacını keşfet.' },
-            { step: '02', icon: 'science', title: 'İçeriğini İncele', desc: 'INCI bazlı bilimsel analiz ile ürünün gerçek değerini gör. Uyumluluk skoru, risk analizi, alternatif öneriler.' },
-            { step: '03', icon: 'shopping_bag', title: 'Karşılaştır & Satın Al', desc: 'Fiyatları platformlar arası karşılaştır. En uygun fiyatla güvenle satın al.' },
-          ].map((item) => (
-            <div key={item.step} className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
-              </div>
-              <span className="label-caps text-outline block mb-2">{item.step}</span>
-              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-2">{item.title}</h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-12">
-          <Link href="/urunler" className="curator-btn-primary text-sm px-8 py-3">
-            Keşfetmeye Başla
-            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* 4. Seni Taniyalim — Quiz/Analiz Kartlari */}
+      {/* 2. Seni Taniyalim — Katalog Kartlar */}
       <section id="seni-taniyalim" className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low scroll-mt-16">
         <div className="text-center mb-8 sm:mb-12">
           <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Seni Tanıyalım</span>
@@ -330,32 +249,35 @@ export default async function HomePage() {
             Kişisel testlerle ihtiyaçlarını keşfet, sana özel önerilere ulaş.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 max-w-7xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
           {QUIZ_CARDS.map((card) => (
             <Link
               key={card.href}
               href={card.href}
-              className="curator-card p-6 group hover:border-primary/30 transition-all duration-300"
+              className="curator-card p-8 sm:p-10 group hover:border-primary/30 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-icon text-primary text-[24px]" aria-hidden="true">{card.icon}</span>
+              <div className="flex items-start justify-between mb-5">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="material-icon text-primary text-[32px]" aria-hidden="true">{card.icon}</span>
                 </div>
                 {card.badge && (
-                  <span className="bg-primary text-on-primary text-[9px] px-2 py-0.5 rounded-full font-bold tracking-wide">
+                  <span className="bg-primary text-on-primary text-[10px] px-2.5 py-1 rounded-full font-bold tracking-wide">
                     {card.badge}
                   </span>
                 )}
               </div>
-              <h3 className="font-bold text-on-surface text-base mb-1 group-hover:text-primary transition-colors">
+              <h3 className="font-bold text-on-surface text-xl mb-2 group-hover:text-primary transition-colors">
                 {card.title}
               </h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed mb-4">
+              <p className="text-base text-on-surface-variant leading-relaxed mb-3">
                 {card.motto}
               </p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-outline">{card.duration}</span>
-                <span className="material-icon text-outline-variant text-[18px] group-hover:text-primary group-hover:translate-x-1 transition-all" aria-hidden="true">
+              <p className="text-xs text-outline mb-5 tracking-wide">{card.detail}</p>
+              <div className="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+                <span className="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                  Teste Başla
+                </span>
+                <span className="material-icon text-outline-variant text-[20px] group-hover:text-primary group-hover:translate-x-1 transition-all" aria-hidden="true">
                   arrow_forward
                 </span>
               </div>
@@ -390,17 +312,19 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 6. Guven */}
+      {/* 6. Neden REVELA — Güven + Nasıl Çalışıyor birleşik */}
       <section className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden Güvenmelisin?</span>
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden REVELA?</span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
               BAĞIMSIZ.<br />
               <span className="text-outline-variant">BİLİMSEL.</span>
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+
+          {/* Trust points */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12">
             {[
               {
                 icon: 'verified',
@@ -410,7 +334,7 @@ export default async function HomePage() {
               {
                 icon: 'block',
                 title: 'Sponsorlu Sıralama Yok',
-                desc: 'Hiçbir marka veya ürün öne çıkarılmak için ödeme yapmaz. Skorlar tamamen veri odaklı.',
+                desc: 'Hiçbir marka ödeme ile öne çıkarılmaz. Skorlar tamamen veri odaklı.',
               },
               {
                 icon: 'menu_book',
@@ -424,6 +348,30 @@ export default async function HomePage() {
                 <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* Steps — Nasıl Çalışıyor */}
+          <div className="border-t border-outline-variant/20 pt-10 sm:pt-12">
+            <p className="label-caps text-outline text-center mb-8 tracking-[0.4em]">Nasıl Çalışıyor?</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
+              {[
+                { step: '01', title: 'Ara veya Analiz Yap', desc: 'Ürünü ara ya da kişisel testi çöz.' },
+                { step: '02', title: 'İçeriğini İncele', desc: 'INCI analizini ve skorları gör.' },
+                { step: '03', title: 'Karşılaştır & Seç', desc: 'Senin için en uygununu bul.' },
+              ].map((item) => (
+                <div key={item.step} className="text-center">
+                  <span className="text-3xl font-extrabold text-primary/40 tracking-tighter block mb-2">{item.step}</span>
+                  <h3 className="text-base font-bold text-on-surface mb-1">{item.title}</h3>
+                  <p className="text-sm text-on-surface-variant">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <Link href="/urunler" className="curator-btn-primary inline-flex items-center gap-2">
+                Keşfetmeye Başla
+                <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 
 const TABS = [
   { href: '/urunler', icon: 'search', activeIcon: 'search', label: 'Keşfet' },
-  { href: '/takviyeler', icon: 'medication', activeIcon: 'medication', label: 'Takviye' },
-  { href: '/cilt-analizi', icon: 'water_drop', activeIcon: 'water_drop', label: 'Analiz' },
+  { href: '/ihtiyaclar', icon: 'healing', activeIcon: 'healing', label: 'İhtiyaçlar' },
+  { href: '/#seni-taniyalim', icon: 'quiz', activeIcon: 'quiz', label: 'Testler' },
   { href: '/karsilastir', icon: 'compare_arrows', activeIcon: 'compare_arrows', label: 'Karşılaştır' },
   { href: '/profilim', icon: 'person_outline', activeIcon: 'person', label: 'Profil' },
 ];

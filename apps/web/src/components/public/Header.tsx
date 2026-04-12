@@ -5,43 +5,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
-const EXPLORE_GROUPS = [
-  {
-    title: 'Dış Bakım',
-    items: [
-      { href: '/urunler', label: 'Kozmetik Ürünler', icon: 'spa', desc: '1900+ kozmetik ürünü' },
-      { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science', desc: '5000+ INCI analizi' },
-      { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'face_retouching_natural', desc: 'AI destekli cilt analizi', badge: 'AI' },
-      { href: '/cilt-yasi-testi', label: 'Cilt Yaşı Testi', icon: 'timer', desc: 'Cildinin gerçek yaşını öğren', badge: 'YENİ' },
-    ],
-  },
-  {
-    title: 'İç Bakım',
-    items: [
-      { href: '/takviyeler', label: 'Takviye Ürünler', icon: 'medication', desc: 'Vitamin, mineral & takviyeler' },
-      { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', desc: 'Takviye ihtiyacını öğren', badge: 'YENİ' },
-    ],
-  },
-  {
-    title: 'Keşfet',
-    items: [
-      { href: '/ihtiyaclar', label: 'İhtiyaçlar', icon: 'healing', desc: 'Dış & iç bakım ihtiyaçları' },
-      { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
-      { href: '/rehber', label: 'Rehber', icon: 'menu_book', desc: 'Cilt bakım rehberleri' },
-      { href: '/onerilerimiz', label: 'Önerilerimiz', icon: 'auto_awesome', desc: 'AI destekli öneriler', badge: 'AI' },
-      { href: '/karsilastir', label: 'Karşılaştır', icon: 'compare_arrows', desc: 'Ürünleri yan yana kıyasla' },
-      { href: '/sac-analizi', label: 'Saç Analizi', icon: 'content_cut', desc: 'Kişisel saç bakım planı', badge: 'YENİ' },
-      { href: '/icerik-testi', label: 'İçerik Testi', icon: 'quiz', desc: 'Kozmetik bilgini ölç', badge: 'YENİ' },
-    ],
-  },
+const TESTS_DROPDOWN = [
+  { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'water_drop', badge: 'AI' },
+  { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', badge: 'YEN\u0130' },
+  { href: '/sac-analizi', label: 'Sa\u00e7 Analizi', icon: 'face_retouching_natural', badge: 'YEN\u0130' },
+  { href: '/cilt-yasi-testi', label: 'Cilt Ya\u015f\u0131 Testi', icon: 'timer', badge: 'V\u0130RAL' },
+  { href: '/icerik-testi', label: '\u0130\u00e7erik Testi', icon: 'quiz', badge: null },
 ];
 
-const ALL_EXPLORE_ITEMS = EXPLORE_GROUPS.flatMap((g) => g.items);
-
 const NAV_ITEMS = [
-  { href: '/takviyeler', label: 'Takviyeler' },
-  { href: '/cilt-analizi', label: 'Cilt Analizi' },
-  { href: '/karsilastir', label: 'Karşılaştır' },
+  { href: '/urunler', label: 'Ke\u015ffet' },
+  { href: '/urunler?domain=cosmetic', label: 'D\u0131\u015f Bak\u0131m' },
+  { href: '/takviyeler', label: '\u0130\u00e7 Bak\u0131m' },
+  { href: '/ihtiyaclar', label: '\u0130htiya\u00e7lar' },
+];
+
+const NAV_ITEMS_RIGHT = [
+  { href: '/karsilastir', label: 'Kar\u015f\u0131la\u015ft\u0131r' },
 ];
 
 export default function Header() {
@@ -81,7 +61,7 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const isExplorePath = ALL_EXPLORE_ITEMS.some(
+  const isTestPath = TESTS_DROPDOWN.some(
     (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
   );
 
@@ -90,28 +70,41 @@ export default function Header() {
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="flex justify-between items-center w-full px-3 sm:px-6 lg:px-12 py-3 sm:py-4 max-w-full">
         {/* Logo */}
-        <Link href="/" className="flex flex-col leading-none">
-          <span className="text-3xl md:text-4xl font-extrabold tracking-tighter text-on-surface">
-            REVELA
-          </span>
-          <span className="text-[8px] md:text-[9px] uppercase tracking-[0.35em] text-outline mt-0.5">
-            Kozmetik Analiz
-          </span>
+        <Link href="/" className="text-3xl md:text-4xl font-extrabold tracking-tighter text-on-surface leading-none">
+          REVELA
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {/* Keşfet dropdown */}
+        <nav className="hidden md:flex items-center gap-7">
+          {/* Direct nav items (left) */}
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`label-caps text-xs transition-colors duration-300 ${
+                  isActive
+                    ? 'text-on-surface border-b-2 border-on-surface pb-1'
+                    : 'text-outline hover:text-on-surface'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+
+          {/* Testler dropdown */}
           <div ref={exploreRef} className="relative">
             <button
               onClick={() => setExploreOpen(!exploreOpen)}
               className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
-                isExplorePath || exploreOpen
+                isTestPath || exploreOpen
                   ? 'text-on-surface border-b-2 border-on-surface pb-1'
                   : 'text-outline hover:text-on-surface'
               }`}
             >
-              Keşfet
+              Testler
               <span
                 className={`material-icon text-[16px] transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`}
                 aria-hidden="true"
@@ -120,51 +113,36 @@ export default function Header() {
               </span>
             </button>
 
-            {/* Dropdown */}
             {exploreOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[420px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up max-h-[75vh] overflow-y-auto">
-                {EXPLORE_GROUPS.map((group, gi) => (
-                  <div key={group.title}>
-                    {gi > 0 && <div className="h-px bg-outline-variant/15 my-1.5" />}
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-outline px-4 pt-2 pb-1 font-semibold">
-                      {group.title}
-                    </p>
-                    {group.items.map((item) => {
-                      const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={`flex items-center gap-4 px-4 py-2.5 rounded-md transition-all duration-200 ${
-                            isActive
-                              ? 'bg-primary/10 text-primary'
-                              : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
-                          }`}
-                        >
-                          <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold">{item.label}</span>
-                              {'badge' in item && item.badge && (
-                                <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
-                                  {item.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-on-surface-variant mt-0.5">{item.desc}</p>
-                          </div>
-                          <span className="material-icon text-[16px] text-outline-variant" aria-hidden="true">arrow_forward</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                ))}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[280px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
+                {TESTS_DROPDOWN.map((item) => {
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-md transition-all duration-200 ${
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                      <span className="text-sm font-semibold flex-1">{item.label}</span>
+                      {item.badge && (
+                        <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          {/* Direct nav items */}
-          {NAV_ITEMS.map((item) => {
+          {/* Direct nav items (right) */}
+          {NAV_ITEMS_RIGHT.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
@@ -237,39 +215,8 @@ export default function Header() {
     {mobileOpen && (
       <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
-          {EXPLORE_GROUPS.map((group, gi) => (
-            <div key={group.title}>
-              {gi > 0 && <div className="h-px bg-white/10 my-4" />}
-              <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">{group.title}</p>
-              {group.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
-                      isActive
-                        ? 'bg-primary text-on-primary font-semibold'
-                        : 'text-white/70 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                    <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
-                    {'badge' in item && item.badge && (
-                      <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
-
-          <div className="h-px bg-white/10 my-6" />
-
-          {/* Direct nav */}
-          {NAV_ITEMS.map((item) => {
+          {/* Main nav */}
+          {[...NAV_ITEMS, ...NAV_ITEMS_RIGHT].map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
@@ -285,6 +232,33 @@ export default function Header() {
                 <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
                   arrow_forward
                 </span>
+              </Link>
+            );
+          })}
+
+          <div className="h-px bg-white/10 my-4" />
+
+          {/* Tests */}
+          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Testler</p>
+          {TESTS_DROPDOWN.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary text-on-primary font-semibold'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
+                {item.badge && (
+                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
