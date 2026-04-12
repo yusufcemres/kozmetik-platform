@@ -1,29 +1,72 @@
 {
   "name": "REVELA - Kozmetik Analiz",
   "short_name": "REVELA",
-  "description": "Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.",
-  "start_url": "/",
+  "description": "Kozmetik ve takviye ürünlerinin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#fafaf8",
   "theme_color": "#1a1a1a",
   "orientation": "portrait-primary",
-  "categories": ["beauty", "health", "shopping"],
+  "lang": "tr-TR",
+  "dir": "ltr",
+  "categories": ["beauty", "health", "shopping", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Keşfet",
+      "short_name": "Keşfet",
+      "description": "Ürün kataloğunda ara",
+      "url": "/urunler?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cilt Analizi",
+      "short_name": "Analiz",
+      "description": "Kişisel cilt testini başlat",
+      "url": "/cilt-analizi?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Karşılaştır",
+      "short_name": "Karşılaştır",
+      "description": "Ürünleri karşılaştır",
+      "url": "/karsilastir?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Profilim",
+      "short_name": "Profil",
+      "description": "Favorilerin ve profilim",
+      "url": "/profilim?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
 }

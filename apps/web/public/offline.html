@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Çevrimdışı — REVELA</title>
+  <link rel="icon" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e5e0;
+      --primary: #1a1a1a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111;
+        --fg: #fafaf8;
+        --muted: #9a9a9a;
+        --border: #2a2a2a;
+        --primary: #fafaf8;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, 'Manrope', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+    .logo {
+      font-size: clamp(48px, 12vw, 96px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+    .tagline {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      margin-bottom: 48px;
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 32px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 340px;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+    button {
+      background: var(--primary);
+      color: var(--bg);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.02); }
+    button:active { transform: scale(0.98); }
+    .tips {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      max-width: 340px;
+      width: 100%;
+    }
+    .tips-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .tip {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">REVELA</div>
+  <div class="tagline">Kozmetik · Takviye · Bakım Analizi</div>
+
+  <div class="icon">📡</div>
+  <h1>Çevrimdışısın</h1>
+  <p>İnternet bağlantın kesildi. Bağlantın döndüğünde tekrar deneyebilirsin.</p>
+
+  <button onclick="location.reload()">Tekrar Dene</button>
+
+  <div class="tips">
+    <div class="tips-title">Çevrimdışıyken</div>
+    <div class="tip">· Daha önce ziyaret ettiğin sayfalar önbellekten açılabilir</div>
+    <div class="tip">· Favorilerin ve profilin cihazında kayıtlı</div>
+  </div>
+
+  <script>
+    // Auto-reload when back online
+    window.addEventListener('online', () => location.reload());
+  </script>
+</body>
+</html>

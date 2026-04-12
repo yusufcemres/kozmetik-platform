@@ -1,10 +1,15 @@
-const CACHE_NAME = 'kozmetik-v3';
+const CACHE_NAME = 'kozmetik-v4';
+const OFFLINE_URL = '/offline.html';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
+  '/offline.html',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
 ];
 
-// Install: cache shell
+// Install: cache shell + offline page
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
@@ -49,7 +54,7 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// Fetch: network-first for API, stale-while-revalidate for pages/assets
+// Fetch handler: navigate → offline.html fallback; API → network-first; assets → stale-while-revalidate
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -59,6 +64,25 @@ self.addEventListener('fetch', (event) => {
 
   // Skip Next.js dev/build assets (prevents stale JS bundles)
   if (url.pathname.startsWith('/_next/')) return;
+
+  // Navigation requests (HTML pages): network-first with offline fallback
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Cache successful navigations for offline reuse
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL))
+        )
+    );
+    return;
+  }
 
   // API calls: network-first with 3s timeout
   if (url.pathname.startsWith('/api/')) {
@@ -77,16 +101,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets & pages: stale-while-revalidate
+  // Static assets & images: stale-while-revalidate
   event.respondWith(
     caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request).then((response) => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      }).catch(() => cached);
+      const fetchPromise = fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => cached);
 
       return cached || fetchPromise;
     })
