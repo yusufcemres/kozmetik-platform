@@ -89,13 +89,13 @@ function SupplementsListInner() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <span className="material-icon absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]" aria-hidden="true">search</span>
+        <span className="material-icon absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant text-[20px] pointer-events-none" aria-hidden="true">search</span>
         <input
           type="text"
           placeholder="Takviye ara... (örneğin: omega-3, d vitamini)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary/50 transition-colors"
+          className="curator-input pl-12"
         />
       </div>
 
@@ -192,19 +192,45 @@ function SupplementsListInner() {
 
           {totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-12">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
-                    p === page
-                      ? 'bg-primary text-on-primary'
-                      : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
+              >
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
+              </button>
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 7) {
+                  pageNum = i + 1;
+                } else if (page <= 4) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 3) {
+                  pageNum = totalPages - 6 + i;
+                } else {
+                  pageNum = page - 3 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
+                      pageNum === page
+                        ? 'bg-primary text-on-primary'
+                        : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
+              >
+                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
+              </button>
             </div>
           )}
         </>

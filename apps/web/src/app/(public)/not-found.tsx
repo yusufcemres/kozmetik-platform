@@ -33,11 +33,11 @@ export default function NotFound() {
           Ürünleri Ara
         </Link>
         <Link
-          href="/cilt-analizi"
+          href="/tara"
           className="curator-btn-outline px-8 py-3 text-xs"
         >
-          <span className="material-icon material-icon-sm mr-1" aria-hidden="true">quiz</span>
-          Cilt Analizi
+          <span className="material-icon material-icon-sm mr-1" aria-hidden="true">qr_code_scanner</span>
+          Akıllı Tarama
         </Link>
       </div>
 
@@ -46,9 +46,11 @@ export default function NotFound() {
         <div className="flex flex-wrap gap-2 justify-center">
           {[
             { href: '/onerilerimiz', label: 'Önerilerimiz' },
+            { href: '/takviyeler', label: 'Takviyeler' },
             { href: '/ihtiyaclar', label: 'İhtiyaçlar' },
             { href: '/markalar', label: 'Markalar' },
             { href: '/karsilastir', label: 'Karşılaştır' },
+            { href: '/cilt-analizi', label: 'Cilt Analizi' },
           ].map((link) => (
             <Link
               key={link.href}
