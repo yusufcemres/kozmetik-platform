@@ -229,6 +229,24 @@ function ingredientJsonLd(ingredient: Ingredient) {
   };
 }
 
+function ingredientBreadcrumbJsonLd(ingredient: Ingredient) {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://revela.com.tr';
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: base },
+      { '@type': 'ListItem', position: 2, name: 'İçerikler', item: `${base}/icerikler` },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: ingredient.inci_name,
+        item: `${base}/icerikler/${ingredient.ingredient_slug}`,
+      },
+    ],
+  };
+}
+
 // === Page ===
 
 export default async function IngredientDetailPage({
@@ -266,6 +284,10 @@ export default async function IngredientDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ingredientJsonLd(ingredient)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ingredientBreadcrumbJsonLd(ingredient)) }}
       />
 
       <article className="curator-section max-w-[1200px] mx-auto">

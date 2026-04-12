@@ -337,6 +337,35 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
           }),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Ana Sayfa',
+                item: process.env.NEXT_PUBLIC_SITE_URL || 'https://revela.com.tr',
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Markalar',
+                item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://revela.com.tr'}/markalar`,
+              },
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: brand.brand_name,
+                item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://revela.com.tr'}/markalar/${brand.brand_slug}`,
+              },
+            ],
+          }),
+        }}
+      />
     </div>
   );
 }

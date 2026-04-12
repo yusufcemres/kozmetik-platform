@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
+import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';
 import ListModal from '@/components/public/ListModal';
 import RecentlyViewed from '@/components/public/RecentlyViewed';
@@ -481,13 +482,17 @@ export default async function ProductDetailPage({
           {/* Image */}
           <div className="col-span-12 md:col-span-6 relative">
             <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center overflow-hidden">
-              <div className="absolute top-4 right-4 z-10">
+              <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 items-end">
                 <FavoriteButton
                   product_id={product.product_id}
                   product_name={product.product_name}
                   product_slug={product.product_slug}
                   brand_name={product.brand?.brand_name}
                   image_url={imageUrl}
+                />
+                <ShareButton
+                  title={product.product_name}
+                  text={`${product.product_name}${product.brand?.brand_name ? ' · ' + product.brand.brand_name : ''} — REVELA'da incele`}
                 />
               </div>
               {imageUrl ? (
