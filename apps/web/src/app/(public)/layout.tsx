@@ -3,6 +3,7 @@ import Footer from '@/components/public/Footer';
 import BottomNav from '@/components/public/BottomNav';
 import AnalyticsProvider from '@/components/providers/AnalyticsProvider';
 import OnboardingModal from '@/components/public/OnboardingModal';
+import InstallPWAButton from '@/components/public/InstallPWAButton';
 
 export default function PublicLayout({
   children,
@@ -16,6 +17,7 @@ export default function PublicLayout({
       <Footer />
       <BottomNav />
       <OnboardingModal />
+      <InstallPWAButton />
     </AnalyticsProvider>
   );
 }
