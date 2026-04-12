@@ -4,22 +4,46 @@ import { Repository, LessThan } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes } from 'crypto';
-import { AppUser, MagicLinkToken } from '@database/entities';
+import {
+  AppUser,
+  MagicLinkToken,
+  UserFavorite,
+  ScanHistory,
+  PushSubscription,
+} from '@database/entities';
 
 const TOKEN_TTL_MINUTES = 20;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 per minute per email
+const IP_RATE_LIMIT_MAX = 5; // 5 requests per minute per IP
+const IP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 @Injectable()
 export class UserAuthService {
   private readonly logger = new Logger(UserAuthService.name);
   private readonly recentRequests = new Map<string, number>();
+  private readonly ipRequests = new Map<string, number[]>();
 
   constructor(
     @InjectRepository(AppUser) private readonly users: Repository<AppUser>,
     @InjectRepository(MagicLinkToken) private readonly tokens: Repository<MagicLinkToken>,
+    @InjectRepository(UserFavorite) private readonly favorites: Repository<UserFavorite>,
+    @InjectRepository(ScanHistory) private readonly scanHistory: Repository<ScanHistory>,
+    @InjectRepository(PushSubscription) private readonly pushSubs: Repository<PushSubscription>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
   ) {}
+
+  private checkIpRateLimit(ip: string | undefined): void {
+    if (!ip) return;
+    const now = Date.now();
+    const windowStart = now - IP_RATE_LIMIT_WINDOW_MS;
+    const recent = (this.ipRequests.get(ip) || []).filter((t) => t > windowStart);
+    if (recent.length >= IP_RATE_LIMIT_MAX) {
+      throw new BadRequestException('Çok fazla istek. Lütfen biraz bekleyin.');
+    }
+    recent.push(now);
+    this.ipRequests.set(ip, recent);
+  }
 
   private hashToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
@@ -34,6 +58,8 @@ export class UserAuthService {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw new BadRequestException('Geçersiz e-posta adresi');
     }
+
+    this.checkIpRateLimit(ip);
 
     const last = this.recentRequests.get(email);
     if (last && Date.now() - last < RATE_LIMIT_WINDOW_MS) {
@@ -145,5 +171,52 @@ export class UserAuthService {
 
   async getUserById(userId: number): Promise<AppUser | null> {
     return this.users.findOne({ where: { user_id: userId, is_active: true } });
+  }
+
+  async exportUserData(userId: number): Promise<Record<string, unknown>> {
+    const user = await this.users.findOne({ where: { user_id: userId } });
+    if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');
+
+    const [favorites, scans, pushes] = await Promise.all([
+      this.favorites.find({ where: { user_id: userId } }),
+      this.scanHistory.find({ where: { user_id: userId } }),
+      this.pushSubs.find({ where: { user_id: userId } }),
+    ]);
+
+    return {
+      exported_at: new Date().toISOString(),
+      user: {
+        user_id: user.user_id,
+        email: user.email,
+        display_name: user.display_name,
+        created_at: user.created_at,
+        last_login_at: user.last_login_at,
+      },
+      favorites: favorites.map((f) => ({
+        product_id: f.product_id,
+        created_at: f.created_at,
+      })),
+      scan_history: scans,
+      push_subscriptions: pushes.map((p) => ({
+        endpoint: p.endpoint,
+        user_agent: p.user_agent,
+        is_active: p.is_active,
+        created_at: p.created_at,
+      })),
+    };
+  }
+
+  async deleteAccount(userId: number): Promise<{ deleted: boolean }> {
+    const user = await this.users.findOne({ where: { user_id: userId } });
+    if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');
+
+    // Cascade delete user-owned records. ScanHistory uses user_id FK (nullable); null out or delete.
+    await this.favorites.delete({ user_id: userId });
+    await this.scanHistory.delete({ user_id: userId });
+    await this.pushSubs.delete({ user_id: userId });
+    await this.tokens.delete({ email: user.email });
+    await this.users.delete({ user_id: userId });
+
+    return { deleted: true };
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Ip, Post, Query, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Ip, Post, Query, UseGuards, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { UserAuthService } from './user-auth.service';
@@ -28,5 +28,19 @@ export class UserAuthController {
   @ApiOperation({ summary: 'Mevcut kullanıcı bilgisi' })
   async me(@Req() req: any) {
     return req.user;
+  }
+
+  @Get('me/export')
+  @UseGuards(AppJwtGuard)
+  @ApiOperation({ summary: 'KVKK: tüm kullanıcı verilerini JSON olarak indir' })
+  async exportMe(@Req() req: any) {
+    return this.service.exportUserData(req.user.user_id);
+  }
+
+  @Delete('me')
+  @UseGuards(AppJwtGuard)
+  @ApiOperation({ summary: 'KVKK: hesabı ve tüm ilişkili verileri sil' })
+  async deleteMe(@Req() req: any) {
+    return this.service.deleteAccount(req.user.user_id);
   }
 }

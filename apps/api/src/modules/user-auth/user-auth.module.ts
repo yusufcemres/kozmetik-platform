@@ -3,14 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppUser, MagicLinkToken } from '@database/entities';
+import { AppUser, MagicLinkToken, UserFavorite, ScanHistory, PushSubscription } from '@database/entities';
 import { UserAuthService } from './user-auth.service';
 import { UserAuthController } from './user-auth.controller';
 import { AppJwtStrategy } from './app-jwt.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AppUser, MagicLinkToken]),
+    TypeOrmModule.forFeature([AppUser, MagicLinkToken, UserFavorite, ScanHistory, PushSubscription]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

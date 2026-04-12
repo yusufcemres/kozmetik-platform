@@ -12,7 +12,7 @@ import {
 } from '@/lib/favorites';
 import { getPriceAlerts, removePriceAlert, PriceAlert } from '@/components/public/PriceAlertButton';
 import PushToggle from '@/components/public/PushToggle';
-import { getUserToken } from '@/lib/user-auth';
+import { getUserToken, clearUserToken } from '@/lib/user-auth';
 
 // === Types ===
 
@@ -57,13 +57,13 @@ interface SkinProfile {
 type Tab = 'genel' | 'favoriler' | 'rutin' | 'gecmis' | 'taramalar';
 
 interface ScanHistoryItem {
-  scan_id: number;
-  barcode?: string | null;
-  matched_product_id?: number | null;
-  matched_product_name?: string | null;
-  matched_product_slug?: string | null;
-  confidence?: number | null;
-  match_method?: string | null;
+  history_id: number;
+  user_id: number;
+  product_id: number | null;
+  method: string;
+  confidence: number | null;
+  raw_barcode: string | null;
+  raw_query: string | null;
   created_at: string;
 }
 
@@ -492,11 +492,11 @@ function ProfilePageInner() {
               Veri Yonetimi
             </h2>
             <p className="text-sm text-on-surface-variant mb-5">
-              REVELA tum verilerini tarayicinda (localStorage) saklar. Hesap veya sunucu kaydi bulunmaz.
+              KVKK Madde 11: verilerini indirme ve silme hakkina sahipsin. Giris yaptiysan sunucudaki veriler de dahil edilir.
             </p>
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => {
+                onClick={async () => {
                   const exportData: Record<string, unknown> = {};
                   const keys = ['skin_profile', 'kozmetik_favorites', 'kozmetik_routine', 'recently_viewed', 'revela_price_alerts', 'revela_onboarding_seen', 'revela_theme'];
                   keys.forEach((k) => {
@@ -508,6 +508,15 @@ function ProfilePageInner() {
                       if (val) exportData[k] = val;
                     }
                   });
+                  const token = getUserToken();
+                  if (token) {
+                    try {
+                      const serverData = await api.get<Record<string, unknown>>('/user-auth/me/export', { token });
+                      exportData._server = serverData;
+                    } catch (err: any) {
+                      alert('Sunucu verileri alinamadi: ' + (err?.message || 'bilinmeyen hata'));
+                    }
+                  }
                   exportData._exported_at = new Date().toISOString();
                   exportData._platform = 'REVELA';
                   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -539,6 +548,30 @@ function ProfilePageInner() {
               >
                 <span className="material-icon material-icon-sm" aria-hidden="true">delete_forever</span>
                 Verilerimi Sil
+              </button>
+              <button
+                onClick={async () => {
+                  const token = getUserToken();
+                  if (!token) {
+                    alert('Hesap silmek icin once giris yapmalisin.');
+                    return;
+                  }
+                  if (!confirm('HESABINI KALICI OLARAK SILMEK UZERESIN.\n\nSunucudaki tum verilerin (favoriler, tarama gecmisi, push abonelikleri, profil) silinecek. Bu islem geri alinamaz.\n\nDevam etmek istiyor musun?')) return;
+                  if (!confirm('Son onay: hesabini silmek icin "TAMAM"a bas. Geri alinamaz.')) return;
+                  try {
+                    await api.delete('/user-auth/me', { token });
+                    clearUserToken();
+                    ['skin_profile', 'kozmetik_favorites', 'kozmetik_routine', 'recently_viewed', 'revela_price_alerts', 'revela_onboarding_seen'].forEach((k) => localStorage.removeItem(k));
+                    alert('Hesabin silindi. Ana sayfaya yonlendiriliyorsun.');
+                    window.location.href = '/';
+                  } catch (err: any) {
+                    alert('Hesap silinemedi: ' + (err?.message || 'bilinmeyen hata'));
+                  }
+                }}
+                className="inline-flex items-center gap-2 text-[10px] font-label uppercase tracking-widest px-6 py-3 rounded-md border border-error bg-error/5 text-error hover:bg-error/10 transition-colors"
+              >
+                <span className="material-icon material-icon-sm" aria-hidden="true">no_accounts</span>
+                Hesabimi Sil (KVKK)
               </button>
             </div>
           </div>
@@ -923,28 +956,25 @@ function ProfilePageInner() {
           ) : (
             <div className="space-y-2">
               {scanHistory.map((scan) => {
-                const confidence = scan.confidence ? Math.round(scan.confidence * 100) : null;
+                const confidence = scan.confidence ? Math.round(Number(scan.confidence) * 100) : null;
                 const confBadge =
                   confidence === null ? null :
                   confidence >= 80 ? 'text-primary bg-primary/10' :
                   confidence >= 50 ? 'text-tertiary bg-tertiary/10' :
                   'text-error bg-error/10';
+                const label = scan.raw_barcode || scan.raw_query || `Tarama #${scan.history_id}`;
                 return (
-                  <div key={scan.scan_id} className="curator-card p-4 flex items-center gap-4">
+                  <div key={scan.history_id} className="curator-card p-4 flex items-center gap-4">
                     <span className="material-icon text-outline-variant" aria-hidden="true">
-                      {scan.matched_product_id ? 'check_circle' : 'help_outline'}
+                      {scan.product_id ? 'check_circle' : 'help_outline'}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-on-surface truncate">
-                        {scan.matched_product_name || scan.barcode || 'Bilinmeyen tarama'}
-                      </p>
+                      <p className="text-sm font-medium text-on-surface truncate">{label}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[10px] text-outline">
                           {new Date(scan.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </span>
-                        {scan.match_method && (
-                          <span className="label-caps text-outline text-[9px]">· {scan.match_method}</span>
-                        )}
+                        <span className="label-caps text-outline text-[9px]">· {scan.method}</span>
                         {confidence !== null && confBadge && (
                           <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-sm ${confBadge}`}>
                             {confidence}%
@@ -952,14 +982,6 @@ function ProfilePageInner() {
                         )}
                       </div>
                     </div>
-                    {scan.matched_product_slug && (
-                      <Link
-                        href={`/urunler/${scan.matched_product_slug}`}
-                        className="curator-btn-outline px-3 py-1.5 text-[10px] label-caps shrink-0"
-                      >
-                        Tekrar Gor
-                      </Link>
-                    )}
                   </div>
                 );
               })}
