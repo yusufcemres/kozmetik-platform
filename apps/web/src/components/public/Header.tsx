@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
+import ThemeToggle from '@/components/public/ThemeToggle';
 
 const TESTS_DROPDOWN = [
   { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'water_drop', badge: 'AI' },
@@ -181,6 +182,9 @@ export default function Header() {
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">search</span>
           </Link>
+
+          {/* Theme toggle */}
+          <ThemeToggle />
 
           {/* Profile */}
           <Link
