@@ -82,17 +82,35 @@ export class NotificationsService implements OnModuleInit {
     return this.sendBatch(subs, payload);
   }
 
-  async sendToAll(payload: PushPayload): Promise<number> {
+  async sendToAll(payload: PushPayload): Promise<BroadcastResult> {
     const subs = await this.subs.find({ where: { is_active: true } });
-    return this.sendBatch(subs, payload);
+    return this.sendBatchWithStats(subs, payload);
+  }
+
+  async sendBroadcast(payload: PushPayload): Promise<BroadcastResult> {
+    return this.sendToAll(payload);
+  }
+
+  async countActiveSubscriptions(): Promise<number> {
+    return this.subs.count({ where: { is_active: true } });
   }
 
   private async sendBatch(subs: PushSubscription[], payload: PushPayload): Promise<number> {
+    const { sent } = await this.sendBatchWithStats(subs, payload);
+    return sent;
+  }
+
+  private async sendBatchWithStats(
+    subs: PushSubscription[],
+    payload: PushPayload,
+  ): Promise<BroadcastResult> {
     if (!this.vapidReady) {
       this.logger.warn('VAPID not configured, cannot send push');
-      return 0;
+      return { total: subs.length, sent: 0, failed: 0, expired: 0 };
     }
     let sent = 0;
+    let failed = 0;
+    let expired = 0;
     for (const sub of subs) {
       try {
         await webpush.sendNotification(
@@ -105,13 +123,22 @@ export class NotificationsService implements OnModuleInit {
         sent++;
       } catch (err: any) {
         this.logger.error(`Push failed for sub ${sub.subscription_id}: ${err.message}`);
-        // 410 Gone / 404 = expired subscription
         if (err.statusCode === 410 || err.statusCode === 404) {
           sub.is_active = false;
           await this.subs.save(sub);
+          expired++;
+        } else {
+          failed++;
         }
       }
     }
-    return sent;
+    return { total: subs.length, sent, failed, expired };
   }
+}
+
+export interface BroadcastResult {
+  total: number;
+  sent: number;
+  failed: number;
+  expired: number;
 }

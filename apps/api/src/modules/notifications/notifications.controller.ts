@@ -1,7 +1,10 @@
 import { Body, Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { Roles } from '@common/decorators/roles.decorator';
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -45,5 +48,31 @@ export class NotificationsController {
       url: '/profilim',
     });
     return { sent };
+  }
+
+  @Get('broadcast/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Aktif push abone sayısı (admin)' })
+  async broadcastStats() {
+    const active = await this.service.countActiveSubscriptions();
+    return { active };
+  }
+
+  @Post('broadcast')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Tüm aktif abonelere push gönder (admin)' })
+  async broadcast(
+    @Body() body: { title: string; body: string; url?: string; icon?: string },
+  ) {
+    return this.service.sendBroadcast({
+      title: body.title,
+      body: body.body,
+      url: body.url,
+      icon: body.icon,
+    });
   }
 }
