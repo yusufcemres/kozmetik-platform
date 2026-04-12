@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { isFavorite, toggleFavorite } from '@/lib/favorites';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface Props {
   product_id: number;
@@ -13,20 +12,13 @@ interface Props {
 }
 
 export default function FavoriteButton({ product_id, product_name, product_slug, brand_name, image_url, size = 'md' }: Props) {
-  const [fav, setFav] = useState(false);
-
-  useEffect(() => {
-    setFav(isFavorite(product_id));
-    const handler = () => setFav(isFavorite(product_id));
-    window.addEventListener('favorites-changed', handler);
-    return () => window.removeEventListener('favorites-changed', handler);
-  }, [product_id]);
+  const { isFav, toggle } = useFavorites();
+  const fav = isFav(product_id);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const result = toggleFavorite({ product_id, product_name, product_slug, brand_name, image_url });
-    setFav(result);
+    void toggle({ product_id, product_name, product_slug, brand_name, image_url });
   };
 
   const sizeClasses = size === 'sm' ? 'w-8 h-8' : 'w-10 h-10';

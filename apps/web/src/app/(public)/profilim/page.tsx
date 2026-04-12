@@ -12,6 +12,7 @@ import {
 } from '@/lib/favorites';
 import { getPriceAlerts, removePriceAlert, PriceAlert } from '@/components/public/PriceAlertButton';
 import PushToggle from '@/components/public/PushToggle';
+import { getUserToken } from '@/lib/user-auth';
 
 // === Types ===
 
@@ -53,7 +54,18 @@ interface SkinProfile {
   updated_at: string;
 }
 
-type Tab = 'genel' | 'favoriler' | 'rutin' | 'gecmis';
+type Tab = 'genel' | 'favoriler' | 'rutin' | 'gecmis' | 'taramalar';
+
+interface ScanHistoryItem {
+  scan_id: number;
+  barcode?: string | null;
+  matched_product_id?: number | null;
+  matched_product_name?: string | null;
+  matched_product_slug?: string | null;
+  confidence?: number | null;
+  match_method?: string | null;
+  created_at: string;
+}
 
 // === Constants ===
 
@@ -118,6 +130,9 @@ function ProfilePageInner() {
     evening: InteractionWarning[];
   }>({ morning: [], evening: [] });
   const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>([]);
+  const [scanHistory, setScanHistory] = useState<ScanHistoryItem[]>([]);
+  const [scanLoading, setScanLoading] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
   // Edit state
   const [editSkinType, setEditSkinType] = useState('');
@@ -142,6 +157,16 @@ function ProfilePageInner() {
 
   useEffect(() => {
     loadAll();
+    const token = getUserToken();
+    setIsAuthed(!!token);
+    if (token) {
+      setScanLoading(true);
+      api
+        .get<ScanHistoryItem[]>('/smart-scan/history', { token })
+        .then((data) => setScanHistory(Array.isArray(data) ? data : []))
+        .catch(() => setScanHistory([]))
+        .finally(() => setScanLoading(false));
+    }
     api.get<{ data: Need[] }>('/needs?limit=50').then((res) => setNeeds(res.data || [])).catch(() => {});
 
     const handler = () => loadAll();
@@ -244,6 +269,7 @@ function ProfilePageInner() {
     { key: 'favoriler', label: 'Favoriler', icon: 'favorite', count: favorites.length },
     { key: 'rutin', label: 'Rutinim', icon: 'event_note', count: routine.morning.length + routine.evening.length },
     { key: 'gecmis', label: 'Gecmis', icon: 'history', count: recentItems.length },
+    { key: 'taramalar', label: 'Taramalarim', icon: 'qr_code_scanner', count: scanHistory.length },
   ];
 
   return (
@@ -863,6 +889,80 @@ function ProfilePageInner() {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ===== TARAMALAR TAB ===== */}
+      {tab === 'taramalar' && (
+        <>
+          {!isAuthed ? (
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">lock</span>
+              <p className="text-on-surface-variant mb-2">Tarama gecmisi sadece hesabinda saklanir</p>
+              <p className="text-xs text-outline mb-6">Giris yaparak tum tarama gecmisine tum cihazlardan eris</p>
+              <Link href="/giris" className="curator-btn-primary px-8 py-3 text-xs inline-flex items-center gap-1.5">
+                <span className="material-icon material-icon-sm" aria-hidden="true">login</span>
+                Giris yap
+              </Link>
+            </div>
+          ) : scanLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          ) : scanHistory.length === 0 ? (
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">qr_code_scanner</span>
+              <p className="text-on-surface-variant mb-4">Henuz tarama yapmadin</p>
+              <Link href="/tara" className="curator-btn-primary px-8 py-3 text-xs inline-flex items-center gap-1.5">
+                <span className="material-icon material-icon-sm" aria-hidden="true">qr_code_scanner</span>
+                Akilli Tarama
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {scanHistory.map((scan) => {
+                const confidence = scan.confidence ? Math.round(scan.confidence * 100) : null;
+                const confBadge =
+                  confidence === null ? null :
+                  confidence >= 80 ? 'text-primary bg-primary/10' :
+                  confidence >= 50 ? 'text-tertiary bg-tertiary/10' :
+                  'text-error bg-error/10';
+                return (
+                  <div key={scan.scan_id} className="curator-card p-4 flex items-center gap-4">
+                    <span className="material-icon text-outline-variant" aria-hidden="true">
+                      {scan.matched_product_id ? 'check_circle' : 'help_outline'}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-on-surface truncate">
+                        {scan.matched_product_name || scan.barcode || 'Bilinmeyen tarama'}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-outline">
+                          {new Date(scan.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </span>
+                        {scan.match_method && (
+                          <span className="label-caps text-outline text-[9px]">· {scan.match_method}</span>
+                        )}
+                        {confidence !== null && confBadge && (
+                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-sm ${confBadge}`}>
+                            {confidence}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {scan.matched_product_slug && (
+                      <Link
+                        href={`/urunler/${scan.matched_product_slug}`}
+                        className="curator-btn-outline px-3 py-1.5 text-[10px] label-caps shrink-0"
+                      >
+                        Tekrar Gor
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </>
