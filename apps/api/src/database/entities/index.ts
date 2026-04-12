@@ -73,3 +73,6 @@ export { ScanHistory } from './scan-history.entity';
 
 // Push Notifications
 export { PushSubscription } from './push-subscription.entity';
+
+// User Favorites
+export { UserFavorite } from './user-favorite.entity';
