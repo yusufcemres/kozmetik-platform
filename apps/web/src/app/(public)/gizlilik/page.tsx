@@ -28,9 +28,15 @@ export default function PrivacyPage() {
           <ul className="list-disc ml-6 space-y-1 mt-2">
             <li><strong>Cilt Profili Verileri:</strong> Cilt analizi sırasında girdiğiniz cilt tipi, yaş aralığı, hassasiyetler ve ihtiyaçlar. Bu veriler yalnızca tarayıcınızda (localStorage) saklanır ve sunucularımıza gönderilmez.</li>
             <li><strong>Favori Listeleri:</strong> Favorilediğiniz ürünler tarayıcınızda yerel olarak saklanır.</li>
-            <li><strong>Analitik Veriler:</strong> Sayfa görüntüleme, tıklama ve gezinme verileri anonim olarak toplanabilir (Google Analytics).</li>
-            <li><strong>Teknik Veriler:</strong> IP adresi (hash&apos;lenmiş), tarayıcı bilgisi, cihaz türü — sunucu günlüklerinde geçici olarak tutulur.</li>
+            <li><strong>Hesap E-postası (opsiyonel):</strong> Magic link ile giriş yaptığınızda e-posta adresiniz doğrulama ve hesap yönetimi için saklanır. Parola tutulmaz.</li>
+            <li><strong>Akıllı Tarama Görselleri:</strong> Kameradan çektiğiniz ürün fotoğrafı yalnızca tanıma için anlık işlenir, kalıcı saklanmaz; 24 saatlik tekrarlama cache&apos;i için yalnızca görsel hash&apos;i (MD5) tutulur.</li>
+            <li><strong>Push Abonelikleri:</strong> Bildirim izni verdiğinizde tarayıcınızın push endpoint bilgileri saklanır (sadece re-engagement için).</li>
+            <li><strong>Analitik Veriler:</strong> Sayfa görüntüleme, tıklama ve gezinme verileri yalnızca çerez onayınız sonrasında Google Analytics 4 ile anonim olarak toplanır (Consent Mode v2).</li>
+            <li><strong>Teknik Veriler:</strong> IP adresi (hash&apos;lenmiş), tarayıcı bilgisi, cihaz türü — sunucu günlüklerinde 30 güne kadar tutulur.</li>
           </ul>
+          <p className="mt-3 text-xs">
+            Detaylı KVKK aydınlatma metni için <a href="/kvkk" className="underline">/kvkk</a> sayfasına bakınız.
+          </p>
         </Section>
 
         <Section title="3. Verilerin İşlenme Amacı">

@@ -54,9 +54,17 @@ export default function Footer() {
           <p className="text-sm text-on-surface-variant text-left md:text-right">
             &copy; {new Date().getFullYear()} REVELA. Tüm hakları saklıdır.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-x-4 gap-y-2 md:justify-end">
             <Link href="/gizlilik" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
-              Gizlilik Politikası
+              Gizlilik
+            </Link>
+            <span className="text-outline-variant">/</span>
+            <Link href="/kvkk" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
+              KVKK Aydınlatma
+            </Link>
+            <span className="text-outline-variant">/</span>
+            <Link href="/cerez-politikasi" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
+              Çerezler
             </Link>
             <span className="text-outline-variant">/</span>
             <Link href="/kullanim-kosullari" className="text-xs text-on-surface-variant hover:text-on-surface transition-colors">
