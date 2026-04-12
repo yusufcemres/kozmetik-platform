@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { BLUR_DATA_URL } from '@/lib/image-placeholder';
 import { api } from '@/lib/api';
 
 interface Product {
@@ -365,6 +366,8 @@ function ProductsListContent() {
                           alt={product.product_name}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          placeholder="blur"
+                          blurDataURL={BLUR_DATA_URL}
                           className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
                         />
                         {hoverImg && (
