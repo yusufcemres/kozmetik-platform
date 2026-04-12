@@ -211,7 +211,7 @@
   }
 
   .curator-section {
-    @apply py-16 px-6 lg:px-12;
+    @apply py-10 px-4 sm:py-16 sm:px-6 lg:px-12;
   }
 
   .curator-divider {

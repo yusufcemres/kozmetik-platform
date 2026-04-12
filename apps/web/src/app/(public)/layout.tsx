@@ -12,7 +12,7 @@ export default function PublicLayout({
   return (
     <AnalyticsProvider>
       <Header />
-      <main className="min-h-screen pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
+      <main className="min-h-screen pt-[57px] sm:pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
       <Footer />
       <BottomNav />
       <OnboardingModal />

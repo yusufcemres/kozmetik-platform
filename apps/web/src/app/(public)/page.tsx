@@ -42,7 +42,6 @@ async function getHomeData() {
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=supplement', { next: { revalidate: 3600 } } as any),
   ]);
 
-  // Fallback stats when API is down (last known values)
   const FALLBACK_PRODUCT_COUNT = 1903;
   const FALLBACK_INGREDIENT_COUNT = 5200;
   const FALLBACK_BRAND_COUNT = 113;
@@ -50,7 +49,6 @@ async function getHomeData() {
   const latestData = latestRes.status === 'fulfilled' ? latestRes.value : { data: [], meta: { total: 0 } };
   const brandsData = brands.status === 'fulfilled' ? brands.value : [];
   const ingredientData = ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0;
-
   const supplementData = supplementsRes.status === 'fulfilled' ? supplementsRes.value : { data: [], meta: { total: 0 } };
 
   return {
@@ -59,7 +57,6 @@ async function getHomeData() {
       ...latestData,
       meta: { total: latestData.meta?.total || FALLBACK_PRODUCT_COUNT },
     },
-    supplements: supplementData.data || [],
     supplementCount: supplementData.meta?.total || 0,
     categories: categories.status === 'fulfilled' ? categories.value : [],
     brands: brandsData,
@@ -159,7 +156,7 @@ function ProductCard({ product }: { product: Product }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, supplements, supplementCount, categories, brands, brandCount, ingredientCount } = await getHomeData();
+  const { topProducts, latest, supplementCount, brands, brandCount, ingredientCount } = await getHomeData();
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
 
   const jsonLd = {
@@ -182,16 +179,16 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero — Full viewport, centered like a search engine */}
-      <section className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-4 text-on-surface">
+      {/* 1. Hero */}
+      <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 text-center">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-4 text-on-surface">
           CİLDİNİ<br />
           <span className="text-outline-variant">ANLA.</span>
         </h1>
-        <p className="text-lg lg:text-xl text-on-surface-variant/50 font-medium tracking-wide mb-6">
+        <p className="text-base sm:text-lg lg:text-xl text-on-surface-variant/50 font-medium tracking-wide mb-4 sm:mb-6">
           Markaların foyalarını ortaya çıkarmaya geldik.
         </p>
-        <p className="max-w-md text-base lg:text-lg text-on-surface-variant mb-10 leading-relaxed">
+        <p className="max-w-md text-sm sm:text-base lg:text-lg text-on-surface-variant mb-8 sm:mb-10 leading-relaxed px-2">
           30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
         </p>
         <Link
@@ -208,8 +205,8 @@ export default async function HomePage() {
           veya ürünleri keşfet
         </Link>
 
-        {/* Stats — bottom of hero */}
-        <div className="flex flex-wrap justify-center gap-8 lg:gap-14 mt-16 lg:mt-20">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-14 mt-12 sm:mt-16 lg:mt-20 w-full max-w-2xl">
           {[
             { label: 'Kozmetik', value: latest.meta?.total || 0 },
             { label: 'Takviye', value: supplementCount || 0 },
@@ -226,11 +223,79 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Seni Tanıyalım — Quiz/Analiz Kartları */}
-      <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface">
-        <div className="text-center mb-12">
+      {/* 2. REVELA Nedir? */}
+      <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
+        <div className="text-center mb-10 sm:mb-14">
+          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden REVELA?</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
+            KOZMETİK DÜNYASINDA<br />
+            <span className="text-outline-variant">REHBERİN.</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+          {[
+            {
+              icon: 'science',
+              title: 'INCI Analizi',
+              desc: 'Her ürünün içerik listesini bilimsel verilere dayanarak analiz ediyoruz. Hangi madde ne işe yarar, hangisinden uzak durmalısın — hepsini açıklıyoruz.',
+            },
+            {
+              icon: 'compare_arrows',
+              title: 'Fiyat Karşılaştırma',
+              desc: 'Aynı ürünü Trendyol, Hepsiburada, Amazon ve daha fazlasında karşılaştır. En uygun fiyatı tek ekranda gör, affiliate linklerle güvenle satın al.',
+            },
+            {
+              icon: 'fingerprint',
+              title: 'Kişisel Eşleştirme',
+              desc: 'Cilt tipini, ihtiyaçlarını ve hassasiyetlerini analiz ediyoruz. Sana özel skor ile hangi ürünün sana en uygun olduğunu gösteriyoruz.',
+            },
+          ].map((item) => (
+            <div key={item.title} className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
+              </div>
+              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-3">{item.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. Nasil Calisiyor? */}
+      <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-16 bg-surface">
+        <div className="text-center mb-10 sm:mb-14">
+          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Nasıl Çalışıyor?</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">3 ADIMDA KEŞFET</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+          {[
+            { step: '01', icon: 'quiz', title: 'Cilt Analizi Yap', desc: '7 kısa soruyla cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.' },
+            { step: '02', icon: 'science', title: 'Sonuçları Gör', desc: 'INCI bazlı bilimsel analiz ile sana en uyumlu ürünleri keşfet.' },
+            { step: '03', icon: 'shopping_bag', title: 'Satın Al', desc: 'Güvenceli affiliate linklerle en uygun fiyatlı platformu seç.' },
+          ].map((item) => (
+            <div key={item.step} className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
+              </div>
+              <span className="label-caps text-outline block mb-2">{item.step}</span>
+              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-2">{item.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <Link href="/cilt-analizi" className="curator-btn-primary text-sm px-8 py-3">
+            Hemen Başla
+            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* 4. Seni Taniyalim — Quiz/Analiz Kartlari */}
+      <section className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
+        <div className="text-center mb-8 sm:mb-12">
           <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Seni Tanıyalım</span>
-          <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
             KİŞİSEL ANALİZLERLE<br />
             <span className="text-outline-variant">İHTİYACINI KEŞFet.</span>
           </h2>
@@ -238,7 +303,7 @@ export default async function HomePage() {
             Kişisel testlerle ihtiyaçlarını keşfet, sana özel önerilere ulaş.
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 max-w-7xl mx-auto">
           {QUIZ_CARDS.map((card) => (
             <Link
               key={card.href}
@@ -272,13 +337,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Top Products Carousel */}
+      {/* 5. En Uyumlu Urunler — Tek Carousel */}
       {featuredProducts.length > 0 && (
-        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface-container-low">
+        <section className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface">
           <div className="flex justify-between items-end mb-12">
             <div>
               <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Bilimsel Analiz</span>
-              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">EN UYUMLU ÜRÜNLER</h2>
             </div>
             <Link href="/urunler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
               Tümünü Gör
@@ -289,165 +354,63 @@ export default async function HomePage() {
               <ProductCard key={p.product_id} product={p} />
             ))}
           </ProductCarousel>
-        </section>
-      )}
-
-      {/* Son Eklenenler — Grid */}
-      {latest.data && latest.data.length > 0 && (
-        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Yeni Keşifler</span>
-              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">SON EKLENENLER</h2>
-            </div>
-            <Link href="/urunler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
-              Tümünü Gör
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {latest.data.slice(0, 6).map((p: Product) => {
-              const img = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
-              const score = avgScore(p);
-              return (
-                <Link
-                  key={p.product_id}
-                  href={`/urunler/${p.product_slug}`}
-                  className="curator-card p-3 group"
-                >
-                  <div className="aspect-square bg-surface-container-low mb-2 overflow-hidden rounded-sm relative">
-                    {img ? (
-                      <Image
-                        src={img}
-                        alt={p.product_name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-icon text-outline-variant/30" style={{ fontSize: '32px' }} aria-hidden="true">spa</span>
-                      </div>
-                    )}
-                    {score !== null && (
-                      <div className="absolute top-1.5 right-1.5 bg-surface/90 backdrop-blur-sm rounded-sm px-1.5 py-0.5">
-                        <span className={`text-[10px] font-bold ${score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low'}`}>
-                          %{score}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-0.5">
-                    {p.brand && (
-                      <p className="label-caps text-outline truncate text-[9px]">{p.brand.brand_name}</p>
-                    )}
-                    <h4 className="text-xs font-semibold text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                      {p.product_name}
-                    </h4>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Supplement Spotlight */}
-      {supplements.length > 0 && (
-        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface-container-low">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <span className="label-caps text-outline mb-3 block tracking-[0.4em]">İç Bakım</span>
-              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">ÖNE ÇIKAN TAKVİYELER</h2>
-            </div>
-            <Link href="/takviyeler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
-              Tümünü Gör
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {supplements.slice(0, 6).map((p: Product) => {
-              const img = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
-              return (
-                <Link
-                  key={p.product_id}
-                  href={`/takviyeler/${p.product_slug}`}
-                  className="curator-card p-3 group"
-                >
-                  <div className="aspect-square bg-surface-container mb-2 overflow-hidden rounded-sm relative">
-                    {img ? (
-                      <Image
-                        src={img}
-                        alt={p.product_name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-icon text-outline-variant/30" style={{ fontSize: '32px' }} aria-hidden="true">medication</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-0.5">
-                    {p.brand && (
-                      <p className="label-caps text-outline truncate text-[9px]">{p.brand.brand_name}</p>
-                    )}
-                    <h4 className="text-xs font-semibold text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                      {p.product_name}
-                    </h4>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
           <div className="text-center mt-8 sm:hidden">
-            <Link href="/takviyeler" className="label-caps text-primary hover:underline underline-offset-4">
-              Tüm Takviyeleri Gör
+            <Link href="/urunler" className="label-caps text-primary hover:underline underline-offset-4">
+              Tüm Ürünleri Gör
               <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
             </Link>
           </div>
         </section>
       )}
 
-      {/* How It Works — 3 Steps */}
-      <section className="py-20 lg:py-28 px-6 lg:px-16 bg-surface">
-        <div className="text-center mb-14">
-          <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Nasıl Çalışıyor?</span>
-          <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">3 ADIMDA KEŞFET</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-4xl mx-auto">
-          {[
-            { step: '01', icon: 'quiz', title: 'Cilt Analizi Yap', desc: '7 kısa soruyla cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.' },
-            { step: '02', icon: 'science', title: 'Sonuçları Gör', desc: 'INCI bazlı bilimsel analiz ile sana en uyumlu ürünleri keşfet.' },
-            { step: '03', icon: 'shopping_bag', title: 'Satın Al', desc: 'Güvenceli affiliate linklerle en uygun fiyatlı platformu seç.' },
-          ].map((item) => (
-            <div key={item.step} className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-                <span className="material-icon text-primary text-[28px]" aria-hidden="true">{item.icon}</span>
+      {/* 6. Guven */}
+      <section className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden Güvenmelisin?</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
+              BAĞIMSIZ.<br />
+              <span className="text-outline-variant">BİLİMSEL.</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              {
+                icon: 'verified',
+                title: `${(latest.meta?.total || 0) + (supplementCount || 0)}+ Ürün Analizi`,
+                desc: 'Kozmetik ve takviye ürünleri INCI bazlı bilimsel verilerle değerlendirildi.',
+              },
+              {
+                icon: 'block',
+                title: 'Sponsorlu Sıralama Yok',
+                desc: 'Hiçbir marka veya ürün öne çıkarılmak için ödeme yapmaz. Skorlar tamamen veri odaklı.',
+              },
+              {
+                icon: 'menu_book',
+                title: `${ingredientCount || 0}+ İçerik Maddesi`,
+                desc: 'Her içerik maddesi bilimsel kaynaklardan derlenen verilerle açıklanır.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="curator-card p-6 text-center">
+                <span className="material-icon text-primary text-[32px] mb-4 block" aria-hidden="true">{item.icon}</span>
+                <h3 className="text-base font-bold text-on-surface mb-2">{item.title}</h3>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
               </div>
-              <span className="label-caps text-outline block mb-2">{item.step}</span>
-              <h3 className="text-lg font-bold tracking-tight text-on-surface mb-2">{item.title}</h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div className="text-center mt-12">
-          <Link href="/cilt-analizi" className="curator-btn-primary text-sm px-8 py-3">
-            Hemen Başla
-            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
-          </Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Popular Brands */}
+      {/* 7. Populer Markalar */}
       {brands.length > 0 && (
-        <section className="py-16 px-6 lg:px-16 border-t border-outline-variant/10">
-          <p className="label-caps text-outline text-center mb-8 tracking-[0.4em]">Popüler Markalar</p>
-          <div className="flex flex-wrap justify-center gap-8 lg:gap-12 opacity-50 hover:opacity-80 transition-all duration-700">
+        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-16 border-t border-outline-variant/10">
+          <p className="label-caps text-outline text-center mb-6 sm:mb-8 tracking-[0.4em]">Popüler Markalar</p>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8 lg:gap-12 opacity-50 hover:opacity-80 transition-all duration-700">
             {brands.slice(0, 8).map((b: Brand) => (
               <Link
                 key={b.brand_id}
                 href={`/urunler?brand=${b.brand_slug}`}
-                className="text-lg lg:text-xl font-bold tracking-tight text-on-surface hover:text-primary transition-colors"
+                className="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-on-surface hover:text-primary transition-colors"
               >
                 {b.brand_name.toUpperCase()}
               </Link>
@@ -456,13 +419,13 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Disclosure — minimal */}
-      <section className="max-w-[1200px] mx-auto px-6 py-8">
+      {/* 8. Disclosure */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <p className="text-xs text-outline text-center leading-relaxed">
           REVELA bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
           niteliğinde değildir. Ürün sayfalarındaki satın alma linkleri komisyon içerebilir.{' '}
           <Link href="/hakkimizda" className="underline hover:text-on-surface-variant transition-colors">
-            Daha fazla bilgi
+            Daha fazla bilgi.
           </Link>
         </p>
       </section>

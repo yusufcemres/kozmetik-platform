@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-surface-container-low w-full py-16 px-6 lg:px-12 mt-0">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start max-w-7xl mx-auto">
+    <footer className="bg-surface-container-low w-full py-10 sm:py-16 px-4 sm:px-6 lg:px-12 mt-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 items-start max-w-7xl mx-auto">
         {/* Brand */}
         <div>
           <div className="text-xl font-bold tracking-tight text-on-surface mb-6">REVELA</div>

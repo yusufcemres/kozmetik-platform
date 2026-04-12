@@ -461,7 +461,7 @@ export default async function ProductDetailPage({
         image_url={imageUrl}
       />
 
-      <article className="max-w-[1200px] mx-auto px-6 lg:px-12 py-8 lg:py-12">
+      <article className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-12">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/urunler" className="hover:text-on-surface transition-colors">
