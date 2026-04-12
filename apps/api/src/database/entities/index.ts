@@ -62,3 +62,7 @@ export { AuditLog } from './audit-log.entity';
 export { UserCorrection } from './user-correction.entity';
 export { BatchImport } from './batch-import.entity';
 export { UserSkinProfile } from './user-skin-profile.entity';
+
+// App Users (end-user magic link auth)
+export { AppUser } from './app-user.entity';
+export { MagicLinkToken } from './magic-link-token.entity';
