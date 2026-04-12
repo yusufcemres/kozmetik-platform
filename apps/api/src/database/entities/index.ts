@@ -70,3 +70,6 @@ export { MagicLinkToken } from './magic-link-token.entity';
 // Smart Scan
 export { UnknownScan } from './unknown-scan.entity';
 export { ScanHistory } from './scan-history.entity';
+
+// Push Notifications
+export { PushSubscription } from './push-subscription.entity';

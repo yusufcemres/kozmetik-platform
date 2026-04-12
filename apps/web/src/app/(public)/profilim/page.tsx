@@ -11,6 +11,7 @@ import {
   Routine, RoutineProduct,
 } from '@/lib/favorites';
 import { getPriceAlerts, removePriceAlert, PriceAlert } from '@/components/public/PriceAlertButton';
+import PushToggle from '@/components/public/PushToggle';
 
 // === Types ===
 
@@ -278,6 +279,9 @@ function ProfilePageInner() {
       {/* ===== GENEL TAB ===== */}
       {tab === 'genel' && !editing && (
         <div className="space-y-6">
+          {/* Push notifications toggle */}
+          <PushToggle />
+
           {/* Profile Summary Card */}
           {profile ? (
             <div className="curator-card p-6">
