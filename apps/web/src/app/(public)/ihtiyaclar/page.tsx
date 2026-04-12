@@ -24,10 +24,16 @@ const CATEGORY_META: Record<string, { label: string; icon: string; desc: string 
 
 const CATEGORY_ORDER = ['skin', 'body', 'hair', 'general_health'];
 
+const DOMAIN_GROUPS = [
+  { key: 'cosmetic', label: 'Dış Bakım', icon: 'spa', desc: 'Cilt, saç ve vücut bakım ihtiyaçları', categories: ['skin', 'hair'] },
+  { key: 'supplement', label: 'İç Bakım', icon: 'medication', desc: 'Beden sağlığı, bağışıklık ve genel sağlık', categories: ['body', 'general_health'] },
+];
+
 export default function NeedsListPage() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -45,14 +51,21 @@ export default function NeedsListPage() {
     return acc;
   }, {});
 
-  const sortedCategories = [
-    ...CATEGORY_ORDER.filter((c) => grouped[c]),
-    ...Object.keys(grouped).filter((c) => !CATEGORY_ORDER.includes(c)),
-  ];
+  // Domain-based grouping
+  const domainNeeds = DOMAIN_GROUPS.map((dg) => ({
+    ...dg,
+    categories: CATEGORY_ORDER
+      .filter((c) => grouped[c])
+      .filter((c) => {
+        if (dg.key === 'cosmetic') return needs.some((n) => n.need_category === c && n.domain_type === 'cosmetic');
+        return needs.some((n) => n.need_category === c && n.domain_type === 'supplement');
+      }),
+    needs: needs.filter((n) => n.domain_type === dg.key),
+  }));
 
-  const filteredCategories = activeFilter
-    ? sortedCategories.filter((c) => c === activeFilter)
-    : sortedCategories;
+  const filteredDomains = activeDomain
+    ? domainNeeds.filter((d) => d.key === activeDomain)
+    : domainNeeds;
 
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
@@ -65,26 +78,45 @@ export default function NeedsListPage() {
         </p>
       </div>
 
-      {/* Category filter chips */}
+      {/* Domain filter chips */}
       <div className="flex flex-wrap gap-2 mb-10">
         <button
-          onClick={() => setActiveFilter(null)}
+          onClick={() => { setActiveDomain(null); setActiveCategory(null); }}
           className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 ${
-            !activeFilter
+            !activeDomain
               ? 'bg-on-surface text-surface'
               : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
           }`}
         >
-          Tumunu Goster
+          Tümünü Göster
         </button>
+        {DOMAIN_GROUPS.map((dg) => {
+          const count = needs.filter((n) => n.domain_type === dg.key).length;
+          if (!count) return null;
+          return (
+            <button
+              key={dg.key}
+              onClick={() => { setActiveDomain(activeDomain === dg.key ? null : dg.key); setActiveCategory(null); }}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                activeDomain === dg.key
+                  ? 'bg-on-surface text-surface'
+                  : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
+              }`}
+            >
+              <span className="material-icon text-[14px]" aria-hidden="true">{dg.icon}</span>
+              {dg.label}
+              <span className="opacity-60">({count})</span>
+            </button>
+          );
+        })}
         {CATEGORY_ORDER.filter((c) => grouped[c]).map((cat) => {
           const meta = CATEGORY_META[cat];
           return (
             <button
               key={cat}
-              onClick={() => setActiveFilter(activeFilter === cat ? null : cat)}
+              onClick={() => { setActiveCategory(activeCategory === cat ? null : cat); setActiveDomain(null); }}
               className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
-                activeFilter === cat
+                activeCategory === cat
                   ? 'bg-on-surface text-surface'
                   : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
               }`}
@@ -112,51 +144,80 @@ export default function NeedsListPage() {
           <p className="text-on-surface-variant">Henüz ihtiyaç tanımlanmamış</p>
         </div>
       ) : (
-        <div className="space-y-14">
-          {filteredCategories.map((cat) => {
-            const meta = CATEGORY_META[cat];
+        <div className="space-y-16">
+          {filteredDomains.map((domain) => {
+            if (domain.needs.length === 0) return null;
+            // Group this domain's needs by category
+            const domainGrouped = domain.needs.reduce<Record<string, Need[]>>((acc, n) => {
+              const cat = n.need_category || 'skin';
+              if (!acc[cat]) acc[cat] = [];
+              acc[cat].push(n);
+              return acc;
+            }, {});
+            const cats = activeCategory
+              ? [activeCategory].filter((c) => domainGrouped[c])
+              : CATEGORY_ORDER.filter((c) => domainGrouped[c]);
+            if (cats.length === 0) return null;
+
             return (
-              <section key={cat}>
+              <div key={domain.key}>
+                {/* Domain header */}
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="material-icon text-primary text-[24px]" aria-hidden="true">{meta?.icon || 'target'}</span>
-                  <h2 className="text-xl font-bold text-on-surface">
-                    {meta?.label || cat}
-                  </h2>
-                  <span className="label-caps text-outline">
-                    ({grouped[cat].length})
-                  </span>
+                  <span className="material-icon text-[28px] text-primary" aria-hidden="true">{domain.icon}</span>
+                  <h2 className="text-2xl font-bold text-on-surface tracking-tight">{domain.label}</h2>
+                  <span className="label-caps text-outline">({domain.needs.length})</span>
                 </div>
-                {meta?.desc && (
-                  <p className="text-sm text-on-surface-variant mb-5 ml-9">{meta.desc}</p>
-                )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {grouped[cat].map((need) => (
-                    <Link
-                      key={need.need_id}
-                      href={`/ihtiyaclar/${need.need_slug}`}
-                      className="curator-card p-5 group"
-                    >
-                      <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors tracking-tight">
-                        {need.need_name}
-                      </h3>
-                      {need.user_friendly_label && (
-                        <p className="text-xs text-primary mt-1">
-                          {need.user_friendly_label}
-                        </p>
-                      )}
-                      {need.short_description && (
-                        <p className="text-sm text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
-                          {need.short_description}
-                        </p>
-                      )}
-                      <span className="inline-flex items-center gap-1 label-caps text-primary mt-3">
-                        Detaylari gor
-                        <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
-                      </span>
-                    </Link>
-                  ))}
+                <p className="text-sm text-on-surface-variant mb-8 ml-10">{domain.desc}</p>
+
+                <div className="space-y-12 ml-1">
+                  {cats.map((cat) => {
+                    const meta = CATEGORY_META[cat];
+                    return (
+                      <section key={cat}>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="material-icon text-primary text-[22px]" aria-hidden="true">{meta?.icon || 'target'}</span>
+                          <h3 className="text-lg font-bold text-on-surface">
+                            {meta?.label || cat}
+                          </h3>
+                          <span className="label-caps text-outline">
+                            ({domainGrouped[cat].length})
+                          </span>
+                        </div>
+                        {meta?.desc && (
+                          <p className="text-sm text-on-surface-variant mb-5 ml-9">{meta.desc}</p>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {domainGrouped[cat].map((need) => (
+                            <Link
+                              key={need.need_id}
+                              href={`/ihtiyaclar/${need.need_slug}`}
+                              className="curator-card p-5 group"
+                            >
+                              <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors tracking-tight">
+                                {need.need_name}
+                              </h3>
+                              {need.user_friendly_label && (
+                                <p className="text-xs text-primary mt-1">
+                                  {need.user_friendly_label}
+                                </p>
+                              )}
+                              {need.short_description && (
+                                <p className="text-sm text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
+                                  {need.short_description}
+                                </p>
+                              )}
+                              <span className="inline-flex items-center gap-1 label-caps text-primary mt-3">
+                                Detayları Gör
+                                <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </section>
+                    );
+                  })}
                 </div>
-              </section>
+              </div>
             );
           })}
         </div>

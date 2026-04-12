@@ -24,6 +24,7 @@ interface Product {
   product_id: number;
   product_name: string;
   product_slug: string;
+  domain_type?: string;
   short_description?: string;
   category?: { category_name: string; category_slug?: string };
   images?: ProductImage[];
@@ -107,14 +108,22 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
     getTopScoredByBrand(brand.brand_id),
   ]);
 
-  // Group products by category
-  const grouped = products.reduce<Record<string, Product[]>>((acc, p) => {
-    const cat = p.category?.category_name || 'Diger';
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(p);
-    return acc;
-  }, {});
-  const categoryNames = Object.keys(grouped).sort();
+  // Split by domain, then group by category
+  const cosmeticProducts = products.filter((p) => p.domain_type !== 'supplement');
+  const supplementProducts = products.filter((p) => p.domain_type === 'supplement');
+
+  const groupByCategory = (items: Product[]) => {
+    const grouped = items.reduce<Record<string, Product[]>>((acc, p) => {
+      const cat = p.category?.category_name || 'Diğer';
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(p);
+      return acc;
+    }, {});
+    return Object.keys(grouped).sort().map((name) => ({ name, items: grouped[name] }));
+  };
+
+  const cosmeticCategories = groupByCategory(cosmeticProducts);
+  const supplementCategories = groupByCategory(supplementProducts);
 
   return (
     <div className="curator-section max-w-[1200px] mx-auto">
@@ -157,8 +166,13 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
               )}
               <span className="inline-flex items-center gap-1.5 bg-surface-container-low px-3 py-1 rounded-sm border border-outline-variant/20">
                 <span className="material-icon material-icon-sm text-primary" aria-hidden="true">inventory_2</span>
-                {meta.total} urun
+                {meta.total} ürün
               </span>
+              {cosmeticProducts.length > 0 && supplementProducts.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 bg-surface-container-low px-3 py-1 rounded-sm border border-outline-variant/20 text-xs">
+                  {cosmeticProducts.length} Kozmetik · {supplementProducts.length} Takviye
+                </span>
+              )}
               {brand.website_url && (
                 <a
                   href={brand.website_url}
@@ -243,66 +257,67 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
         </section>
       )}
 
-      {/* Products by Category */}
-      {categoryNames.length === 0 ? (
+      {/* Products by Domain & Category */}
+      {products.length === 0 ? (
         <div className="text-center py-16">
-          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '48px' }} aria-hidden="true">
-            search_off
-          </span>
+          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '48px' }} aria-hidden="true">search_off</span>
           <p className="text-on-surface-variant">Bu markaya ait ürün bulunamadı.</p>
         </div>
       ) : (
-        <div className="space-y-10">
-          {categoryNames.map((catName) => (
-            <div key={catName}>
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-lg font-semibold text-on-surface">{catName}</h2>
-                <div className="flex-1 h-px bg-outline-variant/20" />
-                <span className="text-xs text-on-surface-variant">{grouped[catName].length} urun</span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {grouped[catName].map((product) => {
-                  const rawImg = product.images?.[0]?.image_url;
-                  const imageUrl = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
-
-                  return (
-                    <Link
-                      key={product.product_id}
-                      href={`/urunler/${product.product_slug}`}
-                      className="curator-card group overflow-hidden hover:shadow-md transition-shadow duration-200"
-                    >
-                      {/* Image */}
-                      <div className="aspect-square bg-surface-container-low relative overflow-hidden">
-                        {imageUrl ? (
-                          <Image
-                            src={imageUrl}
-                            alt={product.product_name}
-                            fill
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                            className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="material-icon text-outline-variant/30" style={{ fontSize: '48px' }} aria-hidden="true">
-                              spa
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-3">
-                        <p className="text-xs text-on-surface-variant mb-1 truncate">
-                          {brand.brand_name}
-                        </p>
-                        <h3 className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-tight">
-                          {product.product_name}
-                        </h3>
-                      </div>
-                    </Link>
-                  );
-                })}
+        <div className="space-y-14">
+          {[
+            { label: 'Kozmetik Ürünler', icon: 'spa', categories: cosmeticCategories, linkPrefix: '/urunler' },
+            { label: 'Takviye Ürünler', icon: 'medication', categories: supplementCategories, linkPrefix: '/takviyeler' },
+          ].filter((section) => section.categories.length > 0).map((section) => (
+            <div key={section.label}>
+              {/* Only show section header if both domains exist */}
+              {cosmeticProducts.length > 0 && supplementProducts.length > 0 && (
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="material-icon text-primary text-[24px]" aria-hidden="true">{section.icon}</span>
+                  <h2 className="text-xl font-bold text-on-surface">{section.label}</h2>
+                  <span className="label-caps text-outline">({section.categories.reduce((s, c) => s + c.items.length, 0)})</span>
+                </div>
+              )}
+              <div className="space-y-10">
+                {section.categories.map((cat) => (
+                  <div key={cat.name}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <h3 className="text-lg font-semibold text-on-surface">{cat.name}</h3>
+                      <div className="flex-1 h-px bg-outline-variant/20" />
+                      <span className="text-xs text-on-surface-variant">{cat.items.length} ürün</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {cat.items.map((product) => {
+                        const rawImg = product.images?.[0]?.image_url;
+                        const imageUrl = rawImg?.includes('placehold.co') || rawImg?.includes('dicebear') ? undefined : rawImg;
+                        const href = product.domain_type === 'supplement'
+                          ? `/takviyeler/${product.product_slug}`
+                          : `/urunler/${product.product_slug}`;
+                        return (
+                          <Link
+                            key={product.product_id}
+                            href={href}
+                            className="curator-card group overflow-hidden hover:shadow-md transition-shadow duration-200"
+                          >
+                            <div className="aspect-square bg-surface-container-low relative overflow-hidden">
+                              {imageUrl ? (
+                                <Image src={imageUrl} alt={product.product_name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-contain p-3 group-hover:scale-105 transition-transform duration-300" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span className="material-icon text-outline-variant/30" style={{ fontSize: '48px' }} aria-hidden="true">{section.icon}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-3">
+                              <p className="text-xs text-on-surface-variant mb-1 truncate">{brand.brand_name}</p>
+                              <h3 className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-tight">{product.product_name}</h3>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}

@@ -374,10 +374,33 @@ export default async function ProductDetailPage({
     .map((pi: any) => pi.ingredient_id)
     .filter(Boolean);
 
-  const [similarProducts, interactions] = await Promise.all([
+  // Fetch supplement cross-references for highlighted/top ingredients
+  const topIngredientIds = (product.ingredients || [])
+    .filter((pi) => pi.ingredient_id && (pi.inci_order_rank <= 3))
+    .map((pi) => pi.ingredient_id!)
+    .slice(0, 5);
+
+  const [similarProducts, interactions, supplementCrossRefs] = await Promise.all([
     getSimilarProducts(product.product_id),
     getIngredientInteractions(keyIngredientIds),
+    Promise.all(
+      topIngredientIds.map(async (id) => {
+        try {
+          return await apiFetch<Array<{ product_id: number; product_name: string; product_slug: string; brand?: { brand_name: string }; images?: { image_url: string }[] }>>(
+            `/products/by-ingredient/${id}?domain_type=supplement&limit=3`,
+            { next: { revalidate: 3600 } } as any,
+          );
+        } catch { return []; }
+      }),
+    ),
   ]);
+
+  // Deduplicate supplement products
+  const supplementMap = new Map<number, { product_id: number; product_name: string; product_slug: string; brand?: { brand_name: string }; images?: { image_url: string }[] }>();
+  supplementCrossRefs.flat().forEach((p) => {
+    if (!supplementMap.has(p.product_id)) supplementMap.set(p.product_id, p);
+  });
+  const supplementProducts = Array.from(supplementMap.values()).slice(0, 6);
 
   // Filter interactions to only those where BOTH ingredients are in this product
   const productIngredientIds = new Set(
@@ -1149,6 +1172,49 @@ export default async function ProductDetailPage({
                   </Link>
                 );
               })}
+            </div>
+          </section>
+        )}
+
+        {/* Cross-Reference: Supplement Products */}
+        {supplementProducts.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">medication</span>
+              İçeriden de Destekle
+            </h2>
+            <p className="text-sm text-on-surface-variant mb-4">
+              Bu üründeki aktif bileşenleri takviye olarak da alabilirsin.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {supplementProducts.map((sp) => (
+                <Link
+                  key={sp.product_id}
+                  href={`/takviyeler/${sp.product_slug}`}
+                  className="curator-card p-3 group hover:border-primary/30 transition-all"
+                >
+                  <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center mb-2 overflow-hidden">
+                    {sp.images?.[0]?.image_url ? (
+                      <Image
+                        src={sp.images[0].image_url}
+                        alt={sp.product_name}
+                        width={100}
+                        height={100}
+                        className="object-contain w-full h-full p-2"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="material-icon text-outline-variant text-[36px]" aria-hidden="true">medication</span>
+                    )}
+                  </div>
+                  {sp.brand && (
+                    <p className="label-caps text-outline text-[8px]">{sp.brand.brand_name}</p>
+                  )}
+                  <p className="text-xs font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2 mt-0.5">
+                    {sp.product_name}
+                  </p>
+                </Link>
+              ))}
             </div>
           </section>
         )}

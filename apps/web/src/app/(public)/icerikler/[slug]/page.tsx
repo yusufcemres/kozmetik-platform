@@ -93,9 +93,10 @@ async function getNeedMappings(ingredientId: number): Promise<NeedMapping[]> {
   }
 }
 
-async function getProductsByIngredient(ingredientId: number): Promise<ProductInCarousel[]> {
+async function getProductsByIngredient(ingredientId: number, domainType?: string): Promise<ProductInCarousel[]> {
   try {
-    return await apiFetch<ProductInCarousel[]>(`/products/by-ingredient/${ingredientId}?limit=20`, {
+    const domainQuery = domainType ? `&domain_type=${domainType}` : '';
+    return await apiFetch<ProductInCarousel[]>(`/products/by-ingredient/${ingredientId}?limit=12${domainQuery}`, {
       next: { revalidate: 3600 },
     } as any);
   } catch {
@@ -238,8 +239,9 @@ export default async function IngredientDetailPage({
   const ingredient = await getIngredient(params.slug);
   if (!ingredient) notFound();
 
-  const [products, needMappings] = await Promise.all([
-    getProductsByIngredient(ingredient.ingredient_id),
+  const [cosmeticProducts, supplementProducts, needMappings] = await Promise.all([
+    getProductsByIngredient(ingredient.ingredient_id, 'cosmetic'),
+    getProductsByIngredient(ingredient.ingredient_id, 'supplement'),
     getNeedMappings(ingredient.ingredient_id),
   ]);
 
@@ -537,20 +539,21 @@ export default async function IngredientDetailPage({
           </section>
         )}
 
-        {/* Products containing this ingredient */}
-        {products.length > 0 && (
+        {/* Products containing this ingredient — Cosmetics */}
+        {cosmeticProducts.length > 0 && (
           <section className="mb-8">
             <div className="flex items-end justify-between mb-4">
-              <h2 className="text-xl font-bold text-on-surface">
-                Bu İçeriği Barındıran Ürünler
+              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary" aria-hidden="true">spa</span>
+                Kozmetik Ürünler
               </h2>
               <span className="label-caps text-outline">
-                {products.length} ürün
+                {cosmeticProducts.length} ürün
               </span>
             </div>
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
-                {products.map((p) => {
+                {cosmeticProducts.map((p) => {
                   const primaryImg = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
                   const hoverImg = p.images?.find(i => i.sort_order === 1)?.image_url;
                   return (
@@ -580,7 +583,7 @@ export default async function IngredientDetailPage({
                             )}
                           </>
                         ) : (
-                          <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">inventory_2</span>
+                          <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">spa</span>
                         )}
                       </div>
                       <div className="p-3">
@@ -602,17 +605,62 @@ export default async function IngredientDetailPage({
                   );
                 })}
               </div>
-              {/* Fade edge */}
               <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
             </div>
-            {products.length > 6 && (
-              <Link
-                href={`/urunler?ingredient=${ingredient.ingredient_slug}`}
-                className="inline-flex items-center gap-1 label-caps text-primary mt-3 hover:underline underline-offset-4"
-              >
-                Tüm {products.length} ürünü gör <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
-              </Link>
-            )}
+          </section>
+        )}
+
+        {/* Products containing this ingredient — Supplements */}
+        {supplementProducts.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-end justify-between mb-4">
+              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary" aria-hidden="true">medication</span>
+                Takviye Ürünler
+              </h2>
+              <span className="label-caps text-outline">
+                {supplementProducts.length} ürün
+              </span>
+            </div>
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+                {supplementProducts.map((p) => {
+                  const primaryImg = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
+                  return (
+                    <Link
+                      key={p.product_id}
+                      href={`/takviyeler/${p.product_slug}`}
+                      className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
+                    >
+                      <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden relative">
+                        {primaryImg ? (
+                          <Image
+                            src={primaryImg}
+                            alt={p.product_name}
+                            fill
+                            sizes="192px"
+                            className="object-contain transition-all duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">medication</span>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        {p.brand && (
+                          <p className="label-caps text-outline truncate">
+                            {p.brand.brand_name}
+                          </p>
+                        )}
+                        <p className="text-xs font-medium text-on-surface line-clamp-2 mt-0.5 leading-snug">
+                          {p.product_name}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
+            </div>
           </section>
         )}
 

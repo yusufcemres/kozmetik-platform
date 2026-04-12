@@ -178,8 +178,8 @@ export class ProductsService {
     return qb.getMany();
   }
 
-  async findByIngredient(ingredientId: number, limit = 20) {
-    return this.repo
+  async findByIngredient(ingredientId: number, limit = 20, domainType?: string) {
+    const qb = this.repo
       .createQueryBuilder('p')
       .innerJoin('p.ingredients', 'pi', 'pi.ingredient_id = :iid', { iid: ingredientId })
       .leftJoinAndSelect('p.brand', 'b')
@@ -187,8 +187,13 @@ export class ProductsService {
       .leftJoinAndSelect('p.category', 'cat')
       .where('p.status = :status', { status: 'published' })
       .orderBy('pi.inci_order_rank', 'ASC')
-      .limit(limit)
-      .getMany();
+      .limit(limit);
+
+    if (domainType) {
+      qb.andWhere('p.domain_type = :domainType', { domainType });
+    }
+
+    return qb.getMany();
   }
 
   async findByIds(ids: number[]) {

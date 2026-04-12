@@ -33,12 +33,13 @@ interface Brand {
 // === Data Fetching (ISR) ===
 
 async function getHomeData() {
-  const [topProducts, latestRes, categories, brands, ingredientCountRes] = await Promise.allSettled([
+  const [topProducts, latestRes, categories, brands, ingredientCountRes, supplementsRes] = await Promise.allSettled([
     apiFetch<Product[]>('/products/top-scored?limit=8&domain_type=cosmetic', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=cosmetic', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
     apiFetch<Brand[]>('/products/popular-brands?limit=12', { next: { revalidate: 3600 } } as any),
     apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),
+    apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=supplement', { next: { revalidate: 3600 } } as any),
   ]);
 
   // Fallback stats when API is down (last known values)
@@ -50,12 +51,16 @@ async function getHomeData() {
   const brandsData = brands.status === 'fulfilled' ? brands.value : [];
   const ingredientData = ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0;
 
+  const supplementData = supplementsRes.status === 'fulfilled' ? supplementsRes.value : { data: [], meta: { total: 0 } };
+
   return {
     topProducts: topProducts.status === 'fulfilled' ? topProducts.value : [],
     latest: {
       ...latestData,
       meta: { total: latestData.meta?.total || FALLBACK_PRODUCT_COUNT },
     },
+    supplements: supplementData.data || [],
+    supplementCount: supplementData.meta?.total || 0,
     categories: categories.status === 'fulfilled' ? categories.value : [],
     brands: brandsData,
     brandCount: brandsData.length || FALLBACK_BRAND_COUNT,
@@ -154,7 +159,7 @@ function ProductCard({ product }: { product: Product }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, categories, brands, brandCount, ingredientCount } = await getHomeData();
+  const { topProducts, latest, supplements, supplementCount, categories, brands, brandCount, ingredientCount } = await getHomeData();
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
 
   const jsonLd = {
@@ -206,7 +211,8 @@ export default async function HomePage() {
         {/* Stats — bottom of hero */}
         <div className="flex flex-wrap justify-center gap-8 lg:gap-14 mt-16 lg:mt-20">
           {[
-            { label: 'Ürün', value: latest.meta?.total || 0 },
+            { label: 'Kozmetik', value: latest.meta?.total || 0 },
+            { label: 'Takviye', value: supplementCount || 0 },
             { label: 'İçerik', value: ingredientCount || 0 },
             { label: 'Marka', value: brandCount || 0 },
           ].map((s) => (
@@ -341,6 +347,63 @@ export default async function HomePage() {
                 </Link>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {/* Supplement Spotlight */}
+      {supplements.length > 0 && (
+        <section className="py-16 lg:py-24 px-6 lg:px-16 bg-surface-container-low">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <span className="label-caps text-outline mb-3 block tracking-[0.4em]">İç Bakım</span>
+              <h2 className="text-3xl lg:text-4xl headline-tight text-on-surface">ÖNE ÇIKAN TAKVİYELER</h2>
+            </div>
+            <Link href="/takviyeler" className="label-caps text-on-surface-variant hover:text-on-surface underline-offset-8 hover:underline transition-all hidden sm:block">
+              Tümünü Gör
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {supplements.slice(0, 6).map((p: Product) => {
+              const img = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
+              return (
+                <Link
+                  key={p.product_id}
+                  href={`/takviyeler/${p.product_slug}`}
+                  className="curator-card p-3 group"
+                >
+                  <div className="aspect-square bg-surface-container mb-2 overflow-hidden rounded-sm relative">
+                    {img ? (
+                      <Image
+                        src={img}
+                        alt={p.product_name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="material-icon text-outline-variant/30" style={{ fontSize: '32px' }} aria-hidden="true">medication</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-0.5">
+                    {p.brand && (
+                      <p className="label-caps text-outline truncate text-[9px]">{p.brand.brand_name}</p>
+                    )}
+                    <h4 className="text-xs font-semibold text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                      {p.product_name}
+                    </h4>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="text-center mt-8 sm:hidden">
+            <Link href="/takviyeler" className="label-caps text-primary hover:underline underline-offset-4">
+              Tüm Takviyeleri Gör
+              <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+            </Link>
           </div>
         </section>
       )}

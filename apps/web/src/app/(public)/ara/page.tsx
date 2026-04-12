@@ -30,9 +30,9 @@ interface Suggestion {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; path: string }> = {
-  product: { label: 'Urun', icon: 'inventory_2', path: '/urunler' },
-  ingredient: { label: 'Icerik', icon: 'science', path: '/icerikler' },
-  need: { label: 'Ihtiyac', icon: 'target', path: '/ihtiyaclar' },
+  product: { label: 'Ürün', icon: 'inventory_2', path: '/urunler' },
+  ingredient: { label: 'İçerik', icon: 'science', path: '/icerikler' },
+  need: { label: 'İhtiyaç', icon: 'target', path: '/ihtiyaclar' },
   brand: { label: 'Marka', icon: 'storefront', path: '/markalar' },
 };
 
@@ -112,8 +112,12 @@ function SearchPageContent() {
     doSearch(query.trim(), 1, typeFilter || undefined);
   };
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
+  const handleSuggestionClick = (suggestion: Suggestion & { extra?: Record<string, any> }) => {
     setShowSuggestions(false);
+    if (suggestion.type === 'product' && (suggestion as any).domain_type === 'supplement') {
+      router.push(`/takviyeler/${suggestion.slug}`);
+      return;
+    }
     const cfg = TYPE_CONFIG[suggestion.type];
     router.push(`${cfg.path}/${suggestion.slug}`);
   };
@@ -134,6 +138,9 @@ function SearchPageContent() {
   };
 
   const resultLink = (r: SearchResult) => {
+    if (r.type === 'product' && r.extra?.domain_type === 'supplement') {
+      return `/takviyeler/${r.slug}`;
+    }
     const cfg = TYPE_CONFIG[r.type];
     return `${cfg.path}/${r.slug}`;
   };
@@ -278,6 +285,15 @@ function SearchPageContent() {
                         <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm shrink-0">
                           {cfg.label}
                         </span>
+                        {r.type === 'product' && r.extra?.domain_type && (
+                          <span className={`label-caps px-2 py-0.5 rounded-sm shrink-0 ${
+                            r.extra.domain_type === 'supplement'
+                              ? 'text-score-high bg-score-high/10'
+                              : 'text-primary bg-primary/5'
+                          }`}>
+                            {r.extra.domain_type === 'supplement' ? 'Takviye' : 'Kozmetik'}
+                          </span>
+                        )}
                       </div>
                       {r.extra?.brand_name && (
                         <p className="label-caps text-primary mt-0.5">{r.extra.brand_name}</p>
@@ -286,7 +302,7 @@ function SearchPageContent() {
                         <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.common_name}</p>
                       )}
                       {r.extra?.product_count != null && (
-                        <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.product_count} urun</p>
+                        <p className="text-xs text-on-surface-variant mt-0.5">{r.extra.product_count} ürün</p>
                       )}
                       {r.extra?.description && (
                         <p className="text-xs text-outline mt-1 line-clamp-1">{r.extra.description}</p>

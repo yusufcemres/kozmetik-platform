@@ -275,7 +275,7 @@ export default async function NeedDetailPage({
                             </Link>
                           ) : (
                             <span className="text-sm font-medium text-on-surface">
-                              Icerik #{m.ingredient_id}
+                              İçerik #{m.ingredient_id}
                             </span>
                           )}
                           {m.ingredient?.common_name && (
@@ -316,7 +316,7 @@ export default async function NeedDetailPage({
                             </Link>
                           ) : (
                             <span className="font-medium text-on-surface">
-                              Icerik #{m.ingredient_id}
+                              İçerik #{m.ingredient_id}
                             </span>
                           )}
                           {m.ingredient?.common_name && (
@@ -367,7 +367,7 @@ export default async function NeedDetailPage({
 
         {/* Compatible Products — Cosmetics */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-on-surface mb-4">Kozmetik Oneriler</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-4">Kozmetik Öneriler</h2>
           {topScores.length > 0 ? (
             <ListModal
               title="Uyumlu Ürünler"

@@ -66,6 +66,24 @@ interface SupplementDetail {
   nutrition_facts?: NutritionFact[];
 }
 
+interface Interaction {
+  interaction_id: number;
+  ingredient_a: { ingredient_id: number; inci_name: string; common_name?: string; ingredient_slug?: string };
+  ingredient_b: { ingredient_id: number; inci_name: string; common_name?: string; ingredient_slug?: string };
+  severity: string;
+  description?: string;
+  recommendation?: string;
+  domain_type?: string;
+}
+
+interface CrossRefProduct {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  brand?: { brand_name: string };
+  images?: { image_url: string }[];
+}
+
 // === Data ===
 
 async function getProduct(slug: string): Promise<Product | null> {
@@ -85,6 +103,26 @@ async function getSupplementDetail(productId: number): Promise<SupplementDetail 
     } as any);
   } catch {
     return null;
+  }
+}
+
+async function getInteractionsByIngredient(ingredientId: number): Promise<Interaction[]> {
+  try {
+    return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`, {
+      next: { revalidate: 3600 },
+    } as any);
+  } catch {
+    return [];
+  }
+}
+
+async function getCrossDomainProducts(ingredientId: number, domainType: string, limit = 3): Promise<CrossRefProduct[]> {
+  try {
+    return await apiFetch<CrossRefProduct[]>(`/products/by-ingredient/${ingredientId}?domain_type=${domainType}&limit=${limit}`, {
+      next: { revalidate: 3600 },
+    } as any);
+  } catch {
+    return [];
   }
 }
 
@@ -204,6 +242,34 @@ export default async function SupplementDetailPage({
     (a, b) => a.sort_order - b.sort_order,
   );
   const activeLinks = (product.affiliate_links || []).filter((l) => l.is_active);
+
+  // Fetch interactions and cross-domain products for all ingredients
+  const ingredientIds = nutritionFacts
+    .map((nf) => nf.ingredient?.ingredient_id)
+    .filter((id): id is number => !!id);
+
+  const [allInteractions, crossRefResults] = await Promise.all([
+    Promise.all(ingredientIds.map((id) => getInteractionsByIngredient(id))),
+    Promise.all(ingredientIds.map((id) => getCrossDomainProducts(id, 'cosmetic', 3))),
+  ]);
+
+  // Deduplicate interactions
+  const interactionMap = new Map<number, Interaction>();
+  allInteractions.flat().forEach((int) => {
+    if (!interactionMap.has(int.interaction_id)) {
+      interactionMap.set(int.interaction_id, int);
+    }
+  });
+  const interactions = Array.from(interactionMap.values());
+
+  // Flatten and deduplicate cross-ref cosmetic products
+  const cosmeticProductMap = new Map<number, CrossRefProduct>();
+  crossRefResults.flat().forEach((p) => {
+    if (!cosmeticProductMap.has(p.product_id)) {
+      cosmeticProductMap.set(p.product_id, p);
+    }
+  });
+  const cosmeticProducts = Array.from(cosmeticProductMap.values()).slice(0, 8);
 
   return (
     <>
@@ -538,6 +604,99 @@ export default async function SupplementDetailPage({
               <span className="material-icon text-[14px] mt-0.5" aria-hidden="true">info</span>
               Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir. Dengeli beslenme takviyeye tercih edilmelidir.
             </p>
+          </section>
+        )}
+
+        {/* Ingredient Interactions */}
+        {interactions.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">sync_alt</span>
+              Etkileşim Uyarıları
+            </h2>
+            <div className="space-y-3">
+              {interactions.map((int) => {
+                const severityConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
+                  severe: { color: 'text-error', bg: 'bg-error/10 border-error/20', icon: 'error', label: 'Ciddi' },
+                  contraindicated: { color: 'text-error', bg: 'bg-error/10 border-error/20', icon: 'dangerous', label: 'Kontrendike' },
+                  moderate: { color: 'text-score-medium', bg: 'bg-score-medium/10 border-score-medium/20', icon: 'warning', label: 'Orta' },
+                  mild: { color: 'text-primary', bg: 'bg-primary/5 border-primary/20', icon: 'info', label: 'Hafif' },
+                  none: { color: 'text-score-high', bg: 'bg-score-high/10 border-score-high/20', icon: 'check_circle', label: 'Sinerjistik' },
+                };
+                const cfg = severityConfig[int.severity] || severityConfig.mild;
+                return (
+                  <div key={int.interaction_id} className={`border rounded-sm p-4 ${cfg.bg}`}>
+                    <div className="flex items-start gap-3">
+                      <span className={`material-icon ${cfg.color} text-[20px] mt-0.5 shrink-0`} aria-hidden="true">{cfg.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Link href={`/icerikler/${int.ingredient_a.ingredient_slug || int.ingredient_a.ingredient_id}`} className="font-semibold text-sm text-on-surface hover:text-primary transition-colors">
+                            {int.ingredient_a.common_name || int.ingredient_a.inci_name}
+                          </Link>
+                          <span className={`material-icon text-[14px] ${cfg.color}`} aria-hidden="true">sync_alt</span>
+                          <Link href={`/icerikler/${int.ingredient_b.ingredient_slug || int.ingredient_b.ingredient_id}`} className="font-semibold text-sm text-on-surface hover:text-primary transition-colors">
+                            {int.ingredient_b.common_name || int.ingredient_b.inci_name}
+                          </Link>
+                          <span className={`label-caps px-2 py-0.5 rounded-sm ${cfg.color} ${cfg.bg}`}>{cfg.label}</span>
+                        </div>
+                        {int.description && (
+                          <p className="text-sm text-on-surface-variant mt-1.5">{int.description}</p>
+                        )}
+                        {int.recommendation && (
+                          <p className="text-xs text-on-surface-variant mt-1 flex items-start gap-1">
+                            <span className="material-icon text-[12px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                            {int.recommendation}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Cross-Reference: Cosmetic Products */}
+        {cosmeticProducts.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
+              <span className="material-icon text-primary" aria-hidden="true">spa</span>
+              Bu Bileşenleri İçeren Kozmetikler
+            </h2>
+            <p className="text-sm text-on-surface-variant mb-4">
+              Bu takviyedeki aktif bileşenleri içeren kozmetik ürünler — dışarıdan da destekle.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {cosmeticProducts.map((cp) => (
+                <Link
+                  key={cp.product_id}
+                  href={`/urunler/${cp.product_slug}`}
+                  className="curator-card p-3 group hover:border-primary/30 transition-all"
+                >
+                  <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center mb-2 overflow-hidden">
+                    {cp.images?.[0]?.image_url ? (
+                      <Image
+                        src={cp.images[0].image_url}
+                        alt={cp.product_name}
+                        width={120}
+                        height={120}
+                        className="object-contain w-full h-full p-2"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="material-icon text-outline-variant text-[40px]" aria-hidden="true">spa</span>
+                    )}
+                  </div>
+                  {cp.brand && (
+                    <p className="label-caps text-outline text-[8px]">{cp.brand.brand_name}</p>
+                  )}
+                  <p className="text-xs font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2 mt-0.5">
+                    {cp.product_name}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </section>
         )}
 

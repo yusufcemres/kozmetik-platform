@@ -54,11 +54,13 @@ export class ProductsController {
   @Get('by-ingredient/:ingredientId')
   @ApiOperation({ summary: 'İçeriğe göre ürün listesi' })
   @ApiQuery({ name: 'limit', required: false })
+  @ApiQuery({ name: 'domain_type', required: false, description: 'cosmetic veya supplement' })
   findByIngredient(
     @Param('ingredientId', ParseIntPipe) ingredientId: number,
     @Query('limit') limit?: string,
+    @Query('domain_type') domainType?: string,
   ) {
-    return this.service.findByIngredient(ingredientId, limit ? parseInt(limit) : 20);
+    return this.service.findByIngredient(ingredientId, limit ? parseInt(limit) : 20, domainType);
   }
 
   @Get('compare')

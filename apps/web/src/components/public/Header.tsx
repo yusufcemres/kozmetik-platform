@@ -5,19 +5,38 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
-const EXPLORE_ITEMS = [
-  { href: '/urunler', label: 'Kozmetik Ürünler', icon: 'spa', desc: '1900+ kozmetik ürünü' },
-  { href: '/takviyeler', label: 'Takviye Ürünler', icon: 'medication', desc: 'Vitamin, mineral & takviyeler' },
-  { href: '/onerilerimiz', label: 'Önerilerimiz', icon: 'auto_awesome', desc: 'AI destekli öneriler', badge: 'AI' },
-  { href: '/ihtiyaclar', label: 'İhtiyaçlar', icon: 'healing', desc: 'Cilt ihtiyaçlarına göre' },
-  { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
-  { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science', desc: '5000+ INCI analizi' },
-  { href: '/rehber', label: 'Rehber', icon: 'menu_book', desc: 'Cilt bakım rehberleri' },
-  { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', desc: 'Takviye ihtiyacını öğren', badge: 'YENİ' },
-  { href: '/sac-analizi', label: 'Saç Analizi', icon: 'face_retouching_natural', desc: 'Kişisel saç bakım planı', badge: 'YENİ' },
-  { href: '/cilt-yasi-testi', label: 'Cilt Yaşı Testi', icon: 'timer', desc: 'Cildinin gerçek yaşını öğren', badge: 'YENİ' },
-  { href: '/icerik-testi', label: 'İçerik Testi', icon: 'quiz', desc: 'Kozmetik bilgini ölç', badge: 'YENİ' },
+const EXPLORE_GROUPS = [
+  {
+    title: 'Dış Bakım',
+    items: [
+      { href: '/urunler', label: 'Kozmetik Ürünler', icon: 'spa', desc: '1900+ kozmetik ürünü' },
+      { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science', desc: '5000+ INCI analizi' },
+      { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'face_retouching_natural', desc: 'AI destekli cilt analizi', badge: 'AI' },
+      { href: '/cilt-yasi-testi', label: 'Cilt Yaşı Testi', icon: 'timer', desc: 'Cildinin gerçek yaşını öğren', badge: 'YENİ' },
+    ],
+  },
+  {
+    title: 'İç Bakım',
+    items: [
+      { href: '/takviyeler', label: 'Takviye Ürünler', icon: 'medication', desc: 'Vitamin, mineral & takviyeler' },
+      { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', desc: 'Takviye ihtiyacını öğren', badge: 'YENİ' },
+    ],
+  },
+  {
+    title: 'Keşfet',
+    items: [
+      { href: '/ihtiyaclar', label: 'İhtiyaçlar', icon: 'healing', desc: 'Dış & iç bakım ihtiyaçları' },
+      { href: '/markalar', label: 'Markalar', icon: 'storefront', desc: '113+ marka' },
+      { href: '/rehber', label: 'Rehber', icon: 'menu_book', desc: 'Cilt bakım rehberleri' },
+      { href: '/onerilerimiz', label: 'Önerilerimiz', icon: 'auto_awesome', desc: 'AI destekli öneriler', badge: 'AI' },
+      { href: '/karsilastir', label: 'Karşılaştır', icon: 'compare_arrows', desc: 'Ürünleri yan yana kıyasla' },
+      { href: '/sac-analizi', label: 'Saç Analizi', icon: 'content_cut', desc: 'Kişisel saç bakım planı', badge: 'YENİ' },
+      { href: '/icerik-testi', label: 'İçerik Testi', icon: 'quiz', desc: 'Kozmetik bilgini ölç', badge: 'YENİ' },
+    ],
+  },
 ];
+
+const ALL_EXPLORE_ITEMS = EXPLORE_GROUPS.flatMap((g) => g.items);
 
 const NAV_ITEMS = [
   { href: '/takviyeler', label: 'Takviyeler' },
@@ -62,7 +81,7 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const isExplorePath = EXPLORE_ITEMS.some(
+  const isExplorePath = ALL_EXPLORE_ITEMS.some(
     (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
   );
 
@@ -103,35 +122,43 @@ export default function Header() {
 
             {/* Dropdown */}
             {exploreOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[420px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
-                {EXPLORE_ITEMS.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
-                      }`}
-                    >
-                      <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold">{item.label}</span>
-                          {'badge' in item && item.badge && (
-                            <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-on-surface-variant mt-0.5">{item.desc}</p>
-                      </div>
-                      <span className="material-icon text-[16px] text-outline-variant" aria-hidden="true">arrow_forward</span>
-                    </Link>
-                  );
-                })}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[420px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up max-h-[75vh] overflow-y-auto">
+                {EXPLORE_GROUPS.map((group, gi) => (
+                  <div key={group.title}>
+                    {gi > 0 && <div className="h-px bg-outline-variant/15 my-1.5" />}
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-outline px-4 pt-2 pb-1 font-semibold">
+                      {group.title}
+                    </p>
+                    {group.items.map((item) => {
+                      const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-4 px-4 py-2.5 rounded-md transition-all duration-200 ${
+                            isActive
+                              ? 'bg-primary/10 text-primary'
+                              : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
+                          }`}
+                        >
+                          <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold">{item.label}</span>
+                              {'badge' in item && item.badge && (
+                                <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-on-surface-variant mt-0.5">{item.desc}</p>
+                          </div>
+                          <span className="material-icon text-[16px] text-outline-variant" aria-hidden="true">arrow_forward</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -210,30 +237,34 @@ export default function Header() {
     {mobileOpen && (
       <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
-          {/* Keşfet section */}
-          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Keşfet</p>
-          {EXPLORE_ITEMS.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
-                  isActive
-                    ? 'bg-primary text-on-primary font-semibold'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
-                {'badge' in item && item.badge && (
-                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+          {EXPLORE_GROUPS.map((group, gi) => (
+            <div key={group.title}>
+              {gi > 0 && <div className="h-px bg-white/10 my-4" />}
+              <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">{group.title}</p>
+              {group.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
+                      isActive
+                        ? 'bg-primary text-on-primary font-semibold'
+                        : 'text-white/70 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                    <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
+                    {'badge' in item && item.badge && (
+                      <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
 
           <div className="h-px bg-white/10 my-6" />
 
