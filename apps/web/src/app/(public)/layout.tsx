@@ -13,8 +13,9 @@ export default function PublicLayout({
 }) {
   return (
     <AnalyticsProvider>
+      <a href="#main-content" className="skip-to-content">İçeriğe atla</a>
       <Header />
-      <main className="min-h-screen pt-[57px] sm:pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
+      <main id="main-content" className="min-h-screen pt-[57px] sm:pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
       <Footer />
       <BottomNav />
       <OnboardingModal />

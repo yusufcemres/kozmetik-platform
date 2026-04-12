@@ -288,3 +288,45 @@
   font-family: 'Inter', system-ui, sans-serif;
   --admin-primary: #2f9468;
 }
+
+/* ========== Accessibility ========== */
+
+/* Skip to content link — visible only when focused (keyboard users) */
+.skip-to-content {
+  position: absolute;
+  top: -44px;
+  left: 0;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  transition: top 0.15s ease;
+}
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Global focus-visible — only show outline for keyboard users */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.dark *:focus-visible {
+  outline-color: #fafaf8;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
