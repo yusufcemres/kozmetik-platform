@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
 import ProductCarousel from '@/components/public/ProductCarousel';
+import NewsletterForm from '@/components/public/NewsletterForm';
 
 // === Types ===
 
@@ -164,7 +165,7 @@ export default async function HomePage() {
     '@type': 'WebSite',
     name: 'REVELA',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app',
-    description: 'Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.',
+    description: 'Kozmetik ve takviye ürünlerinin INCI içeriklerini analiz et, fiyatları karşılaştır, sana en uygun ürünleri bilimsel kanıtlarla keşfet.',
     potentialAction: {
       '@type': 'SearchAction',
       target: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app'}/urunler?search={search_term_string}`,
@@ -182,28 +183,54 @@ export default async function HomePage() {
       {/* 1. Hero */}
       <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 text-center">
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] headline-tight leading-[0.85] mb-4 text-on-surface">
-          CİLDİNİ<br />
-          <span className="text-outline-variant">ANLA.</span>
+          {'\u0130\u00C7ER\u0130\u011E\u0130 OKU.'}<br />
+          <span className="text-outline-variant">{'DO\u011ERUYU BUL.'}</span>
         </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-on-surface-variant/50 font-medium tracking-wide mb-4 sm:mb-6">
-          Markaların foyalarını ortaya çıkarmaya geldik.
+        <p className="max-w-lg text-sm sm:text-base lg:text-lg text-on-surface-variant mb-8 sm:mb-10 leading-relaxed px-2">
+          Kozmetik ve takviye ürünlerinin INCI içeriğini analiz et,
+          fiyatları karşılaştır, sana en uygun olanı bul.
         </p>
-        <p className="max-w-md text-sm sm:text-base lg:text-lg text-on-surface-variant mb-8 sm:mb-10 leading-relaxed px-2">
-          30 saniyede cilt tipini öğren, sana özel ürünleri bilimsel kanıtlarla keşfet.
-        </p>
-        <Link
-          href="/cilt-analizi"
-          className="curator-btn-primary text-sm px-10 py-4"
-        >
-          Cilt Analizini Başlat
-          <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
-        </Link>
-        <Link
-          href="/urunler"
-          className="mt-4 text-sm text-on-surface-variant hover:text-on-surface underline underline-offset-4 transition-colors"
-        >
-          veya ürünleri keşfet
-        </Link>
+
+        {/* Search bar */}
+        <form action="/ara" className="w-full max-w-lg mb-4">
+          <div className="relative">
+            <span className="material-icon text-outline absolute left-4 top-1/2 -translate-y-1/2 text-[20px]" aria-hidden="true">search</span>
+            <input
+              type="text"
+              name="q"
+              placeholder="Ürün, marka veya içerik ara..."
+              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-12 pr-4 py-3.5 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
+            />
+          </div>
+        </form>
+
+        {/* Popular searches */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-10">
+          <span className="text-xs text-outline">Popüler:</span>
+          {['Retinol', 'Niacinamide', 'Vitamin C', 'Hyaluronic Acid', 'SPF'].map((term) => (
+            <Link
+              key={term}
+              href={`/urunler?search=${encodeURIComponent(term)}`}
+              className="text-xs text-on-surface-variant hover:text-primary transition-colors underline underline-offset-2"
+            >
+              {term}
+            </Link>
+          ))}
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/urunler" className="curator-btn-primary text-sm px-10 py-4">
+            Ürünleri Keşfet
+            <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+          </Link>
+          <a
+            href="#seni-taniyalim"
+            className="text-sm px-8 py-4 border border-outline-variant/30 rounded-md text-on-surface-variant hover:text-on-surface hover:border-on-surface/30 transition-all"
+          >
+            Analizlere Başla
+          </a>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-14 mt-12 sm:mt-16 lg:mt-20 w-full max-w-2xl">
@@ -228,7 +255,7 @@ export default async function HomePage() {
         <div className="text-center mb-10 sm:mb-14">
           <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Neden REVELA?</span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
-            KOZMETİK DÜNYASINDA<br />
+            BAKIM DÜNYASINDA<br />
             <span className="text-outline-variant">REHBERİN.</span>
           </h2>
         </div>
@@ -269,9 +296,9 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
           {[
-            { step: '01', icon: 'quiz', title: 'Cilt Analizi Yap', desc: '7 kısa soruyla cilt tipini, ihtiyaçlarını ve hassasiyetlerini belirle.' },
-            { step: '02', icon: 'science', title: 'Sonuçları Gör', desc: 'INCI bazlı bilimsel analiz ile sana en uyumlu ürünleri keşfet.' },
-            { step: '03', icon: 'shopping_bag', title: 'Satın Al', desc: 'Güvenceli affiliate linklerle en uygun fiyatlı platformu seç.' },
+            { step: '01', icon: 'search', title: 'Ara veya Analiz Yap', desc: 'Ürün adı, marka veya içerik maddesi ile ara. Veya kişisel analizlerle ihtiyacını keşfet.' },
+            { step: '02', icon: 'science', title: 'İçeriğini İncele', desc: 'INCI bazlı bilimsel analiz ile ürünün gerçek değerini gör. Uyumluluk skoru, risk analizi, alternatif öneriler.' },
+            { step: '03', icon: 'shopping_bag', title: 'Karşılaştır & Satın Al', desc: 'Fiyatları platformlar arası karşılaştır. En uygun fiyatla güvenle satın al.' },
           ].map((item) => (
             <div key={item.step} className="text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
@@ -284,20 +311,20 @@ export default async function HomePage() {
           ))}
         </div>
         <div className="text-center mt-12">
-          <Link href="/cilt-analizi" className="curator-btn-primary text-sm px-8 py-3">
-            Hemen Başla
+          <Link href="/urunler" className="curator-btn-primary text-sm px-8 py-3">
+            Keşfetmeye Başla
             <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
           </Link>
         </div>
       </section>
 
       {/* 4. Seni Taniyalim — Quiz/Analiz Kartlari */}
-      <section className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low">
+      <section id="seni-taniyalim" className="py-14 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-16 bg-surface-container-low scroll-mt-16">
         <div className="text-center mb-8 sm:mb-12">
           <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Seni Tanıyalım</span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl headline-tight text-on-surface">
             KİŞİSEL ANALİZLERLE<br />
-            <span className="text-outline-variant">İHTİYACINI KEŞFet.</span>
+            <span className="text-outline-variant">İHTİYACINI KEŞFET.</span>
           </h2>
           <p className="text-on-surface-variant text-sm mt-4 max-w-lg mx-auto">
             Kişisel testlerle ihtiyaçlarını keşfet, sana özel önerilere ulaş.
@@ -401,7 +428,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. Populer Markalar */}
+      {/* 7. Newsletter */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-16 bg-surface text-center">
+        <span className="label-caps text-outline mb-3 block tracking-[0.4em]">Güncel Kal</span>
+        <h2 className="text-xl sm:text-2xl headline-tight text-on-surface mb-3">
+          YENİLİKLERDEN HABERDAR OL
+        </h2>
+        <p className="text-sm text-on-surface-variant mb-6 max-w-md mx-auto">
+          Yeni ürün analizleri, içerik rehberleri ve kampanyalardan ilk sen haberdar ol.
+        </p>
+        <NewsletterForm />
+        <p className="text-[11px] text-outline mt-3">Spam yok, istediğin zaman çık.</p>
+      </section>
+
+      {/* 8. Populer Markalar */}
       {brands.length > 0 && (
         <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-16 border-t border-outline-variant/10">
           <p className="label-caps text-outline text-center mb-6 sm:mb-8 tracking-[0.4em]">Popüler Markalar</p>
@@ -419,7 +459,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 8. Disclosure */}
+      {/* 9. Disclosure */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <p className="text-xs text-outline text-center leading-relaxed">
           REVELA bağımsız bir bilgi platformudur. Sunduğumuz bilgiler tıbbi tavsiye
