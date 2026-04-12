@@ -37,14 +37,18 @@ export class HepsiburadaProvider extends BaseAffiliateProvider {
       jsonLd.each((_, el) => {
         try {
           const data = JSON.parse($(el).text());
-          if (data['@type'] === 'Product' && data.offers) {
-            const offers = Array.isArray(data.offers) ? data.offers[0] : data.offers;
-            if (offers.price) {
-              price = parseFloat(offers.price);
+          const extractFromProduct = (item: any) => {
+            if (item?.['@type'] === 'Product' && item.offers) {
+              const offers = Array.isArray(item.offers) ? item.offers[0] : item.offers;
+              if (offers.price) price = parseFloat(offers.price);
+              if (offers.availability) inStock = offers.availability.includes('InStock');
             }
-            if (offers.availability) {
-              inStock = offers.availability.includes('InStock');
-            }
+          };
+          // Top-level Product
+          extractFromProduct(data);
+          // @graph array (HB pattern)
+          if (data['@graph'] && Array.isArray(data['@graph'])) {
+            data['@graph'].forEach(extractFromProduct);
           }
         } catch {
           // skip
