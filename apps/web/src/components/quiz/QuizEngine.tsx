@@ -246,14 +246,17 @@ export default function QuizEngine({ config }: { config: QuizConfig }) {
 
   // Auto-advance on single select
   const handleSingleSelect = (val: string) => {
-    setAnswers((prev) => ({ ...prev, [step.id]: val }));
-    if (!isLast) {
-      setAnimating(true);
-      setTimeout(() => {
+    const updatedAnswers = { ...answers, [step.id]: val };
+    setAnswers(updatedAnswers);
+    setAnimating(true);
+    setTimeout(() => {
+      if (isLast) {
+        config.onComplete(updatedAnswers);
+      } else {
         setCurrentStep((s) => s + 1);
-        setAnimating(false);
-      }, 300);
-    }
+      }
+      setAnimating(false);
+    }, 300);
   };
 
   return (
