@@ -125,19 +125,62 @@ export class IngredientsService {
   }
 
   async suggest(term: string, limit = 10) {
-    // Uses trigram similarity for fuzzy matching
-    const results = await this.repo
+    const q = (term || '').trim();
+    if (!q) return [];
+
+    // pg_trgm fuzzy match over inci_name, common_name, and alias_name (union via subquery)
+    // Threshold 0.2 catches typos; ORDER BY similarity DESC returns best matches first.
+    const rows: Array<{ ingredient_id: number; score: number }> = await this.repo.query(
+      `
+      WITH matches AS (
+        SELECT i.ingredient_id,
+               GREATEST(
+                 similarity(i.inci_name, $1),
+                 similarity(COALESCE(i.common_name, ''), $1),
+                 COALESCE((
+                   SELECT MAX(similarity(a.alias_name, $1))
+                   FROM ingredient_aliases a
+                   WHERE a.ingredient_id = i.ingredient_id
+                 ), 0)
+               ) AS score
+        FROM ingredients i
+        WHERE i.is_active = true
+      )
+      SELECT ingredient_id, score
+      FROM matches
+      WHERE score > 0.2
+      ORDER BY score DESC
+      LIMIT $2
+      `,
+      [q, limit],
+    );
+
+    if (rows.length === 0) {
+      // Fallback to ILIKE (handles very short terms under trgm threshold)
+      return this.repo
+        .createQueryBuilder('i')
+        .leftJoinAndSelect('i.aliases', 'a')
+        .where(
+          `(i.inci_name ILIKE :like OR i.common_name ILIKE :like OR a.alias_name ILIKE :like)`,
+          { like: `%${q}%` },
+        )
+        .andWhere('i.is_active = true')
+        .orderBy('i.inci_name', 'ASC')
+        .take(limit)
+        .getMany();
+    }
+
+    const ids = rows.map((r) => r.ingredient_id);
+    const ingredients = await this.repo
       .createQueryBuilder('i')
       .leftJoinAndSelect('i.aliases', 'a')
-      .where(
-        `(i.inci_name ILIKE :like OR i.common_name ILIKE :like OR a.alias_name ILIKE :like)`,
-        { like: `%${term}%` },
-      )
-      .andWhere('i.is_active = true')
-      .orderBy('i.inci_name', 'ASC')
-      .take(limit)
+      .where('i.ingredient_id IN (:...ids)', { ids })
       .getMany();
 
-    return results;
+    // Preserve similarity order
+    const orderMap = new Map(ids.map((id, idx) => [id, idx]));
+    return ingredients.sort(
+      (a, b) => (orderMap.get(a.ingredient_id) ?? 0) - (orderMap.get(b.ingredient_id) ?? 0),
+    );
   }
 }
