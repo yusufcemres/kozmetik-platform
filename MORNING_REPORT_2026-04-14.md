@@ -2,6 +2,8 @@
 
 **Durum:** Faz 2 otonom tamamlama tamam. 8/8 görev bitti. Kullanıcı uykudayken yapılan tüm işler.
 
+**✅ Canlı final test (commit `e90451d` sonrası):** `/blog`, `/ai-arama`, `/uzmanlar`, `/blog/[slug]`, `/urunler/[slug]`, `/icerikler/[slug]`, `/markalar/[slug]`, `/takviyeler`, `/ara`, `/profilim`, `/karsilastir` — **hepsi 200**.
+
 ---
 
 ## 1. Yapılanlar (8 Görev)
@@ -52,12 +54,18 @@
 4. `CookieConsent.tsx` — `gtag?: (...args: any[])` diğer dosyada `unknown[]` idi, çakışma. Düzeltildi.
 5. `push.ts` — `applicationServerKey: urlBase64ToUint8Array(public_key) as BufferSource` cast eklendi.
 
-### Blog detail sayfası 500 (SSG çakışması)
-**Teşhis:** `/blog` + `/ai-arama` + `/uzmanlar` list sayfaları 200, ama `/blog/[slug]` ve `/uzmanlar/[slug]` 500 dönüyordu. Sebep: build time'da dynamic `[slug]` route'lar için `generateStaticParams` yoktu, Next fallback'te 500 vericiydi.
+### TÜM detail sayfaları 500 — gerçek sebep: `NEXT_PUBLIC_API_URL` trailing newline
+**Teşhis:** `/blog/[slug]`, `/urunler/[slug]`, `/icerikler/[slug]`, `/markalar/[slug]` — hepsi 500. CSP response header'ındaki `connect-src ... https://kozmetik-api.onrender.com/api/v1%0A` kanıt: Vercel'deki `NEXT_PUBLIC_API_URL` env var **trailing `\n`** içeriyor. SSR sırasında `fetch(\`${API_BASE_URL}${endpoint}\`)` invalid URL'ye çevriliyor → TypeError → 500.
 
-**Düzeltildi (`f2bc3cf`):**
-- `apps/web/src/app/(public)/blog/[slug]/page.tsx` → `export const dynamic = 'force-dynamic'`
-- `apps/web/src/app/(public)/uzmanlar/[slug]/page.tsx` → `export const dynamic = 'force-dynamic'`
+List sayfaları çalışıyordu çünkü catch bloğu boş array'e düşüyor; detail sayfaları `notFound()` çağırıyor ama error propagation 500 üretiyordu.
+
+**Düzeltildi (`e90451d`):**
+- `apps/web/src/lib/api.ts` → `API_BASE_URL = (env || default).trim().replace(/\/+$/, '')`
+- `apps/web/next.config.js` → rewrites + CSP header kaynaklarına da `.trim()` eklendi
+
+**Ek (`f2bc3cf`):** `/blog/[slug]` + `/uzmanlar/[slug]` için `export const dynamic = 'force-dynamic'` (belt-and-suspenders, gerçek fix env trim'di).
+
+**🔧 Önerilen sen-yap:** Vercel dashboard'tan `NEXT_PUBLIC_API_URL` değerini edit edip sondaki `\n`'i kaldır, böylece CSP header'ı da temizlenir (şu an runtime trim kod tarafında ama CSP Next config'de build time'da hesaplanıyor — artık o da trim'lendi ama env var'ın kendisi temiz olursa daha garanti).
 
 ---
 
