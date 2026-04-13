@@ -7,7 +7,7 @@ const STORAGE_KEY = 'revela_consent';
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 

@@ -44,7 +44,7 @@ export async function subscribeToPush(): Promise<{ success: boolean; message: st
   if (!sub) {
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(public_key),
+      applicationServerKey: urlBase64ToUint8Array(public_key) as BufferSource,
     });
   }
 

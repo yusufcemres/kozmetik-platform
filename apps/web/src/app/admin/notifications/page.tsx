@@ -73,7 +73,7 @@ export default function AdminNotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Push Bildirim" subtitle="Tüm abonelere veya test olarak push gönder" />
+      <PageHeader title="Push Bildirim" description="Tüm abonelere veya test olarak push gönder" />
 
       <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
         <div className="flex items-center justify-between pb-4 border-b border-gray-100">
