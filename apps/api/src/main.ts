@@ -61,18 +61,21 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger (disabled in production)
-  if (!isProduction) {
+  // Swagger — Faz L: public at /api/docs (B2B onboarding için)
+  const swaggerPublic = configService.get('SWAGGER_PUBLIC', 'true') === 'true';
+  if (!isProduction || swaggerPublic) {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Kozmetik Platform API')
-      .setDescription('Kozmetik ürün, içerik ve ihtiyaç karar destek platformu API')
-      .setVersion('1.0')
+      .setTitle('REVELA Platform API')
+      .setDescription('Kozmetik + Takviye + Bebek karar destek platformu API — B2B entegrasyonlar için public dokümantasyon')
+      .setVersion('2.0')
       .addBearerAuth()
       .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, 'api-key')
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api/docs', app, document);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: { persistAuthorization: true },
+    });
   }
 
   const port = configService.get('PORT', configService.get('API_PORT', 3001));

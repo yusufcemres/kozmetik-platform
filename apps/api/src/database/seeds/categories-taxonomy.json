@@ -1,0 +1,85 @@
+{
+  "_meta": {
+    "version": 1,
+    "updated_at": "2026-04-13",
+    "note": "REVELA 3-seviye kategori ağacı. Faz B."
+  },
+  "tree": [
+    {
+      "slug": "yuz-bakimi", "name": "Yüz Bakımı", "domain": "cosmetic",
+      "children": [
+        { "slug": "yuz-temizleyici", "name": "Temizleyici" },
+        { "slug": "tonik-esans", "name": "Tonik & Esans" },
+        { "slug": "serum-ampul", "name": "Serum & Ampul" },
+        { "slug": "nemlendirici", "name": "Nemlendirici" },
+        { "slug": "goz-bakimi", "name": "Göz Bakımı" },
+        { "slug": "dudak-bakimi", "name": "Dudak Bakımı" },
+        { "slug": "yuz-maskesi", "name": "Maske" },
+        { "slug": "spf", "name": "Güneş Koruyucu (SPF)" },
+        { "slug": "peeling", "name": "Peeling & Eksfoliyan" }
+      ]
+    },
+    {
+      "slug": "vucut-bakimi", "name": "Vücut Bakımı", "domain": "cosmetic",
+      "children": [
+        { "slug": "vucut-temizleyici", "name": "Duş Jeli & Sabun" },
+        { "slug": "vucut-nemlendirici", "name": "Vücut Losyonu" },
+        { "slug": "vucut-yagi", "name": "Vücut Yağı" },
+        { "slug": "el-bakimi", "name": "El Bakımı" },
+        { "slug": "ayak-bakimi", "name": "Ayak Bakımı" },
+        { "slug": "deodorant", "name": "Deodorant" },
+        { "slug": "vucut-spf", "name": "Vücut SPF" },
+        { "slug": "vucut-peeling", "name": "Vücut Peeling" }
+      ]
+    },
+    {
+      "slug": "sac-bakimi", "name": "Saç & Saç Derisi", "domain": "cosmetic",
+      "children": [
+        { "slug": "sampuan", "name": "Şampuan" },
+        { "slug": "sac-kremi", "name": "Saç Kremi" },
+        { "slug": "sac-maskesi", "name": "Saç Maskesi" },
+        { "slug": "sac-serumu", "name": "Saç Serumu & Yağı" },
+        { "slug": "sac-derisi", "name": "Saç Derisi Bakımı" },
+        { "slug": "sac-sekillendirici", "name": "Şekillendirici" }
+      ]
+    },
+    {
+      "slug": "erkek-bakimi", "name": "Erkek Bakımı", "domain": "cosmetic",
+      "children": [
+        { "slug": "tras-oncesi-sonrasi", "name": "Tıraş Öncesi & Sonrası" },
+        { "slug": "erkek-yuz", "name": "Erkek Yüz Bakımı" },
+        { "slug": "sakal-bakimi", "name": "Sakal Bakımı" },
+        { "slug": "erkek-sac", "name": "Erkek Saç" }
+      ]
+    },
+    {
+      "slug": "bebek-cocuk", "name": "Bebek & Çocuk", "domain": "baby",
+      "children": [
+        { "slug": "bebek-yikama", "name": "Bebek Yıkama" },
+        { "slug": "bebek-nemlendirici", "name": "Bebek Nemlendirici" },
+        { "slug": "pisik-bakimi", "name": "Pişik Kremi" },
+        { "slug": "bebek-spf", "name": "Bebek SPF" },
+        { "slug": "atopik-bakim", "name": "Atopik Cilt" },
+        { "slug": "bebek-sac", "name": "Bebek Saç & Şampuan" },
+        { "slug": "masaj-yagi", "name": "Masaj Yağı" },
+        { "slug": "dis-agiz", "name": "Diş & Ağız" },
+        { "slug": "cocuk-takviyesi", "name": "Çocuk Takviyesi" }
+      ]
+    },
+    {
+      "slug": "gida-takviyesi", "name": "Gıda Takviyesi", "domain": "supplement",
+      "children": [
+        { "slug": "vitamin", "name": "Vitamin" },
+        { "slug": "mineral", "name": "Mineral" },
+        { "slug": "omega", "name": "Omega & Yağ Asidi" },
+        { "slug": "protein-aminoasit", "name": "Protein & Aminoasit" },
+        { "slug": "probiyotik", "name": "Probiyotik" },
+        { "slug": "bitkisel-takviye", "name": "Bitkisel Takviye" },
+        { "slug": "uyku-stres", "name": "Uyku & Stres" },
+        { "slug": "enerji-performans", "name": "Enerji & Performans" },
+        { "slug": "sindirim", "name": "Sindirim" },
+        { "slug": "immun", "name": "İmmün Destek" }
+      ]
+    }
+  ]
+}

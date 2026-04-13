@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "version": 1,
+    "note": "Faz N MVP — 30 static intent. Admin sonradan log'dan genişletir."
+  },
+  "shortcuts": [
+    { "intent_key": "rozasea", "keywords": ["rozasea", "rozam", "kuperoz", "yüz kızarıklığı", "telenjiektazi"], "title": "Rozasea için İçerik Rehberi", "description": "Azelaik asit, centella asiatica, niacinamide ve fragrance-free ürünler rozasea bariyerini destekler. Güçlü eksfoliyanlardan kaçın.", "caution": "Alkollü tonik ve yüksek dozlu asitlerden uzak dur. Dermatolog kontrolü önerilir." },
+    { "intent_key": "akne", "keywords": ["akne", "sivilce", "sivilcem", "inflamasyon", "komedon"], "title": "Akneli Cilt Rehberi", "description": "BHA (salisilik), niacinamide, adapalene ve non-komedojenik nemlendiriciler birincil seçim. Cildi aşırı kurutma." },
+    { "intent_key": "kuru-cilt", "keywords": ["kuru cilt", "kuruluk", "gergin cilt", "soyulma"], "title": "Kuru Cilt Bariyer Onarımı", "description": "Seramid, hyaluronik asit, squalane ve oil cleanser'lar bariyerini tamir eder." },
+    { "intent_key": "hassas-cilt", "keywords": ["hassas cilt", "hassasiyet", "yanma", "kızarıklık"], "title": "Hassas Cilt için Güvenli Başlangıç", "description": "Cica, panthenol, fragrance-free ve alkolsüz formüller tercih et.", "caution": "Yeni ürünleri 48 saat patch test et." },
+    { "intent_key": "leke", "keywords": ["leke", "melazma", "ton eşitsizliği", "post inflamatuar"], "title": "Leke Tedavisi Rehberi", "description": "C vitamini, niacinamide, azelaik asit ve mutlaka SPF. Güneş korumasız leke geçmez." },
+    { "intent_key": "yaslanma-karsiti", "keywords": ["yaşlanma", "kırışıklık", "ince çizgi", "kolajen", "anti aging"], "title": "Yaşlanma Karşıtı Rutin", "description": "Retinol/retinal, peptit, C vitamini ve SPF dörtlüsü temeldir." },
+    { "intent_key": "kepek", "keywords": ["kepek", "saç derisi kaşıntı", "seborreik"], "title": "Kepeğe Karşı İçerikler", "description": "Ketokonazol, çinko piritiyon, salisilik asit içeren şampuanlar." },
+    { "intent_key": "atopik", "keywords": ["atopik", "atopi", "ekzema", "kaşıntılı cilt"], "title": "Atopik Cilt Bakımı", "description": "Atoderm, Lipikar, Exomega ve Xeracalm serileri bariyer destekli formüllerdir." },
+    { "intent_key": "hamilelikte-guvenli", "keywords": ["hamile", "hamilelik", "gebelik", "emziriyorum"], "title": "Hamilelikte Güvenli Cilt Bakımı", "description": "Retinoid, yüksek doz salisilik asit ve hidrokinondan kaçın. Azelaik asit, niacinamide, hyaluronik asit güvenli kabul edilir.", "caution": "Her durumda hekim onayı önerilir." },
+    { "intent_key": "bebek-0-6", "keywords": ["bebek", "yenidoğan", "0-6 ay bebek"], "title": "0-6 Ay Bebek Cildi", "description": "Parfümsüz, fragrance-free, göz yakmayan, 0+ onaylı ürünler tercih et." },
+    { "intent_key": "cocuk-spf", "keywords": ["çocuk spf", "bebek güneş", "çocuk güneş kremi"], "title": "Çocuk SPF Rehberi", "description": "Fiziksel filtreli (titanyum dioksit, çinko oksit), parfümsüz SPF 50+." },
+    { "intent_key": "gozenek", "keywords": ["gözenek", "açık gözenek", "sıkılaştırma"], "title": "Gözenek Görünümü", "description": "Niacinamide, BHA ve retinol gözenek görünümünü iyileştirir." },
+    { "intent_key": "dudak-catlama", "keywords": ["dudak", "çatlak dudak", "dudak balmı"], "title": "Dudak Bakımı", "description": "Lanolin, shea, petrolatum ve seramid içeren balmlar etkilidir." },
+    { "intent_key": "goz-cevresi", "keywords": ["göz çevresi", "göz kremi", "koyu halka", "torba"], "title": "Göz Çevresi Bakımı", "description": "Kafein, peptit, retinal ve SPF birleşimi. Nazik uygulama zorunlu." },
+    { "intent_key": "spf-baslangic", "keywords": ["spf nedir", "güneş kremi nasıl", "spf seçimi"], "title": "SPF Başlangıç Rehberi", "description": "Minimum SPF 30, tercihen 50. 2 parmak kuralı. Her 2 saatte yenile." },
+    { "intent_key": "aha-baslangic", "keywords": ["aha", "glikolik", "laktik asit"], "title": "AHA'ya Başlarken", "description": "Glikolik %5, laktik %10'dan başla. Haftada 2-3 gece, ardından nemlendirici ve sabah SPF." },
+    { "intent_key": "bha-baslangic", "keywords": ["bha", "salisilik asit", "sivilceye asit"], "title": "BHA'ya Başlarken", "description": "Salisilik %1-2 gece kullanımı, akne eğilimli ciltlerde birincil seçim." },
+    { "intent_key": "retinol-baslangic", "keywords": ["retinol", "retinal", "retinol kullanımı"], "title": "Retinol'e Başlarken", "description": "Düşük doz (%0.2-0.3) haftada 2 geceden başla, kademeli artır. Sabah SPF şart." },
+    { "intent_key": "post-peeling", "keywords": ["peeling sonrası", "lazer sonrası", "prosedür sonrası"], "title": "Prosedür Sonrası Bakım", "description": "Centella, panthenol, hyaluronik ve SPF. Asit ve retinolü 2 hafta kes." },
+    { "intent_key": "c-vitamini-baslangic", "keywords": ["c vitamini", "askorbik asit", "c vit serum"], "title": "C Vitaminine Başlarken", "description": "Sabah, temiz cilde. L-askorbik asit hassas ciltte etil askorbik asit ile değiştirilebilir." },
+    { "intent_key": "niacinamide", "keywords": ["niacinamide", "b3 vitamini"], "title": "Niacinamide Rehberi", "description": "%4-10 aralığı etkin. Gözenek, leke, bariyer desteği için çok yönlü." },
+    { "intent_key": "hyaluronik", "keywords": ["hyaluronik", "ha", "hyaluronic"], "title": "Hyaluronik Asit Kullanımı", "description": "Nemli cilde uygula, üstüne occlusive nemlendirici kilitle." },
+    { "intent_key": "magnezyum-uyku", "keywords": ["magnezyum", "uyku takviyesi", "uyuyamıyorum"], "title": "Magnezyum ve Uyku", "description": "Magnezyum bisglisinat veya L-treonat uyku kalitesini destekler. Akşam yemekle." },
+    { "intent_key": "d-vitamini", "keywords": ["d vitamini", "d3", "vitamin d"], "title": "D Vitamini Takviyesi", "description": "D3 (kolekalsiferol) formu tercih et. K2 ile kombinasyon biyoyararlılığı artırır." },
+    { "intent_key": "omega3", "keywords": ["omega 3", "balık yağı", "epa dha"], "title": "Omega-3 Rehberi", "description": "EPA+DHA toplamı minimum 500mg/gün. Trigliserid form esterden daha biyoyararlıdır." },
+    { "intent_key": "probiyotik", "keywords": ["probiyotik", "bağırsak", "sindirim"], "title": "Probiyotik Seçimi", "description": "Minimum 10 milyar CFU, çoklu suş. Lactobacillus + Bifidobacterium karışımı." },
+    { "intent_key": "demir", "keywords": ["demir", "ferritin", "kansızlık"], "title": "Demir Takviyesi", "description": "Bisglisinat form mide dostu. C vitamini ile emilimi artar, kalsiyumla birlikte alma." },
+    { "intent_key": "kolajen", "keywords": ["kolajen", "collagen", "kolajen tozu"], "title": "Kolajen Takviyesi", "description": "Hidrolize kolajen peptit (Tip I & III) cilt için, Tip II eklem için." },
+    { "intent_key": "stres", "keywords": ["stres", "anksiyete", "sakinleşme"], "title": "Stres Desteği", "description": "Ashwagandha, L-teanin, magnezyum ve B kompleks birleşimi." },
+    { "intent_key": "immun", "keywords": ["bağışıklık", "immün", "hastalanmamak"], "title": "İmmün Destek", "description": "D vitamini, çinko, C vitamini üçlüsü temel. Kara mürver ve beta glukan ek destek." }
+  ]
+}

@@ -29,6 +29,11 @@ import { B2bModule } from './modules/b2b/b2b.module';
 import { PriceAlertsModule } from './modules/price-alerts/price-alerts.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { BrandPortalModule } from './modules/brand-portal/brand-portal.module';
+import { TitckModule } from './modules/titck/titck.module';
+import { TagValidatorModule } from './modules/tag-validator/tag-validator.module';
+import { ProfileEngineModule } from './modules/profile-engine/profile-engine.module';
+import { BlogModule } from './modules/blog/blog.module';
+import { AiSearchModule } from './modules/ai-search/ai-search.module';
 import { RedisCacheModule } from './common/cache/cache.module';
 
 // DB connection is conditional — works without Docker for initial development
@@ -66,6 +71,7 @@ const featureModules = skipDb
       ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
       SupplementsModule, InteractionsModule, AffiliateModule, B2bModule, PriceAlertsModule,
       AnalyticsModule, BrandPortalModule,
+      TitckModule, TagValidatorModule, ProfileEngineModule, BlogModule, AiSearchModule,
     ];
 
 @Module({

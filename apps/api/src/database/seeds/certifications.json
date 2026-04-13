@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "version": 1,
+    "updated_at": "2026-04-13",
+    "note": "Manuel kurasyon. Kaynaklar: Leaping Bunny, PETA, Vegan Society, Ecocert, GIMDES resmi listeleri. Yıllık 1x elden güncelle.",
+    "sources": {
+      "leaping_bunny": "https://www.leapingbunny.org/shopping-guide",
+      "peta": "https://features.peta.org/cruelty-free-company-search/",
+      "vegan_society": "https://www.vegansociety.com/the-vegan-trademark",
+      "ecocert": "https://www.ecocert.com/en",
+      "gimdes": "https://www.gimdes.org/sertifikali-urunler/"
+    }
+  },
+  "brands": [
+    { "brand_slug": "the-ordinary",        "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "paulas-choice",       "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "the-inkey-list",      "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "drunk-elephant",      "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "pixi",                "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "cosrx",               "certs": ["peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "some-by-mi",          "certs": ["peta_cf"] },
+    { "brand_slug": "klairs",              "certs": ["peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "isntree",             "certs": ["peta_cf"] },
+    { "brand_slug": "purito",              "certs": ["peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "beauty-of-joseon",    "certs": ["peta_cf"] },
+    { "brand_slug": "dr-jart",             "certs": ["peta_cf"] },
+    { "brand_slug": "the-body-shop",       "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "lush",                "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "weleda",              "certs": ["natrue", "ecocert_partial"] },
+    { "brand_slug": "dr-bronner",          "certs": ["leaping_bunny", "vegan_society_partial", "usda_organic"] },
+    { "brand_slug": "biossance",           "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "youth-to-the-people", "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "herbivore-botanicals","certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "kopari",              "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "indie-lee",           "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "acure",               "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "pacifica",            "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "derma-e",             "certs": ["leaping_bunny", "peta_cf", "vegan_society_partial"] },
+    { "brand_slug": "farmacy",             "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "tata-harper",         "certs": ["leaping_bunny", "peta_cf", "ecocert_partial"] },
+    { "brand_slug": "one-love-organics",   "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "caudalie",            "certs": ["leaping_bunny", "peta_cf"] },
+    { "brand_slug": "garnier",             "certs": ["cruelty_free_international"] },
+    { "brand_slug": "naturium",            "certs": ["peta_cf", "vegan_society_partial"] }
+  ],
+  "certification_types": [
+    { "code": "leaping_bunny",            "name_tr": "Leaping Bunny",            "category": "cruelty_free", "legal_risk": true },
+    { "code": "peta_cf",                  "name_tr": "PETA Cruelty-Free",        "category": "cruelty_free", "legal_risk": true },
+    { "code": "cruelty_free_international","name_tr": "Cruelty-Free International","category": "cruelty_free", "legal_risk": true },
+    { "code": "vegan_society",            "name_tr": "Vegan Society Trademark",  "category": "vegan",        "legal_risk": true },
+    { "code": "vegan_society_partial",    "name_tr": "Vegan Society (kısmi)",    "category": "vegan",        "legal_risk": true, "note": "Markanın bazı ürünleri sertifikalı — ürün bazlı doğrula" },
+    { "code": "ecocert",                  "name_tr": "Ecocert",                  "category": "organic",      "legal_risk": true },
+    { "code": "ecocert_partial",          "name_tr": "Ecocert (kısmi)",          "category": "organic",      "legal_risk": true },
+    { "code": "cosmos_organic",           "name_tr": "COSMOS Organic",           "category": "organic",      "legal_risk": true },
+    { "code": "usda_organic",             "name_tr": "USDA Organic",             "category": "organic",      "legal_risk": true },
+    { "code": "natrue",                   "name_tr": "NATRUE",                   "category": "natural",      "legal_risk": true },
+    { "code": "gimdes",                   "name_tr": "GIMDES Helal",             "category": "halal",        "legal_risk": true },
+    { "code": "v_label",                  "name_tr": "V-Label",                  "category": "vegan",        "legal_risk": true }
+  ]
+}
