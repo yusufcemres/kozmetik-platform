@@ -37,7 +37,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/cerez-politikasi`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
     { url: `${BASE_URL}/kvkk`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
     { url: `${BASE_URL}/giris`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/ai-arama`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/uzmanlar`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];
+
+  const blogSlugs = await fetchSlugs('/blog/sitemap', 'slug');
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
+    url: `${BASE_URL}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
 
   const [productSlugs, ingredientSlugs, needSlugs, brandSlugs, supplementSlugs] = await Promise.all([
     fetchSlugs('/products', 'product_slug'),
@@ -82,5 +93,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages];
+  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages, ...blogPages];
 }
