@@ -27,4 +27,24 @@ test.describe('REVELA smoke', () => {
     const emailInput = page.locator('input[type="email"]').first();
     await expect(emailInput).toBeVisible();
   });
+
+  test('/blog list renders', async ({ page }) => {
+    await page.goto('/blog');
+    await expect(page.getByRole('heading', { name: /blog/i })).toBeVisible();
+  });
+
+  test('/ai-arama form renders', async ({ page }) => {
+    await page.goto('/ai-arama');
+    await expect(page.locator('input[placeholder*="arıyorsun" i]')).toBeVisible();
+  });
+
+  test('/uzmanlar directory renders', async ({ page }) => {
+    await page.goto('/uzmanlar');
+    await expect(page.getByRole('heading', { name: /tıbbi|danışma/i })).toBeVisible();
+  });
+
+  test('/karsilastir compare page', async ({ page }) => {
+    await page.goto('/karsilastir');
+    await expect(page.locator('body')).toBeVisible();
+  });
 });
