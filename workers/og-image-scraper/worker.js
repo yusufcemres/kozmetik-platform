@@ -68,6 +68,17 @@ export default {
 
       const html = await res.text();
 
+      // Raw HTML mode for search-result parsing (truncated to 150KB)
+      if (url.searchParams.get('raw') === '1') {
+        return new Response(JSON.stringify({
+          url: targetUrl,
+          status: res.status,
+          html: html.slice(0, 150000),
+        }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
+
       // og:image extract
       const ogImageMatch = html.match(/<meta\s+(?:property|name)=["']og:image["']\s+content=["']([^"']+)["']/i)
         || html.match(/content=["']([^"']+)["']\s+(?:property|name)=["']og:image["']/i);
