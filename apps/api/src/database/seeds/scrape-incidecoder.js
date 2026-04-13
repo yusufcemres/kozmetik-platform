@@ -73,7 +73,7 @@ async function fetchProductImage(slug) {
 
 async function main() {
   const limit = parseInt(process.argv[2]) || 200;
-  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+  let client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
   await client.connect();
   console.log(`Limit: ${limit}`);
 
@@ -91,23 +91,54 @@ async function main() {
   console.log(`${rows.length} urun bulundu\n`);
 
   let ok = 0, fail = 0, noSlug = 0, noImg = 0;
+  let consecutiveDdgFail = 0;
+  let skipDdg = false;
+
+  async function safeInsert(productId, imgUrl) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await client.query(
+          `INSERT INTO product_images (product_id, image_url, image_type, sort_order)
+           VALUES ($1, $2, 'primary', 0)`,
+          [productId, imgUrl]
+        );
+        return true;
+      } catch (err) {
+        if (err.code === '57P01' || err.code === 'ECONNRESET' || /terminating|Connection terminated/i.test(err.message || '')) {
+          try { await client.end(); } catch {}
+          client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+          await client.connect();
+          continue;
+        }
+        throw err;
+      }
+    }
+    return false;
+  }
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const query = `${row.brand_name || ''} ${row.product_name}`.trim();
     try {
       let slug = await tryDirectSlug(row.brand_name, row.product_name);
-      if (!slug) slug = await ddgFindSlug(query);
+      if (!slug && !skipDdg) {
+        slug = await ddgFindSlug(query);
+        if (!slug) {
+          consecutiveDdgFail++;
+          if (consecutiveDdgFail >= 15) {
+            skipDdg = true;
+            console.log('  ! DDG rate-limited, switching to direct-slug only');
+          }
+        } else {
+          consecutiveDdgFail = 0;
+        }
+      }
       if (!slug) { noSlug++; fail++; }
       else {
         const img = await fetchProductImage(slug);
         if (!img) { noImg++; fail++; }
         else {
-          await client.query(
-            `INSERT INTO product_images (product_id, image_url, image_type, sort_order)
-             VALUES ($1, $2, 'primary', 0)`,
-            [row.product_id, img]
-          );
+          await safeInsert(row.product_id, img);
           ok++;
         }
       }

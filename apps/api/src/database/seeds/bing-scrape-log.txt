@@ -1,0 +1,86 @@
+(node:1620) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Connected.
+
+Found 1382 products (limit: 1400)
+
+Testing Bing...
+OK: https://cdn.dsmcdn.com/ty1350/product/media/images/prod/QC/20240604/11/f85f3ebe-...
+
+  [25/1382] updated: 25 (100%) | noImg: 0 | err: 0 | 2.0min | ~109min left
+  [50/1382] updated: 50 (100%) | noImg: 0 | err: 0 | 3.9min | ~104min left
+  [75/1382] updated: 75 (100%) | noImg: 0 | err: 0 | 6.0min | ~105min left
+  [100/1382] updated: 100 (100%) | noImg: 0 | err: 0 | 8.1min | ~104min left
+  [125/1382] updated: 125 (100%) | noImg: 0 | err: 0 | 10.0min | ~101min left
+  [150/1382] updated: 150 (100%) | noImg: 0 | err: 0 | 12.2min | ~100min left
+  [175/1382] updated: 175 (100%) | noImg: 0 | err: 0 | 14.3min | ~99min left
+  [200/1382] updated: 200 (100%) | noImg: 0 | err: 0 | 16.3min | ~96min left
+  [225/1382] updated: 225 (100%) | noImg: 0 | err: 0 | 18.4min | ~95min left
+  [250/1382] updated: 250 (100%) | noImg: 0 | err: 0 | 20.5min | ~93min left
+  [275/1382] updated: 275 (100%) | noImg: 0 | err: 0 | 22.6min | ~91min left
+  [300/1382] updated: 300 (100%) | noImg: 0 | err: 0 | 24.6min | ~89min left
+  [325/1382] updated: 325 (100%) | noImg: 0 | err: 0 | 26.8min | ~87min left
+  [350/1382] updated: 350 (100%) | noImg: 0 | err: 0 | 28.7min | ~85min left
+  [375/1382] updated: 375 (100%) | noImg: 0 | err: 0 | 30.8min | ~83min left
+  [400/1382] updated: 400 (100%) | noImg: 0 | err: 0 | 32.8min | ~80min left
+  [425/1382] updated: 425 (100%) | noImg: 0 | err: 0 | 34.8min | ~78min left
+  [450/1382] updated: 450 (100%) | noImg: 0 | err: 0 | 36.8min | ~76min left
+  [475/1382] updated: 475 (100%) | noImg: 0 | err: 0 | 39.0min | ~74min left
+  [500/1382] updated: 500 (100%) | noImg: 0 | err: 0 | 41.2min | ~73min left
+  [525/1382] updated: 525 (100%) | noImg: 0 | err: 0 | 43.2min | ~71min left
+  [550/1382] updated: 550 (100%) | noImg: 0 | err: 0 | 45.4min | ~69min left
+  [575/1382] updated: 575 (100%) | noImg: 0 | err: 0 | 47.5min | ~67min left
+  [600/1382] updated: 600 (100%) | noImg: 0 | err: 0 | 49.6min | ~65min left
+  [625/1382] updated: 625 (100%) | noImg: 0 | err: 0 | 51.7min | ~63min left
+  [650/1382] updated: 650 (100%) | noImg: 0 | err: 0 | 53.8min | ~61min left
+  [675/1382] updated: 675 (100%) | noImg: 0 | err: 0 | 55.9min | ~59min left
+  [700/1382] updated: 700 (100%) | noImg: 0 | err: 0 | 58.0min | ~56min left
+  [725/1382] updated: 725 (100%) | noImg: 0 | err: 0 | 60.1min | ~54min left
+  [750/1382] updated: 750 (100%) | noImg: 0 | err: 0 | 62.2min | ~52min left
+  [775/1382] updated: 775 (100%) | noImg: 0 | err: 0 | 64.3min | ~50min left
+  [800/1382] updated: 800 (100%) | noImg: 0 | err: 0 | 66.3min | ~48min left
+  [825/1382] updated: 825 (100%) | noImg: 0 | err: 0 | 68.4min | ~46min left
+  [850/1382] updated: 850 (100%) | noImg: 0 | err: 0 | 70.4min | ~44min left
+  [875/1382] updated: 875 (100%) | noImg: 0 | err: 0 | 72.6min | ~42min left
+  [900/1382] updated: 900 (100%) | noImg: 0 | err: 0 | 74.8min | ~40min left
+  [925/1382] updated: 925 (100%) | noImg: 0 | err: 0 | 76.8min | ~38min left
+  [950/1382] updated: 950 (100%) | noImg: 0 | err: 0 | 78.8min | ~36min left
+  [975/1382] updated: 975 (100%) | noImg: 0 | err: 0 | 81.1min | ~34min left
+  [1000/1382] updated: 1000 (100%) | noImg: 0 | err: 0 | 83.2min | ~32min left
+  [1025/1382] updated: 1025 (100%) | noImg: 0 | err: 0 | 85.3min | ~30min left
+  [1050/1382] updated: 1050 (100%) | noImg: 0 | err: 0 | 87.3min | ~28min left
+  [1075/1382] updated: 1075 (100%) | noImg: 0 | err: 0 | 89.3min | ~25min left
+  [1100/1382] updated: 1100 (100%) | noImg: 0 | err: 0 | 91.2min | ~23min left
+  [1125/1382] updated: 1125 (100%) | noImg: 0 | err: 0 | 93.4min | ~21min left
+  [1150/1382] updated: 1150 (100%) | noImg: 0 | err: 0 | 95.6min | ~19min left
+  [1175/1382] updated: 1175 (100%) | noImg: 0 | err: 0 | 97.6min | ~17min left
+  [1200/1382] updated: 1200 (100%) | noImg: 0 | err: 0 | 99.8min | ~15min left
+  [1225/1382] updated: 1225 (100%) | noImg: 0 | err: 0 | 101.9min | ~13min left
+  [1250/1382] updated: 1250 (100%) | noImg: 0 | err: 0 | 103.7min | ~11min left
+  [1275/1382] updated: 1275 (100%) | noImg: 0 | err: 0 | 105.7min | ~9min left
+  [1300/1382] updated: 1300 (100%) | noImg: 0 | err: 0 | 107.8min | ~7min left
+  [1325/1382] updated: 1325 (100%) | noImg: 0 | err: 0 | 109.8min | ~5min left
+  [1350/1382] updated: 1350 (100%) | noImg: 0 | err: 0 | 111.8min | ~3min left
+  [1375/1382] updated: 1375 (100%) | noImg: 0 | err: 0 | 114.0min | ~1min left
+  [1382/1382] updated: 1382 (100%) | noImg: 0 | err: 0 | 114.6min | ~0min left
+
+═══ FINAL RESULTS ═══
+Updated: 1382 / 1382
+No image: 0
+Errors: 0
+Success rate: 100.0%
+Time: 114.7 minutes
+Final image stats: {
+  placeholder: '0',
+  trendyol_cdn: '855',
+  hepsiburada_cdn: '9',
+  real_total: '1840',
+  total: '1840'
+}

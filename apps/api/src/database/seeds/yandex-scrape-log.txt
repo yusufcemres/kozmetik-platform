@@ -1,0 +1,66 @@
+(node:13712) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Connected.
+
+Found 1446 products with DiceBear images
+
+Testing Yandex...
+WARNING: no test result
+
+  ⚠ 15 fails — pausing 90s...
+  [25/1446] updated: 0 (0%) | noImg: 25 | err: 0 | 4.0min elapsed | ~227min left
+  ⚠ 15 fails — pausing 90s...
+  ⚠ 15 fails — pausing 90s...
+  [50/1446] updated: 0 (0%) | noImg: 50 | err: 0 | 9.7min elapsed | ~270min left
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+error: terminating connection due to administrator command
+    at parseErrorMessage (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\parser.js:305:11)
+    at Parser.handlePacket (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\parser.js:143:27)
+    at Parser.parse (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\parser.js:37:38)
+    at TLSSocket.<anonymous> (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\index.js:11:42)
+    at TLSSocket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at TLSWrap.onStreamRead (node:internal/stream_base_commons:189:23)
+Emitted 'error' event on Client instance at:
+    at Client._handleErrorEvent (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg@8.20.0\node_modules\pg\lib\client.js:393:10)
+    at Client._handleErrorMessage (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg@8.20.0\node_modules\pg\lib\client.js:404:12)
+    at Connection.emit (node:events:508:28)
+    at C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg@8.20.0\node_modules\pg\lib\connection.js:115:12
+    at Parser.parse (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\parser.js:38:17)
+    at TLSSocket.<anonymous> (C:\Users\Yusuf Cemre\OneDrive\Desktop\kozmetik-platform\node_modules\.pnpm\pg-protocol@1.13.0\node_modules\pg-protocol\dist\index.js:11:42)
+    at TLSSocket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5) {
+  length: 116,
+  severity: 'FATAL',
+  code: '57P01',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'postgres.c',
+  line: '3318',
+  routine: 'ProcessInterrupts'
+}
+
+Node.js v24.14.1
