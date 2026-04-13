@@ -31,7 +31,7 @@ const nextConfig = {
 
   // API proxy (dev ortamında CORS sorununu çözer)
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').trim().replace(/\/+$/, '');
     return [
       {
         source: '/api/proxy/:path*',
@@ -42,7 +42,7 @@ const nextConfig = {
 
   // Security headers
   async headers() {
-    const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').replace(/\/api\/v1\/?$/, '');
+    const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').trim().replace(/\/api\/v1\/?$/, '');
     const csp = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
