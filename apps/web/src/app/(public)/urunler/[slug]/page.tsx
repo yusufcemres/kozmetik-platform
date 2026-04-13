@@ -11,6 +11,9 @@ import RecentlyViewed from '@/components/public/RecentlyViewed';
 import ProductViewTracker from './ProductViewTracker';
 import AffiliateLink from '@/components/public/AffiliateLink';
 import PriceAlertButton from '@/components/public/PriceAlertButton';
+import { TitckBadge } from '@/components/public/TitckBadge';
+import { CrossSellBlock } from '@/components/public/CrossSellBlock';
+import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 
 // === Types ===
 
@@ -91,6 +94,8 @@ interface Product {
   ingredients?: ProductIngredient[];
   need_scores?: NeedScore[];
   affiliate_links?: AffiliateLink[];
+  titck_status?: 'not_checked' | 'verified' | 'not_found' | 'expired' | 'banned';
+  titck_notification_no?: string | null;
 }
 
 // === Data fetching ===
@@ -520,6 +525,14 @@ export default async function ProductDetailPage({
             <h1 className="text-2xl lg:text-3xl headline-tight text-on-surface mb-4">
               {product.product_name}
             </h1>
+
+            {product.titck_status && product.titck_status !== 'not_checked' && (
+              <div className="mb-3">
+                <TitckBadge status={product.titck_status} notificationNo={product.titck_notification_no} />
+              </div>
+            )}
+
+            <AllergyAlertBanner productId={product.product_id} ingredients={product.ingredients} />
 
             {/* Meta badges — clickable filter links */}
             <div className="flex flex-wrap gap-2 mb-6">
@@ -1223,6 +1236,11 @@ export default async function ProductDetailPage({
             </div>
           </section>
         )}
+
+        {/* Cross-sell blocks */}
+        <CrossSellBlock productId={product.product_id} mode="together" />
+        <CrossSellBlock productId={product.product_id} mode="similar" />
+        <CrossSellBlock productId={product.product_id} mode="same-brand" />
 
         {/* Recently Viewed */}
         <RecentlyViewed excludeProductId={product.product_id} />

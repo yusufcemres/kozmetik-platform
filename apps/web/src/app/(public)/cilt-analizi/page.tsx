@@ -544,6 +544,7 @@ export default function SkinAnalysisPage() {
       updated_at: new Date().toISOString(),
     };
     localStorage.setItem('skin_profile', JSON.stringify(profile));
+    window.dispatchEvent(new Event('skin-profile-changed'));
 
     const sensitivityKeys = Object.entries(quiz.sensitivities)
       .filter(([, v]) => v)

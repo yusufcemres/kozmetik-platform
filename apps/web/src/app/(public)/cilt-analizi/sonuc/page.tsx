@@ -374,6 +374,7 @@ function ResultsContent() {
               })),
             };
             localStorage.setItem('skin_profile', JSON.stringify(prof));
+            window.dispatchEvent(new Event('skin-profile-changed'));
           }
         } catch {}
 

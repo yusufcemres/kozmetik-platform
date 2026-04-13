@@ -174,11 +174,15 @@ function ProfilePageInner() {
     window.addEventListener('routine-changed', handler);
     window.addEventListener('recently-viewed-changed', handler);
     window.addEventListener('price-alerts-changed', handler);
+    window.addEventListener('skin-profile-changed', handler);
+    window.addEventListener('storage', handler);
     return () => {
       window.removeEventListener('favorites-changed', handler);
       window.removeEventListener('routine-changed', handler);
       window.removeEventListener('recently-viewed-changed', handler);
       window.removeEventListener('price-alerts-changed', handler);
+      window.removeEventListener('skin-profile-changed', handler);
+      window.removeEventListener('storage', handler);
     };
   }, [loadAll]);
 
@@ -222,6 +226,7 @@ function ProfilePageInner() {
       updated_at: new Date().toISOString(),
     };
     localStorage.setItem('skin_profile', JSON.stringify(updated));
+    window.dispatchEvent(new Event('skin-profile-changed'));
     setProfile(updated);
     setEditing(false);
   };
