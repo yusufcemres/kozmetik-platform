@@ -12,13 +12,13 @@ export type FeatureKey =
   | 'cross_sell';
 
 const defaults: Record<FeatureKey, boolean> = {
-  ai_search: false,
-  quiz_v2: false,
-  blog: false,
+  ai_search: true,
+  quiz_v2: true,
+  blog: true,
   compare: false,
-  medical_reviewers: false,
-  titck_badge: false,
-  cross_sell: false,
+  medical_reviewers: true,
+  titck_badge: true,
+  cross_sell: true,
 };
 
 function readEnv(key: FeatureKey): boolean {
