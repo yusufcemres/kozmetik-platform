@@ -15,10 +15,6 @@ export class TagDeriverService {
   async deriveForProduct(productId: number): Promise<string[]> {
     const rows = await this.dataSource.query(
       `
-      WITH inci AS (
-        SELECT LOWER(jsonb_array_elements_text(COALESCE(ingredients_inci, '[]'::jsonb))) AS name
-        FROM products WHERE product_id = $1
-      )
       SELECT
         bool_or(i.is_paraben) AS has_paraben,
         bool_or(i.is_silicone) AS has_silicone,
@@ -29,9 +25,9 @@ export class TagDeriverService {
         bool_or(i.is_eu26_allergen) AS has_allergen26,
         bool_or(i.is_alcohol_drying) AS has_drying_alcohol,
         MAX(i.comedogenic_score) AS max_comedogenic
-      FROM inci p
-      JOIN ingredients i
-        ON i.inci_slug = regexp_replace(p.name, '[^a-z0-9]+', '-', 'g')
+      FROM product_ingredients pi
+      JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
+      WHERE pi.product_id = $1
       `,
       [productId],
     );

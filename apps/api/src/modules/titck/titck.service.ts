@@ -38,20 +38,17 @@ export class TitckService {
   }
 
   /**
-   * products.ingredients_inci JSONB listesini titck_banned_ingredients ile kesiştirir.
+   * product_ingredients → ingredients JOIN ile titck_banned_ingredients çakışması kontrol.
    * Bir eşleşme varsa ürün otomatik draft + banned flag.
    */
   async crossCheckBannedIngredients(productId: number): Promise<string | null> {
     const rows = await this.dataSource.query(
       `
-      WITH product_inci AS (
-        SELECT LOWER(jsonb_array_elements_text(COALESCE(ingredients_inci, '[]'::jsonb))) AS name
-        FROM products WHERE product_id = $1
-      )
       SELECT b.inci_name, b.ban_reason
-      FROM product_inci p
-      JOIN titck_banned_ingredients b
-        ON b.inci_slug = regexp_replace(p.name, '[^a-z0-9]+', '-', 'g')
+      FROM product_ingredients pi
+      JOIN ingredients ing ON ing.ingredient_id = pi.ingredient_id
+      JOIN titck_banned_ingredients b ON b.inci_slug = ing.ingredient_slug
+      WHERE pi.product_id = $1
       LIMIT 1
       `,
       [productId],

@@ -46,7 +46,10 @@ export class BlogService {
 
     const postId = rows[0].post_id;
     const products = await this.dataSource.query(
-      `SELECT p.product_id, p.product_name, p.slug, p.image_url
+      `SELECT p.product_id,
+              p.product_name,
+              p.product_slug AS slug,
+              (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.product_id ORDER BY pi.sort_order NULLS LAST LIMIT 1) AS image_url
        FROM blog_post_products bpp
        JOIN products p ON p.product_id = bpp.product_id
        WHERE bpp.post_id = $1 AND p.status = 'published'
@@ -54,7 +57,7 @@ export class BlogService {
       [postId],
     );
     const ingredients = await this.dataSource.query(
-      `SELECT i.ingredient_id, i.inci_name, i.inci_slug
+      `SELECT i.ingredient_id, i.inci_name, i.ingredient_slug AS inci_slug
        FROM blog_post_ingredients bpi
        JOIN ingredients i ON i.ingredient_id = bpi.ingredient_id
        WHERE bpi.post_id = $1`,

@@ -23,10 +23,8 @@ export class TagConflictDetectorService {
       SELECT 1
       FROM products p
       JOIN brand_certifications bc ON bc.brand_id = p.brand_id
-      JOIN LATERAL (
-        SELECT LOWER(jsonb_array_elements_text(COALESCE(p.ingredients_inci, '[]'::jsonb))) AS inci
-      ) inci_list ON true
-      JOIN ingredients i ON i.inci_slug = regexp_replace(inci_list.inci, '[^a-z0-9]+', '-', 'g')
+      JOIN product_ingredients pi ON pi.product_id = p.product_id
+      JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
       WHERE p.product_id = $1
         AND bc.cert_code LIKE 'vegan%'
         AND i.is_animal_derived = true

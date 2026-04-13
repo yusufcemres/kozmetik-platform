@@ -33,18 +33,18 @@ export class PublishGateService {
   async check(productId: number): Promise<PublishCheckResult> {
     const reasons: string[] = [];
     const rows = await this.dataSource.query(
-      `SELECT image_url, category_id, ingredients_inci, titck_status
-       FROM products WHERE product_id = $1`,
+      `SELECT p.category_id, p.titck_status,
+              (SELECT COUNT(*)::int FROM product_images pi WHERE pi.product_id = p.product_id) AS image_count,
+              (SELECT COUNT(*)::int FROM product_ingredients pii WHERE pii.product_id = p.product_id) AS inci_count
+       FROM products p WHERE p.product_id = $1`,
       [productId],
     );
     const p = rows[0];
     if (!p) return { productId, ok: false, reasons: ['product_not_found'] };
 
-    if (!p.image_url) reasons.push('missing_image');
+    if (!p.image_count || p.image_count === 0) reasons.push('missing_image');
     if (!p.category_id) reasons.push('missing_category');
-    if (!p.ingredients_inci || (Array.isArray(p.ingredients_inci) && p.ingredients_inci.length === 0)) {
-      reasons.push('missing_inci');
-    }
+    if (!p.inci_count || p.inci_count === 0) reasons.push('missing_inci');
     if (p.titck_status === 'banned') reasons.push('titck_banned');
 
     const derived = await this.deriver.deriveForProduct(productId);
