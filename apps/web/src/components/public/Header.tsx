@@ -173,7 +173,7 @@ export default function Header() {
                 </button>
 
                 {isOpen && section.dropdown && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[280px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
+                  <div className="absolute top-full left-0 mt-4 w-[280px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
                     {section.dropdown.map((item) => {
                       const base = item.href.split('?')[0];
                       const itemActive = pathname === item.href || pathname === base;
