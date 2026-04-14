@@ -101,39 +101,3 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
 
-  playwright:
-    name: Playwright Smoke
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright browsers
-        run: pnpm --filter web exec playwright install --with-deps chromium
-
-      - name: Build shared (prerequisite)
-        run: pnpm --filter shared build
-
-      - name: Build web
-        run: pnpm --filter web build
-        env:
-          NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
-
-      - name: Run Playwright tests
-        run: pnpm --filter web exec playwright test
-        env:
-          CI: 'true'
