@@ -5,17 +5,29 @@ export const revalidate = 3600;
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app').trim().replace(/\/+$/, '');
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').trim().replace(/\/+$/, '');
 
+const PAGE_SIZE = 200;
+const MAX_PAGES = 50;
+
 async function fetchSlugs(endpoint: string, slugField: string): Promise<string[]> {
-  try {
-    const res = await fetch(`${API_BASE}${endpoint}?limit=5000&page=1`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.data || data || []).map((item: Record<string, string>) => item[slugField]).filter(Boolean);
-  } catch {
-    return [];
+  const slugs: string[] = [];
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}?limit=${PAGE_SIZE}&page=${page}`, {
+        next: { revalidate: 3600 },
+      });
+      if (!res.ok) break;
+      const data = await res.json();
+      const items: Array<Record<string, string>> = data.data || data || [];
+      if (items.length === 0) break;
+      for (const item of items) {
+        if (item[slugField]) slugs.push(item[slugField]);
+      }
+      if (items.length < PAGE_SIZE) break;
+    } catch {
+      break;
+    }
   }
+  return slugs;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
