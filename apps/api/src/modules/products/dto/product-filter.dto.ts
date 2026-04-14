@@ -14,6 +14,11 @@ export class ProductFilterDto extends PaginationDto {
   @IsString()
   category_id?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by category slug (parent or child)' })
+  @IsOptional()
+  @IsString()
+  category_slug?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

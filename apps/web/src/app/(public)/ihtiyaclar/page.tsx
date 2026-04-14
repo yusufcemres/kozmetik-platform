@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 
 interface Need {
@@ -29,11 +30,20 @@ const DOMAIN_GROUPS = [
   { key: 'supplement', label: 'İç Bakım', icon: 'medication', desc: 'Beden sağlığı, bağışıklık ve genel sağlık', categories: ['body', 'general_health'] },
 ];
 
-export default function NeedsListPage() {
+function NeedsListContent() {
+  const searchParams = useSearchParams();
   const [needs, setNeeds] = useState<Need[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeDomain, setActiveDomain] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const kategori = searchParams.get('kategori');
+    if (kategori && CATEGORY_META[kategori]) {
+      setActiveCategory(kategori);
+      setActiveDomain(null);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     api
@@ -239,5 +249,13 @@ export default function NeedsListPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function NeedsListPage() {
+  return (
+    <Suspense fallback={<div className="curator-section text-center text-outline">Yükleniyor...</div>}>
+      <NeedsListContent />
+    </Suspense>
   );
 }

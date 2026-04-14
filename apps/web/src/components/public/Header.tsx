@@ -6,7 +6,14 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import ThemeToggle from '@/components/public/ThemeToggle';
 
-const TESTS_DROPDOWN = [
+interface DropdownItem {
+  href: string;
+  label: string;
+  icon?: string;
+  badge?: string | null;
+}
+
+const TESTS_DROPDOWN: DropdownItem[] = [
   { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'water_drop', badge: 'AI' },
   { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', badge: 'YEN\u0130' },
   { href: '/sac-analizi', label: 'Sa\u00e7 Analizi', icon: 'face_retouching_natural', badge: 'YEN\u0130' },
@@ -14,23 +21,58 @@ const TESTS_DROPDOWN = [
   { href: '/icerik-testi', label: '\u0130\u00e7erik Testi', icon: 'quiz', badge: null },
 ];
 
-const NAV_ITEMS = [
-  { href: '/urunler', label: 'Ke\u015ffet' },
-  { href: '/urunler?domain=cosmetic', label: 'D\u0131\u015f Bak\u0131m' },
-  { href: '/takviyeler', label: '\u0130\u00e7 Bak\u0131m' },
-  { href: '/ihtiyaclar', label: '\u0130htiya\u00e7lar' },
+const DIS_BAKIM_DROPDOWN: DropdownItem[] = [
+  { href: '/urunler', label: 'T\u00fcm\u00fc', icon: 'grid_view' },
+  { href: '/urunler?category=yuz-bakim', label: 'Y\u00fcz Bak\u0131m\u0131', icon: 'face' },
+  { href: '/urunler?category=temizleme', label: 'Temizleme', icon: 'water_drop' },
+  { href: '/urunler?category=gunes-koruma', label: 'G\u00fcne\u015f Koruma', icon: 'wb_sunny' },
+  { href: '/urunler?category=goz-bakim', label: 'G\u00f6z Bak\u0131m\u0131', icon: 'visibility' },
+  { href: '/urunler?category=dudak-bakim', label: 'Dudak Bak\u0131m\u0131', icon: 'mood' },
+  { href: '/urunler?category=vucut-bakim', label: 'V\u00fccut Bak\u0131m\u0131', icon: 'spa' },
+  { href: '/urunler?category=sac-bakim', label: 'Sa\u00e7 & Sa\u00e7 Derisi', icon: 'content_cut' },
+  { href: '/urunler?category=makyaj', label: 'Makyaj', icon: 'palette' },
 ];
 
-const NAV_ITEMS_RIGHT = [
-  { href: '/karsilastir', label: 'Kar\u015f\u0131la\u015ft\u0131r' },
+const IC_BAKIM_DROPDOWN: DropdownItem[] = [
+  { href: '/takviyeler', label: 'T\u00fcm\u00fc', icon: 'grid_view' },
+  { href: '/takviyeler?kategori=vitamin-mineral', label: 'Vitamin & Mineral', icon: 'medication' },
+  { href: '/takviyeler?kategori=probiyotik', label: 'Probiyotik', icon: 'biotech' },
+  { href: '/takviyeler?kategori=bitkisel-takviye', label: 'Bitkisel', icon: 'eco' },
+  { href: '/takviyeler?kategori=omega-yag-asitleri', label: 'Omega & Ya\u011f Asitleri', icon: 'water_drop' },
+];
+
+const IHTIYACLAR_DROPDOWN: DropdownItem[] = [
+  { href: '/ihtiyaclar', label: 'T\u00fcm\u00fc', icon: 'grid_view' },
+  { href: '/ihtiyaclar?kategori=skin', label: 'Cilt \u0130htiya\u00e7lar\u0131', icon: 'face' },
+  { href: '/ihtiyaclar?kategori=hair', label: 'Sa\u00e7 \u0130htiya\u00e7lar\u0131', icon: 'content_cut' },
+  { href: '/ihtiyaclar?kategori=body', label: 'Beden \u0130htiya\u00e7lar\u0131', icon: 'self_improvement' },
+  { href: '/ihtiyaclar?kategori=general_health', label: 'Genel Sa\u011fl\u0131k', icon: 'health_and_safety' },
+];
+
+interface NavSection {
+  key: string;
+  label: string;
+  href?: string;
+  dropdown?: DropdownItem[];
+  basePath?: string;
+}
+
+const NAV_SECTIONS: NavSection[] = [
+  { key: 'kesfet', label: 'Ke\u015ffet', href: '/' },
+  { key: 'dis', label: 'D\u0131\u015f Bak\u0131m', dropdown: DIS_BAKIM_DROPDOWN, basePath: '/urunler' },
+  { key: 'ic', label: '\u0130\u00e7 Bak\u0131m', dropdown: IC_BAKIM_DROPDOWN, basePath: '/takviyeler' },
+  { key: 'ihtiyac', label: '\u0130htiya\u00e7lar', dropdown: IHTIYACLAR_DROPDOWN, basePath: '/ihtiyaclar' },
+  { key: 'testler', label: 'Testler', dropdown: TESTS_DROPDOWN },
+  { key: 'karsilastir', label: 'Kar\u015f\u0131la\u015ft\u0131r', href: '/karsilastir' },
 ];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [exploreOpen, setExploreOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpenSection, setMobileOpenSection] = useState<string | null>(null);
   const [favCount, setFavCount] = useState(0);
   const pathname = usePathname();
-  const exploreRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -48,23 +90,37 @@ export default function Header() {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
-    setExploreOpen(false);
+    setOpenDropdown(null);
+    setMobileOpenSection(null);
   }, [pathname]);
 
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (exploreRef.current && !exploreRef.current.contains(e.target as Node)) {
-        setExploreOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
       }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const isTestPath = TESTS_DROPDOWN.some(
-    (item) => pathname === item.href || pathname.startsWith(item.href + '/'),
-  );
+  const isSectionActive = (section: NavSection) => {
+    if (section.href) {
+      return section.href === '/'
+        ? pathname === '/'
+        : pathname === section.href || pathname.startsWith(section.href + '/');
+    }
+    if (section.basePath) {
+      return pathname === section.basePath || pathname.startsWith(section.basePath + '/');
+    }
+    return section.dropdown?.some(
+      (item) => {
+        const base = item.href.split('?')[0];
+        return pathname === base || pathname.startsWith(base + '/');
+      },
+    ) ?? false;
+  };
 
   return (
     <>
@@ -76,87 +132,75 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-7">
-          {/* Direct nav items (left) */}
-          {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+        <nav ref={navRef} className="hidden md:flex items-center gap-7">
+          {NAV_SECTIONS.map((section) => {
+            const isActive = isSectionActive(section);
+            const isOpen = openDropdown === section.key;
+
+            if (section.href) {
+              return (
+                <Link
+                  key={section.key}
+                  href={section.href}
+                  className={`label-caps text-xs transition-colors duration-300 ${
+                    isActive
+                      ? 'text-on-surface border-b-2 border-on-surface pb-1'
+                      : 'text-outline hover:text-on-surface'
+                  }`}
+                >
+                  {section.label}
+                </Link>
+              );
+            }
+
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`label-caps text-xs transition-colors duration-300 ${
-                  isActive
-                    ? 'text-on-surface border-b-2 border-on-surface pb-1'
-                    : 'text-outline hover:text-on-surface'
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+              <div key={section.key} className="relative">
+                <button
+                  onClick={() => setOpenDropdown(isOpen ? null : section.key)}
+                  className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
+                    isActive || isOpen
+                      ? 'text-on-surface border-b-2 border-on-surface pb-1'
+                      : 'text-outline hover:text-on-surface'
+                  }`}
+                >
+                  {section.label}
+                  <span
+                    className={`material-icon text-[16px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                  >
+                    expand_more
+                  </span>
+                </button>
 
-          {/* Testler dropdown */}
-          <div ref={exploreRef} className="relative">
-            <button
-              onClick={() => setExploreOpen(!exploreOpen)}
-              className={`label-caps text-xs transition-colors duration-300 flex items-center gap-1 ${
-                isTestPath || exploreOpen
-                  ? 'text-on-surface border-b-2 border-on-surface pb-1'
-                  : 'text-outline hover:text-on-surface'
-              }`}
-            >
-              Testler
-              <span
-                className={`material-icon text-[16px] transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`}
-                aria-hidden="true"
-              >
-                expand_more
-              </span>
-            </button>
-
-            {exploreOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[280px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
-                {TESTS_DROPDOWN.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-md transition-all duration-200 ${
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
-                      }`}
-                    >
-                      <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                      <span className="text-sm font-semibold flex-1">{item.label}</span>
-                      {item.badge && (
-                        <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
+                {isOpen && section.dropdown && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[280px] bg-surface border border-outline-variant/20 rounded-md shadow-2xl p-2 animate-slide-up">
+                    {section.dropdown.map((item) => {
+                      const base = item.href.split('?')[0];
+                      const itemActive = pathname === item.href || pathname === base;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-md transition-all duration-200 ${
+                            itemActive
+                              ? 'bg-primary/10 text-primary'
+                              : 'hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface'
+                          }`}
+                        >
+                          <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
+                          <span className="text-sm font-semibold flex-1">{item.label}</span>
+                          {item.badge && (
+                            <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold tracking-wide">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Direct nav items (right) */}
-          {NAV_ITEMS_RIGHT.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`label-caps text-xs transition-colors duration-300 ${
-                  isActive
-                    ? 'text-on-surface border-b-2 border-on-surface pb-1'
-                    : 'text-outline hover:text-on-surface'
-                }`}
-              >
-                {item.label}
-              </Link>
             );
           })}
         </nav>
@@ -219,51 +263,75 @@ export default function Header() {
     {mobileOpen && (
       <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
-          {/* Main nav */}
-          {[...NAV_ITEMS, ...NAV_ITEMS_RIGHT].map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
-                  isActive
-                    ? 'bg-primary text-on-primary font-semibold'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="uppercase tracking-widest text-xs">{item.label}</span>
-                <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
-                  arrow_forward
-                </span>
-              </Link>
-            );
-          })}
+          {NAV_SECTIONS.map((section) => {
+            const isActive = isSectionActive(section);
 
-          <div className="h-px bg-white/10 my-4" />
-
-          {/* Tests */}
-          <p className="label-caps text-white/30 px-4 mb-3 tracking-[0.3em]">Testler</p>
-          {TESTS_DROPDOWN.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-md transition-all duration-300 ${
-                  isActive
-                    ? 'bg-primary text-on-primary font-semibold'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="material-icon text-[20px]" aria-hidden="true">{item.icon}</span>
-                <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
-                {item.badge && (
-                  <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
-                    {item.badge}
+            if (section.href) {
+              return (
+                <Link
+                  key={section.key}
+                  href={section.href}
+                  className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
+                    isActive
+                      ? 'bg-primary text-on-primary font-semibold'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <span className="uppercase tracking-widest text-xs">{section.label}</span>
+                  <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
+                    arrow_forward
                   </span>
+                </Link>
+              );
+            }
+
+            const isSectionOpen = mobileOpenSection === section.key;
+            return (
+              <div key={section.key}>
+                <button
+                  onClick={() => setMobileOpenSection(isSectionOpen ? null : section.key)}
+                  className={`w-full flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
+                    isActive || isSectionOpen
+                      ? 'bg-white/10 text-white font-semibold'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <span className="uppercase tracking-widest text-xs">{section.label}</span>
+                  <span
+                    className={`material-icon material-icon-sm text-white/50 transition-transform duration-200 ${isSectionOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                  >
+                    expand_more
+                  </span>
+                </button>
+                {isSectionOpen && section.dropdown && (
+                  <div className="pl-3 py-1 space-y-0.5">
+                    {section.dropdown.map((item) => {
+                      const base = item.href.split('?')[0];
+                      const itemActive = pathname === item.href || pathname === base;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ${
+                            itemActive
+                              ? 'bg-primary text-on-primary font-semibold'
+                              : 'text-white/60 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          <span className="material-icon text-[18px]" aria-hidden="true">{item.icon}</span>
+                          <span className="text-xs uppercase tracking-widest flex-1">{item.label}</span>
+                          {item.badge && (
+                            <span className="bg-primary text-on-primary text-[8px] px-1.5 py-0.5 rounded-full font-bold">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              </Link>
+              </div>
             );
           })}
 

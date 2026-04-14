@@ -67,11 +67,13 @@ export class ProductsService {
   }
 
   async findAll(query: PaginationDto & {
-    brand_id?: number; category_id?: number; status?: string;
+    brand_id?: number; category_id?: number; category_slug?: string; status?: string;
     target_area?: string; usage_time?: string; product_type?: string; need_id?: number;
     domain_type?: string; ingredient_slug?: string; target_gender?: string;
   }) {
-    const { page, limit, search, brand_id, category_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
+    const { page, limit, search, brand_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
+    let { category_id } = query;
+    const { category_slug } = query;
     const where: any = {};
     if (search) where.product_name = ILike(`%${search}%`);
     if (brand_id) where.brand_id = Number(brand_id);
@@ -81,6 +83,19 @@ export class ProductsService {
     if (product_type) where.product_type_label = ILike(`%${product_type}%`);
     if (domain_type) where.domain_type = domain_type;
     if (target_gender) where.target_gender = target_gender;
+
+    // Resolve category_slug → category_id
+    if (!category_id && category_slug) {
+      const cat = await this.categoryRepo.findOne({
+        where: { category_slug },
+        select: ['category_id'],
+      });
+      if (cat) {
+        category_id = cat.category_id;
+      } else {
+        return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+      }
+    }
 
     // Category filter: include child categories for parent
     if (category_id) {

@@ -425,7 +425,10 @@ export default async function ProductDetailPage({
   const sortedIngredients = [...(product.ingredients || [])].sort(
     (a, b) => a.inci_order_rank - b.inci_order_rank,
   );
-  const activeLinks = (product.affiliate_links || []).filter((l) => l.is_active);
+  const SEARCH_ONLY_PLATFORMS = new Set(['watsons', 'rossmann']);
+  const allActiveLinks = (product.affiliate_links || []).filter((l) => l.is_active);
+  const activeLinks = allActiveLinks.filter((l) => !SEARCH_ONLY_PLATFORMS.has(l.platform));
+  const searchOnlyLinks = allActiveLinks.filter((l) => SEARCH_ONLY_PLATFORMS.has(l.platform));
   const avgScore =
     product.need_scores && product.need_scores.length > 0
       ? Math.round(
@@ -1101,6 +1104,37 @@ export default async function ProductDetailPage({
             </section>
           );
         })()}
+
+        {/* Search-only platforms (Watsons, Rossmann) */}
+        {searchOnlyLinks.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">Diğer Mağazalarda Ara</h2>
+            <p className="text-xs text-outline mb-4">
+              Bu mağazalarda doğrudan ürün linki henüz mevcut değil. Aşağıdaki butonlar mağaza içinde arama sonuçlarına yönlendirir.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {searchOnlyLinks.map((link) => {
+                const pInfo = PLATFORM_INFO[link.platform];
+                return (
+                  <AffiliateLink
+                    key={link.affiliate_link_id}
+                    href={link.affiliate_url}
+                    affiliateLinkId={link.affiliate_link_id}
+                    className="flex items-center gap-2 px-5 py-3 rounded-md border border-outline-variant/30 hover:border-on-surface hover:bg-surface-container-low transition-all duration-300"
+                  >
+                    {pInfo?.logo ? (
+                      <img src={pInfo.logo} alt={pInfo.label} className="h-6 w-auto" style={{ maxWidth: '70px' }} />
+                    ) : (
+                      <span className="font-semibold text-on-surface">{platformLabel(link.platform)}</span>
+                    )}
+                    <span className="label-caps text-on-surface-variant">Ara</span>
+                    <span className="material-icon material-icon-sm text-on-surface-variant" aria-hidden="true">arrow_forward</span>
+                  </AffiliateLink>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (

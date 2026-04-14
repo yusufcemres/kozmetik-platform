@@ -36,6 +36,7 @@ export class ProductsController {
       ...query,
       brand_id: query.brand_id ? Number(query.brand_id) : undefined,
       category_id: query.category_id ? Number(query.category_id) : undefined,
+      category_slug: query.category_slug || undefined,
       need_id: query.need_id ? Number(query.need_id) : undefined,
     });
   }

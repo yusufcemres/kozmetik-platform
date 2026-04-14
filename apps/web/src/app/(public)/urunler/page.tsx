@@ -60,6 +60,7 @@ interface Category {
   category_name: string;
   category_slug: string;
   parent_category_id: number | null;
+  domain_type?: string;
   children?: Category[];
 }
 
@@ -185,7 +186,9 @@ function ProductsListContent() {
     router.push('/urunler');
   };
 
-  const parentCats = categories.filter((c) => !c.parent_category_id);
+  const parentCats = categories.filter(
+    (c) => !c.parent_category_id && (c.domain_type === 'cosmetic' || !c.domain_type),
+  );
   const hasFilters = !!search || !!brandFilter || !!categoryFilter || !!typeFilter || !!areaFilter || !!ingredientSlug;
 
   return (
