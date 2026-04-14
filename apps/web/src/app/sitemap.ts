@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app';
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app').trim().replace(/\/+$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').trim().replace(/\/+$/, '');
 
 async function fetchSlugs(endpoint: string, slugField: string): Promise<string[]> {
   try {
