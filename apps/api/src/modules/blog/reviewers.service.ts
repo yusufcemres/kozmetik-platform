@@ -26,7 +26,7 @@ export class ReviewersService {
       [reviewerId],
     );
     const ingredients = await this.dataSource.query(
-      `SELECT ingredient_id, inci_name, inci_slug, last_reviewed_at FROM ingredients
+      `SELECT ingredient_id, inci_name, ingredient_slug AS inci_slug, last_reviewed_at FROM ingredients
        WHERE medical_reviewer_id = $1`,
       [reviewerId],
     );

@@ -15,10 +15,10 @@ export class InternalLinkingService {
   private async getIndex() {
     if (this.cache && Date.now() - this.cachedAt < 5 * 60_000) return this.cache;
     const ings = await this.dataSource.query(
-      `SELECT LOWER(inci_name) AS name, inci_slug FROM ingredients WHERE inci_name IS NOT NULL`,
+      `SELECT LOWER(inci_name) AS name, ingredient_slug AS inci_slug FROM ingredients WHERE inci_name IS NOT NULL`,
     );
     const brands = await this.dataSource.query(
-      `SELECT LOWER(brand_name) AS name, slug FROM brands`,
+      `SELECT LOWER(brand_name) AS name, brand_slug AS slug FROM brands`,
     );
     this.cache = {
       ingredients: new Map(ings.map((r: any) => [r.name, r.inci_slug])),

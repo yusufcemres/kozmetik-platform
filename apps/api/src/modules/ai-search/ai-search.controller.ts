@@ -39,7 +39,7 @@ export class AiSearchController {
           : [],
         ingredientIds.length
           ? this.dataSource.query(
-              `SELECT ingredient_id, inci_name, inci_slug FROM ingredients WHERE ingredient_id = ANY($1)`,
+              `SELECT ingredient_id, inci_name, ingredient_slug AS inci_slug FROM ingredients WHERE ingredient_id = ANY($1)`,
               [ingredientIds],
             )
           : [],
