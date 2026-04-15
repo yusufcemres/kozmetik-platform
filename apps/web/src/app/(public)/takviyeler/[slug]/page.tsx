@@ -66,6 +66,20 @@ interface SupplementDetail {
   nutrition_facts?: NutritionFact[];
 }
 
+interface SupplementScore {
+  product_id: number;
+  overall_score: number;
+  breakdown: {
+    form_quality: number;
+    dosage_adequacy: number;
+    interaction_score: number;
+    transparency: number;
+    certification: number;
+  };
+  explanation: string[];
+  calculated_at: string;
+}
+
 interface Interaction {
   interaction_id: number;
   ingredient_a: { ingredient_id: number; inci_name: string; common_name?: string; ingredient_slug?: string };
@@ -91,6 +105,16 @@ async function getProduct(slug: string): Promise<Product | null> {
     return await apiFetch<Product>(`/products/slug/${slug}`, {
       next: { revalidate: 3600 },
     } as any);
+  } catch {
+    return null;
+  }
+}
+
+async function getSupplementScore(productId: number): Promise<SupplementScore | null> {
+  try {
+    return await apiFetch<SupplementScore>(`/supplements/${productId}/score`, {
+      next: { revalidate: 300 },
+    });
   } catch {
     return null;
   }
@@ -157,6 +181,20 @@ export async function generateMetadata({
 }
 
 // === Helpers ===
+
+function scoreColorClass(v: number): string {
+  if (v >= 80) return 'border-green-500 text-green-600';
+  if (v >= 60) return 'border-lime-500 text-lime-600';
+  if (v >= 40) return 'border-amber-500 text-amber-600';
+  return 'border-red-500 text-red-600';
+}
+
+function scoreBarColor(v: number): string {
+  if (v >= 80) return 'bg-green-500';
+  if (v >= 60) return 'bg-lime-500';
+  if (v >= 40) return 'bg-amber-500';
+  return 'bg-red-500';
+}
 
 function formLabel(form: string): string {
   const map: Record<string, string> = {
@@ -237,7 +275,10 @@ export default async function SupplementDetailPage({
   const product = await getProduct(params.slug);
   if (!product) notFound();
 
-  const detail = await getSupplementDetail(product.product_id);
+  const [detail, score] = await Promise.all([
+    getSupplementDetail(product.product_id),
+    getSupplementScore(product.product_id),
+  ]);
   const nutritionFacts = (detail?.nutrition_facts || []).sort(
     (a, b) => a.sort_order - b.sort_order,
   );
@@ -349,6 +390,53 @@ export default async function SupplementDetailPage({
             )}
           </div>
         </div>
+
+        {/* REVELA Supplement Skoru */}
+        {score && (
+          <section className="mb-8 curator-card p-6">
+            <div className="flex items-start gap-6 flex-col md:flex-row">
+              <div className="flex flex-col items-center shrink-0">
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${scoreColorClass(score.overall_score)}`}>
+                  <span className="text-3xl font-bold">{score.overall_score}</span>
+                </div>
+                <span className="label-caps text-outline mt-2">REVELA Skoru</span>
+              </div>
+              <div className="flex-1 w-full">
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-3">Skor Detayı</h2>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Form Kalitesi', value: score.breakdown.form_quality },
+                    { label: 'Dozaj Yeterliliği', value: score.breakdown.dosage_adequacy },
+                    { label: 'Etkileşim Skoru', value: score.breakdown.interaction_score },
+                    { label: 'Şeffaflık', value: score.breakdown.transparency },
+                    { label: 'Sertifika', value: score.breakdown.certification },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-center gap-3 text-sm">
+                      <span className="w-36 text-on-surface-variant">{row.label}</span>
+                      <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${scoreBarColor(row.value)}`}
+                          style={{ width: `${row.value}%` }}
+                        />
+                      </div>
+                      <span className="w-10 text-right font-semibold text-on-surface tabular-nums">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+                {score.explanation.length > 0 && (
+                  <ul className="mt-4 text-xs text-on-surface-variant space-y-1">
+                    {score.explanation.map((line, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-primary shrink-0">·</span>
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Supplement Info */}
         {detail && (

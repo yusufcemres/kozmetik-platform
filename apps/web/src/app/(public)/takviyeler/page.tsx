@@ -43,6 +43,8 @@ function SupplementsListInner() {
   const [totalPages, setTotalPages] = useState(1);
   const [kategori, setKategori] = useState(initialKategori);
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'newest' | 'score' | 'name'>('newest');
+  const [scores, setScores] = useState<Record<number, number>>({});
 
   useEffect(() => {
     setLoading(true);
@@ -50,8 +52,7 @@ function SupplementsListInner() {
     params.set('page', String(page));
     params.set('limit', '12');
     if (search) params.set('search', search);
-
-    // Always use products endpoint with domain_type=supplement
+    params.set('sort', sort);
     params.set('domain_type', 'supplement');
     if (kategori) params.set('category_slug', kategori);
     const endpoint = `/products?${params.toString()}`;
@@ -64,12 +65,41 @@ function SupplementsListInner() {
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [page, kategori, search]);
+  }, [page, kategori, search, sort]);
+
+  // Fetch scores in parallel for visible products
+  useEffect(() => {
+    if (!products.length) return;
+    let cancelled = false;
+    Promise.all(
+      products.map((p) =>
+        api
+          .get<{ overall_score: number }>(`/supplements/${p.product_id}/score`)
+          .then((s) => [p.product_id, s.overall_score] as const)
+          .catch(() => [p.product_id, null] as const),
+      ),
+    ).then((entries) => {
+      if (cancelled) return;
+      const map: Record<number, number> = {};
+      for (const [id, val] of entries) {
+        if (val != null) map[id] = val;
+      }
+      setScores(map);
+    });
+    return () => { cancelled = true; };
+  }, [products]);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [kategori, search]);
+  }, [kategori, search, sort]);
+
+  const scoreBadgeClass = (v: number) => {
+    if (v >= 80) return 'bg-green-500/90 text-white';
+    if (v >= 60) return 'bg-lime-500/90 text-white';
+    if (v >= 40) return 'bg-amber-500/90 text-white';
+    return 'bg-red-500/90 text-white';
+  };
 
   const getImageUrl = (p: SupplementProduct) => {
     if (p.images && p.images.length > 0) return p.images[0].image_url;
@@ -97,6 +127,19 @@ function SupplementsListInner() {
           onChange={(e) => setSearch(e.target.value)}
           className="curator-input pl-12"
         />
+      </div>
+
+      {/* Sort */}
+      <div className="flex justify-end mb-4">
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as 'newest' | 'score' | 'name')}
+          className="curator-input !w-auto text-xs py-2"
+        >
+          <option value="newest">En yeni</option>
+          <option value="score">Skora göre (yüksek→düşük)</option>
+          <option value="name">İsme göre (A→Z)</option>
+        </select>
       </div>
 
       {/* Category chips */}
@@ -154,7 +197,12 @@ function SupplementsListInner() {
                   className="curator-card group overflow-hidden"
                 >
                   {/* Image */}
-                  <div className="aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
+                    {scores[p.product_id] != null && (
+                      <div className={`absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${scoreBadgeClass(scores[p.product_id])}`}>
+                        {scores[p.product_id]}
+                      </div>
+                    )}
                     {img ? (
                       <img
                         src={img}

@@ -77,6 +77,18 @@ export class Ingredient {
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
+  @Column({ type: 'smallint', nullable: true })
+  bioavailability_score: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  parent_ingredient_id: number | null;
+
+  @Column({ type: 'varchar', length: 60, nullable: true })
+  form_type: string | null;
+
+  @Column({ type: 'smallint', nullable: true })
+  absorption_rate: number | null;
+
   @OneToMany(() => IngredientAlias, (alias) => alias.ingredient)
   aliases: IngredientAlias[];
 

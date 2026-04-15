@@ -84,10 +84,12 @@ export class SearchService {
     const cached = await this.cache.get<any>(cacheKey);
     if (cached) return cached;
 
-    const suggestions: Array<{ type: string; name: string; slug: string }> = [];
+    type SuggestRow = { name: string; slug: string };
+    type SuggestItem = { type: 'product' | 'ingredient' | 'need' | 'brand'; name: string; slug: string };
+    const suggestions: SuggestItem[] = [];
 
     // Products
-    const products = await this.dataSource.query(
+    const products: SuggestRow[] = await this.dataSource.query(
       `SELECT product_name as name, product_slug as slug
        FROM products
        WHERE status != 'archived'
@@ -96,10 +98,10 @@ export class SearchService {
        LIMIT $2`,
       [`%${term}%`, Math.ceil(limit / 3)],
     );
-    suggestions.push(...products.map((p: any) => ({ type: 'product', ...p })));
+    suggestions.push(...products.map((p): SuggestItem => ({ type: 'product', name: p.name, slug: p.slug })));
 
     // Ingredients
-    const ingredients = await this.dataSource.query(
+    const ingredients: SuggestRow[] = await this.dataSource.query(
       `SELECT DISTINCT i.inci_name as name, i.ingredient_slug as slug
        FROM ingredients i
        LEFT JOIN ingredient_aliases a ON a.ingredient_id = i.ingredient_id
@@ -109,10 +111,10 @@ export class SearchService {
        LIMIT $2`,
       [`%${term}%`, Math.ceil(limit / 3)],
     );
-    suggestions.push(...ingredients.map((i: any) => ({ type: 'ingredient', ...i })));
+    suggestions.push(...ingredients.map((i): SuggestItem => ({ type: 'ingredient', name: i.name, slug: i.slug })));
 
     // Needs
-    const needs = await this.dataSource.query(
+    const needs: SuggestRow[] = await this.dataSource.query(
       `SELECT need_name as name, need_slug as slug
        FROM needs
        WHERE is_active = true AND (need_name ILIKE $1 OR user_friendly_label ILIKE $1)
@@ -120,10 +122,10 @@ export class SearchService {
        LIMIT $2`,
       [`%${term}%`, Math.ceil(limit / 4)],
     );
-    suggestions.push(...needs.map((n: any) => ({ type: 'need', ...n })));
+    suggestions.push(...needs.map((n): SuggestItem => ({ type: 'need', name: n.name, slug: n.slug })));
 
     // Brands
-    const brands = await this.dataSource.query(
+    const brands: SuggestRow[] = await this.dataSource.query(
       `SELECT brand_name as name, brand_slug as slug
        FROM brands
        WHERE brand_name ILIKE $1
@@ -131,7 +133,7 @@ export class SearchService {
        LIMIT $2`,
       [`%${term}%`, Math.ceil(limit / 4)],
     );
-    suggestions.push(...brands.map((b: any) => ({ type: 'brand', ...b })));
+    suggestions.push(...brands.map((b): SuggestItem => ({ type: 'brand', name: b.name, slug: b.slug })));
 
     const result = suggestions.slice(0, limit);
     await this.cache.set(cacheKey, result, SUGGEST_CACHE_TTL);

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import ListModal from '@/components/public/ListModal';
+import ProductCarousel from '@/components/public/ProductCarousel';
 
 // === Types ===
 
@@ -410,7 +411,7 @@ export default async function NeedDetailPage({
                 </div>
               }
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <ProductCarousel>
                 {topScores.slice(0, 6).map((score) => {
                   const product = score.product;
                   if (!product) return null;
@@ -421,7 +422,7 @@ export default async function NeedDetailPage({
                     <Link
                       key={score.product_need_score_id}
                       href={`/urunler/${product.product_slug}`}
-                      className="curator-card overflow-hidden group"
+                      className="curator-card overflow-hidden group snap-start shrink-0 w-[220px] sm:w-[240px]"
                     >
                       <div className="h-32 bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                         {primaryImg ? (
@@ -471,7 +472,7 @@ export default async function NeedDetailPage({
                     </Link>
                   );
                 })}
-              </div>
+              </ProductCarousel>
             </ListModal>
           ) : (
             <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">

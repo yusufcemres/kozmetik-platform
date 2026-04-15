@@ -70,8 +70,10 @@ export class ProductsService {
     brand_id?: number; category_id?: number; category_slug?: string; status?: string;
     target_area?: string; usage_time?: string; product_type?: string; need_id?: number;
     domain_type?: string; ingredient_slug?: string; target_gender?: string;
+    sort?: 'newest' | 'oldest' | 'name' | 'name_desc' | 'score';
   }) {
     const { page, limit, search, brand_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
+    const sort = query.sort ?? 'newest';
     let { category_id } = query;
     const { category_slug } = query;
     const where: any = {};
@@ -155,10 +157,48 @@ export class ProductsService {
       return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
     }
 
+    // Score sort requires aggregation — use QueryBuilder
+    if (sort === 'score') {
+      const qb = this.repo.createQueryBuilder('p')
+        .leftJoinAndSelect('p.brand', 'b')
+        .leftJoinAndSelect('p.category', 'cat')
+        .leftJoinAndSelect('p.label', 'lbl')
+        .leftJoinAndSelect('p.images', 'img')
+        .leftJoin('p.need_scores', 'ns')
+        .addSelect('COALESCE(AVG(ns.compatibility_score), 0)', 'avg_score')
+        .groupBy('p.product_id')
+        .addGroupBy('b.brand_id')
+        .addGroupBy('cat.category_id')
+        .addGroupBy('lbl.product_label_id')
+        .addGroupBy('img.image_id')
+        .orderBy('avg_score', 'DESC');
+
+      if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
+      if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
+      if (status) qb.andWhere('p.status = :st', { st: status });
+      if (domain_type) qb.andWhere('p.domain_type = :dt', { dt: domain_type });
+      if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
+      if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
+      if (product_type) qb.andWhere('p.product_type_label ILIKE :pt', { pt: `%${product_type}%` });
+      if (target_gender) qb.andWhere('p.target_gender = :tg', { tg: target_gender });
+      if (where.category_id) qb.andWhere('p.category_id IN (:...cids)', { cids: (where.category_id as any).value });
+
+      qb.skip((page - 1) * limit).take(limit);
+      const [data, total] = await qb.getManyAndCount();
+      return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    }
+
+    const orderMap: Record<string, Record<string, 'ASC' | 'DESC'>> = {
+      newest: { created_at: 'DESC' },
+      oldest: { created_at: 'ASC' },
+      name: { product_name: 'ASC' },
+      name_desc: { product_name: 'DESC' },
+    };
+
     const [data, total] = await this.repo.findAndCount({
       where,
       relations: ['brand', 'category', 'label', 'images'],
-      order: { created_at: 'DESC' },
+      order: orderMap[sort] ?? orderMap.newest,
       skip: (page - 1) * limit,
       take: limit,
     });

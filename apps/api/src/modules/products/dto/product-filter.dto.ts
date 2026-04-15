@@ -1,7 +1,10 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsIn } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { PaginationDto } from '@common/dto/pagination.dto';
+
+export const PRODUCT_SORT_OPTIONS = ['newest', 'oldest', 'name', 'name_desc', 'score'] as const;
+export type ProductSort = typeof PRODUCT_SORT_OPTIONS[number];
 
 export class ProductFilterDto extends PaginationDto {
   @ApiPropertyOptional()
@@ -58,4 +61,9 @@ export class ProductFilterDto extends PaginationDto {
   @IsOptional()
   @IsString()
   target_gender?: string;
+
+  @ApiPropertyOptional({ description: 'newest | oldest | name | name_desc | score', enum: PRODUCT_SORT_OPTIONS })
+  @IsOptional()
+  @IsIn(PRODUCT_SORT_OPTIONS as readonly string[])
+  sort?: ProductSort;
 }

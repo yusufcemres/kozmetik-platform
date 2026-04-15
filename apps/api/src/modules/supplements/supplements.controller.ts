@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SupplementsService } from './supplements.service';
+import { SupplementScoringService } from '../scoring/supplement-scoring.service';
 import { CreateSupplementDetailDto, UpdateSupplementDetailDto, SupplementIngredientDto } from './dto/create-supplement.dto';
 import { PaginationDto } from '@common/dto/pagination.dto';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
@@ -13,7 +14,10 @@ import { Roles } from '@common/decorators/roles.decorator';
 @ApiTags('Supplements')
 @Controller()
 export class SupplementsController {
-  constructor(private readonly service: SupplementsService) {}
+  constructor(
+    private readonly service: SupplementsService,
+    private readonly scoringService: SupplementScoringService,
+  ) {}
 
   // === Public ===
 
@@ -23,10 +27,34 @@ export class SupplementsController {
     return this.service.findAllSupplements(query);
   }
 
+  @Get('supplements/top-by-nutrient/:ingredientSlug')
+  @ApiOperation({ summary: 'Belirli bir nutrient için en yüksek skorlu supplement ürünler' })
+  topByNutrient(
+    @Param('ingredientSlug') ingredientSlug: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.scoringService.getTopByNutrient(ingredientSlug, limit ? parseInt(limit) : 10);
+  }
+
   @Get('supplements/:productId')
   @ApiOperation({ summary: 'Supplement detay (public)' })
   findOne(@Param('productId', ParseIntPipe) productId: number) {
     return this.service.findByProductId(productId);
+  }
+
+  @Get('supplements/:productId/score')
+  @ApiOperation({ summary: 'Supplement skoru (form kalitesi + dozaj + etkileşim + şeffaflık + sertifika)' })
+  getScore(@Param('productId', ParseIntPipe) productId: number) {
+    return this.scoringService.calculateScore(productId);
+  }
+
+  @Post('admin/supplements/:productId/recalculate-score')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Supplement skorunu yeniden hesapla' })
+  recalculateScore(@Param('productId', ParseIntPipe) productId: number) {
+    return this.scoringService.calculateScore(productId);
   }
 
   // === Admin ===

@@ -25,6 +25,7 @@ interface RecommendedProduct {
   product_slug: string;
   brand?: { brand_name: string };
   images?: { image_url: string }[];
+  supplement_score?: { overall_score: number };
 }
 
 // === Quiz Steps ===
@@ -243,19 +244,25 @@ export default function NutritionAnalysisPage() {
   useEffect(() => {
     if (!result) return;
     const highRiskNutrients = result.risks.filter(r => r.risk === 'high' || r.risk === 'medium').map(r => r.nutrient);
-    const slugs = highRiskNutrients.flatMap(n => NUTRIENT_SLUG_MAP[n] || []).slice(0, 3);
-    if (slugs.length === 0) return;
+    const primarySlugs = highRiskNutrients
+      .map(n => NUTRIENT_SLUG_MAP[n]?.[0])
+      .filter((s): s is string => Boolean(s))
+      .slice(0, 4);
+    if (primarySlugs.length === 0) return;
 
     Promise.all(
-      slugs.map(slug =>
-        api.get<{ data: RecommendedProduct[] }>(`/products?ingredient_slug=${slug}&domain_type=supplement&limit=2`)
-          .then(res => res.data || [])
+      primarySlugs.map(slug =>
+        api.get<RecommendedProduct[]>(`/supplements/top-by-nutrient/${slug}?limit=2`)
+          .then(res => Array.isArray(res) ? res : [])
           .catch(() => [] as RecommendedProduct[])
       )
     ).then(results => {
       const unique = new Map<number, RecommendedProduct>();
       results.flat().forEach(p => { if (!unique.has(p.product_id)) unique.set(p.product_id, p); });
-      setRecommendedProducts([...unique.values()].slice(0, 6));
+      const sorted = [...unique.values()].sort(
+        (a, b) => (b.supplement_score?.overall_score ?? 0) - (a.supplement_score?.overall_score ?? 0),
+      );
+      setRecommendedProducts(sorted.slice(0, 6));
     });
   }, [result]);
 
@@ -338,7 +345,12 @@ export default function NutritionAnalysisPage() {
                   href={`/takviyeler/${p.product_slug}`}
                   className="curator-card group overflow-hidden"
                 >
-                  <div className="aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
+                    {p.supplement_score?.overall_score != null && (
+                      <div className="absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-xs font-bold shadow-md bg-primary text-on-primary">
+                        {p.supplement_score.overall_score}
+                      </div>
+                    )}
                     {p.images?.[0]?.image_url ? (
                       <img src={p.images[0].image_url} alt={p.product_name} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                     ) : (

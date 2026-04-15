@@ -342,7 +342,9 @@ function ResultsContent() {
               `/scoring/needs/${needId}/top-products?limit=5`,
             );
             if (scores) allProducts.push(...scores.map(s => ({ ...s, needId })));
-          } catch {}
+          } catch (err) {
+            console.error(`[cilt-analizi] top-products fetch failed for need ${needId}:`, err);
+          }
         }
 
         const productMap = new Map<number, ProductScore>();
@@ -376,7 +378,9 @@ function ResultsContent() {
             localStorage.setItem('skin_profile', JSON.stringify(prof));
             window.dispatchEvent(new Event('skin-profile-changed'));
           }
-        } catch {}
+        } catch (err) {
+          console.error('[cilt-analizi] localStorage skin_profile update failed:', err);
+        }
 
         const avoid: string[] = [];
         if (sensitivityList.includes('fragrance')) avoid.push('Parfum (Fragrance)', 'Linalool', 'Limonene', 'Citronellol');

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProductCarousel from './ProductCarousel';
 
 interface RecentProduct {
   product_id: number;
@@ -70,12 +71,12 @@ export default function RecentlyViewed({
         </span>
         Son Görüntülenenler
       </h2>
-      <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
+      <ProductCarousel>
         {items.map((item) => (
           <Link
             key={item.product_id}
             href={`/urunler/${item.product_slug}`}
-            className="curator-card overflow-hidden shrink-0 w-36 group"
+            className="curator-card overflow-hidden snap-start shrink-0 w-36 group"
           >
             <div className="aspect-square bg-surface-container-low overflow-hidden relative">
               {item.image_url ? (
@@ -107,7 +108,7 @@ export default function RecentlyViewed({
             </div>
           </Link>
         ))}
-      </div>
+      </ProductCarousel>
     </section>
   );
 }
