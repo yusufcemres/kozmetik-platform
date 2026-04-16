@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
+import ScoreBadge from '@/components/public/ScoreBadge';
 
 // === Types ===
 
@@ -46,6 +47,15 @@ interface SupplementDetail {
   servings_per_container?: number;
 }
 
+interface EvidenceScore {
+  overall_score: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  algorithm_version: string;
+  breakdown: Record<string, number>;
+  explanation?: { component: string; value: number; delta: number; reason: string }[];
+  floor_cap_applied?: string;
+}
+
 interface Product {
   product_id: number;
   product_name: string;
@@ -58,6 +68,7 @@ interface Product {
   need_scores?: NeedScore[];
   affiliate_links?: AffiliateLink[];
   supplement_detail?: SupplementDetail;
+  evidence_score?: EvidenceScore | null;
 }
 
 interface Suggestion {
@@ -168,14 +179,19 @@ function ProductSlot({
             <p className="label-caps text-outline">{product.brand.brand_name}</p>
           )}
           <h3 className="font-semibold text-sm text-on-surface line-clamp-2 tracking-tight">{product.product_name}</h3>
-          {score !== null && (
+          {product.evidence_score ? (
+            <div className="mt-2 flex items-center gap-2">
+              <ScoreBadge score={product.evidence_score.overall_score} grade={product.evidence_score.grade} size="sm" />
+              <span className="text-[10px] text-on-surface-variant">REVELA Skor</span>
+            </div>
+          ) : score !== null ? (
             <div className="mt-2 flex items-center gap-2">
               <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
                 <div className={`h-full rounded-full ${getScoreBarColor(score)}`} style={{ width: `${score}%` }} />
               </div>
               <span className={`text-[10px] font-bold ${getScoreColor(score)}`}>%{score}</span>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     );
@@ -378,6 +394,104 @@ export default function ComparePage() {
               </div>
             </section>
           )}
+
+          {/* Evidence-Based Score Comparison */}
+          {selected.some(p => p.evidence_score) && (() => {
+            const scored = selected.filter(p => p.evidence_score);
+            if (scored.length < 2) return null;
+
+            const SUPP_LABELS: Record<string, string> = {
+              form_quality: 'Form Kalitesi', dose_efficacy: 'Doz Etkinliği',
+              evidence_grade: 'Kanıt Seviyesi', third_party_testing: 'Bağımsız Test',
+              interaction_safety: 'Etkileşim', transparency_and_tier: 'Şeffaflık',
+            };
+            const COS_LABELS: Record<string, string> = {
+              active_efficacy: 'Aktif Etkinlik', safety_class: 'Güvenlik Sınıfı',
+              concentration_fit: 'Konsantrasyon', interaction_safety: 'Etkileşim',
+              allergen_load: 'Alerjen Yükü', cmr_endocrine: 'CMR/Endokrin',
+              transparency: 'Şeffaflık',
+            };
+
+            const isSupp = scored[0].evidence_score!.algorithm_version.startsWith('supplement');
+            const labels = isSupp ? SUPP_LABELS : COS_LABELS;
+            const keys = Object.keys(labels);
+
+            return (
+              <section>
+                <h2 className="text-xl font-bold text-on-surface mb-4">REVELA Skor Karşılaştırması</h2>
+                <div className="curator-card overflow-hidden">
+                  {/* Overall scores */}
+                  <div className="flex items-center justify-around p-6 bg-surface-container-low border-b border-outline-variant/20">
+                    {selected.map(p => (
+                      <div key={p.product_id} className="flex flex-col items-center gap-2">
+                        <p className="text-xs text-on-surface-variant truncate max-w-[140px]">{p.brand?.brand_name}</p>
+                        {p.evidence_score ? (
+                          <ScoreBadge score={p.evidence_score.overall_score} grade={p.evidence_score.grade} size="lg" />
+                        ) : (
+                          <span className="text-outline text-sm">Skor yok</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Breakdown bars */}
+                  <table className="w-full text-sm">
+                    <tbody className="divide-y divide-outline-variant/20">
+                      {keys.map(key => {
+                        const values = selected.map(p => p.evidence_score?.breakdown?.[key] ?? null);
+                        const validValues = values.filter((v): v is number => v !== null);
+                        const maxVal = Math.max(...validValues, 1);
+                        const minVal = Math.min(...validValues, 0);
+
+                        return (
+                          <tr key={key} className="hover:bg-surface-container-low/50 transition-colors">
+                            <td className="px-4 py-3 text-on-surface-variant font-medium w-40">{labels[key]}</td>
+                            {selected.map((p, idx) => {
+                              const val = p.evidence_score?.breakdown?.[key];
+                              if (val == null) return <td key={p.product_id} className="px-4 py-3 text-center text-outline">-</td>;
+                              const isBest = validValues.length >= 2 && val === maxVal && validValues.filter(v => v === maxVal).length === 1;
+                              const isWorst = validValues.length >= 2 && val === minVal && validValues.filter(v => v === minVal).length === 1;
+                              return (
+                                <td key={p.product_id} className="px-4 py-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full transition-all ${val >= 70 ? 'bg-score-high' : val >= 40 ? 'bg-score-medium' : 'bg-score-low'}`}
+                                        style={{ width: `${val}%` }}
+                                      />
+                                    </div>
+                                    <span className={`text-xs font-bold min-w-[28px] text-right ${isBest ? 'text-score-high' : isWorst ? 'text-score-low' : 'text-on-surface-variant'}`}>
+                                      {val}
+                                    </span>
+                                  </div>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+
+                  {/* Floor cap warnings */}
+                  {selected.some(p => p.evidence_score?.floor_cap_applied) && (
+                    <div className="p-4 border-t border-outline-variant/20 bg-error/5">
+                      {selected.filter(p => p.evidence_score?.floor_cap_applied).map(p => (
+                        <p key={p.product_id} className="text-xs text-error">
+                          <span className="font-semibold">{p.brand?.brand_name}:</span> Skor tavanı uygulandı ({p.evidence_score!.floor_cap_applied})
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-outline mt-2">
+                  <Link href="/nasil-puanliyoruz" className="hover:text-primary underline-offset-2 hover:underline transition-colors">
+                    Metodoloji hakkında bilgi al
+                  </Link>
+                </p>
+              </section>
+            );
+          })()}
 
           {/* Ingredient diff */}
           <section>

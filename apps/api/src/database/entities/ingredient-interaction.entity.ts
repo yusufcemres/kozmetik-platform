@@ -49,6 +49,17 @@ export class IngredientInteraction {
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
+  // ── Atıf alanları (Migration 019) ─────────────────────────────
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  citation_source: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  citation_url: string | null;
+
+  @Column({ type: 'varchar', length: 1, nullable: true })
+  evidence_level: string | null; // A|B|C|D
+
   @CreateDateColumn()
   created_at: Date;
 

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import ScoreBadge from '@/components/public/ScoreBadge';
 
 interface SearchResult {
   type: 'product' | 'ingredient' | 'need' | 'brand';
@@ -27,6 +28,8 @@ interface Suggestion {
   id?: number;
   name: string;
   slug: string;
+  score?: number;
+  grade?: 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
 const TYPE_CONFIG: Record<string, { label: string; icon: string; path: string }> = {
@@ -192,6 +195,9 @@ function SearchPageContent() {
                     >
                       <span className="material-icon text-outline-variant" aria-hidden="true">{cfg.icon}</span>
                       <span className="flex-1 text-sm font-medium text-on-surface">{s.name}</span>
+                      {s.type === 'product' && s.score != null && (
+                        <ScoreBadge score={s.score} grade={s.grade} size="sm" />
+                      )}
                       <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm">
                         {cfg.label}
                       </span>

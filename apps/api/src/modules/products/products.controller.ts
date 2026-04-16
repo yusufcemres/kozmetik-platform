@@ -31,14 +31,19 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Ürünleri listele' })
-  findAll(@Query() query: ProductFilterDto) {
-    return this.service.findAll({
+  @ApiQuery({ name: 'include_score', required: false, description: 'true ise precomputed skor eklenir' })
+  async findAll(@Query() query: ProductFilterDto, @Query('include_score') includeScore?: string) {
+    const result = await this.service.findAll({
       ...query,
       brand_id: query.brand_id ? Number(query.brand_id) : undefined,
       category_id: query.category_id ? Number(query.category_id) : undefined,
       category_slug: query.category_slug || undefined,
       need_id: query.need_id ? Number(query.need_id) : undefined,
     });
+    if (includeScore === 'true' && result.data?.length) {
+      result.data = await this.service.attachScores(result.data);
+    }
+    return result;
   }
 
   @Get('top-scored')
@@ -65,11 +70,11 @@ export class ProductsController {
   }
 
   @Get('compare')
-  @ApiOperation({ summary: 'Ürünleri karşılaştır (çoklu ID)' })
+  @ApiOperation({ summary: 'Ürünleri karşılaştır (çoklu ID, skor dahil)' })
   @ApiQuery({ name: 'ids', required: true, description: 'Virgülle ayrılmış product ID\'leri' })
   compare(@Query('ids') ids: string) {
     const idArr = ids.split(',').map(Number).filter(Boolean).slice(0, 4);
-    return this.service.findByIds(idArr);
+    return this.service.findByIdsWithScores(idArr);
   }
 
   @Get('popular-brands')

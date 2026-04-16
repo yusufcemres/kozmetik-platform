@@ -43,11 +43,13 @@ export interface Product {
   short_description: string;
   product_type_label: string;
   status: string;
+  domain_type?: 'cosmetic' | 'supplement' | string;
   brand?: { brand_id: number; brand_name: string; brand_slug: string };
   category?: { category_id: number; category_name: string };
   images?: { image_url: string; sort_order: number }[];
   need_scores?: { need_id: number; score: number; need?: { need_name: string } }[];
   affiliate_links?: AffiliateLink[];
+  score?: { overall_score: number; grade: ScoreGrade; algorithm_version: string } | null;
 }
 
 export interface Ingredient {
@@ -109,6 +111,76 @@ export interface PersonalScore {
   penalties: string[];
 }
 
+// === Evidence-based scoring (REVELA v2) ===
+
+export type ScoreGrade = 'A' | 'B' | 'C' | 'D' | 'F';
+
+export interface ExplanationItem {
+  component: string;
+  value: number;
+  delta: number;
+  reason: string;
+  citation?: {
+    source: string;
+    url?: string;
+    pmid?: string;
+    doi?: string;
+    opinion_ref?: string;
+    year?: number;
+    accessed?: string;
+  };
+}
+
+export interface SupplementScore {
+  product_id: number;
+  algorithm_version: string;
+  overall_score: number;
+  grade: ScoreGrade;
+  breakdown: {
+    form_quality: number;
+    dose_efficacy: number;
+    evidence_grade: number;
+    third_party_testing: number;
+    interaction_safety: number;
+    transparency_and_tier: number;
+  };
+  explanation: ExplanationItem[];
+  flags: {
+    proprietary_blends: string[];
+    ul_exceeded: string[];
+    harmful_interactions: string[];
+  };
+  floor_cap_applied?: string;
+  calculated_at: string;
+}
+
+export interface CosmeticScore {
+  product_id: number;
+  algorithm_version: string;
+  overall_score: number;
+  grade: ScoreGrade;
+  breakdown: {
+    active_efficacy: number;
+    safety_class: number;
+    concentration_fit: number;
+    interaction_safety: number;
+    allergen_load: number;
+    cmr_endocrine: number;
+    transparency: number;
+  };
+  explanation: ExplanationItem[];
+  flags: {
+    allergens: string[];
+    fragrances: string[];
+    harmful: string[];
+    cmr: string[];
+    endocrine: string[];
+    eu_banned: string[];
+  };
+  floor_cap_applied?: string;
+  calculated_at: string;
+}
+
 // === API Functions ===
 
 // Products
@@ -128,6 +200,12 @@ export const getPersonalScore = (productId: number, profileId: string) =>
   api.get<PersonalScore>(`/products/${productId}/personal-score`, {
     params: { profile_id: profileId },
   });
+
+export const getSupplementScore = (productId: number) =>
+  api.get<SupplementScore>(`/supplements/${productId}/score`);
+
+export const getCosmeticScore = (productId: number) =>
+  api.get<CosmeticScore>(`/products/${productId}/cosmetic-score`);
 
 // Ingredients
 export const getIngredients = (params?: { page?: number; limit?: number; search?: string }) =>

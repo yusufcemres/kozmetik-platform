@@ -4,6 +4,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ScoringService } from './scoring.service';
+import { SupplementScoringService } from './supplement-scoring.service';
+import { CosmeticScoringService } from './cosmetic-scoring.service';
+import { CacheService } from '@common/cache/cache.service';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
@@ -11,7 +14,12 @@ import { Roles } from '@common/decorators/roles.decorator';
 @ApiTags('Scoring')
 @Controller()
 export class ScoringController {
-  constructor(private readonly service: ScoringService) {}
+  constructor(
+    private readonly service: ScoringService,
+    private readonly supplementScoring: SupplementScoringService,
+    private readonly cosmeticScoring: CosmeticScoringService,
+    private readonly cache: CacheService,
+  ) {}
 
   @Post('products/:id/calculate-scores')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -95,5 +103,61 @@ export class ScoringController {
     @Body('value') value: number,
   ) {
     return this.service.updateConfig(key, value);
+  }
+
+  // ── Supplement Evidence-Based Scoring (v2) ─────────────────────
+
+  @Get('supplements/:id/score')
+  @ApiOperation({ summary: 'Takviye evidence-based skoru (v2)' })
+  getSupplementScore(@Param('id', ParseIntPipe) id: number) {
+    return this.supplementScoring.calculateScore(id);
+  }
+
+  @Post('admin/supplements/:id/recalculate-score')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Takviye skorunu yeniden hesapla' })
+  async recalculateSupplementScore(@Param('id', ParseIntPipe) id: number) {
+    await this.cache.del(`score:${id}:supplement-v2`);
+    return this.supplementScoring.calculateScore(id, true);
+  }
+
+  @Get('supplements/top-by-nutrient/:slug')
+  @ApiOperation({ summary: 'Besine göre en iyi takviyeler' })
+  @ApiQuery({ name: 'limit', required: false })
+  getTopByNutrient(
+    @Param('slug') slug: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.supplementScoring.getTopByNutrient(slug, limit ? parseInt(limit) : 10);
+  }
+
+  // ── Cosmetic Evidence-Based Scoring (v1) ───────────────────────
+
+  @Get('products/:id/cosmetic-score')
+  @ApiOperation({ summary: 'Kozmetik evidence-based skoru (v1)' })
+  getCosmeticScore(@Param('id', ParseIntPipe) id: number) {
+    return this.cosmeticScoring.calculateScore(id);
+  }
+
+  @Post('admin/products/:id/recalculate-cosmetic-score')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kozmetik skorunu yeniden hesapla' })
+  async recalculateCosmeticScore(@Param('id', ParseIntPipe) id: number) {
+    await this.cache.del(`score:${id}:cosmetic-v1`);
+    return this.cosmeticScoring.calculateScore(id, true);
+  }
+
+  @Get('products/top-by-concern/:slug')
+  @ApiOperation({ summary: 'Cilt sorununa göre en iyi ürünler' })
+  @ApiQuery({ name: 'limit', required: false })
+  getTopByConcern(
+    @Param('slug') slug: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.cosmeticScoring.getTopByConcern(slug, limit ? parseInt(limit) : 10);
   }
 }

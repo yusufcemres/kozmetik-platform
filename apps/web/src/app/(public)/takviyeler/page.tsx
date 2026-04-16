@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { ScoreOverlayBadge } from '@/components/public/ScoreBadge';
 
 interface SupplementProduct {
   product_id: number;
@@ -199,9 +200,7 @@ function SupplementsListInner() {
                   {/* Image */}
                   <div className="relative aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
                     {scores[p.product_id] != null && (
-                      <div className={`absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${scoreBadgeClass(scores[p.product_id])}`}>
-                        {scores[p.product_id]}
-                      </div>
+                      <ScoreOverlayBadge score={scores[p.product_id]} />
                     )}
                     {img ? (
                       <img

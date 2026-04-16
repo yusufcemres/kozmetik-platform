@@ -53,6 +53,14 @@ export class ProductIngredient {
   @Column({ type: 'decimal', precision: 4, scale: 2, nullable: true })
   match_confidence: number;
 
+  // ── Konsantrasyon (Migration 020) ───────────────────────────────
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  concentration_percent: number | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  concentration_source: string | null; // manufacturer | estimated | unknown
+
   @CreateDateColumn()
   created_at: Date;
 

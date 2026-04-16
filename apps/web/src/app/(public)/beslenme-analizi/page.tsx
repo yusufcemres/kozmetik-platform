@@ -5,6 +5,8 @@ import Link from 'next/link';
 import QuizEngine, { QuizAnswers, QuizStep } from '@/components/quiz/QuizEngine';
 import QuizResult, { QuizResultData } from '@/components/quiz/QuizResult';
 import { api } from '@/lib/api';
+import ProductCarousel from '@/components/public/ProductCarousel';
+import { ScoreOverlayBadge } from '@/components/public/ScoreBadge';
 
 // Nutrient → ingredient_slug mapping for product recommendations
 const NUTRIENT_SLUG_MAP: Record<string, string[]> = {
@@ -338,18 +340,16 @@ export default function NutritionAnalysisPage() {
               <span className="material-icon text-primary" aria-hidden="true">medication</span>
               Sana Özel Takviye Önerileri
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ProductCarousel>
               {recommendedProducts.map(p => (
                 <Link
                   key={p.product_id}
                   href={`/takviyeler/${p.product_slug}`}
-                  className="curator-card group overflow-hidden"
+                  className="curator-card group overflow-hidden snap-start shrink-0 w-[260px]"
                 >
                   <div className="relative aspect-[16/9] bg-surface-container-low flex items-center justify-center overflow-hidden">
                     {p.supplement_score?.overall_score != null && (
-                      <div className="absolute top-3 right-3 z-10 rounded-full px-2.5 py-1 text-xs font-bold shadow-md bg-primary text-on-primary">
-                        {p.supplement_score.overall_score}
-                      </div>
+                      <ScoreOverlayBadge score={p.supplement_score.overall_score} />
                     )}
                     {p.images?.[0]?.image_url ? (
                       <img src={p.images[0].image_url} alt={p.product_name} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300" loading="lazy" />
@@ -363,7 +363,7 @@ export default function NutritionAnalysisPage() {
                   </div>
                 </Link>
               ))}
-            </div>
+            </ProductCarousel>
           </div>
         )}
       </div>

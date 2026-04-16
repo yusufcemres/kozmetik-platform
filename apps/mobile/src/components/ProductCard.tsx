@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Product } from '../services/api';
+import ScoreBadge from './ScoreBadge';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
 
 interface Props {
@@ -15,13 +16,24 @@ export default function ProductCard({ product, onPress, compact }: Props) {
 
   return (
     <TouchableOpacity style={[styles.card, compact && styles.cardCompact]} onPress={onPress}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={[styles.image, compact && styles.imageCompact]} />
-      ) : (
-        <View style={[styles.imagePlaceholder, compact && styles.imageCompact]}>
-          <Text style={styles.placeholderIcon}>📦</Text>
-        </View>
-      )}
+      <View style={styles.imageWrap}>
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={[styles.image, compact && styles.imageCompact]} />
+        ) : (
+          <View style={[styles.imagePlaceholder, compact && styles.imageCompact]}>
+            <Text style={styles.placeholderIcon}>📦</Text>
+          </View>
+        )}
+        {product.score && (
+          <View style={styles.badgeOverlay}>
+            <ScoreBadge
+              score={product.score.overall_score}
+              grade={product.score.grade}
+              size="sm"
+            />
+          </View>
+        )}
+      </View>
       <View style={styles.content}>
         {brandName && <Text style={styles.brand}>{brandName}</Text>}
         <Text style={styles.name} numberOfLines={2}>
@@ -44,6 +56,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: 160,
   },
+  imageWrap: { position: 'relative' },
+  badgeOverlay: { position: 'absolute', top: spacing.xs, right: spacing.xs },
   cardCompact: {
     width: '100%',
     flexDirection: 'row',

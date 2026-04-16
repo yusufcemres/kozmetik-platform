@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import ProductCarousel from '@/components/public/ProductCarousel';
 
 interface Need {
   need_id: number;
@@ -196,12 +197,12 @@ function NeedsListContent() {
                         {meta?.desc && (
                           <p className="text-sm text-on-surface-variant mb-5 ml-9">{meta.desc}</p>
                         )}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <ProductCarousel>
                           {domainGrouped[cat].map((need) => (
                             <Link
                               key={need.need_id}
                               href={`/ihtiyaclar/${need.need_slug}`}
-                              className="curator-card p-5 group"
+                              className="curator-card p-5 group snap-start shrink-0 w-[260px] sm:w-[280px]"
                             >
                               <h3 className="font-semibold text-on-surface group-hover:text-primary transition-colors tracking-tight">
                                 {need.need_name}
@@ -222,7 +223,7 @@ function NeedsListContent() {
                               </span>
                             </Link>
                           ))}
-                        </div>
+                        </ProductCarousel>
                       </section>
                     );
                   })}

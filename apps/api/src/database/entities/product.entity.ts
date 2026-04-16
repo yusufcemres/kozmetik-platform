@@ -17,6 +17,7 @@ import { ProductImage } from './product-image.entity';
 import { ProductIngredient } from './product-ingredient.entity';
 import { ProductNeedScore } from './product-need-score.entity';
 import { AffiliateLink } from './affiliate-link.entity';
+import { ProductScore } from './product-score.entity';
 
 @Entity('products')
 export class Product {
@@ -106,6 +107,9 @@ export class Product {
 
   @OneToMany(() => AffiliateLink, (link) => link.product)
   affiliate_links: AffiliateLink[];
+
+  @OneToMany(() => ProductScore, (ps) => ps.product)
+  product_scores: ProductScore[];
 
   @CreateDateColumn()
   created_at: Date;

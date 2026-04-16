@@ -4,6 +4,7 @@ import { Repository, Like, ILike, In } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
   AffiliateLink, AffiliateClick, FormulaRevision, PriceHistory, Category,
+  ProductScore,
 } from '@database/entities';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -35,6 +36,8 @@ export class ProductsService {
     private readonly categoryRepo: Repository<Category>,
     @InjectRepository(AffiliateClick)
     private readonly clickRepo: Repository<AffiliateClick>,
+    @InjectRepository(ProductScore)
+    private readonly scoreRepo: Repository<ProductScore>,
   ) {}
 
   async create(dto: CreateProductDto) {
@@ -207,6 +210,54 @@ export class ProductsService {
       data,
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
+  }
+
+  /**
+   * Attach precomputed scores to a product list (eliminates N+1 score fetches).
+   */
+  async attachScores(products: Product[]): Promise<(Product & { score?: { overall_score: number; grade: string; algorithm_version: string } })[]> {
+    if (!products.length) return products;
+    const ids = products.map(p => p.product_id);
+    const scores = await this.scoreRepo.find({
+      where: { product_id: In(ids) },
+      select: ['product_id', 'overall_score', 'grade', 'algorithm_version'],
+    });
+    const scoreMap = new Map(scores.map(s => [s.product_id, s]));
+    return products.map(p => {
+      const s = scoreMap.get(p.product_id);
+      return {
+        ...p,
+        score: s ? { overall_score: s.overall_score, grade: s.grade, algorithm_version: s.algorithm_version } : undefined,
+      };
+    });
+  }
+
+  /**
+   * findByIds with full score breakdown attached (for /karsilastir).
+   */
+  async findByIdsWithScores(ids: number[]) {
+    if (!ids.length) return [];
+    const products = await this.repo.find({
+      where: ids.map(id => ({ product_id: id })),
+      relations: [
+        'brand', 'category', 'images', 'affiliate_links',
+        'ingredients', 'ingredients.ingredient',
+        'need_scores', 'need_scores.need',
+      ],
+      order: { ingredients: { inci_order_rank: 'ASC' } },
+    });
+    const scores = await this.scoreRepo.find({
+      where: { product_id: In(ids) },
+    });
+    const scoreMap = new Map(scores.map(s => [`${s.product_id}:${s.algorithm_version}`, s]));
+    return products.map(p => {
+      const suppScore = scoreMap.get(`${p.product_id}:supplement-v2`);
+      const cosScore = scoreMap.get(`${p.product_id}:cosmetic-v1`);
+      return {
+        ...p,
+        evidence_score: suppScore || cosScore || null,
+      };
+    });
   }
 
   async findTopScored(limit = 6, brandId?: number) {

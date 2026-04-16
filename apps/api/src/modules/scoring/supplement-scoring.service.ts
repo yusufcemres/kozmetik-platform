@@ -3,35 +3,82 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import {
   Product, SupplementDetail, SupplementIngredient, Ingredient,
-  IngredientInteraction,
+  IngredientInteraction, ProductScore,
 } from '@database/entities';
+import { CacheService } from '@common/cache/cache.service';
+
+// ── Types ────────────────────────────────────────────────────────
+
+export interface ExplanationItem {
+  component: string;
+  value: number;
+  delta: number;
+  reason: string;
+  citation?: {
+    source: string;
+    url?: string;
+    pmid?: string;
+    doi?: string;
+    opinion_ref?: string;
+    year?: number;
+  };
+}
 
 export interface SupplementScoreBreakdown {
   form_quality: number;
-  dosage_adequacy: number;
-  interaction_score: number;
-  transparency: number;
-  certification: number;
+  dose_efficacy: number;
+  evidence_grade: number;
+  third_party_testing: number;
+  interaction_safety: number;
+  transparency_and_tier: number;
 }
 
 export interface SupplementScoreResult {
   product_id: number;
+  algorithm_version: string;
   overall_score: number;
+  grade: string;
   breakdown: SupplementScoreBreakdown;
-  explanation: string[];
+  explanation: ExplanationItem[];
+  flags: { proprietary_blends: string[]; ul_exceeded: string[]; harmful_interactions: string[] };
+  floor_cap_applied?: string;
   calculated_at: string;
 }
 
-const DEFAULT_BIOAVAILABILITY = 50;
-const INTERACTION_DELTA: Record<string, number> = {
-  synergistic: 10,
-  none: 0,
-  mild: -5,
-  moderate: -10,
-  severe: -20,
-  contraindicated: -30,
+// ── Constants ────────────────────────────────────────────────────
+
+const ALGO_VERSION = 'supplement-v2';
+
+const WEIGHTS = {
+  form_quality: 0.25,
+  dose_efficacy: 0.25,
+  evidence_grade: 0.15,
+  third_party_testing: 0.15,
+  interaction_safety: 0.10,
+  transparency_and_tier: 0.10,
 };
-const CERT_BONUS: Record<string, number> = { GMP: 5, NSF: 5, USP: 10 };
+
+const EVIDENCE_SCORE: Record<string, number> = { A: 100, B: 80, C: 60, D: 40, E: 20 };
+const INTERACTION_DELTA: Record<string, number> = {
+  synergistic: 8, none: 0, mild: -5, moderate: -12, severe: -20, contraindicated: -30,
+};
+const CERT_BONUS: Record<string, number> = {
+  USP_VERIFIED: 25, NSF_CERTIFIED: 20, NSF_SPORT: 20,
+  CONSUMERLAB_PASS: 15, LABDOOR_A: 15, INFORMED_SPORT: 10,
+  GMP: 5, PHARMA_GRADE: 5,
+};
+
+function clamp(v: number): number { return Math.max(0, Math.min(100, v)); }
+
+function gradeFromScore(score: number): string {
+  if (score >= 85) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 55) return 'C';
+  if (score >= 40) return 'D';
+  return 'F';
+}
+
+// ── Service ──────────────────────────────────────────────────────
 
 @Injectable()
 export class SupplementScoringService {
@@ -46,14 +93,22 @@ export class SupplementScoringService {
     private readonly ingredientRepo: Repository<Ingredient>,
     @InjectRepository(IngredientInteraction)
     private readonly interactionRepo: Repository<IngredientInteraction>,
+    @InjectRepository(ProductScore)
+    private readonly scoreRepo: Repository<ProductScore>,
+    private readonly cache: CacheService,
   ) {}
 
-  async calculateScore(productId: number): Promise<SupplementScoreResult> {
+  async calculateScore(productId: number, persist = true): Promise<SupplementScoreResult> {
+    // Cache check (skip on forced recalculate = persist+force)
+    const cacheKey = `score:${productId}:${ALGO_VERSION}`;
+    if (persist) {
+      const cached = await this.cache.get<SupplementScoreResult>(cacheKey);
+      if (cached) return cached;
+    }
+
     const product = await this.productRepo.findOne({ where: { product_id: productId } });
     if (!product) throw new NotFoundException('Ürün bulunamadı');
-    if (product.domain_type !== 'supplement') {
-      throw new BadRequestException('Ürün supplement değil');
-    }
+    if (product.domain_type !== 'supplement') throw new BadRequestException('Ürün supplement değil');
 
     const detail = await this.detailRepo.findOne({ where: { product_id: productId } });
     const facts = await this.suppIngRepo.find({
@@ -61,47 +116,110 @@ export class SupplementScoringService {
       relations: ['ingredient'],
     });
 
-    const explanation: string[] = [];
+    const explanation: ExplanationItem[] = [];
+    const flags = { proprietary_blends: [] as string[], ul_exceeded: [] as string[], harmful_interactions: [] as string[] };
 
-    // 1. Form quality — bioavailability ağırlıklı ortalama
+    // ── 1. Form Quality (25%) ──────────────────────────────────
     const formQuality = this.calcFormQuality(facts, explanation);
 
-    // 2. Dosage adequacy — daily_value_percentage
-    const dosageAdequacy = this.calcDosageAdequacy(facts, explanation);
+    // ── 2. Dose Efficacy (25%) ─────────────────────────────────
+    const doseEfficacy = this.calcDoseEfficacy(facts, explanation, flags);
 
-    // 3. Interaction score — ingredient_interactions
-    const interactionScore = await this.calcInteractionScore(facts, explanation);
+    // ── 3. Evidence Grade (15%) ────────────────────────────────
+    const evidenceGrade = this.calcEvidenceGrade(facts, explanation);
 
-    // 4. Transparency — proprietary blend cezası
-    const transparency = this.calcTransparency(facts, explanation);
+    // ── 4. Third-Party Testing (15%) ───────────────────────────
+    const thirdPartyTesting = this.calcThirdPartyTesting(detail, explanation);
 
-    // 5. Certification — GMP/NSF/USP
-    const certification = this.calcCertification(detail?.certification ?? null, explanation);
+    // ── 5. Interaction Safety (10%) ────────────────────────────
+    const interactionSafety = await this.calcInteractionSafety(facts, explanation, flags);
 
-    // Weighted overall (form quality ve dosage en ağır)
-    const overall = clamp(
-      Math.round(
-        formQuality * 0.35 +
-        dosageAdequacy * 0.30 +
-        interactionScore * 0.15 +
-        transparency * 0.10 +
-        certification * 0.10,
-      ),
+    // ── 6. Transparency + Manufacturing Tier (10%) ─────────────
+    const transparencyAndTier = this.calcTransparencyAndTier(facts, detail, explanation);
+
+    // ── Weighted overall ───────────────────────────────────────
+    let overall = Math.round(
+      formQuality * WEIGHTS.form_quality +
+      doseEfficacy * WEIGHTS.dose_efficacy +
+      evidenceGrade * WEIGHTS.evidence_grade +
+      thirdPartyTesting * WEIGHTS.third_party_testing +
+      interactionSafety * WEIGHTS.interaction_safety +
+      transparencyAndTier * WEIGHTS.transparency_and_tier,
     );
 
-    return {
+    // ── Floor caps ─────────────────────────────────────────────
+    let floorCap: string | undefined;
+
+    if (flags.ul_exceeded.length > 0) {
+      overall = Math.min(overall, 50);
+      floorCap = 'ul_exceeded';
+      explanation.push({
+        component: 'floor_cap', value: 50, delta: 0,
+        reason: `Tolerable Upper Intake Level aşıldı (${flags.ul_exceeded.join(', ')}) — max skor 50.`,
+        citation: { source: 'NIH_ODS', url: 'https://ods.od.nih.gov/HealthInformation/Dietary-Reference-Intakes.aspx' },
+      });
+    }
+    if (flags.harmful_interactions.length >= 2 && !floorCap) {
+      overall = Math.min(overall, 45);
+      floorCap = 'harmful_interactions';
+      explanation.push({
+        component: 'floor_cap', value: 45, delta: 0,
+        reason: `≥2 zararlı etkileşim — max skor 45.`,
+      });
+    }
+    if (evidenceGrade <= 20 && !floorCap) {
+      overall = Math.min(overall, 55);
+      floorCap = 'evidence_only_e';
+      explanation.push({
+        component: 'floor_cap', value: 55, delta: 0,
+        reason: 'Tüm içerikler sadece uzman görüşü seviyesinde (E) — max skor 55.',
+      });
+    }
+
+    overall = clamp(overall);
+    const grade = gradeFromScore(overall);
+
+    const result: SupplementScoreResult = {
       product_id: productId,
+      algorithm_version: ALGO_VERSION,
       overall_score: overall,
+      grade,
       breakdown: {
         form_quality: Math.round(formQuality),
-        dosage_adequacy: Math.round(dosageAdequacy),
-        interaction_score: Math.round(interactionScore),
-        transparency: Math.round(transparency),
-        certification: Math.round(certification),
+        dose_efficacy: Math.round(doseEfficacy),
+        evidence_grade: Math.round(evidenceGrade),
+        third_party_testing: Math.round(thirdPartyTesting),
+        interaction_safety: Math.round(interactionSafety),
+        transparency_and_tier: Math.round(transparencyAndTier),
       },
       explanation,
+      flags,
+      floor_cap_applied: floorCap,
       calculated_at: new Date().toISOString(),
     };
+
+    // Persist to product_scores (upsert)
+    if (persist) {
+      await this.scoreRepo.upsert(
+        {
+          product_id: productId,
+          algorithm_version: ALGO_VERSION,
+          overall_score: overall,
+          grade,
+          breakdown: result.breakdown as any,
+          explanation: result.explanation as any,
+          flags: result.flags,
+          floor_cap_applied: floorCap ?? null,
+          computed_at: new Date(),
+        },
+        ['product_id', 'algorithm_version'],
+      );
+    }
+
+    // Cache result
+    await this.cache.set(cacheKey, result, 3600);
+
+    return result;
   }
 
   async getTopByNutrient(ingredientSlug: string, limit = 10) {
@@ -110,7 +228,6 @@ export class SupplementScoringService {
     });
     if (!ingredient) throw new NotFoundException('İçerik bulunamadı');
 
-    // Parent + child (formlar) ingredient id setini bul
     const relatedIds = [ingredient.ingredient_id];
     if (ingredient.parent_ingredient_id == null) {
       const children = await this.ingredientRepo.find({
@@ -122,9 +239,7 @@ export class SupplementScoringService {
       relatedIds.push(ingredient.parent_ingredient_id);
     }
 
-    const facts = await this.suppIngRepo.find({
-      where: { ingredient_id: In(relatedIds) },
-    });
+    const facts = await this.suppIngRepo.find({ where: { ingredient_id: In(relatedIds) } });
     const productIds = Array.from(new Set(facts.map((f) => f.product_id)));
     if (!productIds.length) return [];
 
@@ -133,11 +248,10 @@ export class SupplementScoringService {
       relations: ['brand', 'category', 'images'],
     });
 
-    // Her ürün için skor hesapla
     const scored = await Promise.all(
       products.map(async (p) => ({
         product: p,
-        score: await this.calculateScore(p.product_id).catch(() => null),
+        score: await this.calculateScore(p.product_id, false).catch(() => null),
       })),
     );
 
@@ -148,9 +262,9 @@ export class SupplementScoringService {
       .map((x) => ({ ...x.product, supplement_score: x.score }));
   }
 
-  // --- Component calculators -------------------------------------------
+  // ═══ Component Calculators ═══════════════════════════════════
 
-  private calcFormQuality(facts: SupplementIngredient[], explanation: string[]): number {
+  private calcFormQuality(facts: SupplementIngredient[], explanation: ExplanationItem[]): number {
     if (!facts.length) return 50;
     const scored = facts
       .map((f) => f.ingredient?.bioavailability_score)
@@ -158,20 +272,82 @@ export class SupplementScoringService {
       .map(Number);
 
     if (!scored.length) {
-      explanation.push('Form biyoyararlanım verisi yok — nötr puan (50).');
+      explanation.push({
+        component: 'form_quality', value: 50, delta: 0,
+        reason: 'Form biyoyararlanım verisi yok — nötr puan (50).',
+      });
       return 50;
     }
     const avg = scored.reduce((a, b) => a + b, 0) / scored.length;
-    explanation.push(
-      `Form kalitesi: ${scored.length} içerikte ortalama biyoyararlanım ${avg.toFixed(0)}/100.`,
-    );
+
+    // Find best citation from ingredients
+    const bestIng = facts.find(f => f.ingredient?.evidence_citations?.length);
+    const citation = bestIng?.ingredient?.evidence_citations?.[0];
+
+    explanation.push({
+      component: 'form_quality', value: Math.round(avg), delta: Math.round(avg - 50),
+      reason: `${scored.length} içerikte ortalama biyoyararlanım ${avg.toFixed(0)}/100.`,
+      citation: citation ? { source: citation.source, url: citation.url, pmid: citation.pmid } : undefined,
+    });
     return avg;
   }
 
-  private calcDosageAdequacy(facts: SupplementIngredient[], explanation: string[]): number {
+  private calcDoseEfficacy(
+    facts: SupplementIngredient[],
+    explanation: ExplanationItem[],
+    flags: { ul_exceeded: string[] },
+  ): number {
+    // Try evidence-based dose range first
+    const withEvidence = facts.filter(f =>
+      f.ingredient?.effective_dose_min != null && f.ingredient?.effective_dose_max != null,
+    );
+
+    if (withEvidence.length > 0) {
+      let total = 0;
+      for (const f of withEvidence) {
+        const ing = f.ingredient!;
+        const servingDose = Number(f.amount_per_serving ?? 0);
+        const doseMin = Number(ing.effective_dose_min!);
+        const doseMax = Number(ing.effective_dose_max!);
+        const ulDose = ing.ul_dose != null ? Number(ing.ul_dose) : null;
+
+        let score: number;
+        if (servingDose >= doseMin && servingDose <= doseMax) {
+          score = 100; // Within meta-analytic range
+        } else if (servingDose < doseMin) {
+          score = Math.max(20, (servingDose / doseMin) * 80);
+        } else if (servingDose > doseMax && (!ulDose || servingDose <= ulDose)) {
+          score = Math.max(60, 100 - ((servingDose - doseMax) / doseMax) * 40);
+        } else {
+          score = 30; // Over UL
+        }
+
+        // Check UL
+        if (ulDose && servingDose > ulDose) {
+          flags.ul_exceeded.push(ing.common_name || ing.inci_name);
+        }
+
+        total += score;
+      }
+      const avg = total / withEvidence.length;
+      const bestIng = withEvidence.find(f => f.ingredient?.evidence_citations?.length);
+      const cit = bestIng?.ingredient?.evidence_citations?.[0];
+
+      explanation.push({
+        component: 'dose_efficacy', value: Math.round(avg), delta: Math.round(avg - 50),
+        reason: `${withEvidence.length} içerikte meta-analitik doz aralığına göre değerlendirildi (ort. ${avg.toFixed(0)}/100).`,
+        citation: cit ? { source: cit.source, url: cit.url, pmid: cit.pmid, year: cit.year } : { source: 'NIH_ODS', url: 'https://ods.od.nih.gov/HealthInformation/Dietary-Reference-Intakes.aspx' },
+      });
+      return avg;
+    }
+
+    // Fallback: use daily_value_percentage
     const withDv = facts.filter((f) => f.daily_value_percentage != null);
     if (!withDv.length) {
-      explanation.push('Dozaj (%RDA) bilgisi yok — nötr puan (50).');
+      explanation.push({
+        component: 'dose_efficacy', value: 50, delta: 0,
+        reason: 'Dozaj bilgisi yok — nötr puan (50).',
+      });
       return 50;
     }
     let total = 0;
@@ -186,18 +362,92 @@ export class SupplementScoringService {
       total += score;
     }
     const avg = total / withDv.length;
-    explanation.push(
-      `Dozaj yeterliliği: ${withDv.length} içerikte ortalama ${avg.toFixed(0)}/100 (ideal 80-150% GRD).`,
-    );
+    explanation.push({
+      component: 'dose_efficacy', value: Math.round(avg), delta: Math.round(avg - 50),
+      reason: `${withDv.length} içerikte GRD yeterliliği ort. ${avg.toFixed(0)}/100 (ideal 80-150%).`,
+      citation: { source: 'NIH_ODS', url: 'https://ods.od.nih.gov/HealthInformation/Dietary-Reference-Intakes.aspx' },
+    });
     return avg;
   }
 
-  private async calcInteractionScore(
+  private calcEvidenceGrade(facts: SupplementIngredient[], explanation: ExplanationItem[]): number {
+    const grades = facts
+      .map(f => f.ingredient?.evidence_grade)
+      .filter((g): g is string => g != null && EVIDENCE_SCORE[g] != null);
+
+    if (!grades.length) {
+      explanation.push({
+        component: 'evidence_grade', value: 50, delta: 0,
+        reason: 'Kanıt seviyesi bilgisi yok — nötr puan (50).',
+      });
+      return 50;
+    }
+
+    const avg = grades.reduce((sum, g) => sum + EVIDENCE_SCORE[g], 0) / grades.length;
+    const topGrade = grades.sort((a, b) => EVIDENCE_SCORE[b] - EVIDENCE_SCORE[a])[0];
+    const bestIng = facts.find(f => f.ingredient?.evidence_grade === topGrade);
+    const cit = bestIng?.ingredient?.evidence_citations?.[0];
+
+    explanation.push({
+      component: 'evidence_grade', value: Math.round(avg), delta: Math.round(avg - 50),
+      reason: `${grades.length} içeriğin kanıt seviyesi ortalaması ${avg.toFixed(0)}/100 (en yüksek: ${topGrade}).`,
+      citation: cit ? { source: cit.source, url: cit.url, pmid: cit.pmid, year: cit.year } : undefined,
+    });
+    return avg;
+  }
+
+  private calcThirdPartyTesting(detail: SupplementDetail | null, explanation: ExplanationItem[]): number {
+    if (!detail?.certification) {
+      explanation.push({
+        component: 'third_party_testing', value: 40, delta: -10,
+        reason: 'Bağımsız test sertifikası yok — baz puan (40).',
+      });
+      return 40;
+    }
+
+    const upper = detail.certification.toUpperCase();
+    let bonus = 40;
+    const found: string[] = [];
+    for (const [key, val] of Object.entries(CERT_BONUS)) {
+      if (upper.includes(key.replace('_', ' ')) || upper.includes(key)) {
+        bonus += val;
+        found.push(key);
+      }
+    }
+    bonus = clamp(bonus);
+
+    if (found.length) {
+      explanation.push({
+        component: 'third_party_testing', value: bonus, delta: bonus - 40,
+        reason: `Sertifikalar: ${found.join(', ')} — toplam puan ${bonus}/100.`,
+        citation: found.includes('USP_VERIFIED')
+          ? { source: 'USP', url: 'https://www.usp.org/verification-services' }
+          : found.includes('NSF_CERTIFIED')
+            ? { source: 'NSF', url: 'https://www.nsf.org/consumer-resources/articles/supplement-certification' }
+            : undefined,
+      });
+    } else {
+      explanation.push({
+        component: 'third_party_testing', value: 40, delta: -10,
+        reason: 'Tanınan sertifika bulunamadı — baz puan (40).',
+      });
+    }
+    return bonus;
+  }
+
+  private async calcInteractionSafety(
     facts: SupplementIngredient[],
-    explanation: string[],
+    explanation: ExplanationItem[],
+    flags: { harmful_interactions: string[] },
   ): Promise<number> {
     const ingIds = facts.map((f) => f.ingredient_id).filter(Boolean);
-    if (ingIds.length < 2) return 80;
+    if (ingIds.length < 2) {
+      explanation.push({
+        component: 'interaction_safety', value: 80, delta: 0,
+        reason: 'Tek içerik — etkileşim riski yok.',
+      });
+      return 80;
+    }
 
     const interactions = await this.interactionRepo
       .createQueryBuilder('i')
@@ -211,56 +461,85 @@ export class SupplementScoringService {
     for (const i of interactions) {
       const delta = INTERACTION_DELTA[i.severity] ?? 0;
       score += delta;
+      if (delta <= -20) {
+        flags.harmful_interactions.push(`${i.ingredient_a_id}↔${i.ingredient_b_id}: ${i.severity}`);
+      }
     }
     score = clamp(score);
 
     if (interactions.length) {
       const synergistic = interactions.filter((i) => i.severity === 'synergistic').length;
       const negative = interactions.length - synergistic;
-      explanation.push(
-        `Etkileşim: ${synergistic} sinerjistik, ${negative} antagonist — skor ${score}/100.`,
-      );
+      const cit = interactions.find(i => i.citation_url);
+
+      explanation.push({
+        component: 'interaction_safety', value: score, delta: score - 80,
+        reason: `${synergistic} sinerjistik, ${negative} antagonist etkileşim — skor ${score}/100.`,
+        citation: cit ? { source: cit.citation_source || 'PubMed', url: cit.citation_url || undefined } : undefined,
+      });
     } else {
-      explanation.push('Etkileşim bulunamadı — baz skor 80/100.');
+      explanation.push({
+        component: 'interaction_safety', value: 80, delta: 0,
+        reason: 'Bilinen etkileşim bulunamadı — baz skor 80/100.',
+      });
     }
     return score;
   }
 
-  private calcTransparency(facts: SupplementIngredient[], explanation: string[]): number {
-    const propBlends = facts.filter((f) => f.is_proprietary_blend).length;
-    if (!propBlends) {
-      explanation.push('Tüm içerik dozajları şeffaf.');
-      return 100;
-    }
-    const penalty = Math.min(propBlends * 25, 80);
-    explanation.push(`${propBlends} proprietary blend var — şeffaflık cezası -${penalty}.`);
-    return clamp(100 - penalty);
-  }
+  private calcTransparencyAndTier(
+    facts: SupplementIngredient[],
+    detail: SupplementDetail | null,
+    explanation: ExplanationItem[],
+  ): number {
+    let score = 80;
+    const notes: string[] = [];
 
-  private calcCertification(cert: string | null, explanation: string[]): number {
-    if (!cert) {
-      explanation.push('Sertifika bilgisi yok — nötr puan (50).');
-      return 50;
+    // Proprietary blend penalty
+    const propBlends = facts.filter((f) => f.is_proprietary_blend);
+    if (propBlends.length > 0) {
+      const penalty = Math.min(propBlends.length * 20, 60);
+      score -= penalty;
+      notes.push(`${propBlends.length} proprietary blend (-${penalty})`);
     }
-    const upper = cert.toUpperCase();
-    let bonus = 50;
-    const found: string[] = [];
-    for (const [key, val] of Object.entries(CERT_BONUS)) {
-      if (upper.includes(key)) {
-        bonus += val * 2; // her sertifika 10-20 puan ekler
-        found.push(key);
-      }
-    }
-    bonus = clamp(bonus);
-    if (found.length) {
-      explanation.push(`Sertifika: ${found.join(', ')} — puan ${bonus}/100.`);
-    } else {
-      explanation.push('Tanınan sertifika yok — nötr puan (50).');
-    }
-    return bonus;
-  }
-}
 
-function clamp(v: number): number {
-  return Math.max(0, Math.min(100, v));
+    // TiO2 penalty (EFSA banned in food 2022)
+    const hasTiO2 = facts.some(f => {
+      const name = (f.ingredient?.inci_name || '').toLowerCase();
+      return name.includes('titanium dioxide') || name.includes('e171');
+    });
+    if (hasTiO2) {
+      score -= 10;
+      notes.push('Titanium dioxide (-10)');
+    }
+
+    // Artificial color penalty
+    const hasArtColor = facts.some(f => {
+      const name = (f.ingredient?.inci_name || '').toLowerCase();
+      return /fd&c|red \d|yellow \d|blue \d|e1\d{2}/.test(name);
+    });
+    if (hasArtColor) {
+      score -= 5;
+      notes.push('Yapay boya (-5)');
+    }
+
+    // Manufacturing tier bonus
+    const cert = (detail?.certification || '').toUpperCase();
+    if (cert.includes('PHARMA') || cert.includes('PHARMACEUTICAL')) {
+      score += 5;
+      notes.push('Pharmaceutical grade (+5)');
+    } else if (cert.includes('CGMP') || cert.includes('GMP')) {
+      score += 3;
+      notes.push('cGMP (+3)');
+    }
+
+    score = clamp(score);
+    explanation.push({
+      component: 'transparency_and_tier', value: score, delta: score - 80,
+      reason: notes.length ? notes.join(', ') + '.' : 'Şeffaf formülasyon, nötr üretim tier.',
+      citation: hasTiO2
+        ? { source: 'EFSA', url: 'https://www.efsa.europa.eu/en/efsajournal/pub/6585', year: 2021 }
+        : undefined,
+    });
+    return score;
+  }
 }

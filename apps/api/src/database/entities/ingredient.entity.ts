@@ -89,6 +89,71 @@ export class Ingredient {
   @Column({ type: 'smallint', nullable: true })
   absorption_rate: number | null;
 
+  // ── Kanıt katmanı (Migration 019) ─────────────────────────────
+
+  @Column({ type: 'varchar', length: 1, nullable: true })
+  evidence_grade: string | null; // A|B|C|D|E
+
+  @Column({ type: 'jsonb', nullable: true })
+  evidence_citations: {
+    source: string;
+    url?: string;
+    pmid?: string;
+    doi?: string;
+    title?: string;
+    year?: number;
+    accessed?: string;
+    opinion_ref?: string;
+  }[] | null;
+
+  // ── Takviye dozaj kanıtı ──────────────────────────────────────
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  effective_dose_min: number | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  effective_dose_max: number | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  effective_dose_unit: string | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  ul_dose: number | null;
+
+  // ── Kozmetik konsantrasyon kanıtı ─────────────────────────────
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  efficacy_conc_min: number | null;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  efficacy_conc_max: number | null;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  eu_annex_iii_limit: number | null;
+
+  // ── Regülasyon durumu (kozmetik) ──────────────────────────────
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  cir_status: string | null; // safe | safe_as_used | insufficient_data | unsafe
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  sccs_opinion_ref: string | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  cmr_class: string | null; // 1A | 1B | 2
+
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  iarc_group: string | null; // 1 | 2A | 2B | 3 | 4
+
+  @Column({ type: 'boolean', default: false })
+  endocrine_flag: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  eu_banned: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  eu_restricted: boolean;
+
   @OneToMany(() => IngredientAlias, (alias) => alias.ingredient)
   aliases: IngredientAlias[];
 

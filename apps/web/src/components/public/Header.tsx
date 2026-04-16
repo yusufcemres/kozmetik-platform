@@ -57,12 +57,19 @@ interface NavSection {
   basePath?: string;
 }
 
+const KESFET_DROPDOWN: DropdownItem[] = [
+  { href: '/markalar', label: 'Markalar', icon: 'storefront' },
+  { href: '/icerikler', label: 'İçerik Maddeleri', icon: 'science' },
+  { href: '/rehber', label: 'Rehber', icon: 'menu_book' },
+];
+
 const NAV_SECTIONS: NavSection[] = [
-  { key: 'dis', label: 'D\u0131\u015f Bak\u0131m', dropdown: DIS_BAKIM_DROPDOWN, basePath: '/urunler' },
-  { key: 'ic', label: '\u0130\u00e7 Bak\u0131m', dropdown: IC_BAKIM_DROPDOWN, basePath: '/takviyeler' },
-  { key: 'ihtiyac', label: '\u0130htiya\u00e7lar', dropdown: IHTIYACLAR_DROPDOWN, basePath: '/ihtiyaclar' },
+  { key: 'dis', label: 'Dış Bakım', dropdown: DIS_BAKIM_DROPDOWN, basePath: '/urunler' },
+  { key: 'ic', label: 'İç Bakım', dropdown: IC_BAKIM_DROPDOWN, basePath: '/takviyeler' },
+  { key: 'ihtiyac', label: 'İhtiyaçlar', dropdown: IHTIYACLAR_DROPDOWN, basePath: '/ihtiyaclar' },
   { key: 'testler', label: 'Testler', dropdown: TESTS_DROPDOWN },
-  { key: 'karsilastir', label: 'Kar\u015f\u0131la\u015ft\u0131r', href: '/karsilastir' },
+  { key: 'kesfet', label: 'Keşfet', dropdown: KESFET_DROPDOWN },
+  { key: 'karsilastir', label: 'Karşılaştır', href: '/karsilastir' },
 ];
 
 export default function Header() {

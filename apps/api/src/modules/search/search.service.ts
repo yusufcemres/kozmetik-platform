@@ -85,20 +85,26 @@ export class SearchService {
     if (cached) return cached;
 
     type SuggestRow = { name: string; slug: string };
-    type SuggestItem = { type: 'product' | 'ingredient' | 'need' | 'brand'; name: string; slug: string };
+    type ProductSuggestRow = SuggestRow & { overall_score?: number; grade?: string };
+    type SuggestItem = { type: 'product' | 'ingredient' | 'need' | 'brand'; name: string; slug: string; score?: number; grade?: string };
     const suggestions: SuggestItem[] = [];
 
-    // Products
-    const products: SuggestRow[] = await this.dataSource.query(
-      `SELECT product_name as name, product_slug as slug
-       FROM products
-       WHERE status != 'archived'
-         AND product_name ILIKE $1
-       ORDER BY product_name ASC
+    // Products (with precomputed score)
+    const products: ProductSuggestRow[] = await this.dataSource.query(
+      `SELECT p.product_name as name, p.product_slug as slug,
+              ps.overall_score, ps.grade
+       FROM products p
+       LEFT JOIN product_scores ps ON ps.product_id = p.product_id
+       WHERE p.status != 'archived'
+         AND p.product_name ILIKE $1
+       ORDER BY p.product_name ASC
        LIMIT $2`,
       [`%${term}%`, Math.ceil(limit / 3)],
     );
-    suggestions.push(...products.map((p): SuggestItem => ({ type: 'product', name: p.name, slug: p.slug })));
+    suggestions.push(...products.map((p): SuggestItem => ({
+      type: 'product', name: p.name, slug: p.slug,
+      score: p.overall_score ?? undefined, grade: p.grade ?? undefined,
+    })));
 
     // Ingredients
     const ingredients: SuggestRow[] = await this.dataSource.query(

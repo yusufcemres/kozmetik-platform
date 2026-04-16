@@ -4,10 +4,12 @@ import {
   Product, ProductIngredient, ProductNeedScore,
   IngredientNeedMapping, ScoringConfig, UserSkinProfile,
   SupplementDetail, SupplementIngredient, Ingredient, IngredientInteraction,
+  ProductScore,
 } from '@database/entities';
 import { ScoringController } from './scoring.controller';
 import { ScoringService } from './scoring.service';
 import { SupplementScoringService } from './supplement-scoring.service';
+import { CosmeticScoringService } from './cosmetic-scoring.service';
 
 @Module({
   imports: [
@@ -15,10 +17,11 @@ import { SupplementScoringService } from './supplement-scoring.service';
       Product, ProductIngredient, ProductNeedScore,
       IngredientNeedMapping, ScoringConfig, UserSkinProfile,
       SupplementDetail, SupplementIngredient, Ingredient, IngredientInteraction,
+      ProductScore,
     ]),
   ],
   controllers: [ScoringController],
-  providers: [ScoringService, SupplementScoringService],
-  exports: [ScoringService, SupplementScoringService],
+  providers: [ScoringService, SupplementScoringService, CosmeticScoringService],
+  exports: [ScoringService, SupplementScoringService, CosmeticScoringService],
 })
 export class ScoringModule {}

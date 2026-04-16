@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { api, API_BASE_URL } from '@/lib/api';
+import ProductCarousel from '@/components/public/ProductCarousel';
 
 // === Types ===
 
@@ -629,9 +630,9 @@ function ResultsContent() {
           </h2>
           <p className="text-xs text-on-surface-variant mb-4">Yaşam tarzına göre cildini içeriden destekleyebilecek takviyeler.</p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <ProductCarousel>
             {supplementTips.map((tip) => (
-              <div key={tip.title} className="curator-card p-4 border-l-2 border-l-primary/40">
+              <div key={tip.title} className="curator-card p-4 border-l-2 border-l-primary/40 snap-start shrink-0 w-[280px] sm:w-[320px]">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="material-icon text-primary" aria-hidden="true">{tip.icon}</span>
                   <h3 className="font-bold text-on-surface text-sm">{tip.title}</h3>
@@ -652,7 +653,7 @@ function ResultsContent() {
                 )}
               </div>
             ))}
-          </div>
+          </ProductCarousel>
 
           <div className="mt-3 bg-surface-container-low rounded-sm p-3 flex items-start gap-2">
             <span className="material-icon text-outline text-[14px] mt-0.5 shrink-0" aria-hidden="true">info</span>
@@ -675,7 +676,7 @@ function ResultsContent() {
             <p className="text-sm text-on-surface-variant text-center mb-6">
               Cilt profiline göre şu ürün tiplerini aramanı öneriyoruz:
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <ProductCarousel>
               {(() => {
                 // Need → recommended product categories mapping
                 const needCategoryMap: Record<number, { icon: string; label: string; search: string }[]> = {
@@ -700,7 +701,7 @@ function ResultsContent() {
                   <Link
                     key={rec.label}
                     href={`/urunler?search=${rec.search}&skin_type=${skinType}`}
-                    className="curator-card p-4 flex items-center gap-3 hover:border-primary transition-colors group"
+                    className="curator-card p-4 flex items-center gap-3 hover:border-primary transition-colors group snap-start shrink-0 w-[260px]"
                   >
                     <span className="material-icon text-primary text-xl" aria-hidden="true">{rec.icon}</span>
                     <div className="flex-1">
@@ -711,7 +712,7 @@ function ResultsContent() {
                   </Link>
                 ));
               })()}
-            </div>
+            </ProductCarousel>
           </div>
         ) : (
           <div className="space-y-4">

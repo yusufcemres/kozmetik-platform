@@ -25,6 +25,7 @@ export { ProductIngredient } from './product-ingredient.entity';
 export { IngredientNeedMapping } from './ingredient-need-mapping.entity';
 export { ProductNeedScore } from './product-need-score.entity';
 export { ScoringConfig } from './scoring-config.entity';
+export { ProductScore } from './product-score.entity';
 
 // İçerik
 export { ContentArticle } from './content-article.entity';

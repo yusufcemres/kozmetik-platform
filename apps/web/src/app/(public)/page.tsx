@@ -249,12 +249,12 @@ export default async function HomePage() {
             Kişisel testlerle ihtiyaçlarını keşfet, sana özel önerilere ulaş.
           </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto">
+        <ProductCarousel>
           {QUIZ_CARDS.map((card) => (
             <Link
               key={card.href}
               href={card.href}
-              className="curator-card p-8 sm:p-10 group hover:border-primary/30 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+              className="curator-card p-8 sm:p-10 group hover:border-primary/30 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 snap-start shrink-0 w-[280px] sm:w-[320px]"
             >
               <div className="flex items-start justify-between mb-5">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -283,7 +283,7 @@ export default async function HomePage() {
               </div>
             </Link>
           ))}
-        </div>
+        </ProductCarousel>
       </section>
 
       {/* 5. En Uyumlu Urunler — Tek Carousel */}

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
+import ScoreBadge from '@/components/public/ScoreBadge';
 
 // === Types ===
 
@@ -68,15 +69,26 @@ interface SupplementDetail {
 
 interface SupplementScore {
   product_id: number;
+  algorithm_version: string;
   overall_score: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
   breakdown: {
     form_quality: number;
-    dosage_adequacy: number;
-    interaction_score: number;
-    transparency: number;
-    certification: number;
+    dose_efficacy: number;
+    evidence_grade: number;
+    third_party_testing: number;
+    interaction_safety: number;
+    transparency_and_tier: number;
   };
-  explanation: string[];
+  explanation: {
+    component: string;
+    value: number;
+    delta: number;
+    reason: string;
+    citation?: { source: string; url?: string; pmid?: string; year?: number };
+  }[];
+  flags: { proprietary_blends: string[]; ul_exceeded: string[]; harmful_interactions: string[] };
+  floor_cap_applied?: string;
   calculated_at: string;
 }
 
@@ -391,48 +403,80 @@ export default async function SupplementDetailPage({
           </div>
         </div>
 
-        {/* REVELA Supplement Skoru */}
+        {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
           <section className="mb-8 curator-card p-6">
             <div className="flex items-start gap-6 flex-col md:flex-row">
-              <div className="flex flex-col items-center shrink-0">
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${scoreColorClass(score.overall_score)}`}>
-                  <span className="text-3xl font-bold">{score.overall_score}</span>
-                </div>
-                <span className="label-caps text-outline mt-2">REVELA Skoru</span>
-              </div>
+              <ScoreBadge score={score.overall_score} grade={score.grade} size="lg" />
               <div className="flex-1 w-full">
-                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-3">Skor Detayı</h2>
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-3">REVELA Takviye Skoru</h2>
                 <div className="space-y-2">
                   {[
-                    { label: 'Form Kalitesi', value: score.breakdown.form_quality },
-                    { label: 'Dozaj Yeterliliği', value: score.breakdown.dosage_adequacy },
-                    { label: 'Etkileşim Skoru', value: score.breakdown.interaction_score },
-                    { label: 'Şeffaflık', value: score.breakdown.transparency },
-                    { label: 'Sertifika', value: score.breakdown.certification },
-                  ].map((row) => (
-                    <div key={row.label} className="flex items-center gap-3 text-sm">
-                      <span className="w-36 text-on-surface-variant">{row.label}</span>
-                      <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${scoreBarColor(row.value)}`}
-                          style={{ width: `${row.value}%` }}
-                        />
+                    { label: 'Form Kalitesi', key: 'form_quality' },
+                    { label: 'Doz Etkinliği', key: 'dose_efficacy' },
+                    { label: 'Kanıt Seviyesi', key: 'evidence_grade' },
+                    { label: 'Bağımsız Test', key: 'third_party_testing' },
+                    { label: 'Etkileşim', key: 'interaction_safety' },
+                    { label: 'Şeffaflık + Tier', key: 'transparency_and_tier' },
+                  ].map((row) => {
+                    const bd = score.breakdown as Record<string, number>;
+                    const val = bd?.[row.key] ?? bd?.[row.key.replace(/_/g, '')] ?? 0;
+                    return (
+                      <div key={row.key} className="flex items-center gap-3 text-sm">
+                        <span className="w-36 text-on-surface-variant">{row.label}</span>
+                        <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${val >= 70 ? 'bg-score-high' : val >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
+                            style={{ width: `${val}%` }}
+                          />
+                        </div>
+                        <span className="w-10 text-right font-semibold text-on-surface tabular-nums">{val}</span>
                       </div>
-                      <span className="w-10 text-right font-semibold text-on-surface tabular-nums">{row.value}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-                {score.explanation.length > 0 && (
-                  <ul className="mt-4 text-xs text-on-surface-variant space-y-1">
-                    {score.explanation.map((line, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="text-primary shrink-0">·</span>
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
+
+                {/* "Bu puan neden?" — Explanation with citations */}
+                {score.explanation?.length > 0 && (
+                  <details className="mt-4">
+                    <summary className="text-xs font-semibold text-primary cursor-pointer hover:underline">
+                      Bu puan neden?
+                    </summary>
+                    <ul className="mt-2 space-y-1.5">
+                      {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
+                        <li key={i} className="text-xs text-on-surface-variant leading-relaxed flex items-start gap-1.5">
+                          <span className="material-icon text-sm text-outline mt-0.5 shrink-0" aria-hidden="true">
+                            {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}
+                          </span>
+                          <span>
+                            {e.reason}
+                            {e.citation?.url && (
+                              <a href={e.citation.url} target="_blank" rel="noopener noreferrer" className="text-primary ml-1 hover:underline">
+                                <span className="material-icon text-[12px] align-middle" aria-hidden="true">open_in_new</span>
+                              </a>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
                 )}
+
+                {/* Floor cap warning */}
+                {score.floor_cap_applied && (
+                  <div className="mt-3 flex items-start gap-2 bg-error/5 text-error rounded-sm p-2">
+                    <span className="material-icon text-sm mt-0.5 shrink-0" aria-hidden="true">warning</span>
+                    <p className="text-[10px] leading-relaxed">
+                      {score.explanation?.find((e: any) => e.component === 'floor_cap')?.reason || 'Güvenlik limiti uygulandı.'}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-end mt-3 pt-3 border-t border-outline-variant/20">
+                  <Link href="/nasil-puanliyoruz#supplement" className="text-[10px] text-primary hover:underline">
+                    Metodoloji
+                  </Link>
+                </div>
               </div>
             </div>
           </section>

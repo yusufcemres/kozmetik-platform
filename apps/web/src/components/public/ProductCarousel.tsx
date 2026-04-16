@@ -40,7 +40,7 @@ export default function ProductCarousel({ children }: ProductCarouselProps) {
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-surface/90 backdrop-blur-sm border border-outline-variant/30 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface shadow-md transition-all opacity-0 group-hover/carousel:opacity-100"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-surface/90 backdrop-blur-sm border border-outline-variant/30 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface shadow-md transition-all max-sm:opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100"
           aria-label="Sola kaydır"
         >
           <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
@@ -59,7 +59,7 @@ export default function ProductCarousel({ children }: ProductCarouselProps) {
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-surface/90 backdrop-blur-sm border border-outline-variant/30 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface shadow-md transition-all opacity-0 group-hover/carousel:opacity-100"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-surface/90 backdrop-blur-sm border border-outline-variant/30 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface hover:text-on-surface shadow-md transition-all max-sm:opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100"
           aria-label="Sağa kaydır"
         >
           <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>

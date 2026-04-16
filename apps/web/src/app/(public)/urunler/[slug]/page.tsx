@@ -14,6 +14,7 @@ import PriceAlertButton from '@/components/public/PriceAlertButton';
 import { TitckBadge } from '@/components/public/TitckBadge';
 import { CrossSellBlock } from '@/components/public/CrossSellBlock';
 import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
+import ScoreBadge from '@/components/public/ScoreBadge';
 
 // === Types ===
 
@@ -386,9 +387,10 @@ export default async function ProductDetailPage({
     .map((pi) => pi.ingredient_id!)
     .slice(0, 5);
 
-  const [similarProducts, interactions, supplementCrossRefs] = await Promise.all([
+  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs] = await Promise.all([
     getSimilarProducts(product.product_id),
     getIngredientInteractions(keyIngredientIds),
+    apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 3600 } } as any).catch(() => null),
     Promise.all(
       topIngredientIds.map(async (id) => {
         try {
@@ -673,73 +675,136 @@ export default async function ProductDetailPage({
           </section>
         )}
 
-        {/* Safety Score */}
+        {/* Safety Score — Evidence-Based (cosmetic-v1) */}
         {sortedIngredients.length > 0 && (() => {
+          // Fallback inline calc — API skoru varsa o kullanılır
           const allergenCount = sortedIngredients.filter(pi => pi.ingredient?.allergen_flag).length;
           const fragranceCount = sortedIngredients.filter(pi => pi.ingredient?.fragrance_flag).length;
           const totalCount = sortedIngredients.length;
           const flaggedCount = allergenCount + fragranceCount;
           const cleanPct = totalCount > 0 ? Math.round(((totalCount - flaggedCount) / totalCount) * 100) : 100;
 
-          let safetyScore = 100;
-          safetyScore -= allergenCount * 12;
-          safetyScore -= fragranceCount * 5;
-          safetyScore = Math.max(0, Math.min(100, safetyScore));
-
-          const grade = safetyScore >= 85 ? 'A' : safetyScore >= 70 ? 'B' : safetyScore >= 50 ? 'C' : safetyScore >= 30 ? 'D' : 'F';
-          const gradeColor = { A: 'text-score-high', B: 'text-score-high', C: 'text-score-medium', D: 'text-score-low', F: 'text-error' }[grade];
-          const gradeLabel = { A: 'Cok Guvenli', B: 'Guvenli', C: 'Orta', D: 'Dikkatli Ol', F: 'Riskli' }[grade];
-          const barColor = { A: 'bg-score-high', B: 'bg-score-high', C: 'bg-score-medium', D: 'bg-score-low', F: 'bg-error' }[grade];
+          // Use pre-fetched cosmetic score if available
+          const score = cosmeticScore ?? {
+            overall_score: Math.max(0, Math.min(100, 100 - allergenCount * 12 - fragranceCount * 5)),
+            grade: '',
+            breakdown: null as any,
+            explanation: [] as any[],
+            flags: { allergens: [] as string[], fragrances: [] as string[], harmful: [] as string[], cmr: [] as string[], endocrine: [] as string[], eu_banned: [] as string[] },
+          };
+          const safetyScore = score.overall_score;
+          const grade = score.grade || (safetyScore >= 85 ? 'A' : safetyScore >= 70 ? 'B' : safetyScore >= 55 ? 'C' : safetyScore >= 40 ? 'D' : 'F');
+          const gradeColor = safetyScore >= 70 ? 'text-score-high' : safetyScore >= 55 ? 'text-score-medium' : 'text-score-low';
+          const gradeLabel = ({ A: 'Çok Güvenli', B: 'Güvenli', C: 'Orta', D: 'Dikkatli Ol', F: 'Riskli' } as Record<string, string>)[grade] || 'Bilinmiyor';
 
           const highlights: string[] = [];
-          if (allergenCount === 0) highlights.push('Alerjen icermiyor');
-          if (fragranceCount === 0) highlights.push('Parfumsuz');
+          if (allergenCount === 0) highlights.push('Alerjen içermiyor');
+          if (fragranceCount === 0) highlights.push('Parfümsüz');
 
           const warnings: string[] = [];
-          if (allergenCount > 0) warnings.push(`${allergenCount} alerjen icerik`);
-          if (fragranceCount > 0) warnings.push(`${fragranceCount} parfum/koku bileseni`);
+          if ((score.flags?.eu_banned?.length ?? 0) > 0) warnings.push(`⚠ AB'de yasaklı: ${score.flags.eu_banned.join(', ')}`);
+          if ((score.flags?.cmr?.length ?? 0) > 0) warnings.push(`CMR içerik: ${score.flags.cmr.join(', ')}`);
+          if ((score.flags?.endocrine?.length ?? 0) > 0) warnings.push(`Endokrin bozucu: ${score.flags.endocrine.join(', ')}`);
+          if (allergenCount > 0) warnings.push(`${allergenCount} alerjen içerik`);
+          if (fragranceCount > 0) warnings.push(`${fragranceCount} parfüm/koku bileşeni`);
+
+          const breakdownLabels: Record<string, string> = {
+            active_efficacy: 'Aktif Etkinlik',
+            safety_class: 'Güvenlik Sınıfı',
+            concentration_fit: 'Konsantrasyon',
+            interaction_safety: 'Etkileşim',
+            allergen_load: 'Alerjen Yükü',
+            cmr_endocrine: 'CMR / Endokrin',
+            transparency: 'Şeffaflık',
+          };
 
           return (
             <section className="mb-16" data-analytics-section="safety">
               <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface flex items-center gap-2">
                 <span className="material-icon text-primary" aria-hidden="true">shield</span>
-                Guvenlik Skoru
+                REVELA Güvenlik Skoru
               </h2>
               <div className="curator-card p-6">
-                <div className="flex items-center gap-6 mb-4">
-                  <div className="text-center">
-                    <div className={`text-4xl font-extrabold ${gradeColor}`}>{safetyScore}</div>
-                    <div className="text-xs text-on-surface-variant">/100</div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-sm font-bold ${gradeColor}`}>Sinif {grade}</span>
+                <div className="flex items-start gap-6 flex-col md:flex-row">
+                  <ScoreBadge score={safetyScore} grade={grade as any} size="lg" />
+                  <div className="flex-1 w-full">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`text-sm font-bold ${gradeColor}`}>Sınıf {grade}</span>
                       <span className="text-xs text-on-surface-variant">— {gradeLabel}</span>
                     </div>
-                    <div className="h-2 bg-surface-container rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${safetyScore}%` }} />
+
+                    {/* Breakdown bars */}
+                    {score.breakdown && (
+                      <div className="space-y-2 mb-4">
+                        {Object.entries(score.breakdown).map(([key, val]) => (
+                          <div key={key} className="flex items-center gap-2">
+                            <span className="text-[10px] text-on-surface-variant w-28 shrink-0 text-right">
+                              {breakdownLabels[key] || key}
+                            </span>
+                            <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${(val as number) >= 70 ? 'bg-score-high' : (val as number) >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
+                                style={{ width: `${val}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] font-mono text-on-surface-variant w-8">{val as number}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Flags */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {highlights.map((h) => (
+                        <span key={h} className="inline-flex items-center gap-1 text-xs bg-score-high/10 text-score-high px-2 py-1 rounded-sm">
+                          <span className="material-icon text-sm" aria-hidden="true">check_circle</span>
+                          {h}
+                        </span>
+                      ))}
+                      {warnings.map((w) => (
+                        <span key={w} className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm">
+                          <span className="material-icon text-sm" aria-hidden="true">warning</span>
+                          {w}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Explanation — "Bu puan neden?" */}
+                    {score.explanation?.length > 0 && (
+                      <details className="mt-3">
+                        <summary className="text-xs font-semibold text-primary cursor-pointer hover:underline">
+                          Bu puan neden?
+                        </summary>
+                        <ul className="mt-2 space-y-1.5">
+                          {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
+                            <li key={i} className="text-xs text-on-surface-variant leading-relaxed flex items-start gap-1.5">
+                              <span className="material-icon text-sm text-outline mt-0.5 shrink-0" aria-hidden="true">
+                                {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}
+                              </span>
+                              <span>
+                                {e.reason}
+                                {e.citation?.url && (
+                                  <a href={e.citation.url} target="_blank" rel="noopener noreferrer" className="text-primary ml-1 hover:underline">
+                                    <span className="material-icon text-[12px] align-middle" aria-hidden="true">open_in_new</span>
+                                  </a>
+                                )}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
+
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-outline-variant/20">
+                      <p className="text-xs text-on-surface-variant">
+                        {totalCount} madde analiz edildi · %{cleanPct} temiz içerik
+                      </p>
+                      <Link href="/nasil-puanliyoruz#cosmetic" className="text-[10px] text-primary hover:underline">
+                        Metodoloji
+                      </Link>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {highlights.map((h) => (
-                    <span key={h} className="inline-flex items-center gap-1 text-xs bg-score-high/10 text-score-high px-2 py-1 rounded-sm">
-                      <span className="material-icon text-sm" aria-hidden="true">check_circle</span>
-                      {h}
-                    </span>
-                  ))}
-                  {warnings.map((w) => (
-                    <span key={w} className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm">
-                      <span className="material-icon text-sm" aria-hidden="true">warning</span>
-                      {w}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="text-xs text-on-surface-variant">
-                  {totalCount} madde analiz edildi · %{cleanPct} temiz icerik
-                </p>
               </div>
             </section>
           );

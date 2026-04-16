@@ -4,11 +4,15 @@ import {
 } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import type { HomeStackParamList } from '../navigation/AppNavigator';
-import { getProductBySlug, Product } from '../services/api';
+import {
+  getProductBySlug, getSupplementScore, getCosmeticScore,
+  Product, SupplementScore, CosmeticScore,
+} from '../services/api';
 import { usePersonalScore } from '../hooks/usePersonalScore';
 import { isFavorite, addFavorite, removeFavorite } from '../stores/favorites';
 import { generateShareLink } from '../services/deeplink';
 import ScoreBar from '../components/ScoreBar';
+import EvidenceScoreCard from '../components/EvidenceScoreCard';
 import AffiliateButton from '../components/AffiliateButton';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
 
@@ -19,6 +23,7 @@ export default function ProductDetailScreen() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [fav, setFav] = useState(false);
+  const [evidenceScore, setEvidenceScore] = useState<SupplementScore | CosmeticScore | null>(null);
   const { score: personalScore } = usePersonalScore(product?.product_id ?? null);
 
   useEffect(() => {
@@ -26,6 +31,12 @@ export default function ProductDetailScreen() {
       .then((r) => {
         setProduct(r.data);
         isFavorite(r.data.product_id).then(setFav);
+        const fetcher = r.data.domain_type === 'supplement'
+          ? getSupplementScore(r.data.product_id)
+          : getCosmeticScore(r.data.product_id);
+        fetcher
+          .then((sr) => setEvidenceScore(sr.data))
+          .catch(() => setEvidenceScore(null));
       })
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
@@ -97,6 +108,9 @@ export default function ProductDetailScreen() {
         {product.short_description && (
           <Text style={styles.description}>{product.short_description}</Text>
         )}
+
+        {/* REVELA Evidence-Based Score */}
+        {evidenceScore && <EvidenceScoreCard score={evidenceScore} />}
 
         {/* Scores */}
         {product.need_scores && product.need_scores.length > 0 && (
