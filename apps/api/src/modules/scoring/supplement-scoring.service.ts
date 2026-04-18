@@ -235,10 +235,12 @@ export class SupplementScoringService {
     errors: Array<{ product_id: number; error: string }>;
   }> {
     const started = Date.now();
-    const products = await this.productRepo.find({
-      where: { domain_type: 'supplement', status: 'published' },
-      select: ['product_id'],
-    });
+    const products = await this.productRepo
+      .createQueryBuilder('p')
+      .select('p.product_id', 'product_id')
+      .where('p.domain_type = :d', { d: 'supplement' })
+      .andWhere('p.status IN (:...s)', { s: ['published', 'active'] })
+      .getRawMany<{ product_id: number }>();
 
     const errors: Array<{ product_id: number; error: string }> = [];
     let succeeded = 0;
