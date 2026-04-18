@@ -48,6 +48,26 @@
               "scheme": "https",
               "host": "kozmetikplatform.com",
               "pathPrefix": "/ihtiyaclar"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/takviyeler"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/karsilastir"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/nasil-puanliyoruz"
+            },
+            {
+              "scheme": "https",
+              "host": "kozmetikplatform.com",
+              "pathPrefix": "/markalar"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

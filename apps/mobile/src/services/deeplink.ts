@@ -63,9 +63,17 @@ export async function openAffiliateLink(platform: string, url: string): Promise<
  * kozmetik://search?q=retinol → Search screen
  */
 export interface DeepLinkRoute {
-  screen: 'ProductDetail' | 'IngredientDetail' | 'NeedDetail' | 'Search';
+  screen:
+    | 'ProductDetail'
+    | 'IngredientDetail'
+    | 'NeedDetail'
+    | 'Search'
+    | 'Compare'
+    | 'External';
   params: Record<string, string>;
 }
+
+const WEB_BASE = 'https://kozmetik-platform.vercel.app';
 
 export function parseDeepLink(url: string): DeepLinkRoute | null {
   try {
@@ -80,7 +88,7 @@ export function parseDeepLink(url: string): DeepLinkRoute | null {
 
     const segments = path.split('/').filter(Boolean);
 
-    if (segments[0] === 'product' || segments[0] === 'urunler') {
+    if (segments[0] === 'product' || segments[0] === 'urunler' || segments[0] === 'takviyeler') {
       return { screen: 'ProductDetail', params: { slug: segments[1] || '' } };
     }
     if (segments[0] === 'ingredient' || segments[0] === 'icerikler') {
@@ -93,11 +101,30 @@ export function parseDeepLink(url: string): DeepLinkRoute | null {
       const searchParams = new URLSearchParams(queryString);
       return { screen: 'Search', params: { query: searchParams.get('q') || '' } };
     }
+    if (segments[0] === 'karsilastir' || segments[0] === 'compare') {
+      return { screen: 'Compare', params: {} };
+    }
+
+    // Public web sayfaları — native ekran yok, tarayıcıda aç
+    const WEB_ONLY = ['nasil-puanliyoruz', 'markalar', 'keshfet', 'gizlilik', 'kullanim-sartlari'];
+    if (WEB_ONLY.includes(segments[0] || '')) {
+      return {
+        screen: 'External',
+        params: { url: `${WEB_BASE}/${segments.join('/')}${queryString ? `?${queryString}` : ''}` },
+      };
+    }
 
     return null;
   } catch {
     return null;
   }
+}
+
+/**
+ * External linkleri tarayıcıda açar.
+ */
+export async function openExternalLink(url: string): Promise<void> {
+  await Linking.openURL(url);
 }
 
 /**

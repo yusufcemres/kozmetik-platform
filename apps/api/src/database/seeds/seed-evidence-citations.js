@@ -291,7 +291,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'omega-6',
+    slug: 'omega-6-fatty-acids',
     evidence_grade: 'C',
     effective_dose_min: 11000, effective_dose_max: 17000, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -310,7 +310,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'ashwagandha',
+    slug: 'ashwagandha-extract',
     evidence_grade: 'B',
     effective_dose_min: 300, effective_dose_max: 600, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -330,7 +330,7 @@ const INGREDIENTS = [
   {
     slug: 'probiotics',
     evidence_grade: 'B',
-    effective_dose_min: 1, effective_dose_max: 100, effective_dose_unit: 'billion CFU', ul_dose: null,
+    effective_dose_min: 1, effective_dose_max: 100, effective_dose_unit: 'B CFU', ul_dose: null,
     evidence_citations: [
       { source: 'NIH_ODS', url: 'https://ods.od.nih.gov/factsheets/Probiotics-HealthProfessional/', accessed: '2026-04-16' },
       { source: 'PubMed', pmid: '25157183', doi: '10.1002/14651858.CD006095.pub3', title: 'Probiotics for the prevention of antibiotic-associated diarrhea', year: 2015 },
@@ -346,7 +346,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'glucosamine',
+    slug: 'n-acetyl-glucosamine',
     evidence_grade: 'B',
     effective_dose_min: 1500, effective_dose_max: 1500, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -354,7 +354,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'chondroitin',
+    slug: 'chondroitin-sulfate',
     evidence_grade: 'B',
     effective_dose_min: 800, effective_dose_max: 1200, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -362,7 +362,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'saw-palmetto',
+    slug: 'serenoa-repens-fruit-extract',
     evidence_grade: 'C',
     effective_dose_min: 160, effective_dose_max: 320, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -370,7 +370,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'ginkgo-biloba',
+    slug: 'ginkgo-biloba-leaf-extract',
     evidence_grade: 'B',
     effective_dose_min: 120, effective_dose_max: 240, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -379,7 +379,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'milk-thistle',
+    slug: 'silybum-marianum-seed-extract',
     evidence_grade: 'C',
     effective_dose_min: 200, effective_dose_max: 400, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
@@ -387,7 +387,7 @@ const INGREDIENTS = [
     ],
   },
   {
-    slug: 'spirulina',
+    slug: 'spirulina-platensis-extract',
     evidence_grade: 'C',
     effective_dose_min: 1000, effective_dose_max: 8000, effective_dose_unit: 'mg', ul_dose: null,
     evidence_citations: [
