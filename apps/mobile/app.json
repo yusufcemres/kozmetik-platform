@@ -97,6 +97,14 @@
         {
           "cameraPermission": "Barkod tarama ve INCI etiketi OCR için kamera erişimi gereklidir."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
       ]
     ],
     "experiments": {
