@@ -222,6 +222,58 @@ export class SupplementScoringService {
     return result;
   }
 
+  /**
+   * Tüm supplement ürünleri için evidence-based skorları yeniden hesaplar
+   * ve product_scores cache tablosuna yazar. Chunk'lı ilerler, progress log'lar.
+   */
+  async recalculateAll(chunkSize = 20): Promise<{
+    algorithm_version: string;
+    total: number;
+    succeeded: number;
+    failed: number;
+    duration_ms: number;
+    errors: Array<{ product_id: number; error: string }>;
+  }> {
+    const started = Date.now();
+    const products = await this.productRepo.find({
+      where: { domain_type: 'supplement', status: 'published' },
+      select: ['product_id'],
+    });
+
+    const errors: Array<{ product_id: number; error: string }> = [];
+    let succeeded = 0;
+
+    for (let i = 0; i < products.length; i += chunkSize) {
+      const chunk = products.slice(i, i + chunkSize);
+      const results = await Promise.allSettled(
+        chunk.map(async (p) => {
+          await this.cache.del(`score:${p.product_id}:${ALGO_VERSION}`);
+          return this.calculateScore(p.product_id, true);
+        }),
+      );
+      for (let j = 0; j < results.length; j++) {
+        const r = results[j];
+        if (r.status === 'fulfilled') {
+          succeeded++;
+        } else {
+          errors.push({
+            product_id: chunk[j].product_id,
+            error: (r.reason as Error)?.message ?? 'unknown',
+          });
+        }
+      }
+    }
+
+    return {
+      algorithm_version: ALGO_VERSION,
+      total: products.length,
+      succeeded,
+      failed: errors.length,
+      duration_ms: Date.now() - started,
+      errors: errors.slice(0, 50),
+    };
+  }
+
   async getTopByNutrient(ingredientSlug: string, limit = 10) {
     const ingredient = await this.ingredientRepo.findOne({
       where: { ingredient_slug: ingredientSlug },
