@@ -12,14 +12,21 @@
       "resizeMode": "contain",
       "backgroundColor": "#0D9488"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kozmetikplatform.app",
-      "associatedDomains": ["applinks:kozmetikplatform.com"],
+      "associatedDomains": [
+        "applinks:kozmetikplatform.com"
+      ],
       "infoPlist": {
         "NSCameraUsageDescription": "Barkod tarama ve INCI etiketi OCR için kamera erişimi gereklidir.",
-        "LSApplicationQueriesSchemes": ["trendyol", "hepsiburada"]
+        "LSApplicationQueriesSchemes": [
+          "trendyol",
+          "hepsiburada"
+        ]
       }
     },
     "android": {
@@ -28,7 +35,10 @@
         "backgroundColor": "#0D9488"
       },
       "package": "com.kozmetikplatform.app",
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",
@@ -70,7 +80,10 @@
               "pathPrefix": "/markalar"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -88,6 +101,20 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "045929f7-3a9c-4d90-8b20-5e95ed744004"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/045929f7-3a9c-4d90-8b20-5e95ed744004"
     }
   }
 }
