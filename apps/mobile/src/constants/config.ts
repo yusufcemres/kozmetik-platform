@@ -5,10 +5,10 @@ const ENV = {
     apiUrl: 'http://localhost:3001/api/v1',
   },
   staging: {
-    apiUrl: 'https://staging-api.kozmetikplatform.com/api/v1',
+    apiUrl: 'https://kozmetik-api.onrender.com/api/v1',
   },
   production: {
-    apiUrl: 'https://api.kozmetikplatform.com/api/v1',
+    apiUrl: 'https://kozmetik-api.onrender.com/api/v1',
   },
 };
 

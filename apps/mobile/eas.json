@@ -22,7 +22,7 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "https://staging-api.kozmetikplatform.com/api/v1"
+        "API_URL": "https://kozmetik-api.onrender.com/api/v1"
       }
     },
     "production": {
@@ -32,7 +32,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "API_URL": "https://api.kozmetikplatform.com/api/v1"
+        "API_URL": "https://kozmetik-api.onrender.com/api/v1"
       }
     }
   },
