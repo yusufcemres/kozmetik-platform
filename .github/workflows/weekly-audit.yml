@@ -52,3 +52,18 @@ jobs:
           pnpm --filter api exec ts-node "src/scripts/audit/weekly-report.ts" \
             --notify \
             --since-days=${{ github.event.inputs.since_days || '7' }}
+
+      - name: Schema drift audit (entity ↔ validator payload)
+        # Non-blocking — logs drift so a dev can address it in the next PR.
+        # CI gate in onboarding-drift.yml handles per-PR blocking.
+        continue-on-error: true
+        run: pnpm --filter api exec ts-node "src/scripts/audit/schema-drift-check.ts"
+
+      - name: Score regression detector (compare last two score rows)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          pnpm --filter api exec ts-node "src/scripts/audit/score-regression-check.ts" \
+            --notify-telegram
