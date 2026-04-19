@@ -59,7 +59,9 @@ pnpm --filter api exec ts-node src/scripts/onboarding/onboard-supplement.ts \
 
 | Fail / Uyarı | Sebep | Fix |
 |---|---|---|
-| `image_url HEAD check failed` | URL ölü / CDN değişti | Trendyol sayfasından yeni URL al |
+| `image_url kalite reddi — Çözünürlük ...` | Image < 300x300 veya aspect ratio küp değil | CDN'den yüksek çözünürlük URL al (genelde `.../mnresize/128/192/...` kısmı `.../product/media/images/...` direkt CDN path'ine değiştirilebilir) |
+| `image_url kalite reddi — Dosya N bayt` | 5KB'dan küçük, muhtemelen logo thumbnail | Ürün sayfasında ana galeri görüntüsünü seç |
+| `image_url kalite reddi — URL path logo/placeholder` | URL'de `/logo|favicon|placeholder|brand-` kelimesi var | Gerçek ürün CDN URL'ini al |
 | `Tavily fetch fail: 401` | `TAVILY_API_KEY` invalid | `.env` güncelle |
 | `affiliate: Search URL — affiliate revenue kaybı` | Trendyol search URL verildi | Ürün sayfasının direkt URL'ini al (`/sr?q=...` yerine `/brand/urun-p-123456`) |
 
