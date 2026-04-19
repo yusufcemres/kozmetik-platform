@@ -30,12 +30,14 @@ export class ReviewsService {
       .leftJoin('app_users', 'u', 'u.user_id = r.user_id')
       .select([
         'r.review_id AS review_id',
+        'r.user_id AS user_id',
         'r.rating AS rating',
         'r.title AS title',
         'r.body AS body',
         'r.helpful_count AS helpful_count',
         'r.verified_purchase AS verified_purchase',
         'r.created_at AS created_at',
+        'r.updated_at AS updated_at',
         'u.display_name AS user_display_name',
       ])
       .where('r.product_id = :pid AND r.status = :st', { pid: productId, st: 'visible' })
