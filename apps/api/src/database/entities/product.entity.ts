@@ -78,6 +78,9 @@ export class Product {
   @Column({ type: 'varchar', length: 20, nullable: true, default: null })
   target_gender: string; // null=unisex, 'female', 'male'
 
+  @Column({ type: 'varchar', length: 30, default: 'adult' })
+  target_audience: string; // adult|pregnant|breastfeeding|infant_0_12m|child_1_3y|child_4_12y
+
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status: string; // draft, in_review, published, archived
 

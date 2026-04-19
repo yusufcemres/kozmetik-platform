@@ -123,7 +123,7 @@ export class SupplementScoringService {
     const formQuality = this.calcFormQuality(facts, explanation);
 
     // ── 2. Dose Efficacy (25%) ─────────────────────────────────
-    const doseEfficacy = this.calcDoseEfficacy(facts, explanation, flags);
+    const doseEfficacy = this.calcDoseEfficacy(facts, explanation, flags, product.target_audience);
 
     // ── 3. Evidence Grade (15%) ────────────────────────────────
     const evidenceGrade = this.calcEvidenceGrade(facts, explanation);
@@ -350,7 +350,15 @@ export class SupplementScoringService {
     facts: SupplementIngredient[],
     explanation: ExplanationItem[],
     flags: { ul_exceeded: string[] },
+    targetAudience?: string,
   ): number {
+    const audience = targetAudience || 'adult';
+    const resolveUl = (ing: SupplementIngredient['ingredient']): number | null => {
+      if (!ing) return null;
+      const byAud = ing.ul_by_audience?.[audience];
+      if (byAud != null) return Number(byAud);
+      return ing.ul_dose != null ? Number(ing.ul_dose) : null;
+    };
     // Try evidence-based dose range first
     const withEvidence = facts.filter(f =>
       f.ingredient?.effective_dose_min != null && f.ingredient?.effective_dose_max != null,
@@ -364,7 +372,7 @@ export class SupplementScoringService {
         const servingDose = Number(f.amount_per_serving ?? 0) * ratio;
         const doseMin = Number(ing.effective_dose_min!);
         const doseMax = Number(ing.effective_dose_max!);
-        const ulDose = ing.ul_dose != null ? Number(ing.ul_dose) : null;
+        const ulDose = resolveUl(ing);
 
         let score: number;
         if (servingDose >= doseMin && servingDose <= doseMax) {
