@@ -1,0 +1,74 @@
+name: Onboarding Dry-Run
+
+on:
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'apps/api/src/database/seeds/products-queue/*.json'
+      - 'apps/api/src/scripts/onboarding/**'
+
+jobs:
+  offline-gate:
+    name: Onboarding Offline Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect changed product JSON files
+        id: changes
+        shell: bash
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          changed=$(git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'apps/api/src/database/seeds/products-queue/*.json' | grep -v '_template.json' || true)
+          {
+            echo "files<<EOF"
+            echo "$changed"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Changed product JSONs:"
+          echo "$changed"
+
+      - name: Run offline gate on each changed JSON
+        if: steps.changes.outputs.files != ''
+        shell: bash
+        run: |
+          set -e
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            rel="${file#apps/api/}"
+            echo "::group::$file"
+            pnpm --filter api exec ts-node "src/scripts/onboarding/onboard-supplement.ts" "$rel" --offline
+            echo "::endgroup::"
+          done <<< "${{ steps.changes.outputs.files }}"
+
+      - name: No product JSONs changed
+        if: steps.changes.outputs.files == ''
+        run: echo "No product JSONs added/modified in this PR. Onboarding gate skipped."
