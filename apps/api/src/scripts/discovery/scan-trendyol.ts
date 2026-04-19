@@ -12,6 +12,10 @@
  *   --config <path>    : brand list JSON (default: ./brands.config.json)
  *   --json             : machine-readable output (for future cron integration)
  *   --max-per-brand N  : cap results kept per brand (default: 10)
+ *   --write-drafts     : write one skeleton JSON per new SKU under
+ *                        products-queue/_drafts/<brand>-<ty-id>.json. CI offline
+ *                        gate already skips `_*` files, so drafts never break PRs.
+ *   --notify           : post a Telegram summary (TELEGRAM_BOT_TOKEN/CHAT_ID env).
  *
  * Why dedupe on affiliate_url (not product_name): TY product URLs carry a
  * numeric -p-<id> that's unique per SKU across variants, which is stabler
@@ -42,6 +46,8 @@ function parseArgs() {
     configPath: get('config') ?? path.join(__dirname, 'brands.config.json'),
     asJson: argv.includes('--json'),
     maxPerBrand: Number(get('max-per-brand') ?? '10'),
+    writeDrafts: argv.includes('--write-drafts'),
+    notify: argv.includes('--notify'),
   };
 }
 
@@ -86,8 +92,109 @@ function loadConfig(p: string): BrandEntry[] {
   return parsed.brands as BrandEntry[];
 }
 
+function tyProductId(url: string): string | null {
+  const m = url.match(/-p-(\d+)/);
+  return m ? m[1] : null;
+}
+
+function draftSkeleton(brandSlug: string, tyUrl: string, title: string) {
+  // Minimal skeleton — intentionally leaves all curated fields empty so the
+  // pipeline's Zod validator blocks the draft until a human fills it. Stored
+  // under _drafts/ so CI offline gate skips (filter excludes `_*`).
+  return {
+    _draft: {
+      source: 'scan-trendyol',
+      discovered_at: new Date().toISOString(),
+      trendyol_title: title,
+      instructions:
+        'Kaynak Trendyol sayfasını aç, ürün adı/doz/serving bilgisini doldur. Yeni ingredient ise `ingredients_to_create` ekle. Hazır olunca bu dosyayı _drafts/ dışına taşı (products-queue/ kökü) ve PR aç.',
+    },
+    product: {
+      product_name: 'REQUIRED — tam isim + doz',
+      brand_slug: brandSlug,
+      category_slug: 'REQUIRED',
+      short_description: '',
+      net_content_value: 0,
+      net_content_unit: 'tablet',
+      target_audience: 'adult',
+      supplement_detail: {
+        form: 'tablet',
+        serving_size: 1,
+        serving_unit: 'tablet',
+        certification: '',
+      },
+      ingredients: [],
+      affiliate_url: tyUrl,
+      affiliate_platform: 'trendyol',
+      image_url: '',
+    },
+    ingredients_to_create: [],
+  };
+}
+
+function writeDrafts(discoveries: Discovery[], root: string): string[] {
+  const dir = path.join(root, '_drafts');
+  fs.mkdirSync(dir, { recursive: true });
+  const written: string[] = [];
+  for (const d of discoveries) {
+    const id = tyProductId(d.url);
+    if (!id) continue;
+    const file = path.join(dir, `${d.brand_slug}-${id}.json`);
+    if (fs.existsSync(file)) continue; // idempotent — skip already-drafted SKUs
+    fs.writeFileSync(file, JSON.stringify(draftSkeleton(d.brand_slug, d.url, d.title), null, 2));
+    written.push(path.relative(process.cwd(), file));
+  }
+  return written;
+}
+
+async function sendTelegram(text: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chat) {
+    console.warn('⚠️  TELEGRAM_BOT_TOKEN/CHAT_ID yok — bildirim atlandı.');
+    return;
+  }
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chat, text, disable_web_page_preview: true }),
+  });
+  if (!res.ok) {
+    console.warn(`⚠️  Telegram gönderimi başarısız (${res.status}): ${(await res.text()).slice(0, 200)}`);
+    return;
+  }
+  console.log('✅ Telegram bildirimi gönderildi.');
+}
+
+function formatTelegram(newOnes: Discovery[], draftsWritten: string[]): string {
+  if (newOnes.length === 0) return '🔎 Trendyol scan: yeni SKU yok. Katalog güncel.';
+  const lines: string[] = [];
+  lines.push(`🆕 Trendyol scan — ${newOnes.length} yeni SKU aday`);
+  lines.push('');
+  const perBrand = new Map<string, Discovery[]>();
+  for (const d of newOnes) {
+    const arr = perBrand.get(d.brand_slug) ?? [];
+    arr.push(d);
+    perBrand.set(d.brand_slug, arr);
+  }
+  for (const [brand, items] of perBrand) {
+    lines.push(`• ${brand} (${items.length})`);
+    for (const it of items.slice(0, 5)) {
+      const t = (it.title || '(başlık yok)').slice(0, 70);
+      lines.push(`   - ${t}`);
+      lines.push(`     ${it.url}`);
+    }
+    if (items.length > 5) lines.push(`   … +${items.length - 5} more`);
+  }
+  if (draftsWritten.length > 0) {
+    lines.push('');
+    lines.push(`📝 ${draftsWritten.length} draft JSON yazıldı → products-queue/_drafts/`);
+  }
+  return lines.join('\n');
+}
+
 async function main(): Promise<void> {
-  const { configPath, asJson, maxPerBrand } = parseArgs();
+  const { configPath, asJson, maxPerBrand, writeDrafts: doWrite, notify } = parseArgs();
   const brands = loadConfig(configPath);
   const known = await fetchKnownAffiliateUrls();
 
@@ -119,8 +226,23 @@ async function main(): Promise<void> {
   const newOnes = discoveries.filter((d) => d.status === 'new');
   const dupes = discoveries.filter((d) => d.status === 'known');
 
+  let draftsWritten: string[] = [];
+  if (doWrite && newOnes.length > 0) {
+    const queueRoot = path.resolve(__dirname, '..', '..', 'database', 'seeds', 'products-queue');
+    draftsWritten = writeDrafts(newOnes, queueRoot);
+  }
+
+  if (notify) {
+    await sendTelegram(formatTelegram(newOnes, draftsWritten));
+  }
+
   if (asJson) {
-    console.log(JSON.stringify({ total: discoveries.length, new: newOnes, known_count: dupes.length }, null, 2));
+    console.log(JSON.stringify({
+      total: discoveries.length,
+      new: newOnes,
+      known_count: dupes.length,
+      drafts_written: draftsWritten,
+    }, null, 2));
     return;
   }
 
@@ -139,6 +261,10 @@ async function main(): Promise<void> {
   for (const d of newOnes) {
     console.log(`  • [${d.brand_slug}] ${d.title}`);
     console.log(`    ${d.url}`);
+  }
+  if (draftsWritten.length > 0) {
+    console.log(`\n📝 ${draftsWritten.length} draft JSON yazıldı:`);
+    for (const f of draftsWritten) console.log(`   ${f}`);
   }
   console.log('');
 }
