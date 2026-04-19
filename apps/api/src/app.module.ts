@@ -34,6 +34,7 @@ import { TagValidatorModule } from './modules/tag-validator/tag-validator.module
 import { ProfileEngineModule } from './modules/profile-engine/profile-engine.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { AiSearchModule } from './modules/ai-search/ai-search.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 import { RedisCacheModule } from './common/cache/cache.module';
 
 // DB connection is conditional — works without Docker for initial development
@@ -72,6 +73,7 @@ const featureModules = skipDb
       SupplementsModule, InteractionsModule, AffiliateModule, B2bModule, PriceAlertsModule,
       AnalyticsModule, BrandPortalModule,
       TitckModule, TagValidatorModule, ProfileEngineModule, BlogModule, AiSearchModule,
+      ReviewsModule,
     ];
 
 @Module({

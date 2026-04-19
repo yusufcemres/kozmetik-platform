@@ -77,3 +77,6 @@ export { PushSubscription } from './push-subscription.entity';
 
 // User Favorites
 export { UserFavorite } from './user-favorite.entity';
+
+// Product Reviews (V2.B.12)
+export { ProductReview } from './product-review.entity';
