@@ -1,0 +1,56 @@
+{
+  "product": {
+    "product_name": "REQUIRED — Marka + Ürün + Doz (örn. 'Nutraxin Magnesium Bisglycinate 400mg')",
+    "brand_slug": "REQUIRED — brands.brand_slug (örn. 'nutraxin')",
+    "category_slug": "REQUIRED — categories.category_slug (örn. 'vitamin-mineral')",
+    "short_description": "OPTIONAL — Türkçe kısa açıklama",
+
+    "net_content_value": 60,
+    "net_content_unit": "tablet",
+
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium-bisglycinate",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 95
+      }
+    ],
+
+    "affiliate_url": "https://www.trendyol.com/brand/urun-p-123456789",
+    "affiliate_platform": "trendyol",
+    "image_url": "https://cdn.dsmcdn.com/ty.../product-1.jpg"
+  },
+
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "magnesium-bisglycinate",
+      "inci_name": "Magnesium Bisglycinate",
+      "common_name": "Magnezyum Bisglisinat",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Şelatlı magnezyum formu. Oksit/sitrat formlarına göre daha iyi emilir; GI yan etkisi düşüktür. Kas gevşemesi, uyku kalitesi ve migren profilaksisi alanlarında kullanılır.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        { "source": "NIH_ODS", "url": "https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/", "accessed": "2026-04-19" }
+      ],
+      "effective_dose_min": 200,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": 350,
+      "form_type": "bisglisinat",
+      "safety_class": "neutral",
+      "food_sources": [
+        { "food_name": "Kabak çekirdeği", "amount_per_100g": 592, "unit": "mg" },
+        { "food_name": "Badem", "amount_per_100g": 270, "unit": "mg" }
+      ]
+    }
+  ]
+}
