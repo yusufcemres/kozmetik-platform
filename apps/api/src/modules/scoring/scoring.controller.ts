@@ -160,4 +160,48 @@ export class ScoringController {
   ) {
     return this.cosmeticScoring.getTopByConcern(slug, limit ? parseInt(limit) : 10);
   }
+
+  // ── Bulk recalculate (evidence-based v2) ───────────────────────
+
+  @Post('admin/scoring/recalculate-supplements-v2')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Tüm takviye ürünlerini supplement-v2 ile toplu hesapla',
+    description: 'product_scores cache tablosunu doldurur. Chunk 20, Promise.allSettled.',
+  })
+  recalculateAllSupplementsV2() {
+    return this.supplementScoring.recalculateAll();
+  }
+
+  @Post('admin/scoring/recalculate-cosmetics-v1')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Tüm kozmetik ürünlerini cosmetic-v1 ile toplu hesapla',
+    description: 'product_scores cache tablosunu doldurur. Chunk 20, Promise.allSettled.',
+  })
+  recalculateAllCosmeticsV1() {
+    return this.cosmeticScoring.recalculateAll();
+  }
+
+  @Post('admin/scoring/recalculate-evidence-all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Hem takviye hem kozmetik ürünlerini sırayla yeniden hesapla',
+    description: 'Sabah morning job için tek endpoint. Supplement → cosmetic sırayla.',
+  })
+  async recalculateAllEvidence() {
+    const supplement = await this.supplementScoring.recalculateAll();
+    const cosmetic = await this.cosmeticScoring.recalculateAll();
+    return {
+      supplement,
+      cosmetic,
+      total_duration_ms: supplement.duration_ms + cosmetic.duration_ms,
+    };
+  }
 }
