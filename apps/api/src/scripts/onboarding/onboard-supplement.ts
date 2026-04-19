@@ -23,6 +23,7 @@ import { classifyAffiliateUrl, formatErrors, validateDocument } from './validato
 import type { OnboardingDocument } from './validators';
 import { newContext, PipelineError, type PipelineFlags } from './context';
 import { detectElementalRatio } from './enrichers/elemental-detect';
+import { writeOnboardingLog, type OnboardingLogEntry } from './telemetry';
 
 import { runPreflight } from './stages/preflight';
 import { runIngredientEnrich } from './stages/ingredient-enrich';
@@ -120,6 +121,12 @@ async function main(): Promise<void> {
   await client.connect();
   const ctx = newContext(doc, client, flags);
 
+  const startedAt = new Date();
+  const t0 = Date.now();
+  let telemetryStatus: 'success' | 'failed' | 'dry_run' = 'success';
+  let failedStage: string | null = null;
+  let errorMessage: string | null = null;
+
   try {
     await runPreflight(ctx);
     await runIngredientEnrich(ctx);
@@ -129,6 +136,7 @@ async function main(): Promise<void> {
     const shouldProceed = await runDiffPreview(ctx);
     if (!shouldProceed) {
       console.log("\n👋 Durduruldu (dry-run veya onay reddi). DB'ye yazılmadı.");
+      telemetryStatus = 'dry_run';
       return;
     }
 
@@ -142,14 +150,32 @@ async function main(): Promise<void> {
 
     console.log(`\n✅ Product ${ctx.product_id} onboarded.`);
   } catch (e: any) {
+    telemetryStatus = 'failed';
     if (e instanceof PipelineError) {
+      failedStage = e.stage;
+      errorMessage = e.message;
       console.error(`\n❌ ${e.message}`);
     } else {
+      errorMessage = e?.message ?? String(e);
       console.error(`\n❌ Beklenmeyen hata: ${e?.stack ?? e?.message ?? e}`);
     }
     process.exitCode = 1;
   } finally {
     await client.end().catch(() => undefined);
+
+    const entry: OnboardingLogEntry = {
+      product_id: ctx.product_id ?? null,
+      product_slug: ctx.resolved.product_slug ?? doc.product.product_name ?? null,
+      started_at: startedAt,
+      completed_at: new Date(),
+      duration_ms: Date.now() - t0,
+      status: telemetryStatus,
+      failed_stage: failedStage,
+      error_message: errorMessage,
+      warnings: ctx.resolved.warnings ?? [],
+      flags: { ...flags },
+    };
+    await writeOnboardingLog(entry);
   }
 }
 
