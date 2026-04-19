@@ -420,7 +420,7 @@ export class ProductsService {
     if (!source) throw new NotFoundException('Ürün bulunamadı');
 
     const sourceKeyIngredients = (source.ingredients || [])
-      .filter((pi: any) => pi.is_key_ingredient)
+      .filter((pi: any) => pi.is_highlighted_in_claims)
       .map((pi: any) => ({
         ingredient_id: pi.ingredient_id,
         name: pi.ingredient?.inci_name || pi.ingredient?.ingredient_name || '',
@@ -466,7 +466,7 @@ export class ProductsService {
       `SELECT pi.product_id, pi.ingredient_id, i.inci_name
        FROM product_ingredients pi
        JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
-       WHERE pi.product_id = ANY($1) AND pi.is_key_ingredient = true`,
+       WHERE pi.product_id = ANY($1) AND pi.is_highlighted_in_claims = true`,
       [candidateIds],
     );
 
