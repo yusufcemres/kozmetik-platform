@@ -55,7 +55,7 @@ interface ProductScore {
 async function getNeed(slug: string): Promise<Need | null> {
   try {
     return await apiFetch<Need>(`/needs/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
@@ -66,7 +66,7 @@ async function getMappings(needId: number): Promise<IngredientMapping[]> {
   try {
     return await apiFetch<IngredientMapping[]>(
       `/ingredient-need-mappings/by-need/${needId}`,
-      { next: { revalidate: 3600 } } as any,
+      { next: { revalidate: 300 } } as any,
     );
   } catch {
     return [];
@@ -78,7 +78,7 @@ async function getTopProducts(needId: number, domainType?: string): Promise<Prod
     const dt = domainType ? `&domain_type=${domainType}` : '';
     return await apiFetch<ProductScore[]>(
       `/scoring/needs/${needId}/top-products?limit=12${dt}`,
-      { next: { revalidate: 3600 } } as any,
+      { next: { revalidate: 300 } } as any,
     );
   } catch {
     return [];

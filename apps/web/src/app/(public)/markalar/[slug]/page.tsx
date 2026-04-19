@@ -51,7 +51,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
 
 async function getBrand(slug: string): Promise<Brand | null> {
   try {
-    return await apiFetch<Brand>(`/brands/slug/${slug}`, { next: { revalidate: 3600 } } as RequestInit);
+    return await apiFetch<Brand>(`/brands/slug/${slug}`, { next: { revalidate: 300 } } as RequestInit);
   } catch {
     return null;
   }
@@ -61,7 +61,7 @@ async function getBrandProducts(brandId: number): Promise<{ data: Product[]; met
   try {
     return await apiFetch<{ data: Product[]; meta: { total: number } }>(
       `/products?brand_id=${brandId}&limit=100&page=1`,
-      { next: { revalidate: 3600 } } as RequestInit,
+      { next: { revalidate: 300 } } as RequestInit,
     );
   } catch {
     return { data: [], meta: { total: 0 } };
@@ -72,7 +72,7 @@ async function getTopScoredByBrand(brandId: number): Promise<Product[]> {
   try {
     return await apiFetch<Product[]>(
       `/products/top-scored?brand_id=${brandId}&limit=3`,
-      { next: { revalidate: 3600 } } as RequestInit,
+      { next: { revalidate: 300 } } as RequestInit,
     );
   } catch {
     return [];

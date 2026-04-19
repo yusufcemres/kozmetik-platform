@@ -115,7 +115,7 @@ interface CrossRefProduct {
 async function getProduct(slug: string): Promise<Product | null> {
   try {
     return await apiFetch<Product>(`/products/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
@@ -135,7 +135,7 @@ async function getSupplementScore(productId: number): Promise<SupplementScore | 
 async function getSupplementDetail(productId: number): Promise<SupplementDetail | null> {
   try {
     return await apiFetch<SupplementDetail>(`/supplements/${productId}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
@@ -145,7 +145,7 @@ async function getSupplementDetail(productId: number): Promise<SupplementDetail 
 async function getInteractionsByIngredient(ingredientId: number): Promise<Interaction[]> {
   try {
     return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return [];
@@ -155,7 +155,7 @@ async function getInteractionsByIngredient(ingredientId: number): Promise<Intera
 async function getCrossDomainProducts(ingredientId: number, domainType: string, limit = 3): Promise<CrossRefProduct[]> {
   try {
     return await apiFetch<CrossRefProduct[]>(`/products/by-ingredient/${ingredientId}?domain_type=${domainType}&limit=${limit}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return [];
