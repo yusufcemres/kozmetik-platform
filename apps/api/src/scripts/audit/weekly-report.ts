@@ -10,6 +10,7 @@
  *   1. Schema drift — any payload/entity desync
  *   2. Missing ingredient data — NULL common_name / EN summary / etc
  *   3. Score regressions — >=15pt drops in the last 7 days
+ *   4. Onboarding activity — runs, success rate, failures-by-stage (V2.A.7)
  *
  * Env:
  *   DATABASE_URL          (mandatory)
@@ -23,6 +24,7 @@
  */
 import { execFileSync } from 'child_process';
 import * as path from 'path';
+import { newClient } from '../onboarding/db';
 
 type Section = { title: string; lines: string[]; count: number };
 
@@ -113,6 +115,74 @@ function regressionSection(sinceDays: number): Section {
   return { title: `Score regressions (${sinceDays}g)`, count: rows.length, lines: top };
 }
 
+async function telemetrySection(sinceDays: number): Promise<Section> {
+  // Queries onboarding_log directly (populated by onboard-supplement.ts hook).
+  // Kept separate from the execFileSync audits because this one talks to DB,
+  // not to a subprocess — the count we surface here is *failed runs*, so a
+  // clean week shows 0.
+  const c = newClient();
+  try {
+    await c.connect();
+    const { rows } = await c.query<{
+      status: 'success' | 'failed' | 'dry_run';
+      count: string;
+    }>(
+      `SELECT status, COUNT(*)::int AS count
+         FROM onboarding_log
+        WHERE started_at >= NOW() - ($1 || ' days')::interval
+        GROUP BY status`,
+      [String(sinceDays)],
+    );
+    const by: Record<string, number> = { success: 0, failed: 0, dry_run: 0 };
+    for (const r of rows) by[r.status] = Number(r.count);
+    const total = by.success + by.failed + by.dry_run;
+
+    if (total === 0) {
+      return {
+        title: `Onboarding activity (${sinceDays}g)`,
+        count: 0,
+        lines: ['✅ çalışma yok (pipeline hiç tetiklenmedi)'],
+      };
+    }
+
+    const lines = [
+      `• total: ${total} (✅ ${by.success} / ❌ ${by.failed} / 👀 ${by.dry_run})`,
+    ];
+
+    if (by.failed > 0) {
+      const stageRes = await c.query<{ failed_stage: string; count: string }>(
+        `SELECT failed_stage, COUNT(*)::int AS count
+           FROM onboarding_log
+          WHERE status='failed'
+            AND failed_stage IS NOT NULL
+            AND started_at >= NOW() - ($1 || ' days')::interval
+          GROUP BY failed_stage
+          ORDER BY count DESC
+          LIMIT 5`,
+        [String(sinceDays)],
+      );
+      for (const row of stageRes.rows) {
+        lines.push(`• ${row.failed_stage}: ${row.count} fail`);
+      }
+    }
+
+    return {
+      title: `Onboarding activity (${sinceDays}g)`,
+      // count reflects *failures* — that's what the header icon reacts to.
+      count: by.failed,
+      lines,
+    };
+  } catch (e: any) {
+    return {
+      title: `Onboarding activity (${sinceDays}g)`,
+      count: -1,
+      lines: [`⚠️  onboarding_log sorgu hatası: ${e?.message ?? e}`],
+    };
+  } finally {
+    await c.end().catch(() => undefined);
+  }
+}
+
 async function sendTelegram(text: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
@@ -139,7 +209,12 @@ async function main(): Promise<void> {
 
   console.log(`🗓️  Weekly catalog audit — ${new Date().toISOString().slice(0, 10)} (window: ${sinceDays}g)\n`);
 
-  const sections = [schemaDriftSection(), missingDataSection(), regressionSection(sinceDays)];
+  const sections = [
+    schemaDriftSection(),
+    missingDataSection(),
+    regressionSection(sinceDays),
+    await telemetrySection(sinceDays),
+  ];
 
   for (const s of sections) {
     console.log(`── ${s.title} (${s.count}) ──`);
