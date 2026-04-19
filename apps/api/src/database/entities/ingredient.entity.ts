@@ -124,6 +124,11 @@ export class Ingredient {
   @Column({ type: 'decimal', precision: 5, scale: 4, nullable: true })
   elemental_ratio: number | null;
 
+  // Optional per-audience UL overrides. Keys match products.target_audience.
+  // NULL or missing key → fallback to ul_dose.
+  @Column({ type: 'jsonb', nullable: true })
+  ul_by_audience: Record<string, number> | null;
+
   // ── Kozmetik konsantrasyon kanıtı ─────────────────────────────
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })

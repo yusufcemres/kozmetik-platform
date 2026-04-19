@@ -8,6 +8,8 @@
     "net_content_value": 60,
     "net_content_unit": "tablet",
 
+    "target_audience": "adult",
+
     "supplement_detail": {
       "form": "tablet",
       "serving_size": 1,
@@ -45,6 +47,7 @@
       "effective_dose_max": 400,
       "effective_dose_unit": "mg",
       "ul_dose": 350,
+      "ul_by_audience": null,
       "form_type": "bisglisinat",
       "safety_class": "neutral",
       "food_sources": [

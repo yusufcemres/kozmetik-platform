@@ -39,6 +39,7 @@ export type IngredientPayload = {
   effective_dose_max?: number | null;
   effective_dose_unit?: string | null;
   ul_dose?: number | null;
+  ul_by_audience?: Record<string, number> | null;
   elemental_ratio?: number | null;
   form_type?: string | null;
   bioavailability_score?: number | null;
@@ -53,6 +54,14 @@ export type SupplementIngredientRef = {
   daily_value_percentage?: number | null;
 };
 
+export type TargetAudience =
+  | 'adult'
+  | 'pregnant'
+  | 'breastfeeding'
+  | 'infant_0_12m'
+  | 'child_1_3y'
+  | 'child_4_12y';
+
 export type ProductPayload = {
   product_name: string;
   brand_slug: string;
@@ -60,6 +69,7 @@ export type ProductPayload = {
   short_description?: string;
   net_content_value?: number;
   net_content_unit?: string;
+  target_audience?: TargetAudience;
   supplement_detail: {
     form: string;
     serving_size?: number;
@@ -94,6 +104,7 @@ const EVIDENCE_GRADES = ['A', 'B', 'C', 'D', 'E'];
 const NUTRIENT_GROUPS = new Set(['vitamin', 'mineral', 'amino-acid', 'fatty-acid']);
 const TRENDYOL_PRODUCT_RE = /^https:\/\/www\.trendyol\.com\/.*-p-\d+(\?.*)?$/;
 const TRENDYOL_SEARCH_RE = /^https:\/\/www\.trendyol\.com\/sr(\?|\/)/;
+const TARGET_AUDIENCE_ENUM = ['adult', 'pregnant', 'breastfeeding', 'infant_0_12m', 'child_1_3y', 'child_4_12y'];
 
 // ── Core helpers ─────────────────────────────────────────────────────────────
 
@@ -229,6 +240,9 @@ export function validateProduct(p: ProductPayload): ValidationError[] {
   }
   if (!isNonEmptyString(p.affiliate_url)) {
     pushErr(errs, 'product.affiliate_url', 'Zorunlu.');
+  }
+  if (p.target_audience != null && !TARGET_AUDIENCE_ENUM.includes(p.target_audience)) {
+    pushErr(errs, 'product.target_audience', `Enum: ${TARGET_AUDIENCE_ENUM.join('|')}. Atlarsan default 'adult'.`);
   }
 
   return errs;

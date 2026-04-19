@@ -62,9 +62,9 @@ export async function runAtomicInsert(ctx: PipelineContext): Promise<void> {
         `INSERT INTO ingredients
            (domain_type, inci_name, common_name, ingredient_slug, ingredient_group,
             function_summary, evidence_grade, evidence_citations,
-            effective_dose_min, effective_dose_max, effective_dose_unit, ul_dose, elemental_ratio,
+            effective_dose_min, effective_dose_max, effective_dose_unit, ul_dose, ul_by_audience, elemental_ratio,
             form_type, bioavailability_score, safety_class, food_sources, is_active)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12,$13,$14,$15,$16,$17::jsonb,true)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12,$13::jsonb,$14,$15,$16,$17,$18::jsonb,true)
          RETURNING ingredient_id`,
         [
           ing.domain_type ?? 'supplement',
@@ -79,6 +79,7 @@ export async function runAtomicInsert(ctx: PipelineContext): Promise<void> {
           ing.effective_dose_max ?? null,
           ing.effective_dose_unit ?? null,
           ing.ul_dose ?? null,
+          ing.ul_by_audience ? JSON.stringify(ing.ul_by_audience) : null,
           ing.elemental_ratio ?? null,
           ing.form_type ?? null,
           ing.bioavailability_score ?? null,
@@ -96,8 +97,8 @@ export async function runAtomicInsert(ctx: PipelineContext): Promise<void> {
     const prodRes = await client.query(
       `INSERT INTO products
          (brand_id, category_id, domain_type, product_name, product_slug, short_description,
-          net_content_value, net_content_unit, status)
-       VALUES ($1,$2,'supplement',$3,$4,$5,$6,$7,'draft')
+          net_content_value, net_content_unit, target_audience, status)
+       VALUES ($1,$2,'supplement',$3,$4,$5,$6,$7,$8,'draft')
        RETURNING product_id`,
       [
         brandId,
@@ -107,6 +108,7 @@ export async function runAtomicInsert(ctx: PipelineContext): Promise<void> {
         doc.product.short_description ?? null,
         doc.product.net_content_value ?? null,
         doc.product.net_content_unit ?? null,
+        doc.product.target_audience ?? 'adult',
       ],
     );
     const productId: number = prodRes.rows[0].product_id;

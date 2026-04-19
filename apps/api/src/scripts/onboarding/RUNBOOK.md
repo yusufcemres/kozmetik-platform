@@ -84,6 +84,7 @@ pnpm --filter api exec ts-node src/scripts/onboarding/onboard-supplement.ts \
 | `Grade=F (score=N)` | evidence_grade veya food_sources eksik | Audit: `find-missing-ingredient-data.ts` koş |
 | `floor_cap UL_EXCEEDED aktif` | Elemental_ratio yanlış veya eksik | İngredient row'da `elemental_ratio` kontrol et, chelated'se NIH ODS elemental norm'a çek |
 | `overall_score=0` | İngredient eşleşmedi (product_ingredients boş?) | Stage 0 ingredient_alias logic kontrol |
+| Bebek/çocuk ürünü yetişkin UL'siyle patlıyor | `target_audience` eklenmemiş ya da ingredient'ta `ul_by_audience` yok | JSON product bloğuna `"target_audience": "infant_0_12m"` (veya uygun enum) ekle; gerekiyorsa `ingredients_to_create[i].ul_by_audience = { "infant_0_12m": <NIH_ODS_UL> }` doldur, skor recalc et |
 
 ### Stage 5 VERCEL_QA
 
