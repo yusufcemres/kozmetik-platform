@@ -120,6 +120,10 @@ export class Ingredient {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   ul_dose: number | null;
 
+  // Elemental mineral ratio for chelated/compound forms (0-1). NULL = 1.0.
+  @Column({ type: 'decimal', precision: 5, scale: 4, nullable: true })
+  elemental_ratio: number | null;
+
   // ── Kozmetik konsantrasyon kanıtı ─────────────────────────────
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })

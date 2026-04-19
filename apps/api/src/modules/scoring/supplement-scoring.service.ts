@@ -360,7 +360,8 @@ export class SupplementScoringService {
       let total = 0;
       for (const f of withEvidence) {
         const ing = f.ingredient!;
-        const servingDose = Number(f.amount_per_serving ?? 0);
+        const ratio = ing.elemental_ratio != null ? Number(ing.elemental_ratio) : 1;
+        const servingDose = Number(f.amount_per_serving ?? 0) * ratio;
         const doseMin = Number(ing.effective_dose_min!);
         const doseMax = Number(ing.effective_dose_max!);
         const ulDose = ing.ul_dose != null ? Number(ing.ul_dose) : null;
@@ -376,7 +377,7 @@ export class SupplementScoringService {
           score = 30; // Over UL
         }
 
-        // Check UL
+        // Check UL (on elemental-equivalent dose)
         if (ulDose && servingDose > ulDose) {
           flags.ul_exceeded.push(ing.common_name || ing.inci_name);
         }
