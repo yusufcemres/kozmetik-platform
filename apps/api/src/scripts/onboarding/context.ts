@@ -11,6 +11,7 @@ export type PipelineFlags = {
   dryRun: boolean;
   yes: boolean;
   skipQa: boolean;
+  offline: boolean;
 };
 
 export type ResolvedState = {

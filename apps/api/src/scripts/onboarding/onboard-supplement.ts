@@ -8,6 +8,8 @@
  *   --dry-run     : Stage 2.5'te dur (diff göster), DB'ye dokunma
  *   --yes         : Stage 2.5'te interactive onay sor**ma**, direkt Stage 3
  *   --skip-qa     : Stage 5 atla (CI için)
+ *   --offline     : DB/network yok — sadece pure validator + elemental-detect
+ *                   + affiliate URL classify koşar. CI PR-gate için.
  *   --batch <dir> : (future) Sıralı tüm *.json'ları işle
  *
  * Each stage is in ./stages/*.ts and receives the shared PipelineContext.
@@ -17,9 +19,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { newClient } from './db';
-import { formatErrors, validateDocument } from './validators';
+import { classifyAffiliateUrl, formatErrors, validateDocument } from './validators';
 import type { OnboardingDocument } from './validators';
 import { newContext, PipelineError, type PipelineFlags } from './context';
+import { detectElementalRatio } from './enrichers/elemental-detect';
 
 import { runPreflight } from './stages/preflight';
 import { runIngredientEnrich } from './stages/ingredient-enrich';
@@ -41,8 +44,46 @@ function parseFlags(argv: string[]): { jsonPath: string; flags: PipelineFlags } 
       dryRun: argv.includes('--dry-run'),
       yes: argv.includes('--yes'),
       skipQa: argv.includes('--skip-qa'),
+      offline: argv.includes('--offline'),
     },
   };
+}
+
+/**
+ * Offline gate: runs pure checks only (validator + elemental-detect + affiliate
+ * classify). Used by CI on PRs touching products-queue/*.json — no DB, no HTTP.
+ * Exits 1 if any rule fails.
+ */
+function runOfflineGate(doc: OnboardingDocument): void {
+  console.log(`\n🛡️  OFFLINE mode — DB/network atlandı, sadece pure gate.\n`);
+
+  // 1) Static validator (already run before this func — we just log success)
+  console.log(`  [validator] ✓ ${doc.ingredients_to_create?.length ?? 0} ingredient payload + product shape`);
+
+  // 2) Elemental-ratio enrichment check for each new ingredient
+  let elementalMissing = 0;
+  for (const ing of doc.ingredients_to_create ?? []) {
+    const res = detectElementalRatio(ing);
+    if (res.action === 'missing') {
+      console.error(`  [elemental] ✗ ${ing.ingredient_slug}: ${res.reason}`);
+      elementalMissing++;
+    } else if (res.action === 'kept') {
+      console.log(`  [elemental] ✓ ${ing.ingredient_slug}: ratio=${res.ratio} (${res.source})`);
+    } else {
+      console.log(`  [elemental] – ${ing.ingredient_slug}: ${res.reason}`);
+    }
+  }
+
+  // 3) Affiliate URL classification
+  const cls = classifyAffiliateUrl(doc.product.affiliate_url, doc.product.affiliate_platform);
+  const tag = cls.verification_status === 'verified' ? '✓' : cls.verification_status === 'unverified' ? '~' : '⚠';
+  console.log(`  [affiliate] ${tag} status=${cls.verification_status}${cls.warning ? ` — ${cls.warning}` : ''}`);
+
+  if (elementalMissing > 0) {
+    console.error(`\n❌ Offline gate FAIL: ${elementalMissing} ingredient chelated ama elemental_ratio yok.`);
+    process.exit(1);
+  }
+  console.log(`\n✅ Offline gate passed.`);
 }
 
 function loadDocument(p: string): OnboardingDocument {
@@ -59,7 +100,7 @@ async function main(): Promise<void> {
   const { jsonPath, flags } = parseFlags(process.argv.slice(2));
   console.log(`\n🧪 Supplement Onboarding Pipeline`);
   console.log(`   input: ${jsonPath}`);
-  console.log(`   mode : ${flags.dryRun ? 'DRY-RUN' : 'LIVE'}${flags.yes ? ' --yes' : ''}${flags.skipQa ? ' --skip-qa' : ''}\n`);
+  console.log(`   mode : ${flags.offline ? 'OFFLINE' : flags.dryRun ? 'DRY-RUN' : 'LIVE'}${flags.yes ? ' --yes' : ''}${flags.skipQa ? ' --skip-qa' : ''}\n`);
 
   const doc = loadDocument(jsonPath);
 
@@ -68,6 +109,11 @@ async function main(): Promise<void> {
   if (staticErrs.length > 0) {
     console.error(`❌ Static validation FAIL (${staticErrs.length} hata):\n${formatErrors(staticErrs)}`);
     process.exit(1);
+  }
+
+  if (flags.offline) {
+    runOfflineGate(doc);
+    return;
   }
 
   const client = newClient();
