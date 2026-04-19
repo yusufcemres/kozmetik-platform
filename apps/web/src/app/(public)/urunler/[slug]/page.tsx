@@ -6,6 +6,7 @@ import { apiFetch } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';
+import ReviewsBlock from '@/components/public/ReviewsBlock';
 import ListModal from '@/components/public/ListModal';
 import RecentlyViewed from '@/components/public/RecentlyViewed';
 import ProductViewTracker from './ProductViewTracker';
@@ -118,6 +119,23 @@ interface IngredientInteraction {
   recommendation: string;
   ingredient_a: { inci_name: string; ingredient_slug: string };
   ingredient_b: { inci_name: string; ingredient_slug: string };
+}
+
+type ReviewsAggregate = {
+  product_id: number;
+  rating_value: number | null;
+  review_count: number;
+  rating_distribution: Record<'1' | '2' | '3' | '4' | '5', number>;
+};
+
+async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate | null> {
+  try {
+    return await apiFetch<ReviewsAggregate>(`/products/${productId}/reviews/aggregate`, {
+      next: { revalidate: 120 },
+    } as any);
+  } catch {
+    return null;
+  }
 }
 
 async function getIngredientInteractions(ingredientIds: number[]): Promise<IngredientInteraction[]> {
@@ -290,13 +308,8 @@ function formatPrice(price: number | null): string {
 
 // === JSON-LD ===
 
-function productJsonLd(product: Product) {
+function productJsonLd(product: Product, reviewsAgg: ReviewsAggregate | null) {
   const imageUrl = product.images?.[0]?.image_url;
-  const avgScore =
-    product.need_scores && product.need_scores.length > 0
-      ? product.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) /
-        product.need_scores.length
-      : null;
 
   return {
     '@context': 'https://schema.org',
@@ -309,13 +322,14 @@ function productJsonLd(product: Product) {
     ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand.brand_name } } : {}),
     ...(product.category ? { category: product.category.category_name } : {}),
     ...(product.barcode ? { gtin13: product.barcode } : {}),
-    ...(avgScore
+    ...(reviewsAgg && reviewsAgg.review_count > 0 && reviewsAgg.rating_value != null
       ? {
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: (avgScore / 20).toFixed(1),
+            ratingValue: reviewsAgg.rating_value.toFixed(1),
             bestRating: '5',
-            ratingCount: product.need_scores?.length || 1,
+            worstRating: '1',
+            reviewCount: reviewsAgg.review_count,
           },
         }
       : {}),
@@ -387,7 +401,7 @@ export default async function ProductDetailPage({
     .map((pi) => pi.ingredient_id!)
     .slice(0, 5);
 
-  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs] = await Promise.all([
+  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs, reviewsAgg] = await Promise.all([
     getSimilarProducts(product.product_id),
     getIngredientInteractions(keyIngredientIds),
     apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 300 } } as any).catch(() => null),
@@ -401,6 +415,7 @@ export default async function ProductDetailPage({
         } catch { return []; }
       }),
     ),
+    getReviewsAggregate(product.product_id),
   ]);
 
   // Deduplicate supplement products
@@ -443,7 +458,7 @@ export default async function ProductDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, reviewsAgg)) }}
       />
       <script
         type="application/ld+json"
@@ -1335,6 +1350,9 @@ export default async function ProductDetailPage({
             </div>
           </section>
         )}
+
+        {/* Reviews (B.12) */}
+        <ReviewsBlock productId={product.product_id} />
 
         {/* Cross-sell blocks */}
         <CrossSellBlock productId={product.product_id} mode="together" />

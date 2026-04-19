@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
 import ScoreBadge from '@/components/public/ScoreBadge';
+import PriceChart from '@/components/public/PriceChart';
+import ReviewsBlock from '@/components/public/ReviewsBlock';
 
 // === Types ===
 
@@ -142,6 +144,23 @@ async function getSupplementDetail(productId: number): Promise<SupplementDetail 
   }
 }
 
+type ReviewsAggregate = {
+  product_id: number;
+  rating_value: number | null;
+  review_count: number;
+  rating_distribution: Record<'1' | '2' | '3' | '4' | '5', number>;
+};
+
+async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate | null> {
+  try {
+    return await apiFetch<ReviewsAggregate>(`/products/${productId}/reviews/aggregate`, {
+      next: { revalidate: 120 },
+    } as any);
+  } catch {
+    return null;
+  }
+}
+
 async function getInteractionsByIngredient(ingredientId: number): Promise<Interaction[]> {
   try {
     return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`, {
@@ -241,7 +260,11 @@ function formatPrice(price: number | null): string {
 
 // === JSON-LD ===
 
-function supplementJsonLd(product: Product, detail: SupplementDetail | null) {
+function supplementJsonLd(
+  product: Product,
+  detail: SupplementDetail | null,
+  reviewsAgg: ReviewsAggregate | null,
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -250,6 +273,17 @@ function supplementJsonLd(product: Product, detail: SupplementDetail | null) {
     ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand.brand_name } } : {}),
     ...(product.category ? { category: product.category.category_name } : {}),
     ...(product.images?.[0]?.image_url ? { image: product.images[0].image_url } : {}),
+    ...(reviewsAgg && reviewsAgg.review_count > 0 && reviewsAgg.rating_value != null
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: reviewsAgg.rating_value.toFixed(1),
+            bestRating: '5',
+            worstRating: '1',
+            reviewCount: reviewsAgg.review_count,
+          },
+        }
+      : {}),
     ...(product.affiliate_links && product.affiliate_links.length > 0
       ? {
           offers: product.affiliate_links
@@ -287,9 +321,10 @@ export default async function SupplementDetailPage({
   const product = await getProduct(params.slug);
   if (!product) notFound();
 
-  const [detail, score] = await Promise.all([
+  const [detail, score, reviewsAgg] = await Promise.all([
     getSupplementDetail(product.product_id),
     getSupplementScore(product.product_id),
+    getReviewsAggregate(product.product_id),
   ]);
   const nutritionFacts = (detail?.nutrition_facts || []).sort(
     (a, b) => a.sort_order - b.sort_order,
@@ -328,7 +363,7 @@ export default async function SupplementDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(supplementJsonLd(product, detail)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(supplementJsonLd(product, detail, reviewsAgg)) }}
       />
 
       <article className="curator-section max-w-[1200px] mx-auto">
@@ -402,6 +437,11 @@ export default async function SupplementDetailPage({
             )}
           </div>
         </div>
+
+        {/* Price history chart (B.11) */}
+        <section className="mb-8">
+          <PriceChart productId={product.product_id} />
+        </section>
 
         {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
@@ -843,6 +883,9 @@ export default async function SupplementDetailPage({
             </div>
           </section>
         )}
+
+        {/* Reviews (B.12) */}
+        <ReviewsBlock productId={product.product_id} />
 
         {/* Back */}
         <div className="border-t border-outline-variant/20 pt-8">
