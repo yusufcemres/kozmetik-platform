@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, SITE_URL } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';
@@ -467,8 +467,8 @@ export default async function ProductDetailPage({
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kozmetik-platform.vercel.app' },
-              { '@type': 'ListItem', position: 2, name: 'Ürünler', item: 'https://kozmetik-platform.vercel.app/urunler' },
+              { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: SITE_URL },
+              { '@type': 'ListItem', position: 2, name: 'Ürünler', item: `${SITE_URL}/urunler` },
               ...(product.category
                 ? [{ '@type': 'ListItem', position: 3, name: product.category.category_name }]
                 : []),

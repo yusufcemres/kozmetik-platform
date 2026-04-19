@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { apiFetch, API_BASE_URL } from '@/lib/api';
+import { apiFetch, API_BASE_URL, SITE_URL } from '@/lib/api';
 
 // === Types ===
 
@@ -332,7 +332,7 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
             '@context': 'https://schema.org',
             '@type': 'Brand',
             name: brand.brand_name,
-            url: brand.website_url || `https://kozmetik-platform.vercel.app/markalar/${brand.brand_slug}`,
+            url: brand.website_url || `${SITE_URL}/markalar/${brand.brand_slug}`,
             ...(brand.logo_url ? { logo: brand.logo_url } : {}),
           }),
         }}

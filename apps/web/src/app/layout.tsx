@@ -126,7 +126,7 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'REVELA',
-              url: 'https://kozmetik-platform.vercel.app',
+              url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app').replace(/\/+$/, ''),
               description: 'Kozmetik ürünlerin INCI içeriklerini analiz et, cildine uygun ürünleri bilimsel kanıtlarla keşfet.',
               sameAs: [],
             }),
