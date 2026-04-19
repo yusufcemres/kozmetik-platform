@@ -73,7 +73,7 @@ export interface DeepLinkRoute {
   params: Record<string, string>;
 }
 
-const WEB_BASE = 'https://kozmetik-platform.vercel.app';
+const WEB_BASE = process.env.EXPO_PUBLIC_WEB_URL || 'https://kozmetik-platform.vercel.app';
 
 export function parseDeepLink(url: string): DeepLinkRoute | null {
   try {

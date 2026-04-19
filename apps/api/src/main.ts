@@ -27,10 +27,16 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api/v1');
 
-  // CORS
+  // CORS — WEB_URL supports comma-separated origins for domain cutover transitions
+  // (e.g. "https://revela.com.tr,https://kozmetik-platform.vercel.app").
+  const webUrlRaw = configService.get<string>('WEB_URL', 'https://kozmetik-platform.vercel.app');
+  const webOrigins = webUrlRaw
+    .split(',')
+    .map((s) => s.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
   const allowedOrigins = isProduction
     ? [
-        configService.get('WEB_URL', 'https://kozmetik-platform.vercel.app'),
+        ...webOrigins,
         configService.get('MOBILE_URL', ''),
         configService.get('VERCEL_URL', ''),
       ].filter(Boolean)

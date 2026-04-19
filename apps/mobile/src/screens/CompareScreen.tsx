@@ -443,7 +443,7 @@ export default function CompareScreen() {
           <TouchableOpacity
             onPress={() =>
               Linking.openURL(
-                'https://kozmetik-platform.vercel.app/nasil-puanliyoruz',
+                `${process.env.EXPO_PUBLIC_WEB_URL || 'https://kozmetik-platform.vercel.app'}/nasil-puanliyoruz`,
               )
             }
           >

@@ -2,6 +2,10 @@ export const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'
 ).trim().replace(/\/+$/, '');
 
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://kozmetik-platform.vercel.app'
+).trim().replace(/\/+$/, '');
+
 interface FetchOptions extends RequestInit {
   token?: string;
 }
