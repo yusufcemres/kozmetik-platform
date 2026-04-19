@@ -1,0 +1,10 @@
+{
+  "_comment": "V2.B.10 — brands to scan for new Trendyol SKUs. Each entry becomes one Tavily search. Add brands when we start carrying them. Queries kept conservative ('takviye' qualifier) to avoid cosmetic overlap.",
+  "brands": [
+    { "slug": "nutraxin", "query": "site:trendyol.com nutraxin takviye" },
+    { "slug": "solgar", "query": "site:trendyol.com solgar takviye" },
+    { "slug": "nature-s-supreme", "query": "site:trendyol.com nature's supreme takviye" },
+    { "slug": "ocean", "query": "site:trendyol.com orzax ocean takviye" },
+    { "slug": "vitaccord", "query": "site:trendyol.com vitaccord takviye" }
+  ]
+}
