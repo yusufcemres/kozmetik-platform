@@ -47,7 +47,10 @@ jobs:
         run: |
           BASE="${{ github.event.pull_request.base.sha }}"
           HEAD="${{ github.event.pull_request.head.sha }}"
-          changed=$(git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'apps/api/src/database/seeds/products-queue/*.json' | grep -v '_template.json' || true)
+          # Skip underscore-prefixed files (templates like _template.json,
+          # _cosmetic-template.json) — those carry REQUIRED placeholders that
+          # would fail validation by design.
+          changed=$(git diff --name-only --diff-filter=AM "$BASE" "$HEAD" -- 'apps/api/src/database/seeds/products-queue/*.json' | grep -v '/_' || true)
           {
             echo "files<<EOF"
             echo "$changed"
@@ -64,8 +67,17 @@ jobs:
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             rel="${file#apps/api/}"
-            echo "::group::$file"
-            pnpm --filter api exec ts-node "src/scripts/onboarding/onboard-supplement.ts" "$rel" --offline
+            # Domain detection: supplement has product.supplement_detail;
+            # cosmetic has product.product_type_label. Route accordingly.
+            if jq -e '.product.supplement_detail' "$file" > /dev/null 2>&1; then
+              script="src/scripts/onboarding/onboard-supplement.ts"
+              domain="supplement"
+            else
+              script="src/scripts/onboarding/onboard-cosmetic.ts"
+              domain="cosmetic"
+            fi
+            echo "::group::$file [$domain]"
+            pnpm --filter api exec ts-node "$script" "$rel" --offline
             echo "::endgroup::"
           done <<< "${{ steps.changes.outputs.files }}"
 

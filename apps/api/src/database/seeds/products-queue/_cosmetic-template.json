@@ -1,0 +1,91 @@
+{
+  "_comment": "V2.B.8 — Cosmetic onboarding template. Kullanım: ts-node apps/api/src/scripts/onboarding/onboard-cosmetic.ts apps/api/src/database/seeds/products-queue/<dosya>.json [--dry-run|--yes]",
+
+  "product": {
+    "product_name": "REQUIRED — Marka + Ürün adı (örn. 'The Ordinary Niacinamide 10% + Zinc 1%')",
+    "brand_slug": "REQUIRED — brands.brand_slug (örn. 'the-ordinary')",
+    "category_slug": "REQUIRED — categories.category_slug, domain_type='cosmetic' olmalı (örn. 'serum')",
+    "short_description": "OPTIONAL — Türkçe kısa açıklama",
+
+    "net_content_value": 30,
+    "net_content_unit": "ml",
+
+    "product_type_label": "serum",
+    "target_area": "face",
+    "usage_time_hint": "both",
+    "target_gender": null,
+
+    "ingredients": [
+      {
+        "ingredient_slug": "niacinamide",
+        "inci_order_rank": 2,
+        "concentration_percent": 10.0,
+        "is_highlighted_in_claims": true
+      },
+      {
+        "ingredient_slug": "zinc-pca",
+        "inci_order_rank": 5,
+        "concentration_percent": 1.0,
+        "is_highlighted_in_claims": true
+      }
+    ],
+
+    "affiliate_url": "https://www.trendyol.com/the-ordinary/niacinamide-10-zinc-1-p-123456789",
+    "affiliate_platform": "trendyol",
+    "image_url": "https://cdn.dsmcdn.com/ty.../niacinamide-1.jpg"
+  },
+
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "niacinamide",
+      "inci_name": "Niacinamide",
+      "common_name": "Niasinamid",
+      "ingredient_group": "active",
+      "function_summary": "B3 vitamininin amid formu. Gözenek görünümünü küçültür, sebum üretimini dengeler ve hiperpigmentasyonu azaltır. %2-10 aralığında etkili; duyarlı ciltlerde tolere edilebilir.",
+
+      "cir_status": "safe",
+      "sccs_opinion_ref": null,
+      "cmr_class": "none",
+      "iarc_group": "none",
+      "safety_class": "safe",
+
+      "efficacy_conc_min": 2.0,
+      "efficacy_conc_max": 10.0,
+      "eu_annex_iii_limit": null,
+
+      "endocrine_flag": false,
+      "eu_banned": false,
+      "eu_restricted": false,
+      "allergen_flag": false,
+      "fragrance_flag": false,
+      "preservative_flag": false,
+
+      "sensitivity_note": null,
+      "safety_note": null
+    },
+    {
+      "ingredient_slug": "zinc-pca",
+      "inci_name": "Zinc PCA",
+      "common_name": "Çinko PCA",
+      "ingredient_group": "active",
+      "function_summary": "Çinko tuzunun pirolidon karboksilik asit formu. Yağlı ciltte sebum regülasyonu ve antibakteriyel etki sağlar. Niasinamid ile kombinasyonlarda %1 konsantrasyon yeterlidir.",
+
+      "cir_status": "safe",
+      "sccs_opinion_ref": null,
+      "cmr_class": "none",
+      "iarc_group": "none",
+      "safety_class": "safe",
+
+      "efficacy_conc_min": 0.5,
+      "efficacy_conc_max": 2.0,
+      "eu_annex_iii_limit": null,
+
+      "endocrine_flag": false,
+      "eu_banned": false,
+      "eu_restricted": false,
+      "allergen_flag": false,
+      "fragrance_flag": false,
+      "preservative_flag": false
+    }
+  ]
+}
