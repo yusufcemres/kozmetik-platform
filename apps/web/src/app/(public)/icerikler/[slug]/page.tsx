@@ -76,7 +76,7 @@ interface ProductInCarousel {
 async function getIngredient(slug: string): Promise<Ingredient | null> {
   try {
     return await apiFetch<Ingredient>(`/ingredients/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
@@ -86,7 +86,7 @@ async function getIngredient(slug: string): Promise<Ingredient | null> {
 async function getNeedMappings(ingredientId: number): Promise<NeedMapping[]> {
   try {
     return await apiFetch<NeedMapping[]>(`/ingredient-need-mappings/by-ingredient/${ingredientId}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return [];
@@ -97,7 +97,7 @@ async function getProductsByIngredient(ingredientId: number, domainType?: string
   try {
     const domainQuery = domainType ? `&domain_type=${domainType}` : '';
     return await apiFetch<ProductInCarousel[]>(`/products/by-ingredient/${ingredientId}?limit=12${domainQuery}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return [];

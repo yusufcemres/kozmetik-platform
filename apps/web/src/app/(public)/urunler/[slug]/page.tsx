@@ -104,7 +104,7 @@ interface Product {
 async function getProduct(slug: string): Promise<Product | null> {
   try {
     return await apiFetch<Product>(`/products/slug/${slug}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
@@ -129,7 +129,7 @@ async function getIngredientInteractions(ingredientIds: number[]): Promise<Ingre
     for (const id of idsToCheck) {
       const data = await apiFetch<IngredientInteraction[]>(
         `/interactions/by-ingredient/${id}`,
-        { next: { revalidate: 3600 } } as any,
+        { next: { revalidate: 300 } } as any,
       );
       if (data?.length) results.push(...data);
     }
@@ -359,7 +359,7 @@ async function getSimilarProducts(productId: number): Promise<SimilarProductResu
   try {
     return await apiFetch<SimilarProductResult[]>(
       `/products/${productId}/similar?limit=4`,
-      { next: { revalidate: 3600 } } as any,
+      { next: { revalidate: 300 } } as any,
     );
   } catch {
     return [];
@@ -390,13 +390,13 @@ export default async function ProductDetailPage({
   const [similarProducts, interactions, cosmeticScore, supplementCrossRefs] = await Promise.all([
     getSimilarProducts(product.product_id),
     getIngredientInteractions(keyIngredientIds),
-    apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 3600 } } as any).catch(() => null),
+    apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 300 } } as any).catch(() => null),
     Promise.all(
       topIngredientIds.map(async (id) => {
         try {
           return await apiFetch<Array<{ product_id: number; product_name: string; product_slug: string; brand?: { brand_name: string }; images?: { image_url: string }[] }>>(
             `/products/by-ingredient/${id}?domain_type=supplement&limit=3`,
-            { next: { revalidate: 3600 } } as any,
+            { next: { revalidate: 300 } } as any,
           );
         } catch { return []; }
       }),

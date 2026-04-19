@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 async function getRecommendations(): Promise<{ need: Need; topProduct: ProductScore | null }[]> {
   try {
     const needsRes = await apiFetch<{ data: Need[] }>('/needs?limit=50', {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
     } as any);
     const needs = needsRes.data || [];
 
@@ -68,7 +68,7 @@ async function getRecommendations(): Promise<{ need: Need; topProduct: ProductSc
           const dt = need.domain_type || 'cosmetic';
           const scores = await apiFetch<ProductScore[]>(
             `/scoring/needs/${need.need_id}/top-products?limit=1&domain_type=${dt}`,
-            { next: { revalidate: 3600 } } as any,
+            { next: { revalidate: 300 } } as any,
           );
           return { need, topProduct: scores?.[0] || null };
         } catch {
