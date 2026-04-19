@@ -11,6 +11,7 @@
  * Retries once after 5s (revalidate may not have fired yet).
  */
 import type { PipelineContext } from '../context';
+import { runMobileHttpCheck } from '../qa/mobile-http-check';
 
 const VERCEL_BASE = process.env.ONBOARDING_WEB_BASE ?? 'https://kozmetik-platform.vercel.app';
 const GENERIC_PLACEHOLDER = 'Aktif madde, hedefe yönelik bakım etkisi';
@@ -79,5 +80,15 @@ export async function runVercelQa(ctx: PipelineContext): Promise<void> {
     logger.warn(5, '⚠️  İlk deploy döngüsünde bu normal. 5 dk sonra tekrar kontrol et.');
   } else {
     logger.ok(5, 'Vercel page QA tamam.');
+  }
+
+  // Mobile HTTP shape check — same data the Expo app consumes.
+  logger.info(5, 'Mobile API shape check...');
+  const mobileIssues = await runMobileHttpCheck(ctx);
+  if (mobileIssues.length > 0) {
+    const lines = mobileIssues.map((i) => `${i.endpoint}: ${i.message}`).join('\n  - ');
+    logger.warn(5, `Mobile HTTP QA ${mobileIssues.length} hata:\n  - ${lines}`);
+  } else {
+    logger.ok(5, 'Mobile HTTP QA tamam (3 endpoint assertion geçti).');
   }
 }
