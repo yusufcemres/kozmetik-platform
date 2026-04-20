@@ -110,11 +110,21 @@ export default function ProfileScreen() {
 
         {/* Quick links */}
         <View style={styles.linksSection}>
-          <TouchableOpacity style={styles.linkCard} onPress={() => navigation.navigate('Favorites')}>
+          <TouchableOpacity
+            style={styles.linkCard}
+            onPress={() => navigation.navigate('Favorites')}
+            accessibilityRole="button"
+            accessibilityLabel="Favorilerimi aç"
+          >
             <Text style={styles.linkIcon}>❤️</Text>
             <Text style={styles.linkLabel}>Favorilerim</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.linkCard} onPress={() => navigation.navigate('Routine')}>
+          <TouchableOpacity
+            style={styles.linkCard}
+            onPress={() => navigation.navigate('Routine')}
+            accessibilityRole="button"
+            accessibilityLabel="Rutinimi aç"
+          >
             <Text style={styles.linkIcon}>🧴</Text>
             <Text style={styles.linkLabel}>Rutinim</Text>
           </TouchableOpacity>

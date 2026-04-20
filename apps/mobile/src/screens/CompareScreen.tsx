@@ -22,6 +22,7 @@ import {
 } from '../services/api';
 import ScoreBadge from '../components/ScoreBadge';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
+import { config } from '../constants/config';
 
 type EvidenceScore = SupplementScore | CosmeticScore;
 
@@ -441,11 +442,9 @@ export default function CompareScreen() {
             )}
           </View>
           <TouchableOpacity
-            onPress={() =>
-              Linking.openURL(
-                `${process.env.EXPO_PUBLIC_WEB_URL || 'https://kozmetik-platform.vercel.app'}/nasil-puanliyoruz`,
-              )
-            }
+            onPress={() => Linking.openURL(`${config.webUrl}/nasil-puanliyoruz`)}
+            accessibilityRole="link"
+            accessibilityLabel="Puanlama metodolojisi sayfasını aç"
           >
             <Text style={styles.methodologyLink}>Metodoloji hakkında bilgi al →</Text>
           </TouchableOpacity>

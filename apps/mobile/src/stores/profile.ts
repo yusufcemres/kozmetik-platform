@@ -23,7 +23,13 @@ export async function getAnonymousId(): Promise<string> {
 
 export async function getLocalProfile(): Promise<SkinProfile | null> {
   const raw = await AsyncStorage.getItem(PROFILE_KEY);
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as SkinProfile;
+  } catch {
+    await AsyncStorage.removeItem(PROFILE_KEY);
+    return null;
+  }
 }
 
 export async function saveLocalProfile(profile: SkinProfile): Promise<void> {
