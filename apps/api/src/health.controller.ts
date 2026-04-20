@@ -29,10 +29,11 @@ export class HealthController {
       timestamp: new Date().toISOString(),
       service: 'kozmetik-platform-api',
       version: process.env.npm_package_version || '1.0.0',
-      // BUILD_SHA / BUILD_TIME are baked in by Dockerfile ARG at build time
-      // so we can verify which commit is actually live on Render.
+      // RENDER_GIT_COMMIT is injected by Render at runtime; BUILD_SHA is the
+      // Docker ARG fallback for other hosts. Lets us diff live vs master.
       build: {
-        sha: process.env.BUILD_SHA || 'unknown',
+        sha: process.env.RENDER_GIT_COMMIT || process.env.BUILD_SHA || 'unknown',
+        branch: process.env.RENDER_GIT_BRANCH || 'unknown',
         time: process.env.BUILD_TIME || 'unknown',
       },
       uptime: {
