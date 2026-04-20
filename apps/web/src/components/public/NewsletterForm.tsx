@@ -30,9 +30,12 @@ export default function NewsletterForm() {
       <input
         type="email"
         required
+        autoComplete="email"
+        inputMode="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="E-posta adresin"
+        aria-label="E-posta adresi"
         className="flex-1 bg-surface border border-outline-variant/30 rounded-md px-4 py-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
       />
       <button

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { API_BASE_URL } from '@/lib/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = API_BASE_URL;
 
 interface Brand {
   brand_id: number;
@@ -253,6 +254,8 @@ export default function BrandRegisterPage() {
                 </label>
                 <input
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   value={form.email}
                   onChange={(e) => updateForm('email', e.target.value)}
                   className="w-full border border-outline-variant rounded-lg px-3 py-2.5 bg-surface-container text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
@@ -268,6 +271,8 @@ export default function BrandRegisterPage() {
                 </label>
                 <input
                   type="password"
+                  autoComplete="new-password"
+                  minLength={6}
                   value={form.password}
                   onChange={(e) => updateForm('password', e.target.value)}
                   className="w-full border border-outline-variant rounded-lg px-3 py-2.5 bg-surface-container text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
@@ -280,6 +285,8 @@ export default function BrandRegisterPage() {
                 </label>
                 <input
                   type="password"
+                  autoComplete="new-password"
+                  minLength={6}
                   value={form.password_confirm}
                   onChange={(e) => updateForm('password_confirm', e.target.value)}
                   className="w-full border border-outline-variant rounded-lg px-3 py-2.5 bg-surface-container text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
