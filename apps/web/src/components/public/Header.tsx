@@ -254,7 +254,9 @@ export default function Header() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden text-on-surface-variant hover:text-on-surface transition-colors"
-            aria-label="Menüyü aç"
+            aria-label={mobileOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-menu"
           >
             <span className="material-icon" aria-hidden="true">
               {mobileOpen ? 'close' : 'menu'}
@@ -267,7 +269,7 @@ export default function Header() {
 
     {/* Mobile overlay menu */}
     {mobileOpen && (
-      <div className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
+      <div id="mobile-nav-menu" className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
           {NAV_SECTIONS.map((section) => {
             const isActive = isSectionActive(section);

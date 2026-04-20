@@ -3,6 +3,7 @@ import {
   Post, Put, Query, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { IngredientsService } from './ingredients.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -32,11 +33,13 @@ export class IngredientsController {
   }
 
   @Get('suggest')
+  @Throttle({ public: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'İçerik maddesi öner (auto-suggest)' })
   @ApiQuery({ name: 'q', required: true })
   @ApiQuery({ name: 'limit', required: false })
-  suggest(@Query('q') q: string, @Query('limit') limit?: number) {
-    return this.service.suggest(q, limit || 10);
+  suggest(@Query('q') q: string, @Query('limit') limit?: string) {
+    const lim = Math.min(Math.max(Number(limit) || 10, 1), 50);
+    return this.service.suggest(q, lim);
   }
 
   @Get(':id')
