@@ -1,10 +1,19 @@
 # API deployment (Render) — run from monorepo root
-FROM node:20-alpine AS base
-RUN apk add --no-cache python3 make g++
+# Switched from node:20-alpine to node:20-slim (Debian): glibc-based,
+# better native-dep compatibility (bcrypt, pg, etc). Slightly larger image
+# but we don't pay per MB on Render free tier, and we pay *a lot* if Alpine
+# build fails silently on musl quirks.
+FROM node:20-slim AS base
+
+# Debian build essentials for node-gyp / bcrypt native rebuild
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 RUN corepack enable && corepack prepare pnpm@9 --activate
 WORKDIR /app
 
-# Bump Node heap for TypeScript build — default 1.7GB hits OOM on
+# Bump Node heap for TypeScript build — default ~1.7GB hits OOM on
 # low-memory build workers as the monorepo has grown (scripts/onboarding,
 # reviews, discovery, ~100+ entities/modules).
 ENV NODE_OPTIONS="--max-old-space-size=3072"
@@ -19,13 +28,13 @@ RUN pnpm install --frozen-lockfile
 COPY packages/shared/ packages/shared/
 RUN cd packages/shared && pnpm exec tsc
 
-# ---- Build API (split tsc + tsc-alias for clearer error output) ----
+# ---- Build API (split tsc + tsc-alias so Render log points at the failing step) ----
 COPY apps/api/ apps/api/
 RUN cd apps/api && pnpm exec tsc -p tsconfig.json
 RUN cd apps/api && pnpm exec tsc-alias -p tsconfig.json
 
 # ---- Production image ----
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /app
 
 # Copy entire node_modules tree (pnpm symlinks need full structure)
