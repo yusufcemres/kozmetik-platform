@@ -14,7 +14,14 @@ export interface FavoriteItem {
 
 export async function getFavorites(): Promise<FavoriteItem[]> {
   const raw = await AsyncStorage.getItem(FAVORITES_KEY);
-  return raw ? JSON.parse(raw) : [];
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    await AsyncStorage.removeItem(FAVORITES_KEY);
+    return [];
+  }
 }
 
 export async function addFavorite(product: Product): Promise<FavoriteItem[]> {

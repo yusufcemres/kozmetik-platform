@@ -122,7 +122,7 @@ export default function SearchScreen() {
       ) : (
         <FlatList
           data={results}
-          keyExtractor={(item, i) => `${item.type}-${item.id}-${i}`}
+          keyExtractor={(item) => `${item.type}-${item.id}`}
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.resultCard} onPress={() => navigateToResult(item)}>
               <Text style={styles.resultIcon}>{typeIcon[item.type]}</Text>

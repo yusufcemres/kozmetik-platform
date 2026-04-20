@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import ScoreBadge from './ScoreBadge';
 import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
+import { config } from '../constants/config';
 import type { SupplementScore, CosmeticScore, ExplanationItem } from '../services/api';
 
 type AnyScore = SupplementScore | CosmeticScore;
@@ -159,8 +160,10 @@ export default function EvidenceScoreCard({ score }: Props) {
       )}
 
       <TouchableOpacity
-        onPress={() => Linking.openURL('https://kozmetikplatform.com/nasil-puanliyoruz')}
+        onPress={() => Linking.openURL(`${config.webUrl}/nasil-puanliyoruz`)}
         style={styles.methodologyLink}
+        accessibilityRole="link"
+        accessibilityLabel="Puanlama metodolojisi sayfasını aç"
       >
         <Text style={styles.methodologyText}>Metodoloji →</Text>
       </TouchableOpacity>
