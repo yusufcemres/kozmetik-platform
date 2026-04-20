@@ -147,6 +147,59 @@ export default function PriceChart({ productId }: { productId: number }) {
     </div>
   );
 
+  // Require at least one platform with ≥2 points so the polyline actually shows a trend.
+  // Prevents the "single-dot chart" UX bug when the cron has only run once.
+  const hasRenderableSeries = data.platforms.some((p) => p.points.length >= 2);
+  if (!hasRenderableSeries) {
+    const currentPrices = data.platforms
+      .map((p) => ({ platform: p.platform, price: p.current }))
+      .filter((p) => p.price != null);
+    return (
+      <div className="curator-card p-5 mb-4">
+        <h3 className="label-caps text-on-surface-variant tracking-[0.2em] mb-4">Fiyat Takip</h3>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <span className="material-icon text-outline-variant/40 mb-3" style={{ fontSize: '40px' }} aria-hidden="true">
+            schedule
+          </span>
+          <p className="text-sm text-on-surface-variant">Fiyat geçmişi oluşturuluyor</p>
+          <p className="text-xs text-outline mt-1">
+            Grafik en az 2 fiyat ölçümü olunca görünür — ölçüm günlük olarak yapılıyor.
+          </p>
+        </div>
+        {currentPrices.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-4 pt-4 border-t border-outline-variant/20">
+            {currentPrices.map(({ platform, price }) => {
+              const brand = getPlatform(platform);
+              return (
+                <div
+                  key={platform}
+                  className="flex items-center gap-2.5 p-2 rounded-md border border-outline-variant/20"
+                >
+                  {brand.logo ? (
+                    <img
+                      src={brand.logo}
+                      alt={brand.label}
+                      className="h-5 w-auto shrink-0 rounded-sm"
+                      style={{ maxWidth: '60px' }}
+                    />
+                  ) : (
+                    <span
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: brand.color }}
+                    />
+                  )}
+                  <span className="text-[10px] font-bold truncate" style={{ color: brand.color }}>
+                    {formatTL(price)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // SVG chart dimensions
   const W = 700;
   const H = 260;
