@@ -182,14 +182,14 @@ export default function BrandsPage() {
                   </span>
                 </div>
 
-                <div className="curator-card divide-y divide-outline-variant/15 overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {grouped[letter]
                     .sort((a, b) => a.brand_name.localeCompare(b.brand_name))
                     .map((brand) => (
                       <Link
                         key={brand.brand_id}
                         href={`/markalar/${brand.brand_slug}`}
-                        className="flex items-center gap-4 px-5 py-4 group hover:bg-surface-container-low transition-colors duration-200"
+                        className="curator-card flex items-center gap-4 px-4 py-3.5 group hover:bg-surface-container-low transition-colors duration-200"
                       >
                         {/* Logo / Initial */}
                         <div className="w-12 h-12 rounded-lg bg-surface-container-low border border-outline-variant/15 flex items-center justify-center shrink-0 overflow-hidden">
@@ -220,21 +220,13 @@ export default function BrandsPage() {
                                   {COUNTRY_FLAGS[brand.country_of_origin]}
                                 </span>
                               )}
-                            {brand.country_of_origin && (
+                            {brand.product_count !== undefined && brand.product_count > 0 && (
                               <span className="label-caps text-outline text-[10px]">
-                                {COUNTRY_LABELS[brand.country_of_origin] ||
-                                  brand.country_of_origin}
+                                {brand.product_count} ürün
                               </span>
                             )}
                           </div>
                         </div>
-
-                        {/* Product count */}
-                        {brand.product_count !== undefined && brand.product_count > 0 && (
-                          <span className="text-xs text-on-surface-variant whitespace-nowrap">
-                            {brand.product_count} urun
-                          </span>
-                        )}
 
                         {/* Arrow */}
                         <span

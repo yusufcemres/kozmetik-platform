@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/public/SafeImage';
 import { apiFetch } from '@/lib/api';
 import ProductCarousel from '@/components/public/ProductCarousel';
 import NewsletterForm from '@/components/public/NewsletterForm';
@@ -99,29 +99,23 @@ function ProductCard({ product }: { product: Product }) {
       className="flex flex-col curator-card p-3 group min-w-[180px] w-[180px] lg:min-w-[200px] lg:w-[200px] snap-start shrink-0"
     >
       <div className="aspect-[3/4] bg-surface-container-low mb-3 overflow-hidden rounded-sm relative">
-        {primaryImg ? (
-          <>
-            <Image
-              src={primaryImg}
-              alt={product.product_name}
-              fill
-              sizes="(max-width: 640px) 50vw, 25vw"
-              className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
-            />
-            {hoverImg && (
-              <Image
-                src={hoverImg}
-                alt={`${product.product_name} - detay`}
-                fill
-                sizes="(max-width: 640px) 50vw, 25vw"
-                className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
-              />
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="material-icon material-icon-lg text-outline-variant">inventory_2</span>
-          </div>
+        <SafeImage
+          src={primaryImg}
+          alt={product.product_name}
+          fill
+          sizes="(max-width: 640px) 50vw, 25vw"
+          fallbackIcon="inventory_2"
+          className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+        />
+        {hoverImg && (
+          <SafeImage
+            src={hoverImg}
+            alt={`${product.product_name} - detay`}
+            fill
+            sizes="(max-width: 640px) 50vw, 25vw"
+            fallbackIcon="inventory_2"
+            className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+          />
         )}
       </div>
       <div className="space-y-1 min-w-0">

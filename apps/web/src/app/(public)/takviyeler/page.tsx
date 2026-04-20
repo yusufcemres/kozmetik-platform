@@ -19,7 +19,7 @@ interface SupplementProduct {
 const CATEGORIES = [
   { slug: '', label: 'Tümü', icon: 'grid_view' },
   { slug: 'vitamin-mineral', label: 'Vitamin & Mineral', icon: 'medication' },
-  { slug: 'probiyotik', label: 'Probiyotik', icon: 'bacteria' },
+  { slug: 'probiyotik', label: 'Probiyotik', icon: 'biotech' },
   { slug: 'bitkisel-takviye', label: 'Bitkisel', icon: 'spa' },
   { slug: 'omega-yag-asitleri', label: 'Omega & Yağ Asitleri', icon: 'water_drop' },
   { slug: 'sporcu-besinleri', label: 'Sporcu', icon: 'fitness_center' },
