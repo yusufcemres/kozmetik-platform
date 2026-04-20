@@ -13,14 +13,31 @@ export class AffiliateCronService {
    */
   @Cron(CronExpression.EVERY_DAY_AT_4AM, { name: 'daily-price-update' })
   async handleDailyPriceUpdate() {
-    this.logger.log('Starting daily price update...');
+    const startedAt = Date.now();
+    this.logger.log(JSON.stringify({ event: 'cron.price_update.started', cron: 'daily-price-update' }));
     try {
       const result = await this.affiliateService.batchUpdatePrices();
+      const duration_ms = Date.now() - startedAt;
       this.logger.log(
-        `Daily price update complete: ${result.updated}/${result.total} updated, ${result.errors} errors`,
+        JSON.stringify({
+          event: 'cron.price_update.completed',
+          cron: 'daily-price-update',
+          total: result.total,
+          updated: result.updated,
+          errors: result.errors,
+          duration_ms,
+        }),
       );
     } catch (err) {
-      this.logger.error('Daily price update failed', err);
+      const duration_ms = Date.now() - startedAt;
+      this.logger.error(
+        JSON.stringify({
+          event: 'cron.price_update.failed',
+          cron: 'daily-price-update',
+          duration_ms,
+          error: err instanceof Error ? err.message : String(err),
+        }),
+      );
     }
   }
 
@@ -29,14 +46,34 @@ export class AffiliateCronService {
    */
   @Cron(CronExpression.EVERY_6_HOURS, { name: 'stale-price-check' })
   async handleStalePriceCheck() {
-    this.logger.log('Checking for stale prices...');
+    const startedAt = Date.now();
     try {
       const metrics = await this.affiliateService.getAffiliateMetrics();
+      const duration_ms = Date.now() - startedAt;
+      this.logger.log(
+        JSON.stringify({
+          event: 'cron.stale_price_check.completed',
+          cron: 'stale-price-check',
+          stale_prices: metrics.stale_prices,
+          duration_ms,
+        }),
+      );
       if (metrics.stale_prices > 0) {
-        this.logger.warn(`${metrics.stale_prices} affiliate links have stale prices (>7 days)`);
+        this.logger.warn(
+          JSON.stringify({
+            event: 'cron.stale_price_check.alert',
+            stale_prices: metrics.stale_prices,
+            threshold_days: 7,
+          }),
+        );
       }
     } catch (err) {
-      this.logger.error('Stale price check failed', err);
+      this.logger.error(
+        JSON.stringify({
+          event: 'cron.stale_price_check.failed',
+          error: err instanceof Error ? err.message : String(err),
+        }),
+      );
     }
   }
 }
