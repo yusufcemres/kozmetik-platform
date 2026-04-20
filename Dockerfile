@@ -37,6 +37,13 @@ RUN cd apps/api && pnpm exec tsc-alias -p tsconfig.json
 FROM node:20-slim
 WORKDIR /app
 
+# Bake commit SHA + build time into the image so /api/v1/health returns
+# the currently-deployed commit — quick way to verify Render picked up a push.
+ARG BUILD_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV BUILD_SHA=${BUILD_SHA}
+ENV BUILD_TIME=${BUILD_TIME}
+
 # Copy entire node_modules tree (pnpm symlinks need full structure)
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/apps/api/node_modules ./apps/api/node_modules
