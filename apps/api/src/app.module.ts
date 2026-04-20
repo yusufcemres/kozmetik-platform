@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './health.controller';
@@ -54,6 +55,8 @@ const dbModule = skipDb
           password: configService.get<string>('DB_PASS', 'kozmetik_dev'),
           database: configService.get<string>('DB_NAME', 'kozmetik_platform'),
           autoLoadEntities: true,
+          migrations: [join(__dirname, 'database/migrations/*{.ts,.js}')],
+          migrationsRun: configService.get('DB_MIGRATIONS_RUN', 'true') === 'true',
           synchronize: configService.get('DB_SYNC', 'false') === 'true',
           logging: configService.get('NODE_ENV') === 'development',
           ssl: configService.get('DB_SSL', 'false') === 'true'
