@@ -29,6 +29,12 @@ export class HealthController {
       timestamp: new Date().toISOString(),
       service: 'kozmetik-platform-api',
       version: process.env.npm_package_version || '1.0.0',
+      // BUILD_SHA / BUILD_TIME are baked in by Dockerfile ARG at build time
+      // so we can verify which commit is actually live on Render.
+      build: {
+        sha: process.env.BUILD_SHA || 'unknown',
+        time: process.env.BUILD_TIME || 'unknown',
+      },
       uptime: {
         ms: uptimeMs,
         human: this.formatUptime(uptimeMs),

@@ -5,7 +5,10 @@ services:
     region: frankfurt
     plan: free
     branch: master
+    autoDeploy: true
+    healthCheckPath: /api/v1/health
     dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: DB_HOST
         value: ep-solitary-bar-al8ftlrb.c-3.eu-central-1.aws.neon.tech
