@@ -80,7 +80,44 @@ export class ContentService {
   async findBySlug(slug: string) {
     const entity = await this.repo.findOne({ where: { slug, status: 'published' } });
     if (!entity) throw new NotFoundException('Makale bulunamadı');
-    return entity;
+
+    const [productLinks, ingredientLinks, needLinks] = await Promise.all([
+      this.productArticleRepo
+        .createQueryBuilder('pa')
+        .leftJoin('products', 'p', 'p.product_id = pa.product_id')
+        .leftJoin('brands', 'b', 'b.brand_id = p.brand_id')
+        .where('pa.article_id = :id', { id: entity.article_id })
+        .select(['p.product_id AS product_id', 'p.product_name AS product_name', 'p.product_slug AS product_slug', 'b.brand_name AS brand_name'])
+        .getRawMany(),
+      this.ingredientArticleRepo
+        .createQueryBuilder('ia')
+        .leftJoin('ingredients', 'i', 'i.ingredient_id = ia.ingredient_id')
+        .where('ia.article_id = :id', { id: entity.article_id })
+        .select(['i.ingredient_id AS ingredient_id', 'i.inci_name AS inci_name', 'i.ingredient_slug AS ingredient_slug', 'i.common_name AS common_name'])
+        .getRawMany(),
+      this.needArticleRepo
+        .createQueryBuilder('na')
+        .leftJoin('needs', 'n', 'n.need_id = na.need_id')
+        .where('na.article_id = :id', { id: entity.article_id })
+        .select(['n.need_id AS need_id', 'n.need_name AS need_name', 'n.need_slug AS need_slug', 'n.user_friendly_label AS user_friendly_label'])
+        .getRawMany(),
+    ]);
+
+    return {
+      ...entity,
+      related_products: productLinks.filter((r) => r.product_id),
+      related_ingredients: ingredientLinks.filter((r) => r.ingredient_id),
+      related_needs: needLinks.filter((r) => r.need_id),
+    };
+  }
+
+  async getSitemap() {
+    const rows = await this.repo.find({
+      where: { status: 'published' },
+      select: ['slug', 'updated_at'],
+      order: { updated_at: 'DESC' },
+    });
+    return rows.map((r) => ({ slug: r.slug, updated_at: r.updated_at }));
   }
 
   async update(id: number, dto: UpdateArticleDto) {
