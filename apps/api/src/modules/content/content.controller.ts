@@ -62,6 +62,12 @@ export class ContentController {
     return this.service.findBySlug(slug);
   }
 
+  @Get('sitemap/all')
+  @ApiOperation({ summary: 'Sitemap için yayınlanmış makale slugları' })
+  sitemap() {
+    return this.service.getSitemap();
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'content_editor')

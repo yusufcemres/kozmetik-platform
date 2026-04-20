@@ -366,7 +366,8 @@ export default async function NeedDetailPage({
           )}
         </section>
 
-        {/* Compatible Products — Cosmetics */}
+        {/* Compatible Products — Cosmetics (hidden when no cosmetic products match) */}
+        {topScores.length > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-bold text-on-surface mb-4">Kozmetik Öneriler</h2>
           {topScores.length > 0 ? (
@@ -480,6 +481,7 @@ export default async function NeedDetailPage({
             </div>
           )}
         </section>
+        )}
 
         {/* Compatible Products — Supplements */}
         {supplementScores.length > 0 && (

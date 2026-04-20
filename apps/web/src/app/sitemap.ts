@@ -52,6 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/kvkk`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.2 },
     { url: `${BASE_URL}/giris`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/rehber`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/ai-arama`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/uzmanlar`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];
@@ -59,6 +60,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogSlugs = await fetchSlugs('/blog/sitemap', 'slug');
   const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
     url: `${BASE_URL}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  const rehberSlugs = await fetchSlugs('/articles/sitemap/all', 'slug');
+  const rehberPages: MetadataRoute.Sitemap = rehberSlugs.map((slug) => ({
+    url: `${BASE_URL}/rehber/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
@@ -107,5 +116,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages, ...blogPages];
+  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages, ...blogPages, ...rehberPages];
 }

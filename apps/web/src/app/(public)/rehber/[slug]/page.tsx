@@ -3,6 +3,25 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 
+interface RelatedProduct {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  brand_name?: string;
+}
+interface RelatedIngredient {
+  ingredient_id: number;
+  inci_name: string;
+  ingredient_slug: string;
+  common_name?: string;
+}
+interface RelatedNeed {
+  need_id: number;
+  need_name: string;
+  need_slug: string;
+  user_friendly_label?: string;
+}
+
 interface Article {
   article_id: number;
   title: string;
@@ -11,6 +30,9 @@ interface Article {
   summary?: string;
   body_markdown?: string;
   published_at?: string;
+  related_products?: RelatedProduct[];
+  related_ingredients?: RelatedIngredient[];
+  related_needs?: RelatedNeed[];
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -157,6 +179,81 @@ export default async function GuideDetailPage({
           <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">article</span>
           <p className="text-on-surface-variant">Makale içeriği henüz eklenmemiş</p>
         </div>
+      )}
+
+      {/* Related entities */}
+      {((article.related_ingredients?.length ?? 0) > 0 ||
+        (article.related_needs?.length ?? 0) > 0 ||
+        (article.related_products?.length ?? 0) > 0) && (
+        <section className="mt-12 pt-8 border-t border-outline-variant/20 space-y-8">
+          {(article.related_ingredients?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="label-caps text-outline mb-3 flex items-center gap-1.5">
+                <span className="material-icon material-icon-sm" aria-hidden="true">science</span>
+                İlgili İçerikler
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {article.related_ingredients!.map((ing) => (
+                  <Link
+                    key={ing.ingredient_id}
+                    href={`/icerikler/${ing.ingredient_slug}`}
+                    className="curator-card px-3 py-2 text-xs text-on-surface hover:text-primary transition-colors"
+                  >
+                    <span className="font-medium">{ing.inci_name}</span>
+                    {ing.common_name && (
+                      <span className="text-outline ml-1.5">{ing.common_name}</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(article.related_needs?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="label-caps text-outline mb-3 flex items-center gap-1.5">
+                <span className="material-icon material-icon-sm" aria-hidden="true">target</span>
+                İlgili İhtiyaçlar
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {article.related_needs!.map((need) => (
+                  <Link
+                    key={need.need_id}
+                    href={`/ihtiyaclar/${need.need_slug}`}
+                    className="curator-card px-3 py-2 text-xs text-on-surface hover:text-primary transition-colors"
+                  >
+                    {need.user_friendly_label || need.need_name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(article.related_products?.length ?? 0) > 0 && (
+            <div>
+              <h3 className="label-caps text-outline mb-3 flex items-center gap-1.5">
+                <span className="material-icon material-icon-sm" aria-hidden="true">inventory_2</span>
+                İlgili Ürünler
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {article.related_products!.map((p) => (
+                  <Link
+                    key={p.product_id}
+                    href={`/urunler/${p.product_slug}`}
+                    className="curator-card p-3 group hover:bg-surface-container-low transition-colors"
+                  >
+                    {p.brand_name && (
+                      <p className="label-caps text-outline mb-0.5">{p.brand_name}</p>
+                    )}
+                    <p className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                      {p.product_name}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
       )}
 
       {/* Back link */}
