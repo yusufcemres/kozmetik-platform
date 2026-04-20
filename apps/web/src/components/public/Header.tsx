@@ -64,8 +64,8 @@ const KESFET_DROPDOWN: DropdownItem[] = [
 ];
 
 const NAV_SECTIONS: NavSection[] = [
-  { key: 'dis', label: 'Dış Bakım', dropdown: DIS_BAKIM_DROPDOWN, basePath: '/urunler' },
-  { key: 'ic', label: 'İç Bakım', dropdown: IC_BAKIM_DROPDOWN, basePath: '/takviyeler' },
+  { key: 'dis', label: 'Kozmetik', dropdown: DIS_BAKIM_DROPDOWN, basePath: '/urunler' },
+  { key: 'ic', label: 'Takviye', dropdown: IC_BAKIM_DROPDOWN, basePath: '/takviyeler' },
   { key: 'ihtiyac', label: 'İhtiyaçlar', dropdown: IHTIYACLAR_DROPDOWN, basePath: '/ihtiyaclar' },
   { key: 'testler', label: 'Testler', dropdown: TESTS_DROPDOWN },
   { key: 'kesfet', label: 'Keşfet', dropdown: KESFET_DROPDOWN },
