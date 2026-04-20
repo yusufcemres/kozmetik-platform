@@ -51,10 +51,9 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'brand_id', required: false })
   findTopScored(@Query('limit') limit?: string, @Query('brand_id') brandId?: string) {
-    return this.service.findTopScored(
-      limit ? parseInt(limit) : 6,
-      brandId ? parseInt(brandId) : undefined,
-    );
+    const lim = Math.min(Math.max(parseInt(limit ?? '', 10) || 6, 1), 50);
+    const bId = brandId ? parseInt(brandId, 10) || undefined : undefined;
+    return this.service.findTopScored(lim, bId);
   }
 
   @Get('by-ingredient/:ingredientId')
@@ -66,14 +65,19 @@ export class ProductsController {
     @Query('limit') limit?: string,
     @Query('domain_type') domainType?: string,
   ) {
-    return this.service.findByIngredient(ingredientId, limit ? parseInt(limit) : 20, domainType);
+    const lim = Math.min(Math.max(parseInt(limit ?? '', 10) || 20, 1), 100);
+    return this.service.findByIngredient(ingredientId, lim, domainType);
   }
 
   @Get('compare')
   @ApiOperation({ summary: 'Ürünleri karşılaştır (çoklu ID, skor dahil)' })
   @ApiQuery({ name: 'ids', required: true, description: 'Virgülle ayrılmış product ID\'leri' })
   compare(@Query('ids') ids: string) {
-    const idArr = ids.split(',').map(Number).filter(Boolean).slice(0, 4);
+    const idArr = (ids ?? '')
+      .split(',')
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => Number.isInteger(n) && n > 0)
+      .slice(0, 4);
     return this.service.findByIdsWithScores(idArr);
   }
 
@@ -81,7 +85,8 @@ export class ProductsController {
   @ApiOperation({ summary: 'Popüler markalar (ürün sayısına göre)' })
   @ApiQuery({ name: 'limit', required: false })
   findPopularBrands(@Query('limit') limit?: string) {
-    return this.service.findPopularBrands(limit ? parseInt(limit) : 12);
+    const lim = Math.min(Math.max(parseInt(limit ?? '', 10) || 12, 1), 50);
+    return this.service.findPopularBrands(lim);
   }
 
   @Get('affiliate-health')
@@ -99,7 +104,8 @@ export class ProductsController {
     @Query('limit') limit?: string,
     @Query('domain_type') domainType?: string,
   ) {
-    return this.service.findSimilar(id, limit ? parseInt(limit) : 4, domainType || undefined);
+    const lim = Math.min(Math.max(parseInt(limit ?? '', 10) || 4, 1), 20);
+    return this.service.findSimilar(id, lim, domainType || undefined);
   }
 
   @Get(':id')
@@ -197,7 +203,8 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Query('days') days?: string,
   ) {
-    return this.service.getPriceHistory(id, days ? parseInt(days) : 90);
+    const d = Math.min(Math.max(parseInt(days ?? '', 10) || 90, 1), 365);
+    return this.service.getPriceHistory(id, d);
   }
 
   // === Affiliate Click Tracking ===
