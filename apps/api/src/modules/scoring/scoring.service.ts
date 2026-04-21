@@ -287,10 +287,14 @@ export class ScoringService {
   }
 
   async recalculateAll() {
-    const products = await this.productRepo.find({
-      where: { status: 'published' },
-      select: ['product_id'],
-    });
+    // Supplements are stored with status='active', cosmetics with 'published'
+    // (legacy convention inherited from onboarding). Include both so the need
+    // matching cache covers every live product.
+    const products = await this.productRepo
+      .createQueryBuilder('p')
+      .select('p.product_id', 'product_id')
+      .where('p.status IN (:...statuses)', { statuses: ['published', 'active'] })
+      .getRawMany<{ product_id: number }>();
 
     const results: Array<{ product_id: number; score_count: number }> = [];
     for (const p of products) {
