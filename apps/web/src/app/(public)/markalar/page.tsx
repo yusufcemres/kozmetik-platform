@@ -60,6 +60,7 @@ function brandInitial(name: string): string {
 export default function BrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -75,21 +76,26 @@ export default function BrandsPage() {
     load();
   }, []);
 
-  // Group by first letter
-  const grouped = brands.reduce<Record<string, Brand[]>>((acc, brand) => {
+  // Country stats (based on full list, not filtered — counts stay stable)
+  const countryCounts = brands.reduce<Record<string, number>>((acc, b) => {
+    const c = b.country_of_origin || 'OTHER';
+    acc[c] = (acc[c] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Apply country filter to the visible list
+  const visibleBrands = selectedCountry
+    ? brands.filter((b) => (b.country_of_origin || 'OTHER') === selectedCountry)
+    : brands;
+
+  // Group visible brands by first letter
+  const grouped = visibleBrands.reduce<Record<string, Brand[]>>((acc, brand) => {
     const letter = brandInitial(brand.brand_name);
     if (!acc[letter]) acc[letter] = [];
     acc[letter].push(brand);
     return acc;
   }, {});
   const sortedLetters = Object.keys(grouped).sort();
-
-  // Country stats
-  const countryCounts = brands.reduce<Record<string, number>>((acc, b) => {
-    const c = b.country_of_origin || 'OTHER';
-    acc[c] = (acc[c] || 0) + 1;
-    return acc;
-  }, {});
 
   return (
     <div className="curator-section max-w-[1200px] mx-auto">
@@ -140,18 +146,44 @@ export default function BrandsPage() {
             <div className="flex flex-wrap justify-center gap-2 mb-10">
               {Object.entries(countryCounts)
                 .sort((a, b) => b[1] - a[1])
-                .map(([country, count]) => (
-                  <span
-                    key={country}
-                    className="inline-flex items-center gap-1.5 bg-surface-container-low border border-outline-variant/20 px-3 py-1.5 rounded-sm text-xs text-on-surface-variant"
-                  >
-                    {COUNTRY_FLAGS[country] && (
-                      <span>{COUNTRY_FLAGS[country]}</span>
-                    )}
-                    <span>{COUNTRY_LABELS[country] || country}</span>
-                    <span className="text-outline">({count})</span>
+                .map(([country, count]) => {
+                  const isActive = selectedCountry === country;
+                  return (
+                    <button
+                      key={country}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCountry((prev) => (prev === country ? null : country))
+                      }
+                      aria-pressed={isActive}
+                      className={`inline-flex items-center gap-1.5 border px-3 py-1.5 rounded-sm text-xs transition-colors ${
+                        isActive
+                          ? 'bg-primary text-on-primary border-primary'
+                          : 'bg-surface-container-low border-outline-variant/20 text-on-surface-variant hover:border-primary/40'
+                      }`}
+                    >
+                      {COUNTRY_FLAGS[country] && (
+                        <span>{COUNTRY_FLAGS[country]}</span>
+                      )}
+                      <span>{COUNTRY_LABELS[country] || country}</span>
+                      <span className={isActive ? 'opacity-80' : 'text-outline'}>
+                        ({count})
+                      </span>
+                    </button>
+                  );
+                })}
+              {selectedCountry && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedCountry(null)}
+                  className="inline-flex items-center gap-1 border border-outline-variant/20 px-3 py-1.5 rounded-sm text-xs text-on-surface-variant hover:border-primary/40 transition-colors"
+                >
+                  <span className="material-icon material-icon-sm" aria-hidden="true">
+                    close
                   </span>
-                ))}
+                  Temizle
+                </button>
+              )}
             </div>
           )}
 

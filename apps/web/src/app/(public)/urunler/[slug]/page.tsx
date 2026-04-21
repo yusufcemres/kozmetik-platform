@@ -16,6 +16,7 @@ import { TitckBadge } from '@/components/public/TitckBadge';
 import { CrossSellBlock } from '@/components/public/CrossSellBlock';
 import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 import ScoreBadge from '@/components/public/ScoreBadge';
+import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 
 // === Types ===
 
@@ -263,39 +264,40 @@ function getLowScoreExplanation(product: Product, avgScore: number): string[] {
   return reasons;
 }
 
-const PLATFORM_INFO: Record<string, { label: string; logo: string; color: string }> = {
-  trendyol:     { label: 'Trendyol',     logo: '/logos/trendyol.svg',     color: '#F27A1A' },
-  hepsiburada:  { label: 'Hepsiburada',  logo: '/logos/hepsiburada.svg',  color: '#FF6000' },
-  amazon_tr:    { label: 'Amazon TR',    logo: '/logos/amazon_tr.svg',    color: '#232F3E' },
-  dermoeczanem: { label: 'Dermoeczanem', logo: '/logos/dermoeczanem.svg', color: '#00A99D' },
-  gratis:       { label: 'Gratis',       logo: '/logos/gratis.svg',       color: '#4A0E78' },
-  rossmann:     { label: 'Rossmann',     logo: '/logos/rossmann.svg',     color: '#D40E14' },
-  watsons:      { label: 'Watsons',      logo: '/logos/watsons.svg',      color: '#00B0A0' },
-};
-
 function platformLabel(platform: string): string {
-  const map: Record<string, string> = {
-    trendyol: 'Trendyol',
-    hepsiburada: 'Hepsiburada',
-    amazon_tr: 'Amazon TR',
-    dermoeczanem: 'Dermoeczanem',
-    gratis: 'Gratis',
-    rossmann: 'Rossmann',
-    watsons: 'Watsons',
-    other: 'Diğer',
-  };
-  return map[platform] || platform;
+  if (platform === 'other') return 'Diğer';
+  return sharedPlatformLabel(platform);
 }
 
-function concentrationLabel(band: string): { label: string; color: string } {
-  const map: Record<string, { label: string; color: string }> = {
-    very_high: { label: 'Çok Yüksek', color: 'bg-score-high-bg text-score-high' },
-    high: { label: 'Yüksek', color: 'bg-score-high-bg/50 text-score-high' },
-    medium: { label: 'Orta', color: 'bg-score-medium-bg text-score-medium' },
-    low: { label: 'Düşük', color: 'bg-surface-container text-on-surface-variant' },
-    trace: { label: 'Eser', color: 'bg-surface-container text-outline' },
+function concentrationLabel(band: string): { label: string; color: string; tooltip: string } {
+  const map: Record<string, { label: string; color: string; tooltip: string }> = {
+    very_high: {
+      label: 'Çok Yüksek',
+      color: 'bg-score-high-bg text-score-high',
+      tooltip: 'Çok yüksek (tahmini %10+): INCI listesinin ilk sıralarında, formülün büyük bölümünü oluşturur.',
+    },
+    high: {
+      label: 'Yüksek',
+      color: 'bg-score-high-bg/50 text-score-high',
+      tooltip: 'Yüksek (tahmini %5-10): Formülde ana bileşenlerden biri, INCI sırasında üst sıralarda.',
+    },
+    medium: {
+      label: 'Orta',
+      color: 'bg-score-medium-bg text-score-medium',
+      tooltip: 'Orta (tahmini %1-5): Orta sıralarda; aktif içerik olarak anlamlı düzeyde.',
+    },
+    low: {
+      label: 'Düşük',
+      color: 'bg-surface-container text-on-surface-variant',
+      tooltip: 'Düşük (tahmini %0.1-1): Alt sıralarda; destek veya yardımcı bileşen.',
+    },
+    trace: {
+      label: 'Eser',
+      color: 'bg-surface-container text-outline',
+      tooltip: 'Eser (tahmini <%0.1): INCI listesinin sonunda; çoğunlukla koku, koruyucu veya katkı.',
+    },
   };
-  return map[band] || { label: band, color: 'text-outline' };
+  return map[band] || { label: band, color: 'text-outline', tooltip: 'Konsantrasyon bilinmiyor' };
 }
 
 function formatPrice(price: number | null): string {
@@ -827,7 +829,7 @@ export default async function ProductDetailPage({
 
         {/* INCI Ingredients */}
         <section className="mb-16" data-analytics-section="inci">
-          <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface">
+          <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">
             İçerik Listesi (INCI)
             {sortedIngredients.length > 0 && (
               <span className="text-sm font-normal text-outline ml-2">
@@ -835,6 +837,28 @@ export default async function ProductDetailPage({
               </span>
             )}
           </h2>
+          {sortedIngredients.length > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-on-surface-variant bg-surface-container-low border border-outline-variant/20 rounded-md px-3 py-2">
+              <span className="label-caps text-outline">İçerik Yoğunluğu</span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-score-high-bg text-score-high px-1.5 py-0.5 rounded-sm">Yüksek</span>
+                <span>%5+</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-score-medium-bg text-score-medium px-1.5 py-0.5 rounded-sm">Orta</span>
+                <span>%1-5</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-sm">Düşük</span>
+                <span>%0.1-1</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-surface-container text-outline px-1.5 py-0.5 rounded-sm">Eser</span>
+                <span>&lt;%0.1</span>
+              </span>
+              <span className="text-outline">(INCI sırasına göre tahmini)</span>
+            </div>
+          )}
           {sortedIngredients.length > 0 ? (
             <ListModal
               title="İçerik Listesi (INCI)"
@@ -882,7 +906,11 @@ export default async function ProductDetailPage({
                           {pi.concentration_band !== 'unknown' && (() => {
                             const conc = concentrationLabel(pi.concentration_band);
                             return (
-                              <span className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}>
+                              <span
+                                className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}
+                                title={conc.tooltip}
+                                aria-label={conc.tooltip}
+                              >
                                 {conc.label}
                               </span>
                             );
@@ -931,7 +959,11 @@ export default async function ProductDetailPage({
                             {pi.concentration_band !== 'unknown' && (() => {
                               const conc = concentrationLabel(pi.concentration_band);
                               return (
-                                <span className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}>
+                                <span
+                                  className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}
+                                  title={conc.tooltip}
+                                  aria-label={conc.tooltip}
+                                >
                                   {conc.label}
                                 </span>
                               );
@@ -1138,7 +1170,9 @@ export default async function ProductDetailPage({
                       key={link.affiliate_link_id}
                       href={link.affiliate_url}
                       affiliateLinkId={link.affiliate_link_id}
-                      className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
+                      className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 border-l-4 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
+                      style={pInfo ? { borderLeftColor: pInfo.color } : { borderLeftColor: 'transparent' }}
+                      aria-label={`${platformLabel(link.platform)} sayfasında aç`}
                     >
                       <div className="flex-1 min-w-0 flex items-center gap-3">
                         {pInfo?.logo ? (
@@ -1195,20 +1229,27 @@ export default async function ProductDetailPage({
             <div className="flex flex-wrap gap-3">
               {searchOnlyLinks.map((link) => {
                 const pInfo = PLATFORM_INFO[link.platform];
+                const branded = !!pInfo;
                 return (
                   <AffiliateLink
                     key={link.affiliate_link_id}
                     href={link.affiliate_url}
                     affiliateLinkId={link.affiliate_link_id}
-                    className="flex items-center gap-2 px-5 py-3 rounded-md border border-outline-variant/30 hover:border-on-surface hover:bg-surface-container-low transition-all duration-300"
+                    className={
+                      branded
+                        ? 'flex items-center gap-2 px-5 py-3 rounded-md transition-all duration-300 hover:brightness-95 shadow-sm'
+                        : 'flex items-center gap-2 px-5 py-3 rounded-md border border-outline-variant/30 hover:border-on-surface hover:bg-surface-container-low transition-all duration-300'
+                    }
+                    style={branded ? { backgroundColor: pInfo.color, color: pInfo.textColor } : undefined}
+                    aria-label={`${platformLabel(link.platform)} mağazasında ara`}
                   >
                     {pInfo?.logo ? (
-                      <img src={pInfo.logo} alt={pInfo.label} className="h-6 w-auto" style={{ maxWidth: '70px' }} />
+                      <img src={pInfo.logo} alt={pInfo.label} className="h-6 w-auto bg-white/90 rounded-sm px-1 py-0.5" style={{ maxWidth: '70px' }} />
                     ) : (
                       <span className="font-semibold text-on-surface">{platformLabel(link.platform)}</span>
                     )}
-                    <span className="label-caps text-on-surface-variant">Ara</span>
-                    <span className="material-icon material-icon-sm text-on-surface-variant" aria-hidden="true">arrow_forward</span>
+                    <span className="label-caps" style={branded ? { color: pInfo.textColor } : undefined}>Ara</span>
+                    <span className="material-icon material-icon-sm" style={branded ? { color: pInfo.textColor } : undefined} aria-hidden="true">arrow_forward</span>
                   </AffiliateLink>
                 );
               })}

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
+import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import PriceChart from '@/components/public/PriceChart';
 import ReviewsBlock from '@/components/public/ReviewsBlock';
@@ -242,15 +243,8 @@ function formLabel(form: string): string {
 }
 
 function platformLabel(p: string): string {
-  const map: Record<string, string> = {
-    trendyol: 'Trendyol',
-    hepsiburada: 'Hepsiburada',
-    amazon_tr: 'Amazon TR',
-    dermoeczanem: 'Dermoeczanem',
-    gratis: 'Gratis',
-    other: 'Diğer',
-  };
-  return map[p] || p;
+  if (p === 'other') return 'Diğer';
+  return sharedPlatformLabel(p);
 }
 
 function formatPrice(price: number | null): string {
@@ -416,23 +410,39 @@ export default async function SupplementDetailPage({
             {/* Quick price section */}
             {activeLinks.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-4">
-                {activeLinks.map((link) => (
-                  <a
-                    key={link.affiliate_link_id}
-                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow sponsored"
-                    className="inline-flex items-center gap-2 border border-outline-variant/30 rounded-sm px-4 py-2.5 hover:border-primary hover:bg-primary/5 transition-all"
-                  >
-                    <span className="font-semibold text-sm text-on-surface">{platformLabel(link.platform)}</span>
-                    {link.price_snapshot ? (
-                      <span className="text-lg font-bold text-primary">{formatPrice(link.price_snapshot)}</span>
-                    ) : (
-                      <span className="text-sm text-outline">Fiyat bilgisi yok</span>
-                    )}
-                    <span className="material-icon text-primary text-[16px]" aria-hidden="true">arrow_forward</span>
-                  </a>
-                ))}
+                {activeLinks.map((link) => {
+                  const pInfo = PLATFORM_INFO[link.platform];
+                  const branded = !!pInfo;
+                  return (
+                    <a
+                      key={link.affiliate_link_id}
+                      href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      aria-label={`${platformLabel(link.platform)}'de aç`}
+                      className={
+                        branded
+                          ? 'inline-flex items-center gap-2 rounded-sm px-4 py-2.5 transition-all hover:brightness-95 shadow-sm'
+                          : 'inline-flex items-center gap-2 border border-outline-variant/30 rounded-sm px-4 py-2.5 hover:border-primary hover:bg-primary/5 transition-all'
+                      }
+                      style={
+                        branded
+                          ? { backgroundColor: pInfo.color, color: pInfo.textColor }
+                          : undefined
+                      }
+                    >
+                      <span className="font-semibold text-sm">{platformLabel(link.platform)}</span>
+                      {link.price_snapshot ? (
+                        <span className="text-lg font-bold">{formatPrice(link.price_snapshot)}</span>
+                      ) : (
+                        <span className={branded ? 'text-sm opacity-80' : 'text-sm text-outline'}>
+                          Fiyat bilgisi yok
+                        </span>
+                      )}
+                      <span className="material-icon text-[16px]" aria-hidden="true">arrow_forward</span>
+                    </a>
+                  );
+                })}
               </div>
             )}
           </div>
