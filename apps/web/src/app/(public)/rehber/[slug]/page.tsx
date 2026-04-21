@@ -80,7 +80,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-// Simple markdown-to-HTML: supports ## headings, **bold**, - lists, paragraphs
+// Simple markdown-to-HTML: supports ## headings, **bold**, - lists, | tables |, paragraphs
 function renderMarkdown(md: string): string {
   return md
     .split('\n\n')
@@ -94,6 +94,37 @@ function renderMarkdown(md: string): string {
         return `<h2 class="text-xl font-bold text-on-surface mt-8 mb-3">${trimmed.slice(3)}</h2>`;
       if (trimmed.startsWith('# '))
         return `<h1 class="text-2xl font-bold text-on-surface mt-8 mb-3">${trimmed.slice(2)}</h1>`;
+      // Table block (GFM pipe tables)
+      if (trimmed.startsWith('|')) {
+        const rows = trimmed.split('\n').filter((r) => r.trim().startsWith('|'));
+        if (rows.length >= 2 && /^\|\s*:?-+/.test(rows[1])) {
+          const parseCells = (row: string) =>
+            row
+              .replace(/^\||\|$/g, '')
+              .split('|')
+              .map((c) => c.trim());
+          const header = parseCells(rows[0]);
+          const bodyRows = rows.slice(2).map(parseCells);
+          const th = header
+            .map(
+              (c) =>
+                `<th class="border border-outline-variant/30 px-3 py-2 text-left font-semibold text-on-surface bg-surface-container-low">${inlineFormat(c)}</th>`,
+            )
+            .join('');
+          const tbody = bodyRows
+            .map(
+              (cells) =>
+                `<tr>${cells
+                  .map(
+                    (c) =>
+                      `<td class="border border-outline-variant/30 px-3 py-2 text-on-surface-variant align-top">${inlineFormat(c)}</td>`,
+                  )
+                  .join('')}</tr>`,
+            )
+            .join('');
+          return `<div class="overflow-x-auto my-4"><table class="w-full border-collapse text-sm"><thead><tr>${th}</tr></thead><tbody>${tbody}</tbody></table></div>`;
+        }
+      }
       // List block
       if (trimmed.startsWith('- ')) {
         const items = trimmed
