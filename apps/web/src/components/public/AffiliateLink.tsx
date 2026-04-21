@@ -7,12 +7,16 @@ export default function AffiliateLink({
   affiliateLinkId,
   sourcePage = 'product_detail',
   className,
+  style,
+  'aria-label': ariaLabel,
   children,
 }: {
   href: string;
   affiliateLinkId: number;
   sourcePage?: string;
   className?: string;
+  style?: React.CSSProperties;
+  'aria-label'?: string;
   children: React.ReactNode;
 }) {
   // Redirect endpoint: click tracking + tracking param injection + 302
@@ -24,6 +28,8 @@ export default function AffiliateLink({
       target="_blank"
       rel="noopener noreferrer nofollow sponsored"
       className={className}
+      style={style}
+      aria-label={ariaLabel}
     >
       {children}
     </a>
