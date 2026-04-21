@@ -1,38 +1,47 @@
 import * as cheerio from 'cheerio';
-import { BaseAffiliateProvider, PriceFetchResult, AffiliateUrlParams } from './base-provider';
+import { BaseAffiliateProvider, PriceFetchResult, AffiliateUrlParams, AffiliateErrorType } from './base-provider';
 
 export class TrendyolProvider extends BaseAffiliateProvider {
   readonly platformName = 'Trendyol';
   readonly platformSlug = 'trendyol';
 
   async fetchPrice(productUrl: string): Promise<PriceFetchResult> {
+    const fetchedAt = new Date();
     try {
       const res = await fetch(productUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml',
-          'Accept-Language': 'tr-TR,tr;q=0.9',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Upgrade-Insecure-Requests': '1',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
         },
         signal: AbortSignal.timeout(15000),
+        redirect: 'follow',
       });
 
       if (!res.ok) {
+        const errorType: AffiliateErrorType = this.classifyHttpStatus(res.status);
         return {
           price: null,
           in_stock: false,
           currency: 'TRY',
-          fetched_at: new Date(),
+          fetched_at: fetchedAt,
           error: `HTTP ${res.status}`,
+          error_type: errorType,
         };
       }
 
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      // Try JSON-LD structured data first (most reliable)
       let price: number | null = null;
       let inStock = true;
 
+      // JSON-LD (primary — en stabil)
       const jsonLd = $('script[type="application/ld+json"]');
       jsonLd.each((_, el) => {
         try {
@@ -40,8 +49,8 @@ export class TrendyolProvider extends BaseAffiliateProvider {
           const extractFromProduct = (item: any) => {
             if (item?.['@type'] === 'Product' && item.offers) {
               const offers = Array.isArray(item.offers) ? item.offers[0] : item.offers;
-              if (offers.price) price = parseFloat(offers.price);
-              if (offers.availability) inStock = offers.availability.includes('InStock');
+              if (offers.price && price === null) price = parseFloat(offers.price);
+              if (offers.availability) inStock = String(offers.availability).includes('InStock');
             }
           };
           extractFromProduct(data);
@@ -53,42 +62,68 @@ export class TrendyolProvider extends BaseAffiliateProvider {
         }
       });
 
-      // Fallback: parse price from HTML selectors
+      // Fallback: genişletilmiş CSS selectors (2026 DOM varyantları)
       if (price === null) {
-        const priceText = $('.prc-dsc').first().text()
-          || $('[data-testid="product-price"]').text()
-          || $('.product-price-container .prc-slg').text();
-
-        if (priceText) {
-          const cleaned = priceText.replace(/[^\d,.]/g, '').replace(',', '.');
-          const parsed = parseFloat(cleaned);
-          if (!isNaN(parsed)) {
+        const selectors = [
+          '.prc-dsc',
+          '.product-price-container .prc-slg',
+          '.product-price-container .prc-dsc',
+          '[data-testid="product-price"]',
+          '.pr-bx-w .prc-dsc',
+          '.featured-prices .prc-dsc',
+          '.campaign-price-container .prc-dsc',
+          'span.price',
+          '[class*="priceInfo"]',
+        ];
+        for (const sel of selectors) {
+          const txt = $(sel).first().text().trim();
+          const parsed = this.parsePriceString(txt);
+          if (parsed !== null) {
             price = parsed;
+            break;
           }
         }
       }
 
-      // Check out of stock indicators
-      if ($('.out-of-stock-btn').length || $('.sold-out').length) {
+      // OOS: explicit markers
+      if ($('.out-of-stock-btn').length || $('.sold-out').length || /tükendi|stokta yok/i.test($('button').text())) {
         inStock = false;
+      }
+
+      if (price === null) {
+        return {
+          price: null,
+          in_stock: inStock,
+          currency: 'TRY',
+          fetched_at: fetchedAt,
+          error: 'Fiyat HTML\'den çıkarılamadı',
+          error_type: inStock ? 'dom_mismatch' : 'oos',
+        };
       }
 
       return {
         price,
         in_stock: inStock,
         currency: 'TRY',
-        fetched_at: new Date(),
-        error: price === null ? 'Fiyat HTML\'den çıkarılamadı' : undefined,
+        fetched_at: fetchedAt,
       };
     } catch (err: any) {
       return {
         price: null,
         in_stock: false,
         currency: 'TRY',
-        fetched_at: new Date(),
-        error: err.message || 'Bağlantı hatası',
+        fetched_at: fetchedAt,
+        error: err?.message || 'Bağlantı hatası',
+        error_type: this.classifyNetworkError(err),
       };
     }
+  }
+
+  private parsePriceString(txt: string): number | null {
+    if (!txt) return null;
+    const cleaned = txt.replace(/[^\d,.]/g, '').replace(/\.(?=\d{3}(?:,|$))/g, '').replace(',', '.');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? null : parsed;
   }
 
   generateTrackingUrl(params: AffiliateUrlParams): string {

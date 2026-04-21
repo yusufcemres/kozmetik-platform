@@ -358,6 +358,11 @@ export class ProductsService {
       order: { ingredients: { inci_order_rank: 'ASC' }, need_scores: { compatibility_score: 'DESC' } },
     });
     if (!entity) throw new NotFoundException('Ürün bulunamadı');
+    if (entity.affiliate_links) {
+      entity.affiliate_links = entity.affiliate_links.filter(
+        (l: any) => l.verification_status !== 'needs_review' && l.verification_status !== 'dead',
+      );
+    }
     return entity;
   }
 

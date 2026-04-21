@@ -25,6 +25,8 @@ export class AffiliateCronService {
           total: result.total,
           updated: result.updated,
           errors: result.errors,
+          quarantined: result.quarantined,
+          error_breakdown: result.error_breakdown,
           duration_ms,
         }),
       );

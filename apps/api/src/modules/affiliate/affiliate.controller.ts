@@ -68,4 +68,23 @@ export class AffiliateController {
   getPriceAlerts(@Query('threshold') threshold?: string) {
     return this.service.getRecentPriceDropAlerts(threshold ? parseFloat(threshold) : 5);
   }
+
+  @Get('admin/affiliate/quarantined')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Karantinaya alınmış linkler (needs_review)' })
+  @ApiQuery({ name: 'limit', required: false })
+  listQuarantined(@Query('limit') limit?: string) {
+    return this.service.listQuarantinedLinks(limit ? parseInt(limit) : 100);
+  }
+
+  @Post('admin/affiliate/reverify/:linkId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Karantina linkini yeniden doğrula' })
+  reverify(@Param('linkId', ParseIntPipe) linkId: number) {
+    return this.service.reverifyLink(linkId);
+  }
 }
