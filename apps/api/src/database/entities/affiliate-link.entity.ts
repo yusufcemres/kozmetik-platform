@@ -42,7 +42,19 @@ export class AffiliateLink {
   last_verified: Date;
 
   @Column({ type: 'varchar', length: 20, default: 'unverified' })
-  verification_status: string; // unverified, valid, redirect, dead, search_only
+  verification_status: string; // unverified, valid, redirect, dead, search_only, needs_review
+
+  @Column({ type: 'int', default: 0 })
+  consecutive_failures: number;
+
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  last_error_type: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  last_error_message: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  last_attempted_at: Date | null;
 
   @CreateDateColumn()
   created_at: Date;
