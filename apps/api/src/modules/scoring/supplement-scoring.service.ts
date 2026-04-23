@@ -65,7 +65,11 @@ const INTERACTION_DELTA: Record<string, number> = {
 const CERT_BONUS: Record<string, number> = {
   USP_VERIFIED: 25, NSF_CERTIFIED: 20, NSF_SPORT: 20,
   CONSUMERLAB_PASS: 15, LABDOOR_A: 15, INFORMED_SPORT: 10,
-  GMP: 5, PHARMA_GRADE: 5,
+  IFOS: 10, IFOS_5_STAR: 15,
+  ISO_22000: 5, ISO_9001: 3, TURKAK: 3,
+  HALAL: 3, HELAL: 3, KOSHER: 3,
+  NON_GMO: 3, GLUTEN_FREE: 2, GLUTENSIZ: 2, GACP: 5,
+  GMP: 5, CGMP: 5, PHARMA_GRADE: 5,
 };
 
 function clamp(v: number): number { return Math.max(0, Math.min(100, v)); }

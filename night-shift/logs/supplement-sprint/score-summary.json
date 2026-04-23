@@ -1,0 +1,52 @@
+{
+  "total": 6,
+  "published": 6,
+  "stayed_draft": 0,
+  "failed": 0,
+  "threshold": 50,
+  "since": "2026-04-22 18:00",
+  "per_product": [
+    {
+      "id": 2053,
+      "slug": "ocean-passiflora-incarnata-likit-150-ml",
+      "score": 72,
+      "grade": "B",
+      "action": "published"
+    },
+    {
+      "id": 2052,
+      "slug": "ocean-passiflora-incarnata-300-mg-30-kapsul",
+      "score": 71,
+      "grade": "B",
+      "action": "published"
+    },
+    {
+      "id": 2063,
+      "slug": "ocean-tribulus-terrestris-60-kapsul",
+      "score": 68,
+      "grade": "C",
+      "action": "published"
+    },
+    {
+      "id": 2009,
+      "slug": "ocean-bromelain-complex-30-tablet",
+      "score": 68,
+      "grade": "C",
+      "action": "published"
+    },
+    {
+      "id": 2010,
+      "slug": "ocean-bromelain-1000-mg-60-kapsul",
+      "score": 68,
+      "grade": "C",
+      "action": "published"
+    },
+    {
+      "id": 2035,
+      "slug": "ocean-l-glutatyon-30-tablet",
+      "score": 65,
+      "grade": "C",
+      "action": "published"
+    }
+  ]
+}

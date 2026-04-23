@@ -1,0 +1,17 @@
+🌅 REVELA Supplement Sprint — 2026-04-23
+✅ Aktif: 91
+📝 Draft: 0
+📊 Ortalama skor: 72.7
+Marka:
+  orzax: 91 (91 aktif, skor 73)
+Skor:
+  80-100: 19
+  60-79: 69
+  50-59: 3
+  40-49: 0
+  <40: 0
+  null: 0
+Claude: 91 ready, 46 rej, 0 dup
+Onboard: 88 OK, 3 fail
+Verify: 0 eksik
+Rapor: MORNING_REPORT_SUPPLEMENT_INGEST_20260423.md
