@@ -1,0 +1,8 @@
+{
+  "ready": 91,
+  "rejected": 46,
+  "duplicate": 0,
+  "finished_at": "2026-04-23T01:10:54.970Z",
+  "ready_dir": "C:\\Users\\Yusuf Cemre\\OneDrive\\Desktop\\kozmetik-platform\\apps\\api\\src\\database\\seeds\\products-queue\\_ready",
+  "rejected_dir": "C:\\Users\\Yusuf Cemre\\OneDrive\\Desktop\\kozmetik-platform\\apps\\api\\src\\database\\seeds\\products-queue\\_rejected"
+}
