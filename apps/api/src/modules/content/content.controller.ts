@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { ContentService } from './content.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { PaginationDto } from '@common/dto/pagination.dto';
+import { ArticleFilterDto } from './dto/article-filter.dto';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
@@ -27,12 +27,8 @@ export class ContentController {
 
   @Get()
   @ApiOperation({ summary: 'Yayınlanmış makaleler (public)' })
-  @ApiQuery({ name: 'content_type', required: false })
-  findPublished(
-    @Query() query: PaginationDto,
-    @Query('content_type') content_type?: string,
-  ) {
-    return this.service.findPublished({ ...query, content_type });
+  findPublished(@Query() query: ArticleFilterDto) {
+    return this.service.findPublished(query);
   }
 
   @Get('admin')
@@ -40,14 +36,8 @@ export class ContentController {
   @Roles('super_admin', 'content_editor', 'reviewer')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Tüm makaleler (admin)' })
-  @ApiQuery({ name: 'content_type', required: false })
-  @ApiQuery({ name: 'status', required: false })
-  findAll(
-    @Query() query: PaginationDto,
-    @Query('content_type') content_type?: string,
-    @Query('status') status?: string,
-  ) {
-    return this.service.findAll({ ...query, content_type, status });
+  findAll(@Query() query: ArticleFilterDto) {
+    return this.service.findAll(query);
   }
 
   @Get(':id')

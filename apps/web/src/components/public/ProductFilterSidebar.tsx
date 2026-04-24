@@ -145,6 +145,10 @@ const POPULAR_INGREDIENTS_SUPPLEMENT = [
   { slug: 'methylcobalamin', label: 'B12' },
   { slug: 'hydrolyzed-collagen', label: 'Kolajen' },
   { slug: 'biotin', label: 'Biotin' },
+  { slug: 'vitamin-k2', label: 'K2 Vitamini' },
+  { slug: 'coq10', label: 'CoQ10' },
+  { slug: 'beta-glucan', label: 'Beta-Glukan' },
+  { slug: 'lactobacillus-acidophilus', label: 'Probiyotik' },
 ];
 
 const POPULAR_INGREDIENTS_COSMETIC = [
@@ -157,6 +161,34 @@ const POPULAR_INGREDIENTS_COSMETIC = [
   { slug: 'centella-asiatica-extract', label: 'Centella' },
   { slug: 'panthenol', label: 'Panthenol' },
 ];
+
+/** Alt-alta checkbox satırı — multi-select dimension'lar için ortak render. */
+function CheckboxRow({ label, active, onToggle, count }: { label: string; active: boolean; onToggle: () => void; count?: number }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-sm text-left transition-colors ${
+        active ? 'bg-primary/10 text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'
+      }`}
+    >
+      <span
+        className={`w-3.5 h-3.5 border rounded-sm shrink-0 flex items-center justify-center ${
+          active ? 'bg-primary border-primary' : 'border-outline-variant/50'
+        }`}
+      >
+        {active && (
+          <span className="material-icon text-on-primary" style={{ fontSize: '10px' }} aria-hidden="true">
+            check
+          </span>
+        )}
+      </span>
+      <span className={`flex-1 text-[11px] truncate ${active ? 'font-semibold' : ''}`}>{label}</span>
+      {count !== undefined && count > 0 && (
+        <span className="text-outline text-[9px] shrink-0 tabular-nums">{count}</span>
+      )}
+    </button>
+  );
+}
 
 export default function ProductFilterSidebar({
   categories,
@@ -195,7 +227,6 @@ export default function ProductFilterSidebar({
       .catch(() => setNeeds([]));
   }, [domain]);
 
-  // Etken madde arama (debounced)
   useEffect(() => {
     if (ingredientSearch.length < 2) {
       setIngredientResults([]);
@@ -203,7 +234,7 @@ export default function ProductFilterSidebar({
     }
     const t = setTimeout(() => {
       api
-        .get<{ data: Ingredient[] }>(`/ingredients?search=${encodeURIComponent(ingredientSearch)}&limit=20`)
+        .get<{ data: Ingredient[] }>(`/ingredients?search=${encodeURIComponent(ingredientSearch)}&limit=30`)
         .then((res) => setIngredientResults(res.data || []))
         .catch(() => setIngredientResults([]));
     }, 250);
@@ -246,10 +277,17 @@ export default function ProductFilterSidebar({
   const toggleArrayItem = <T extends string | number>(arr: T[], item: T): T[] =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 
-  const Section = ({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) => (
+  const Section = ({ title, children, defaultOpen = false, count }: { title: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) => (
     <details open={defaultOpen} className="group border-b border-outline-variant/15 last:border-b-0">
       <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between py-2.5">
-        <span className="label-caps text-on-surface">{title}</span>
+        <span className="label-caps text-on-surface flex items-center gap-1.5">
+          {title}
+          {count !== undefined && count > 0 && (
+            <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full tabular-nums">
+              {count}
+            </span>
+          )}
+        </span>
         <span
           className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
           style={{ fontSize: '14px' }}
@@ -261,6 +299,24 @@ export default function ProductFilterSidebar({
       <div className="pb-3">{children}</div>
     </details>
   );
+
+  // Etken madde render — popüler + arama sonuçları birleşik, alt alta list
+  const ingredientListItems = (() => {
+    const items = new Map<string, { slug: string; label: string; popular?: boolean }>();
+    // Popüler önce
+    for (const p of popularIngredients) items.set(p.slug, { slug: p.slug, label: p.label, popular: true });
+    // Arama sonuçları + seçili olanlar (ki seçim listeden kaybolmasın)
+    for (const i of ingredientResults) {
+      if (!items.has(i.ingredient_slug)) {
+        items.set(i.ingredient_slug, { slug: i.ingredient_slug, label: i.common_name || i.inci_name });
+      }
+    }
+    // Seçili ama listede yoksa (rare, başka slug'lardan sonra) → ekle
+    for (const slug of state.ingredient_slugs) {
+      if (!items.has(slug)) items.set(slug, { slug, label: slug });
+    }
+    return Array.from(items.values());
+  })();
 
   const content = (
     <div className="space-y-1">
@@ -320,59 +376,43 @@ export default function ProductFilterSidebar({
         </div>
       </Section>
 
-      <Section title="Etken Madde">
-        {/* Popüler chip'ler */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {popularIngredients.map((ing) => {
-            const active = state.ingredient_slugs.includes(ing.slug);
-            return (
-              <button
-                key={ing.slug}
-                onClick={() => onChange({ ingredient_slugs: toggleArrayItem(state.ingredient_slugs, ing.slug) })}
-                className={`text-[9px] px-1.5 py-0.5 rounded-sm border transition-colors ${
-                  active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                }`}
-              >
-                {ing.label}
-              </button>
-            );
-          })}
+      <Section title="Etken Madde" count={state.ingredient_slugs.length}>
+        <div className="relative mb-1.5">
+          <span className="material-icon absolute left-2 top-1/2 -translate-y-1/2 text-outline-variant text-[12px] pointer-events-none" aria-hidden="true">search</span>
+          <input
+            type="text"
+            placeholder="Madde ara..."
+            value={ingredientSearch}
+            onChange={(e) => setIngredientSearch(e.target.value)}
+            className="w-full pl-6 pr-2 py-1 text-xs border border-outline-variant/30 rounded-sm bg-surface"
+          />
         </div>
-        {/* Autocomplete */}
-        <input
-          type="text"
-          placeholder="Madde ara..."
-          value={ingredientSearch}
-          onChange={(e) => setIngredientSearch(e.target.value)}
-          className="w-full text-xs py-1 px-2 border border-outline-variant/30 rounded-sm bg-surface mb-1"
-        />
-        {ingredientResults.length > 0 && (
-          <div className="max-h-40 overflow-y-auto space-y-0.5 border border-outline-variant/15 rounded-sm">
-            {ingredientResults.slice(0, 15).map((i) => {
-              const active = state.ingredient_slugs.includes(i.ingredient_slug);
-              return (
-                <button
-                  key={i.ingredient_id}
-                  onClick={() => {
-                    onChange({ ingredient_slugs: toggleArrayItem(state.ingredient_slugs, i.ingredient_slug) });
-                    setIngredientSearch('');
-                  }}
-                  className={`w-full text-left text-[10px] px-2 py-1 transition-colors ${
-                    active ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container-low'
-                  }`}
-                >
-                  {i.common_name || i.inci_name}
-                </button>
-              );
-            })}
-          </div>
-        )}
-        {state.ingredient_slugs.length > 0 && (
-          <p className="text-[9px] text-outline mt-1">{state.ingredient_slugs.length} madde seçili</p>
-        )}
+        <div className="max-h-64 overflow-y-auto">
+          {ingredientSearch.length >= 2 && ingredientResults.length > 0 && (
+            <p className="text-[9px] text-outline px-2 py-0.5 sticky top-0 bg-surface">
+              {ingredientResults.length} sonuç
+            </p>
+          )}
+          {ingredientSearch.length < 2 && (
+            <p className="text-[9px] text-outline px-2 py-0.5 sticky top-0 bg-surface">
+              Popüler maddeler
+            </p>
+          )}
+          {ingredientListItems.map((ing) => (
+            <CheckboxRow
+              key={ing.slug}
+              label={ing.label}
+              active={state.ingredient_slugs.includes(ing.slug)}
+              onToggle={() => onChange({ ingredient_slugs: toggleArrayItem(state.ingredient_slugs, ing.slug) })}
+            />
+          ))}
+          {ingredientSearch.length >= 2 && ingredientResults.length === 0 && (
+            <p className="text-[10px] text-outline px-2 py-2">Sonuç yok — farklı arama dene</p>
+          )}
+        </div>
       </Section>
 
-      <Section title="İhtiyaç">
+      <Section title="İhtiyaç" count={state.need_ids.length}>
         {needs.length > 10 && (
           <input
             type="text"
@@ -382,67 +422,49 @@ export default function ProductFilterSidebar({
             className="w-full text-xs py-1 px-2 mb-1.5 border border-outline-variant/30 rounded-sm bg-surface"
           />
         )}
-        <div className="max-h-44 overflow-y-auto space-y-0.5">
-          {filteredNeeds.slice(0, 30).map((n) => {
-            const active = state.need_ids.includes(n.need_id);
-            return (
-              <button
-                key={n.need_id}
-                onClick={() => onChange({ need_ids: toggleArrayItem(state.need_ids, n.need_id) })}
-                className={`w-full text-left text-[10px] px-2 py-1 rounded-sm transition-colors ${
-                  active ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container-low'
-                }`}
-              >
-                {n.need_name}
-              </button>
-            );
-          })}
+        <div className="max-h-64 overflow-y-auto">
+          {filteredNeeds.map((n) => (
+            <CheckboxRow
+              key={n.need_id}
+              label={n.need_name}
+              active={state.need_ids.includes(n.need_id)}
+              onToggle={() => onChange({ need_ids: toggleArrayItem(state.need_ids, n.need_id) })}
+            />
+          ))}
         </div>
       </Section>
 
       {categories.length > 1 && (
-        <Section title="Kategori">
-          <div className="flex flex-wrap gap-1">
-            {categories.map((c) => {
-              const active = state.kategori === c.slug;
-              return (
-                <button
-                  key={c.slug || 'all'}
-                  onClick={() => onChange({ kategori: active ? '' : c.slug })}
-                  className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                    active ? 'bg-on-surface text-surface border-on-surface' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              );
-            })}
+        <Section title="Kategori" count={state.kategori ? 1 : 0}>
+          <div>
+            {categories.map((c) => (
+              <CheckboxRow
+                key={c.slug || 'all'}
+                label={c.label}
+                active={state.kategori === c.slug}
+                onToggle={() => onChange({ kategori: state.kategori === c.slug ? '' : c.slug })}
+              />
+            ))}
           </div>
         </Section>
       )}
 
       {domain === 'supplement' && (
-        <Section title="Form">
-          <div className="flex flex-wrap gap-1">
-            {SUPPLEMENT_FORMS.map((f) => {
-              const active = state.form.includes(f.value);
-              return (
-                <button
-                  key={f.value}
-                  onClick={() => onChange({ form: toggleArrayItem(state.form, f.value) })}
-                  className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                    active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
+        <Section title="Form" count={state.form.length}>
+          <div>
+            {SUPPLEMENT_FORMS.map((f) => (
+              <CheckboxRow
+                key={f.value}
+                label={f.label}
+                active={state.form.includes(f.value)}
+                onToggle={() => onChange({ form: toggleArrayItem(state.form, f.value) })}
+              />
+            ))}
           </div>
         </Section>
       )}
 
-      <Section title="Marka">
+      <Section title="Marka" count={state.brand_id ? 1 : 0}>
         <input
           type="text"
           placeholder="Marka ara..."
@@ -450,58 +472,41 @@ export default function ProductFilterSidebar({
           onChange={(e) => setBrandSearch(e.target.value)}
           className="w-full text-xs py-1 px-2 mb-1 border border-outline-variant/30 rounded-sm bg-surface"
         />
-        <div className="max-h-48 overflow-y-auto space-y-0.5">
-          <button
-            onClick={() => onChange({ brand_id: '' })}
-            className={`w-full text-left text-[10px] px-2 py-1 rounded-sm transition-colors ${
-              !state.brand_id ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container-low'
-            }`}
-          >
-            Tüm markalar
-          </button>
-          {filteredBrands.slice(0, 60).map((b) => {
-            const active = state.brand_id === String(b.brand_id);
-            return (
-              <button
-                key={b.brand_id}
-                onClick={() => onChange({ brand_id: active ? '' : String(b.brand_id) })}
-                className={`w-full text-left text-[10px] px-2 py-1 rounded-sm transition-colors flex items-center justify-between ${
-                  active ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container-low'
-                }`}
-              >
-                <span className="truncate">{b.brand_name}</span>
-                {b.product_count !== undefined && b.product_count > 0 && (
-                  <span className="text-outline text-[9px] shrink-0 ml-1">{b.product_count}</span>
-                )}
-              </button>
-            );
-          })}
-          {filteredBrands.length > 60 && (
-            <p className="text-[9px] text-outline px-2 py-1">+{filteredBrands.length - 60} marka. Aramayı daralt.</p>
+        <div className="max-h-64 overflow-y-auto">
+          <CheckboxRow
+            label="Tüm markalar"
+            active={!state.brand_id}
+            onToggle={() => onChange({ brand_id: '' })}
+          />
+          {filteredBrands.slice(0, 80).map((b) => (
+            <CheckboxRow
+              key={b.brand_id}
+              label={b.brand_name}
+              active={state.brand_id === String(b.brand_id)}
+              onToggle={() => onChange({ brand_id: state.brand_id === String(b.brand_id) ? '' : String(b.brand_id) })}
+              count={b.product_count}
+            />
+          ))}
+          {filteredBrands.length > 80 && (
+            <p className="text-[9px] text-outline px-2 py-1">+{filteredBrands.length - 80} marka. Aramayı daralt.</p>
           )}
         </div>
       </Section>
 
-      <Section title="Sertifika">
-        <div className="flex flex-wrap gap-1">
-          {CERTIFICATIONS.map((c) => {
-            const active = state.certifications.includes(c.value);
-            return (
-              <button
-                key={c.value}
-                onClick={() => onChange({ certifications: toggleArrayItem(state.certifications, c.value) })}
-                className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                  active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                }`}
-              >
-                {c.label}
-              </button>
-            );
-          })}
+      <Section title="Sertifika" count={state.certifications.length}>
+        <div>
+          {CERTIFICATIONS.map((c) => (
+            <CheckboxRow
+              key={c.value}
+              label={c.label}
+              active={state.certifications.includes(c.value)}
+              onToggle={() => onChange({ certifications: toggleArrayItem(state.certifications, c.value) })}
+            />
+          ))}
         </div>
       </Section>
 
-      <Section title="Fiyat (₺)">
+      <Section title="Fiyat (₺)" count={state.fiyatMin != null || state.fiyatMax != null ? 1 : 0}>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -524,63 +529,45 @@ export default function ProductFilterSidebar({
       </Section>
 
       {domain === 'supplement' && (
-        <Section title="Hedef Kitle">
-          <div className="flex flex-wrap gap-1">
-            {TARGET_AUDIENCE.map((ta) => {
-              const active = state.target_audience.includes(ta.value);
-              return (
-                <button
-                  key={ta.value}
-                  onClick={() => onChange({ target_audience: toggleArrayItem(state.target_audience, ta.value) })}
-                  className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                    active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                  }`}
-                >
-                  {ta.label}
-                </button>
-              );
-            })}
+        <Section title="Hedef Kitle" count={state.target_audience.length}>
+          <div>
+            {TARGET_AUDIENCE.map((ta) => (
+              <CheckboxRow
+                key={ta.value}
+                label={ta.label}
+                active={state.target_audience.includes(ta.value)}
+                onToggle={() => onChange({ target_audience: toggleArrayItem(state.target_audience, ta.value) })}
+              />
+            ))}
           </div>
         </Section>
       )}
 
       {domain === 'cosmetic' && (
-        <Section title="Cilt Tipi">
-          <div className="flex flex-wrap gap-1">
-            {SKIN_TYPES.map((st) => {
-              const active = state.skin_type.includes(st.value);
-              return (
-                <button
-                  key={st.value}
-                  onClick={() => onChange({ skin_type: toggleArrayItem(state.skin_type, st.value) })}
-                  className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                    active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                  }`}
-                >
-                  {st.label}
-                </button>
-              );
-            })}
+        <Section title="Cilt Tipi" count={state.skin_type.length}>
+          <div>
+            {SKIN_TYPES.map((st) => (
+              <CheckboxRow
+                key={st.value}
+                label={st.label}
+                active={state.skin_type.includes(st.value)}
+                onToggle={() => onChange({ skin_type: toggleArrayItem(state.skin_type, st.value) })}
+              />
+            ))}
           </div>
         </Section>
       )}
 
-      <Section title="Üretim Ülkesi">
-        <div className="flex flex-wrap gap-1">
-          {COUNTRIES.map((c) => {
-            const active = state.manufacturer_country.includes(c.value);
-            return (
-              <button
-                key={c.value}
-                onClick={() => onChange({ manufacturer_country: toggleArrayItem(state.manufacturer_country, c.value) })}
-                className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
-                  active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-                }`}
-              >
-                {c.label}
-              </button>
-            );
-          })}
+      <Section title="Üretim Ülkesi" count={state.manufacturer_country.length}>
+        <div>
+          {COUNTRIES.map((c) => (
+            <CheckboxRow
+              key={c.value}
+              label={c.label}
+              active={state.manufacturer_country.includes(c.value)}
+              onToggle={() => onChange({ manufacturer_country: toggleArrayItem(state.manufacturer_country, c.value) })}
+            />
+          ))}
         </div>
       </Section>
     </div>
