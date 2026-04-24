@@ -18,6 +18,7 @@ import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import AccordionSection from '@/components/public/AccordionSection';
+import { hasSkinProfileCookie } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -642,19 +643,31 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Personal Score CTA */}
-            <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
-              <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
-              <p className="text-lg font-bold text-primary mt-1">
-                Kişisel skorunu gör
-              </p>
-              <p className="text-xs text-outline mt-2">
-                <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
-                  Cilt profili oluştur
-                </Link>{' '}
-                &rarr; sana özel uyumluluk skoru
-              </p>
-            </div>
+            {/* Personal Score CTA — cookie-aware (profil varsa farklı mesaj) */}
+            {hasSkinProfileCookie() ? (
+              <Link
+                href="/profilim"
+                className="block bg-primary/5 border border-primary/20 rounded-md p-4 hover:bg-primary/10 transition-colors"
+              >
+                <p className="label-caps text-primary">Senin Cildine Uyumu</p>
+                <p className="text-sm text-on-surface mt-1">
+                  Profilin kayıtlı &mdash; kişisel skorunu görmek için devam et &rarr;
+                </p>
+              </Link>
+            ) : (
+              <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
+                <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
+                <p className="text-lg font-bold text-primary mt-1">
+                  Kişisel skorunu gör
+                </p>
+                <p className="text-xs text-outline mt-2">
+                  <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
+                    Cilt profili oluştur
+                  </Link>{' '}
+                  &rarr; sana özel uyumluluk skoru
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

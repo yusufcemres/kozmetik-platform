@@ -73,6 +73,12 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('revela_theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
+        {/* Sync skin_profile in localStorage → has_skin_profile cookie, so SSR knows to hide "Cilt profili oluştur" CTAs */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=localStorage.getItem('skin_profile');document.cookie='has_skin_profile='+(p?'1':'')+';path=/;max-age='+(p?31536000:0)+';SameSite=Lax'}catch(e){}})()`,
+          }}
+        />
         {/* Google Analytics 4 with Consent Mode v2 */}
         {process.env.NEXT_PUBLIC_GA4_ID && (
           <>
