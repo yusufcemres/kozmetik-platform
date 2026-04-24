@@ -300,9 +300,9 @@ export default async function IngredientDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ingredientBreadcrumbJsonLd(ingredient)) }}
       />
 
-      <article className="curator-section max-w-[1200px] mx-auto">
+      <article className="curator-section max-w-[1400px] mx-auto">
         {/* Breadcrumb */}
-        <nav className="label-caps text-outline mb-8 flex items-center gap-2">
+        <nav className="label-caps text-outline mb-4 flex items-center gap-2">
           <Link href="/icerikler" className="hover:text-primary transition-colors">
             İçerikler
           </Link>
@@ -311,44 +311,44 @@ export default async function IngredientDetailPage({
         </nav>
 
         {/* Header */}
-        <div className="curator-card p-6 md:p-8 mb-8">
+        <div className="curator-card p-4 md:p-5 mb-4">
           <h1 className="text-2xl md:text-3xl headline-tight text-on-surface">
             {ingredient.inci_name}
           </h1>
           {ingredient.common_name && (
-            <p className="text-lg text-primary font-medium mt-1">
+            <p className="text-base text-primary font-medium mt-0.5">
               {ingredient.common_name}
             </p>
           )}
 
           {/* Aliases */}
           {ingredient.aliases && ingredient.aliases.length > 0 && (
-            <p className="text-sm text-outline mt-2">
+            <p className="text-xs text-outline mt-1.5">
               Diğer adları:{' '}
               {ingredient.aliases.map((a) => a.alias_name).join(', ')}
             </p>
           )}
 
           {/* Badges */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-1.5 mt-2">
             {ingredient.ingredient_group && (
-              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-sm border border-outline-variant/20">
+              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded-sm border border-outline-variant/20">
                 {ingredient.ingredient_group}
               </span>
             )}
             {ingredient.origin_type && (
-              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-sm border border-outline-variant/20">
+              <span className="label-caps text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded-sm border border-outline-variant/20">
                 {originLabel(ingredient.origin_type)}
               </span>
             )}
             {evidence && (
-              <span className={`label-caps px-2.5 py-1 rounded-sm bg-surface-container-low border border-outline-variant/20 ${evidence.color}`}>
+              <span className={`label-caps px-2 py-0.5 rounded-sm bg-surface-container-low border border-outline-variant/20 ${evidence.color}`}>
                 {evidence.label}
               </span>
             )}
             {safety && (
-              <span className={`label-caps px-2.5 py-1 rounded-sm flex items-center gap-1 ${safety.color}`}>
-                <span className="material-icon text-[12px]" aria-hidden="true">{safety.icon}</span>
+              <span className={`label-caps px-2 py-0.5 rounded-sm flex items-center gap-1 ${safety.color}`}>
+                <span className="material-icon text-[10px]" aria-hidden="true">{safety.icon}</span>
                 {safety.label}
               </span>
             )}
@@ -357,14 +357,14 @@ export default async function IngredientDetailPage({
 
         {/* Warning Flags */}
         {flags.length > 0 && (
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {flags.map((flag) => (
               <div
                 key={flag.label}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-sm border ${flag.color}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border ${flag.color}`}
               >
-                <span className="material-icon material-icon-sm" aria-hidden="true">{flag.icon}</span>
-                <span className="text-sm font-medium">
+                <span className="material-icon" style={{ fontSize: '14px' }} aria-hidden="true">{flag.icon}</span>
+                <span className="text-xs font-medium">
                   {flag.label}
                 </span>
               </div>
@@ -374,11 +374,11 @@ export default async function IngredientDetailPage({
 
         {/* Sensitivity Note */}
         {ingredient.sensitivity_note && (
-          <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-4 mb-8">
-            <p className="text-sm font-semibold text-on-surface mb-1">
+          <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-3 mb-4">
+            <p className="text-xs font-semibold text-on-surface mb-0.5">
               Hassasiyet Notu
             </p>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
+            <p className="text-xs text-on-surface-variant leading-relaxed">
               {ingredient.sensitivity_note}
             </p>
           </div>
@@ -386,9 +386,9 @@ export default async function IngredientDetailPage({
 
         {/* Function Summary */}
         {ingredient.function_summary && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Ne İşe Yarar?</h2>
-            <p className="text-on-surface-variant leading-relaxed">
+          <section className="mb-4">
+            <h2 className="text-lg font-bold text-on-surface mb-2">Ne İşe Yarar?</h2>
+            <p className="text-sm text-on-surface-variant leading-relaxed">
               {ingredient.function_summary}
             </p>
           </section>
@@ -396,78 +396,76 @@ export default async function IngredientDetailPage({
 
         {/* Detailed Description */}
         {ingredient.detailed_description && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Detaylı Bilgi</h2>
-            <div className="bg-surface-container-low rounded-sm p-5">
-              <p className="text-on-surface-variant leading-relaxed whitespace-pre-line">
+          <section className="mb-4">
+            <h2 className="text-lg font-bold text-on-surface mb-2">Detaylı Bilgi</h2>
+            <div className="bg-surface-container-low rounded-sm p-4">
+              <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {ingredient.detailed_description}
               </p>
             </div>
           </section>
         )}
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="curator-card p-4">
-            <p className="label-caps text-outline mb-1">Kanıt Seviyesi</p>
-            <p className={`text-lg font-bold ${evidence ? evidence.color : 'text-outline'}`}>
-              {evidence ? evidence.label : 'Belirtilmemiş'}
+        {/* Info Cards — inline compact */}
+        <div className="grid grid-cols-3 gap-1.5 mb-4">
+          <div className="curator-card p-2">
+            <p className="label-caps text-outline text-[9px]">Kanıt</p>
+            <p className={`text-xs font-bold leading-tight mt-0.5 ${evidence ? evidence.color : 'text-outline'}`}>
+              {evidence ? evidence.label : '—'}
             </p>
           </div>
-          <div className="curator-card p-4">
-            <p className="label-caps text-outline mb-1">Grup</p>
-            <p className="text-lg font-bold text-on-surface">
-              {ingredient.ingredient_group || 'Belirtilmemiş'}
+          <div className="curator-card p-2">
+            <p className="label-caps text-outline text-[9px]">Grup</p>
+            <p className="text-xs font-bold text-on-surface leading-tight mt-0.5 truncate" title={ingredient.ingredient_group || ''}>
+              {ingredient.ingredient_group || '—'}
             </p>
           </div>
-          <div className="curator-card p-4">
-            <p className="label-caps text-outline mb-1">Kaynak</p>
-            <p className="text-lg font-bold text-on-surface">
-              {ingredient.origin_type ? originLabel(ingredient.origin_type) : 'Belirtilmemiş'}
+          <div className="curator-card p-2">
+            <p className="label-caps text-outline text-[9px]">Kaynak</p>
+            <p className="text-xs font-bold text-on-surface leading-tight mt-0.5 truncate">
+              {ingredient.origin_type ? originLabel(ingredient.origin_type) : '—'}
             </p>
           </div>
         </div>
 
         {/* Evidence Links */}
         {ingredient.evidence_links && ingredient.evidence_links.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4">Bilimsel Kaynaklar</h2>
-            <div className="space-y-3">
+          <section className="mb-4">
+            <h2 className="text-lg font-bold text-on-surface mb-2">Bilimsel Kaynaklar</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
               {ingredient.evidence_links.map((el) => (
                 <a
                   key={el.link_id}
                   href={el.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block curator-card p-4 group"
+                  className="block curator-card p-2 group"
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="material-icon text-primary mt-0.5" aria-hidden="true">description</span>
+                  <div className="flex items-start gap-1.5">
+                    <span className="material-icon text-primary mt-0.5 text-[14px]" aria-hidden="true">description</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">
+                      <p className="text-xs font-medium text-on-surface group-hover:text-primary transition-colors leading-snug">
                         {el.source_title}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-1.5 mt-0.5">
                         {el.source_type && (
-                          <span className="label-caps text-outline">
+                          <span className="label-caps text-[9px] text-outline">
                             {sourceTypeLabel(el.source_type)}
                           </span>
                         )}
                         {el.publication_year && (
-                          <span className="label-caps text-outline">
+                          <span className="label-caps text-[9px] text-outline">
                             ({el.publication_year})
                           </span>
                         )}
                       </div>
                       {el.summary_note && (
-                        <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+                        <p className="text-[10px] text-on-surface-variant mt-1 leading-relaxed line-clamp-2">
                           {el.summary_note}
                         </p>
                       )}
                     </div>
-                    <span className="label-caps text-primary shrink-0">
-                      Kaynak <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
-                    </span>
+                    <span className="material-icon text-primary shrink-0 text-[14px]" aria-hidden="true">arrow_forward</span>
                   </div>
                 </a>
               ))}
@@ -477,13 +475,13 @@ export default async function IngredientDetailPage({
 
         {/* Need Mappings — which needs does this ingredient help? */}
         {sortedMappings.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">target</span>
+          <section className="mb-4">
+            <h2 className="text-lg font-bold text-on-surface mb-2 flex items-center gap-2">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">target</span>
               Hangi İhtiyaçlara İyi Gelir?
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {sortedMappings.slice(0, 8).map((m) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5">
+              {sortedMappings.slice(0, 12).map((m) => {
                 const score = Math.round(m.relevance_score || 0);
                 const scoreColor = score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low';
                 const barColor = score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low';
@@ -491,20 +489,18 @@ export default async function IngredientDetailPage({
                   <Link
                     key={m.mapping_id}
                     href={`/ihtiyaclar/${m.need!.need_slug}`}
-                    className="curator-card p-4 group flex items-center gap-3"
+                    className="curator-card p-2 group"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-on-surface group-hover:text-primary transition-colors">
+                    <div className="flex items-start justify-between gap-1">
+                      <p className="text-[11px] font-medium text-on-surface group-hover:text-primary transition-colors leading-tight truncate flex-1" title={m.need!.need_name}>
                         {m.need!.need_name}
                       </p>
-                      <p className="label-caps text-outline mt-0.5">{effectTypeLabel(m.effect_type)}</p>
+                      <span className={`text-[11px] font-bold tabular-nums shrink-0 ${scoreColor}`}>%{score}</span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="w-16 h-1 bg-surface-container rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${Math.min(100, score)}%` }} />
-                      </div>
-                      <span className={`text-sm font-bold ${scoreColor}`}>%{score}</span>
+                    <div className="mt-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${barColor}`} style={{ width: `${Math.min(100, score)}%` }} />
                     </div>
+                    <p className="label-caps text-outline text-[8px] mt-1 truncate">{effectTypeLabel(m.effect_type)}</p>
                   </Link>
                 );
               })}
@@ -514,12 +510,12 @@ export default async function IngredientDetailPage({
 
         {/* Safety Note (from new field) */}
         {ingredient.safety_note && (
-          <div className="bg-surface-container-low border border-outline-variant/20 rounded-sm p-4 mb-8">
-            <p className="text-sm font-semibold text-on-surface mb-1 flex items-center gap-1.5">
-              <span className="material-icon text-[16px]" aria-hidden="true">shield</span>
+          <div className="bg-surface-container-low border border-outline-variant/20 rounded-sm p-3 mb-4">
+            <p className="text-xs font-semibold text-on-surface mb-0.5 flex items-center gap-1">
+              <span className="material-icon text-[14px]" aria-hidden="true">shield</span>
               Güvenlik Notu
             </p>
-            <p className="text-sm text-on-surface-variant leading-relaxed">{ingredient.safety_note}</p>
+            <p className="text-xs text-on-surface-variant leading-relaxed">{ingredient.safety_note}</p>
           </div>
         )}
 
@@ -531,18 +527,18 @@ export default async function IngredientDetailPage({
           ingredient.iarc_group ||
           ingredient.eu_banned ||
           ingredient.eu_restricted) && (
-          <section className="mb-8">
+          <section className="mb-4">
             <div className="curator-card border-l-4 border-score-medium overflow-hidden">
-              <div className="bg-score-medium/5 px-5 py-3 flex items-center gap-2">
-                <span className="material-icon text-score-medium" aria-hidden="true">
+              <div className="bg-score-medium/5 px-4 py-2 flex items-center gap-2">
+                <span className="material-icon text-score-medium text-[18px]" aria-hidden="true">
                   warning
                 </span>
-                <h2 className="text-lg font-bold text-on-surface">
+                <h2 className="text-base font-bold text-on-surface">
                   Güvenlik & Tartışma
                 </h2>
               </div>
 
-              <div className="p-5">
+              <div className="p-4">
                 {/* Regulatory flags */}
                 {(ingredient.endocrine_flag ||
                   ingredient.cmr_class ||
@@ -622,13 +618,13 @@ export default async function IngredientDetailPage({
 
         {/* Food Sources */}
         {ingredient.food_sources && ingredient.food_sources.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">restaurant</span>
+          <section className="mb-4">
+            <h2 className="text-lg font-bold text-on-surface mb-1 flex items-center gap-2">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">restaurant</span>
               Doğal Kaynaklar
             </h2>
             {ingredient.daily_recommended_value && (
-              <p className="text-sm text-on-surface-variant mb-4">
+              <p className="text-xs text-on-surface-variant mb-2">
                 Günlük önerilen miktar: <strong>{ingredient.daily_recommended_value} {ingredient.daily_recommended_unit || 'mg'}</strong>
               </p>
             )}
@@ -670,10 +666,10 @@ export default async function IngredientDetailPage({
 
         {/* Products containing this ingredient — Cosmetics */}
         {cosmeticProducts.length > 0 && (
-          <section className="mb-8">
-            <div className="flex items-end justify-between mb-4">
-              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
-                <span className="material-icon text-primary" aria-hidden="true">spa</span>
+          <section className="mb-4">
+            <div className="flex items-end justify-between mb-2">
+              <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary text-[18px]" aria-hidden="true">spa</span>
                 Kozmetik Ürünler
               </h2>
               <span className="label-caps text-outline">
@@ -681,7 +677,7 @@ export default async function IngredientDetailPage({
               </span>
             </div>
             <div className="relative">
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+              <div className="flex gap-2 overflow-x-auto pb-3 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
                 {cosmeticProducts.map((p) => {
                   const primaryImg = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
                   const hoverImg = p.images?.find(i => i.sort_order === 1)?.image_url;
@@ -689,7 +685,7 @@ export default async function IngredientDetailPage({
                     <Link
                       key={p.product_id}
                       href={`/urunler/${p.product_slug}`}
-                      className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
+                      className="flex-shrink-0 w-36 snap-start curator-card overflow-hidden group"
                     >
                       <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                         {primaryImg ? (
@@ -715,17 +711,17 @@ export default async function IngredientDetailPage({
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">spa</span>
                         )}
                       </div>
-                      <div className="p-3">
+                      <div className="p-2">
                         {p.brand && (
-                          <p className="label-caps text-outline truncate">
+                          <p className="label-caps text-outline text-[9px] truncate">
                             {p.brand.brand_name}
                           </p>
                         )}
-                        <p className="text-xs font-medium text-on-surface line-clamp-2 mt-0.5 leading-snug">
+                        <p className="text-[11px] font-medium text-on-surface line-clamp-2 leading-tight">
                           {p.product_name}
                         </p>
                         {p.category && (
-                          <p className="label-caps text-outline-variant mt-1 truncate">
+                          <p className="label-caps text-outline-variant text-[9px] mt-0.5 truncate">
                             {p.category.category_name}
                           </p>
                         )}
@@ -734,17 +730,17 @@ export default async function IngredientDetailPage({
                   );
                 })}
               </div>
-              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
             </div>
           </section>
         )}
 
         {/* Products containing this ingredient — Supplements */}
         {supplementProducts.length > 0 && (
-          <section className="mb-8">
-            <div className="flex items-end justify-between mb-4">
-              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
-                <span className="material-icon text-primary" aria-hidden="true">medication</span>
+          <section className="mb-4">
+            <div className="flex items-end justify-between mb-2">
+              <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary text-[18px]" aria-hidden="true">medication</span>
                 Takviye Ürünler
               </h2>
               <span className="label-caps text-outline">
@@ -752,14 +748,14 @@ export default async function IngredientDetailPage({
               </span>
             </div>
             <div className="relative">
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
+              <div className="flex gap-2 overflow-x-auto pb-3 snap-x snap-mandatory" style={{ scrollbarWidth: 'thin' }}>
                 {supplementProducts.map((p) => {
                   const primaryImg = p.images?.find(i => i.sort_order === 0)?.image_url || p.images?.[0]?.image_url;
                   return (
                     <Link
                       key={p.product_id}
                       href={`/takviyeler/${p.product_slug}`}
-                      className="flex-shrink-0 w-48 snap-start curator-card overflow-hidden group"
+                      className="flex-shrink-0 w-36 snap-start curator-card overflow-hidden group"
                     >
                       <div className="aspect-square bg-surface-container-low flex items-center justify-center overflow-hidden relative">
                         {primaryImg ? (
@@ -774,13 +770,13 @@ export default async function IngredientDetailPage({
                           <span className="material-icon material-icon-lg text-outline-variant" aria-hidden="true">medication</span>
                         )}
                       </div>
-                      <div className="p-3">
+                      <div className="p-2">
                         {p.brand && (
-                          <p className="label-caps text-outline truncate">
+                          <p className="label-caps text-outline text-[9px] truncate">
                             {p.brand.brand_name}
                           </p>
                         )}
-                        <p className="text-xs font-medium text-on-surface line-clamp-2 mt-0.5 leading-snug">
+                        <p className="text-[11px] font-medium text-on-surface line-clamp-2 leading-tight">
                           {p.product_name}
                         </p>
                       </div>
@@ -788,13 +784,13 @@ export default async function IngredientDetailPage({
                   );
                 })}
               </div>
-              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
             </div>
           </section>
         )}
 
         {/* Back Link */}
-        <div className="border-t border-outline-variant/20 pt-8">
+        <div className="border-t border-outline-variant/20 pt-4">
           <Link
             href="/icerikler"
             className="label-caps text-primary hover:underline underline-offset-4 flex items-center gap-1"
