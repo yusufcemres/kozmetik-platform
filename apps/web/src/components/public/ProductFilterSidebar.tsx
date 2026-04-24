@@ -45,6 +45,8 @@ export interface FilterState {
   fiyatMin: number | null;
   fiyatMax: number | null;
   skin_type: string[];
+  product_types: string[];
+  target_areas: string[];
 }
 
 export const EMPTY_FILTER_STATE: FilterState = {
@@ -63,6 +65,8 @@ export const EMPTY_FILTER_STATE: FilterState = {
   fiyatMin: null,
   fiyatMax: null,
   skin_type: [],
+  product_types: [],
+  target_areas: [],
 };
 
 interface ProductFilterSidebarProps {
@@ -134,6 +138,31 @@ const SKIN_TYPES = [
   { value: 'combination', label: 'Karma' },
   { value: 'normal', label: 'Normal' },
   { value: 'sensitive', label: 'Hassas' },
+];
+
+const COSMETIC_PRODUCT_TYPES = [
+  { value: 'serum', label: 'Serum & Ampul' },
+  { value: 'krem', label: 'Krem' },
+  { value: 'temizleyici', label: 'Temizleyici' },
+  { value: 'nemlendirici', label: 'Nemlendirici' },
+  { value: 'güneş kremi', label: 'Güneş Koruyucu' },
+  { value: 'tonik', label: 'Tonik' },
+  { value: 'maske', label: 'Maske' },
+  { value: 'göz kremi', label: 'Göz Kremi' },
+  { value: 'peeling', label: 'Peeling & Eksfoliyan' },
+  { value: 'esans', label: 'Esans' },
+  { value: 'dudak bakım', label: 'Dudak Bakımı' },
+  { value: 'fondöten', label: 'Fondöten' },
+];
+
+const COSMETIC_TARGET_AREAS = [
+  { value: 'yüz', label: 'Yüz' },
+  { value: 'göz', label: 'Göz Çevresi' },
+  { value: 'vücut', label: 'Vücut' },
+  { value: 'dudak', label: 'Dudak' },
+  { value: 'saç', label: 'Saç' },
+  { value: 'el', label: 'El' },
+  { value: 'yüz_vücut', label: 'Yüz & Vücut' },
 ];
 
 const POPULAR_INGREDIENTS_SUPPLEMENT = [
@@ -256,6 +285,8 @@ export default function ProductFilterSidebar({
     ...state.target_audience,
     ...state.manufacturer_country,
     ...state.skin_type,
+    ...state.product_types,
+    ...state.target_areas,
   ].filter(Boolean).length;
 
   const filteredBrands = brandSearch
@@ -537,6 +568,36 @@ export default function ProductFilterSidebar({
                 label={ta.label}
                 active={state.target_audience.includes(ta.value)}
                 onToggle={() => onChange({ target_audience: toggleArrayItem(state.target_audience, ta.value) })}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {domain === 'cosmetic' && (
+        <Section title="Ürün Tipi" count={state.product_types.length}>
+          <div>
+            {COSMETIC_PRODUCT_TYPES.map((pt) => (
+              <CheckboxRow
+                key={pt.value}
+                label={pt.label}
+                active={state.product_types.includes(pt.value)}
+                onToggle={() => onChange({ product_types: toggleArrayItem(state.product_types, pt.value) })}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {domain === 'cosmetic' && (
+        <Section title="Bölge" count={state.target_areas.length}>
+          <div>
+            {COSMETIC_TARGET_AREAS.map((ta) => (
+              <CheckboxRow
+                key={ta.value}
+                label={ta.label}
+                active={state.target_areas.includes(ta.value)}
+                onToggle={() => onChange({ target_areas: toggleArrayItem(state.target_areas, ta.value) })}
               />
             ))}
           </div>
