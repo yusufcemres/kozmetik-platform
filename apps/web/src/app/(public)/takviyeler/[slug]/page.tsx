@@ -709,9 +709,9 @@ export default async function SupplementDetailPage({
                       : null;
                     return (
                       <div key={i} className="flex items-baseline gap-1 py-0.5 text-[10px] leading-tight">
-                        <span className="text-on-surface truncate min-w-0">{fs.food_name}</span>
+                        <span className="text-on-surface min-w-0 flex-1 break-words" title={fs.food_name}>{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
-                          <span className={`tabular-nums font-semibold shrink-0 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          <span className={`tabular-nums font-semibold shrink-0 ml-auto pl-1 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
                           </span>
                         )}
