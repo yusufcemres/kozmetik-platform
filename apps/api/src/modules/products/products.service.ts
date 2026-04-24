@@ -86,6 +86,8 @@ export class ProductsService {
     price_min?: number;
     price_max?: number;
     skin_type?: string[];
+    product_types?: string[];
+    target_areas?: string[];
   }) {
     const { page, limit, search, brand_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
     const sort = query.sort ?? 'newest';
@@ -104,7 +106,10 @@ export class ProductsService {
       query.score_min != null ||
       query.score_max != null ||
       query.price_min != null ||
-      query.price_max != null
+      query.price_max != null ||
+      query.skin_type?.length ||
+      query.product_types?.length ||
+      query.target_areas?.length
     );
 
     if (hasRichFilter) {
@@ -216,6 +221,18 @@ export class ProductsService {
             ...(query.price_max != null ? { pmax: query.price_max } : {}),
           },
         );
+      }
+
+      // Ürün tipi (kozmetik)
+      if (query.product_types?.length) {
+        qb.andWhere('LOWER(p.product_type_label) IN (:...ptypes)', {
+          ptypes: query.product_types.map((t) => t.toLowerCase()),
+        });
+      }
+
+      // Bölge / target_area (kozmetik)
+      if (query.target_areas?.length) {
+        qb.andWhere('p.target_area IN (:...tareas)', { tareas: query.target_areas });
       }
 
       // Sıralama

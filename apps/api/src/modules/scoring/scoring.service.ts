@@ -267,7 +267,7 @@ export class ScoringService {
       .leftJoinAndSelect('p.images', 'images')
       .leftJoinAndSelect('p.affiliate_links', 'affiliate_links')
       .where('s.need_id = :needId', { needId })
-      .andWhere('p.status = :status', { status: 'published' });
+      .andWhere('p.status IN (:...statuses)', { statuses: ['published', 'active'] });
 
     // Gender filter: exclude opposite gender products
     if (options?.gender === 'female') {

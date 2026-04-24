@@ -7,7 +7,6 @@ import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';
 import ReviewsBlock from '@/components/public/ReviewsBlock';
-import ListModal from '@/components/public/ListModal';
 import RecentlyViewed from '@/components/public/RecentlyViewed';
 import ProductViewTracker from './ProductViewTracker';
 import AffiliateLink from '@/components/public/AffiliateLink';
@@ -874,40 +873,70 @@ export default async function ProductDetailPage({
             </div>
           )}
           {sortedIngredients.length > 0 ? (
-            <ListModal
-              title="İçerik Listesi (INCI)"
-              count={sortedIngredients.length}
-              previewCount={8}
-              allChildren={
+            // ListModal kaldırıldı: 17 madde tek seferde 4-col grid'de gösteriliyor.
+            // Her kart bağımsız accordion, hepsi aynı anda açık kalabilir.
+            // Üstteki güvenlik uyarılarındaki ingredient'lar (endokrin/CMR/EU yasaklı) burada
+            // KIRMIZI BORDER + ⚠ ünlem ikonu ile flag'leniyor → görsel bağlantı.
+            (() => {
+              const flaggedNames = new Set<string>([
+                ...(cosmeticScore?.flags?.eu_banned ?? []),
+                ...(cosmeticScore?.flags?.cmr ?? []),
+                ...(cosmeticScore?.flags?.endocrine ?? []),
+              ].map((s: string) => s.toLowerCase()));
+
+              return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                   {sortedIngredients.map((pi, idx) => {
                     const isAllergen = pi.ingredient?.allergen_flag;
                     const isFragrance = pi.ingredient?.fragrance_flag;
+                    const displayName = pi.ingredient_display_name || '';
+                    const isCritical =
+                      flaggedNames.has(displayName.toLowerCase()) ||
+                      (pi.ingredient?.inci_name && flaggedNames.has(pi.ingredient.inci_name.toLowerCase()));
+
+                    const cardClass = isCritical
+                      ? 'border-2 border-error bg-error/5'
+                      : isAllergen
+                        ? 'bg-error/5'
+                        : isFragrance
+                          ? 'bg-tertiary-container/30'
+                          : '';
+
+                    const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
+                    const conc = concentrationLabel(band);
+
                     return (
                       <details
                         key={pi.product_ingredient_id}
-                        className={`group curator-card px-3 py-2 ${
-                          isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
-                        }`}
+                        className={`group curator-card px-3 py-2 ${cardClass}`}
                       >
-                        <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center gap-1.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                           <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
                             {idx + 1}
                           </span>
-                          <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
-                            {pi.ingredient_display_name}
+                          {isCritical && (
+                            <span
+                              className="material-icon text-error shrink-0"
+                              style={{ fontSize: '14px' }}
+                              aria-hidden="true"
+                              title="Bu içerik üstte güvenlik uyarısı aldı"
+                            >
+                              warning
+                            </span>
+                          )}
+                          <span
+                            className={`flex-1 min-w-0 text-xs font-medium leading-snug group-open:text-primary transition-colors line-clamp-2 ${
+                              isCritical ? 'text-error font-semibold' : 'text-on-surface'
+                            }`}
+                          >
+                            {displayName}
                           </span>
-                          {pi.concentration_band !== 'unknown' && (() => {
-                            const conc = concentrationLabel(pi.concentration_band);
-                            return (
-                              <span
-                                className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
-                                title={conc.tooltip}
-                              >
-                                {conc.label}
-                              </span>
-                            );
-                          })()}
+                          <span
+                            className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
+                            title={conc.tooltip}
+                          >
+                            {conc.label}
+                          </span>
                           <span
                             className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
                             style={{ fontSize: '14px' }}
@@ -918,6 +947,11 @@ export default async function ProductDetailPage({
                         </summary>
                         <div className="mt-2 pt-2 border-t border-outline-variant/15">
                           <div className="flex items-center gap-1 mb-1.5 flex-wrap">
+                            {isCritical && (
+                              <span className="label-caps text-[9px] bg-error text-on-error px-1.5 py-0.5 rounded-sm font-bold">
+                                UYARI
+                              </span>
+                            )}
                             {isAllergen && (
                               <span className="label-caps text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded-sm">Alerjen</span>
                             )}
@@ -952,83 +986,8 @@ export default async function ProductDetailPage({
                     );
                   })}
                 </div>
-              }
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-                {sortedIngredients.slice(0, 8).map((pi, idx) => {
-                  const isAllergen = pi.ingredient?.allergen_flag;
-                  const isFragrance = pi.ingredient?.fragrance_flag;
-                  return (
-                    <details
-                      key={pi.product_ingredient_id}
-                      className={`group curator-card px-3 py-2 ${
-                        isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
-                      }`}
-                    >
-                      <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                        <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
-                          {idx + 1}
-                        </span>
-                        <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
-                          {pi.ingredient_display_name}
-                        </span>
-                        {(() => {
-                          const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
-                          const conc = concentrationLabel(band);
-                          return (
-                            <span
-                              className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
-                              title={conc.tooltip}
-                            >
-                              {conc.label}
-                            </span>
-                          );
-                        })()}
-                        <span
-                          className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
-                          style={{ fontSize: '14px' }}
-                          aria-hidden="true"
-                        >
-                          expand_more
-                        </span>
-                      </summary>
-                      <div className="mt-2 pt-2 border-t border-outline-variant/15">
-                        <div className="flex items-center gap-1 mb-1.5 flex-wrap">
-                          {isAllergen && (
-                            <span className="label-caps text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded-sm">Alerjen</span>
-                          )}
-                          {isFragrance && (
-                            <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-sm">Parfüm</span>
-                          )}
-                          {pi.is_below_one_percent_estimate && (
-                            <span className="label-caps text-[9px] text-outline">(&lt;1%)</span>
-                          )}
-                        </div>
-                        {pi.ingredient ? (
-                          <>
-                            {pi.ingredient.function_summary && (
-                              <p className="text-[11px] text-on-surface-variant leading-relaxed line-clamp-4">
-                                {pi.ingredient.function_summary}
-                              </p>
-                            )}
-                            <Link
-                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                              className="inline-block mt-1.5 label-caps text-[9px] text-primary hover:underline underline-offset-4"
-                            >
-                              Detaylı bilgi &rarr;
-                            </Link>
-                          </>
-                        ) : (
-                          <p className="text-[11px] text-on-surface-variant">
-                            İçerik detayları güncelleniyor.
-                          </p>
-                        )}
-                      </div>
-                    </details>
-                  );
-                })}
-              </div>
-            </ListModal>
+              );
+            })()
           ) : (
             <div className="bg-surface-container-low rounded-md p-8 text-on-surface-variant text-sm text-center">
               <span className="material-icon material-icon-lg text-outline-variant block mb-2" aria-hidden="true">science</span>
