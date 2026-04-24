@@ -628,19 +628,21 @@ export default async function SupplementDetailPage({
           )}
         </AccordionSection>
 
-        {/* Ingredient Functions — accordion, 3-col, minimal */}
-        {nutritionFacts.some(nf => nf.ingredient?.function_summary) && (
-          <AccordionSection
-            title="Bu Bileşenler Ne İşe Yarar?"
-            icon="biotech"
-            count={`${nutritionFacts.filter(nf => nf.ingredient?.function_summary).length} bileşen`}
-            className="mb-4"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {nutritionFacts
-                .filter(nf => nf.ingredient?.function_summary)
-                .map((nf) => {
+        {/* Ingredient Functions — TÜM bileşenler, eksik açıklamada placeholder */}
+        {nutritionFacts.some(nf => nf.ingredient) && (() => {
+          const cards = nutritionFacts.filter(nf => nf.ingredient);
+          const filledCount = cards.filter(nf => nf.ingredient?.function_summary).length;
+          return (
+            <AccordionSection
+              title="Bu Bileşenler Ne İşe Yarar?"
+              icon="biotech"
+              count={`${filledCount}/${cards.length} bileşen`}
+              className="mb-4"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {cards.map((nf) => {
                   const ing = nf.ingredient!;
+                  const hasSummary = !!ing.function_summary;
                   return (
                     <Link
                       key={nf.supplement_ingredient_id}
@@ -655,34 +657,47 @@ export default async function SupplementDetailPage({
                           <p className="font-semibold text-xs text-on-surface group-hover:text-primary transition-colors">
                             {ing.common_name || ing.inci_name}
                           </p>
-                          <p className="text-[10px] text-on-surface-variant leading-relaxed mt-0.5 line-clamp-3">
-                            {ing.function_summary}
-                          </p>
+                          {hasSummary ? (
+                            <p className="text-[10px] text-on-surface-variant leading-relaxed mt-0.5 line-clamp-3">
+                              {ing.function_summary}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] text-outline italic mt-0.5">
+                              Açıklama yakında eklenecek &mdash; detay için tıkla
+                            </p>
+                          )}
                         </div>
                       </div>
                     </Link>
                   );
                 })}
-            </div>
-          </AccordionSection>
-        )}
+              </div>
+            </AccordionSection>
+          );
+        })()}
 
-        {/* Food Sources — accordion, 2-col, each card shows top-3 foods + nested details for the rest */}
-        {nutritionFacts.some(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0) && (
-          <AccordionSection
-            title="Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?"
-            icon="restaurant"
-            count={`${nutritionFacts.filter(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0).length} bileşen`}
-            className="mb-4"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {nutritionFacts
-                .filter(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0)
-                .map((nf) => {
+        {/* Food Sources — TÜM bileşenler için kart, eksik veride placeholder */}
+        {nutritionFacts.length > 0 && (() => {
+          const ingredientCards = nutritionFacts.filter(nf => nf.ingredient);
+          const filledCount = ingredientCards.filter(
+            nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0,
+          ).length;
+          if (ingredientCards.length === 0) return null;
+
+          return (
+            <AccordionSection
+              title="Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?"
+              icon="restaurant"
+              count={`${filledCount}/${ingredientCards.length} bileşen`}
+              className="mb-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {ingredientCards.map((nf) => {
                   const ing = nf.ingredient!;
                   const dose = Number(nf.amount_per_serving) || 0;
                   const doseUnit = nf.unit || '';
-                  const allFoods = ing.food_sources!;
+                  const allFoods = ing.food_sources || [];
+                  const hasUsableFoods = allFoods.length > 0 && allFoods[0].amount_per_100g > 0;
                   const topFoods = allFoods.slice(0, 3);
                   const restFoods = allFoods.slice(3);
                   const renderFoodRow = (fs: FoodSource, i: number) => {
@@ -715,26 +730,36 @@ export default async function SupplementDetailPage({
                           {dose > 0 && <span className="text-outline font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
                         </h3>
                       </div>
-                      {topFoods.map(renderFoodRow)}
-                      {restFoods.length > 0 && (
-                        <details className="mt-2">
-                          <summary className="text-[10px] text-primary cursor-pointer hover:underline">
-                            +{restFoods.length} gıda daha
-                          </summary>
-                          <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
-                        </details>
+                      {hasUsableFoods ? (
+                        <>
+                          {topFoods.map(renderFoodRow)}
+                          {restFoods.length > 0 && (
+                            <details className="mt-2">
+                              <summary className="text-[10px] text-primary cursor-pointer hover:underline">
+                                +{restFoods.length} gıda daha
+                              </summary>
+                              <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
+                            </details>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2 py-1.5 text-[11px] text-outline">
+                          <span className="material-icon text-[12px]" aria-hidden="true">hourglass_empty</span>
+                          <span>Doğal kaynak verisi yakında eklenecek</span>
+                        </div>
                       )}
                     </div>
                   );
                 })}
-            </div>
+              </div>
 
-            <p className="text-[10px] text-outline mt-3 flex items-start gap-1">
-              <span className="material-icon text-[12px] mt-0.5" aria-hidden="true">info</span>
-              Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir.
-            </p>
-          </AccordionSection>
-        )}
+              <p className="text-[10px] text-outline mt-3 flex items-start gap-1">
+                <span className="material-icon text-[12px] mt-0.5" aria-hidden="true">info</span>
+                Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir.
+              </p>
+            </AccordionSection>
+          );
+        })()}
 
         {/* Ingredient Interactions — accordion, 2-col, minimal */}
         {interactions.length > 0 && (

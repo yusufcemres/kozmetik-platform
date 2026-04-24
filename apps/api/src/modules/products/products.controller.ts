@@ -33,12 +33,27 @@ export class ProductsController {
   @ApiOperation({ summary: 'Ürünleri listele' })
   @ApiQuery({ name: 'include_score', required: false, description: 'true ise precomputed skor eklenir' })
   async findAll(@Query() query: ProductFilterDto, @Query('include_score') includeScore?: string) {
+    // Sprint 6: rich filter param normalize — comma-separated string → array
+    const splitCsv = (s?: string) => s ? s.split(',').map(x => x.trim()).filter(Boolean) : undefined;
+    const parseNum = (s?: string) => s != null && s !== '' ? Number(s) : undefined;
+
     const result = await this.service.findAll({
       ...query,
       brand_id: query.brand_id ? Number(query.brand_id) : undefined,
       category_id: query.category_id ? Number(query.category_id) : undefined,
       category_slug: query.category_slug || undefined,
       need_id: query.need_id ? Number(query.need_id) : undefined,
+      ingredient_slugs: splitCsv(query.ingredient_slugs),
+      need_ids: splitCsv(query.need_ids)?.map(Number).filter(n => Number.isFinite(n)),
+      form: splitCsv(query.form),
+      certifications: splitCsv(query.certifications),
+      target_audience: splitCsv(query.target_audience),
+      manufacturer_country: splitCsv(query.manufacturer_country),
+      score_min: parseNum(query.score_min),
+      score_max: parseNum(query.score_max),
+      price_min: parseNum(query.price_min),
+      price_max: parseNum(query.price_max),
+      skin_type: splitCsv(query.skin_type),
     });
     if (includeScore === 'true' && result.data?.length) {
       result.data = await this.service.attachScores(result.data);
