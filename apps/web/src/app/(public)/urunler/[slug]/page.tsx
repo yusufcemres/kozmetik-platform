@@ -17,6 +17,7 @@ import { CrossSellBlock } from '@/components/public/CrossSellBlock';
 import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
+import AccordionSection from '@/components/public/AccordionSection';
 
 // === Types ===
 
@@ -489,7 +490,7 @@ export default async function ProductDetailPage({
         image_url={imageUrl}
       />
 
-      <article className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-12">
+      <article className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-12">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/urunler" className="hover:text-on-surface transition-colors">
@@ -643,27 +644,25 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Need Scores */}
+        {/* Need Scores — 3-col grid, minimal cards */}
         {product.need_scores && product.need_scores.length > 0 && (
-          <section className="mb-16" data-analytics-section="scores">
+          <section className="mb-10" data-analytics-section="scores">
             <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface">Uyumluluk Skorları</h2>
-            <p className="text-sm text-on-surface-variant mb-6 leading-relaxed">
-              Skorlar, ürünün INCI listesindeki her bir etken maddenin bilimsel kanıt seviyesi,
-              konsantrasyon sıralaması ve ilgili cilt ihtiyacına katkısı analiz edilerek hesaplanır.
-              <span className="font-medium text-score-high"> %70+</span> yüksek uyum,
-              <span className="font-medium text-score-medium"> %40-69</span> orta uyum,
-              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum anlamına gelir.
+            <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">
+              <span className="font-medium text-score-high">%70+</span> yüksek,
+              <span className="font-medium text-score-medium"> %40-69</span> orta,
+              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               {product.need_scores.map((ns) => {
                 const score = Math.round(Number(ns.compatibility_score));
                 return (
                   <div
                     key={ns.product_need_score_id}
-                    className="curator-card p-5 flex items-center gap-4"
+                    className="curator-card p-3"
                   >
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-on-surface">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-medium text-on-surface truncate">
                         {ns.need ? (
                           <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
                             {ns.need.need_name}
@@ -672,19 +671,19 @@ export default async function ProductDetailPage({
                           `İhtiyaç #${ns.need_id}`
                         )}
                       </p>
-                      <div className="mt-2 h-1.5 bg-surface-container rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${getScoreBarColor(score)}`}
-                          style={{ width: getScoreBarWidth(score) }}
-                        />
-                      </div>
-                      {ns.score_reason_summary && (
-                        <p className="text-[10px] text-outline mt-1.5">{ns.score_reason_summary}</p>
-                      )}
+                      <span className={`text-sm font-bold shrink-0 ${getScoreColor(score)}`}>
+                        %{score}
+                      </span>
                     </div>
-                    <span className={`text-xl font-bold ${getScoreColor(score)}`}>
-                      %{score}
-                    </span>
+                    <div className="mt-2 h-1 bg-surface-container rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${getScoreBarColor(score)}`}
+                        style={{ width: getScoreBarWidth(score) }}
+                      />
+                    </div>
+                    {ns.score_reason_summary && (
+                      <p className="text-[9px] text-outline mt-1 line-clamp-2">{ns.score_reason_summary}</p>
+                    )}
                   </div>
                 );
               })}
@@ -863,131 +862,74 @@ export default async function ProductDetailPage({
             <ListModal
               title="İçerik Listesi (INCI)"
               count={sortedIngredients.length}
-              previewCount={5}
+              previewCount={8}
               allChildren={
-                <div className="divide-y divide-outline-variant/15">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                   {sortedIngredients.map((pi, idx) => {
-                    const isAllergen = pi.ingredient?.allergen_flag;
-                    const isFragrance = pi.ingredient?.fragrance_flag;
-                    return (
-                      <div
-                        key={pi.product_ingredient_id}
-                        className={`flex items-center gap-3 py-2.5 ${
-                          isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
-                        }`}
-                      >
-                        <span className="label-caps text-outline w-6 text-right shrink-0">
-                          {idx + 1}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          {pi.ingredient ? (
-                            <Link
-                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                              className="text-sm font-medium text-on-surface hover:text-primary transition-colors"
-                            >
-                              {pi.ingredient_display_name}
-                            </Link>
-                          ) : (
-                            <span className="text-sm font-medium text-on-surface">
-                              {pi.ingredient_display_name}
-                            </span>
-                          )}
-                          {pi.is_below_one_percent_estimate && (
-                            <span className="label-caps text-outline ml-1">(&lt;1%)</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          {isAllergen && (
-                            <span className="label-caps bg-error/10 text-error px-2 py-0.5 rounded-md">Alerjen</span>
-                          )}
-                          {isFragrance && (
-                            <span className="label-caps bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-md">Parfüm</span>
-                          )}
-                          {pi.concentration_band !== 'unknown' && (() => {
-                            const conc = concentrationLabel(pi.concentration_band);
-                            return (
-                              <span
-                                className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}
-                                title={conc.tooltip}
-                                aria-label={conc.tooltip}
-                              >
-                                {conc.label}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              }
-            >
-              <div className="curator-card overflow-hidden">
-                <div className="divide-y divide-outline-variant/15">
-                  {sortedIngredients.slice(0, 5).map((pi, idx) => {
                     const isAllergen = pi.ingredient?.allergen_flag;
                     const isFragrance = pi.ingredient?.fragrance_flag;
                     return (
                       <details
                         key={pi.product_ingredient_id}
-                        className={`group px-5 py-3.5 ${
+                        className={`group curator-card px-3 py-2 ${
                           isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
                         }`}
                       >
-                        <summary className="flex items-center gap-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                          <span className="label-caps text-outline w-6 text-right">
+                        <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                          <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
                             {idx + 1}
                           </span>
-                          <div className="flex-1 min-w-0 flex items-center gap-2">
-                            <span className="text-sm font-medium text-on-surface group-open:text-primary transition-colors">
-                              {pi.ingredient_display_name}
-                            </span>
-                            <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform" style={{ fontSize: '16px' }} aria-hidden="true">
-                              expand_more
-                            </span>
-                            {pi.is_below_one_percent_estimate && (
-                              <span className="label-caps text-outline">(&lt;1%)</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
+                          <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
+                            {pi.ingredient_display_name}
+                          </span>
+                          {pi.concentration_band !== 'unknown' && (() => {
+                            const conc = concentrationLabel(pi.concentration_band);
+                            return (
+                              <span
+                                className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
+                                title={conc.tooltip}
+                              >
+                                {conc.label}
+                              </span>
+                            );
+                          })()}
+                          <span
+                            className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                            style={{ fontSize: '14px' }}
+                            aria-hidden="true"
+                          >
+                            expand_more
+                          </span>
+                        </summary>
+                        <div className="mt-2 pt-2 border-t border-outline-variant/15">
+                          <div className="flex items-center gap-1 mb-1.5 flex-wrap">
                             {isAllergen && (
-                              <span className="label-caps bg-error/10 text-error px-2 py-0.5 rounded-md">Alerjen</span>
+                              <span className="label-caps text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded-sm">Alerjen</span>
                             )}
                             {isFragrance && (
-                              <span className="label-caps bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded-md">Parfüm</span>
+                              <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-sm">Parfüm</span>
                             )}
-                            {pi.concentration_band !== 'unknown' && (() => {
-                              const conc = concentrationLabel(pi.concentration_band);
-                              return (
-                                <span
-                                  className={`label-caps px-2 py-0.5 rounded-md ${conc.color}`}
-                                  title={conc.tooltip}
-                                  aria-label={conc.tooltip}
-                                >
-                                  {conc.label}
-                                </span>
-                              );
-                            })()}
+                            {pi.is_below_one_percent_estimate && (
+                              <span className="label-caps text-[9px] text-outline">(&lt;1%)</span>
+                            )}
                           </div>
-                        </summary>
-                        <div className="ml-9 mt-2 bg-surface-container-low border-l-2 border-primary/30 rounded-r-md px-4 py-3 animate-[fadeIn_0.15s_ease-in]">
                           {pi.ingredient ? (
                             <>
                               {pi.ingredient.function_summary && (
-                                <p className="text-xs text-on-surface-variant leading-relaxed">
+                                <p className="text-[11px] text-on-surface-variant leading-relaxed line-clamp-4">
                                   {pi.ingredient.function_summary}
                                 </p>
                               )}
                               <Link
                                 href={`/icerikler/${pi.ingredient.ingredient_slug}`}
-                                className="inline-block mt-2 label-caps text-primary hover:underline underline-offset-4"
+                                className="inline-block mt-1.5 label-caps text-[9px] text-primary hover:underline underline-offset-4"
                               >
                                 Detaylı bilgi &rarr;
                               </Link>
                             </>
                           ) : (
-                            <p className="text-xs text-on-surface-variant leading-relaxed">
-                              <span className="font-medium">{pi.ingredient_display_name}</span> — içerik detayları güncelleniyor.
+                            <p className="text-[11px] text-on-surface-variant">
+                              İçerik detayları güncelleniyor.
                             </p>
                           )}
                         </div>
@@ -995,6 +937,80 @@ export default async function ProductDetailPage({
                     );
                   })}
                 </div>
+              }
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                {sortedIngredients.slice(0, 8).map((pi, idx) => {
+                  const isAllergen = pi.ingredient?.allergen_flag;
+                  const isFragrance = pi.ingredient?.fragrance_flag;
+                  return (
+                    <details
+                      key={pi.product_ingredient_id}
+                      className={`group curator-card px-3 py-2 ${
+                        isAllergen ? 'bg-error/5' : isFragrance ? 'bg-tertiary-container/30' : ''
+                      }`}
+                    >
+                      <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                        <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
+                          {pi.ingredient_display_name}
+                        </span>
+                        {pi.concentration_band !== 'unknown' && (() => {
+                          const conc = concentrationLabel(pi.concentration_band);
+                          return (
+                            <span
+                              className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
+                              title={conc.tooltip}
+                            >
+                              {conc.label}
+                            </span>
+                          );
+                        })()}
+                        <span
+                          className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                          style={{ fontSize: '14px' }}
+                          aria-hidden="true"
+                        >
+                          expand_more
+                        </span>
+                      </summary>
+                      <div className="mt-2 pt-2 border-t border-outline-variant/15">
+                        <div className="flex items-center gap-1 mb-1.5 flex-wrap">
+                          {isAllergen && (
+                            <span className="label-caps text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded-sm">Alerjen</span>
+                          )}
+                          {isFragrance && (
+                            <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-sm">Parfüm</span>
+                          )}
+                          {pi.is_below_one_percent_estimate && (
+                            <span className="label-caps text-[9px] text-outline">(&lt;1%)</span>
+                          )}
+                        </div>
+                        {pi.ingredient ? (
+                          <>
+                            {pi.ingredient.function_summary && (
+                              <p className="text-[11px] text-on-surface-variant leading-relaxed line-clamp-4">
+                                {pi.ingredient.function_summary}
+                              </p>
+                            )}
+                            <Link
+                              href={`/icerikler/${pi.ingredient.ingredient_slug}`}
+                              className="inline-block mt-1.5 label-caps text-[9px] text-primary hover:underline underline-offset-4"
+                            >
+                              Detaylı bilgi &rarr;
+                            </Link>
+                          </>
+                        ) : (
+                          <p className="text-[11px] text-on-surface-variant">
+                            İçerik detayları güncelleniyor.
+                          </p>
+                        )}
+                      </div>
+                    </details>
+                  );
+                })}
               </div>
             </ListModal>
           ) : (
@@ -1005,54 +1021,55 @@ export default async function ProductDetailPage({
           )}
         </section>
 
-        {/* Ingredient Interactions */}
+        {/* Ingredient Interactions — accordion, 2-col, minimal */}
         {relevantInteractions.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
-              <span className="material-icon text-score-medium" aria-hidden="true">sync_alt</span>
-              Icerik Etkilesimleri
-            </h2>
-            <p className="text-sm text-on-surface-variant mb-4">
-              Bu urundeki aktif maddelerin bilinen etkilesimleri.
-            </p>
-            <div className="space-y-3">
-              {relevantInteractions.slice(0, 5).map((inter) => {
+          <AccordionSection
+            title="İçerik Etkileşimleri"
+            icon="sync_alt"
+            count={`${relevantInteractions.length} uyarı`}
+            className="mb-6"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {relevantInteractions.slice(0, 6).map((inter) => {
                 const severityConfig = inter.severity === 'severe'
-                  ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kacinilmali' }
+                  ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kaçınılmalı' }
                   : inter.severity === 'moderate'
-                  ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli Kullanin' }
+                  ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli' }
                   : { icon: 'info', color: 'border-outline-variant/20 bg-surface-container-low', badge: 'bg-surface-container text-on-surface-variant', label: 'Bilgi' };
                 return (
-                  <div key={inter.interaction_id} className={`rounded-sm border p-4 ${severityConfig.color}`}>
-                    <div className="flex items-start gap-3">
-                      <span className="material-icon text-on-surface-variant mt-0.5" style={{ fontSize: '20px' }} aria-hidden="true">{severityConfig.icon}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-semibold text-on-surface">
-                            {inter.ingredient_a?.inci_name || '?'}
-                          </span>
-                          <span className="text-xs text-outline">+</span>
-                          <span className="text-sm font-semibold text-on-surface">
-                            {inter.ingredient_b?.inci_name || '?'}
-                          </span>
-                          <span className={`label-caps px-1.5 py-0.5 rounded-sm ${severityConfig.badge}`}>
-                            {severityConfig.label}
-                          </span>
-                        </div>
-                        <p className="text-xs text-on-surface-variant leading-relaxed">{inter.description}</p>
-                        {inter.recommendation && (
-                          <p className="text-xs text-primary mt-1.5 flex items-center gap-1">
-                            <span className="material-icon material-icon-sm" aria-hidden="true">lightbulb</span>
-                            {inter.recommendation}
-                          </p>
-                        )}
+                  <details key={inter.interaction_id} className={`group rounded-sm border px-3 py-2 ${severityConfig.color}`}>
+                    <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className="material-icon text-on-surface-variant shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">{severityConfig.icon}</span>
+                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
+                        <span className="font-semibold text-on-surface truncate">
+                          {inter.ingredient_a?.inci_name || '?'}
+                        </span>
+                        <span className="text-outline">+</span>
+                        <span className="font-semibold text-on-surface truncate">
+                          {inter.ingredient_b?.inci_name || '?'}
+                        </span>
+                        <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${severityConfig.badge}`}>
+                          {severityConfig.label}
+                        </span>
                       </div>
+                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">
+                        expand_more
+                      </span>
+                    </summary>
+                    <div className="mt-2 pt-2 border-t border-outline-variant/15">
+                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{inter.description}</p>
+                      {inter.recommendation && (
+                        <p className="text-[10px] text-primary mt-1 flex items-start gap-1">
+                          <span className="material-icon text-[10px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                          {inter.recommendation}
+                        </p>
+                      )}
                     </div>
-                  </div>
+                  </details>
                 );
               })}
             </div>
-          </section>
+          </AccordionSection>
         )}
 
         {/* Label Info */}

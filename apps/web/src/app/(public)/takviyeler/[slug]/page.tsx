@@ -7,6 +7,7 @@ import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platf
 import ScoreBadge from '@/components/public/ScoreBadge';
 import PriceChart from '@/components/public/PriceChart';
 import ReviewsBlock from '@/components/public/ReviewsBlock';
+import AccordionSection from '@/components/public/AccordionSection';
 
 // === Types ===
 
@@ -360,7 +361,7 @@ export default async function SupplementDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(supplementJsonLd(product, detail, reviewsAgg)) }}
       />
 
-      <article className="curator-section max-w-[1200px] mx-auto">
+      <article className="curator-section max-w-[1400px] mx-auto">
         {/* Breadcrumb */}
         <nav className="label-caps text-outline mb-8 flex items-center gap-2">
           <Link href="/takviyeler" className="hover:text-primary transition-colors">
@@ -581,11 +582,13 @@ export default async function SupplementDetailPage({
           </section>
         )}
 
-        {/* Nutrition Facts */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold text-on-surface mb-4">
-            Besin Değerleri (Nutrition Facts)
-          </h2>
+        {/* Nutrition Facts — accordion, collapsed */}
+        <AccordionSection
+          title="Besin Değerleri (Nutrition Facts)"
+          icon="science"
+          count={nutritionFacts.length > 0 ? `${nutritionFacts.length} madde` : undefined}
+          className="mb-4"
+        >
           {nutritionFacts.length > 0 ? (
             <div className="curator-card overflow-hidden">
               <table className="w-full text-sm">
@@ -647,20 +650,21 @@ export default async function SupplementDetailPage({
               </div>
             </div>
           ) : (
-            <div className="bg-surface-container-low rounded-sm p-6 text-on-surface-variant text-sm">
+            <div className="bg-surface-container-low rounded-sm p-4 text-on-surface-variant text-xs">
               Besin bilgileri henüz eklenmemiş.
             </div>
           )}
-        </section>
+        </AccordionSection>
 
-        {/* Ingredient Functions */}
+        {/* Ingredient Functions — accordion, 3-col, minimal */}
         {nutritionFacts.some(nf => nf.ingredient?.function_summary) && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">science</span>
-              Bu Bileşenler Ne İşe Yarar?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <AccordionSection
+            title="Bu Bileşenler Ne İşe Yarar?"
+            icon="biotech"
+            count={`${nutritionFacts.filter(nf => nf.ingredient?.function_summary).length} bileşen`}
+            className="mb-4"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {nutritionFacts
                 .filter(nf => nf.ingredient?.function_summary)
                 .map((nf) => {
@@ -669,134 +673,106 @@ export default async function SupplementDetailPage({
                     <Link
                       key={nf.supplement_ingredient_id}
                       href={`/icerikler/${ing.ingredient_slug}`}
-                      className="curator-card p-4 group hover:border-primary/30 transition-all"
+                      className="curator-card p-3 group hover:border-primary/30 transition-all"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <span className="material-icon text-primary text-[16px]" aria-hidden="true">biotech</span>
+                      <div className="flex items-start gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="material-icon text-primary text-[12px]" aria-hidden="true">biotech</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-on-surface group-hover:text-primary transition-colors">
+                          <p className="font-semibold text-xs text-on-surface group-hover:text-primary transition-colors">
                             {ing.common_name || ing.inci_name}
                           </p>
-                          <p className="text-xs text-on-surface-variant leading-relaxed mt-1">
+                          <p className="text-[10px] text-on-surface-variant leading-relaxed mt-0.5 line-clamp-3">
                             {ing.function_summary}
                           </p>
                         </div>
-                        <span className="material-icon text-outline-variant text-[16px] shrink-0 group-hover:text-primary transition-colors" aria-hidden="true">arrow_forward</span>
                       </div>
                     </Link>
                   );
                 })}
             </div>
-          </section>
+          </AccordionSection>
         )}
 
-        {/* Food Sources */}
+        {/* Food Sources — accordion, 2-col, each card shows top-3 foods + nested details for the rest */}
         {nutritionFacts.some(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0) && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">restaurant</span>
-              Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?
-            </h2>
-            <p className="text-sm text-on-surface-variant mb-6">
-              Takviye yerine veya yanında tüketebileceğiniz doğal gıda kaynakları.
-            </p>
-
-            <div className="space-y-6">
+          <AccordionSection
+            title="Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?"
+            icon="restaurant"
+            count={`${nutritionFacts.filter(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0).length} bileşen`}
+            className="mb-4"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {nutritionFacts
                 .filter(nf => nf.ingredient?.food_sources && nf.ingredient.food_sources.length > 0 && nf.ingredient.food_sources[0].amount_per_100g > 0)
                 .map((nf) => {
                   const ing = nf.ingredient!;
                   const dose = Number(nf.amount_per_serving) || 0;
                   const doseUnit = nf.unit || '';
-                  return (
-                    <div key={nf.supplement_ingredient_id} className="curator-card overflow-hidden">
-                      <div className="bg-surface-container-low px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="material-icon text-primary text-[18px]" aria-hidden="true">eco</span>
-                          <h3 className="font-semibold text-on-surface text-sm">
-                            {ing.common_name || ing.inci_name}
-                            {dose > 0 && <span className="text-on-surface-variant font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
-                          </h3>
-                        </div>
-                        {ing.daily_recommended_value && (
-                          <span className="label-caps text-outline">
-                            Günlük önerilen: {ing.daily_recommended_value} {ing.daily_recommended_unit || 'mg'}
+                  const allFoods = ing.food_sources!;
+                  const topFoods = allFoods.slice(0, 3);
+                  const restFoods = allFoods.slice(3);
+                  const renderFoodRow = (fs: FoodSource, i: number) => {
+                    const neededGrams = dose > 0 && fs.amount_per_100g > 0
+                      ? Math.round((dose / fs.amount_per_100g) * 100)
+                      : null;
+                    return (
+                      <div key={i} className="flex items-center gap-2 py-1.5 border-b border-outline-variant/10 last:border-b-0 text-xs">
+                        <span className="flex-1 font-medium text-on-surface truncate">{fs.food_name}</span>
+                        {dose > 0 && neededGrams !== null && (
+                          <span className={`font-semibold tabular-nums ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                            ~{neededGrams}g
                           </span>
                         )}
+                        {fs.bioavailability && (
+                          <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${
+                            fs.bioavailability === 'Yüksek' ? 'text-score-high bg-score-high/10' :
+                            fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
+                            'text-outline bg-surface-container-low'
+                          }`}>{fs.bioavailability}</span>
+                        )}
                       </div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-outline-variant/20">
-                              <th className="text-left px-4 py-2 label-caps text-outline">Gıda</th>
-                              <th className="text-right px-4 py-2 label-caps text-outline">100g&apos;da</th>
-                              {dose > 0 && (
-                                <th className="text-right px-4 py-2 label-caps text-outline">
-                                  {Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit} için
-                                </th>
-                              )}
-                              <th className="text-center px-4 py-2 label-caps text-outline">Biyoyararlanım</th>
-                              <th className="text-left px-4 py-2 label-caps text-outline hidden sm:table-cell">Not</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-outline-variant/10">
-                            {ing.food_sources!.map((fs, i) => {
-                              const neededGrams = dose > 0 && fs.amount_per_100g > 0
-                                ? Math.round((dose / fs.amount_per_100g) * 100)
-                                : null;
-                              return (
-                                <tr key={i} className="hover:bg-surface-container-low/50 transition-colors">
-                                  <td className="px-4 py-2.5 font-medium text-on-surface">{fs.food_name}</td>
-                                  <td className="px-4 py-2.5 text-right text-on-surface-variant">
-                                    {fs.amount_per_100g > 0 ? `${fs.amount_per_100g} ${fs.unit}` : '-'}
-                                  </td>
-                                  {dose > 0 && (
-                                    <td className="px-4 py-2.5 text-right">
-                                      {neededGrams !== null ? (
-                                        <span className={`font-semibold ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                          ~{neededGrams}g
-                                        </span>
-                                      ) : '-'}
-                                    </td>
-                                  )}
-                                  <td className="px-4 py-2.5 text-center">
-                                    {fs.bioavailability && (
-                                      <span className={`label-caps px-2 py-0.5 rounded-sm ${
-                                        fs.bioavailability === 'Yüksek' ? 'text-score-high bg-score-high/10' :
-                                        fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
-                                        'text-outline bg-surface-container-low'
-                                      }`}>{fs.bioavailability}</span>
-                                    )}
-                                  </td>
-                                  <td className="px-4 py-2.5 text-xs text-on-surface-variant hidden sm:table-cell">{fs.note || ''}</td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                    );
+                  };
+                  return (
+                    <div key={nf.supplement_ingredient_id} className="curator-card p-3">
+                      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-outline-variant/20">
+                        <h3 className="font-semibold text-on-surface text-xs truncate">
+                          {ing.common_name || ing.inci_name}
+                          {dose > 0 && <span className="text-outline font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
+                        </h3>
                       </div>
+                      {topFoods.map(renderFoodRow)}
+                      {restFoods.length > 0 && (
+                        <details className="mt-2">
+                          <summary className="text-[10px] text-primary cursor-pointer hover:underline">
+                            +{restFoods.length} gıda daha
+                          </summary>
+                          <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
+                        </details>
+                      )}
                     </div>
                   );
                 })}
             </div>
 
-            <p className="text-xs text-outline mt-4 flex items-start gap-1.5">
-              <span className="material-icon text-[14px] mt-0.5" aria-hidden="true">info</span>
-              Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir. Dengeli beslenme takviyeye tercih edilmelidir.
+            <p className="text-[10px] text-outline mt-3 flex items-start gap-1">
+              <span className="material-icon text-[12px] mt-0.5" aria-hidden="true">info</span>
+              Gıdalardan alınan vitaminlerin biyoyararlanımı genellikle takviyelerden daha yüksektir.
             </p>
-          </section>
+          </AccordionSection>
         )}
 
-        {/* Ingredient Interactions */}
+        {/* Ingredient Interactions — accordion, 2-col, minimal */}
         {interactions.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">sync_alt</span>
-              Etkileşim Uyarıları
-            </h2>
-            <div className="space-y-3">
+          <AccordionSection
+            title="Etkileşim Uyarıları"
+            icon="sync_alt"
+            count={`${interactions.length} uyarı`}
+            className="mb-4"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {interactions.map((int) => {
                 const severityConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
                   severe: { color: 'text-error', bg: 'bg-error/10 border-error/20', icon: 'error', label: 'Ciddi' },
@@ -807,91 +783,108 @@ export default async function SupplementDetailPage({
                 };
                 const cfg = severityConfig[int.severity] || severityConfig.mild;
                 return (
-                  <div key={int.interaction_id} className={`border rounded-sm p-4 ${cfg.bg}`}>
-                    <div className="flex items-start gap-3">
-                      <span className={`material-icon ${cfg.color} text-[20px] mt-0.5 shrink-0`} aria-hidden="true">{cfg.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Link href={`/icerikler/${int.ingredient_a.ingredient_slug || int.ingredient_a.ingredient_id}`} className="font-semibold text-sm text-on-surface hover:text-primary transition-colors">
-                            {int.ingredient_a.common_name || int.ingredient_a.inci_name}
-                          </Link>
-                          <span className={`material-icon text-[14px] ${cfg.color}`} aria-hidden="true">sync_alt</span>
-                          <Link href={`/icerikler/${int.ingredient_b.ingredient_slug || int.ingredient_b.ingredient_id}`} className="font-semibold text-sm text-on-surface hover:text-primary transition-colors">
-                            {int.ingredient_b.common_name || int.ingredient_b.inci_name}
-                          </Link>
-                          <span className={`label-caps px-2 py-0.5 rounded-sm ${cfg.color} ${cfg.bg}`}>{cfg.label}</span>
-                        </div>
+                  <details key={int.interaction_id} className={`group border rounded-sm px-3 py-2 ${cfg.bg}`}>
+                    <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className={`material-icon ${cfg.color} text-[14px] shrink-0`} aria-hidden="true">{cfg.icon}</span>
+                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
+                        <Link
+                          href={`/icerikler/${int.ingredient_a.ingredient_slug || int.ingredient_a.ingredient_id}`}
+                          className="font-semibold text-on-surface hover:text-primary transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {int.ingredient_a.common_name || int.ingredient_a.inci_name}
+                        </Link>
+                        <span className={`material-icon text-[12px] ${cfg.color}`} aria-hidden="true">sync_alt</span>
+                        <Link
+                          href={`/icerikler/${int.ingredient_b.ingredient_slug || int.ingredient_b.ingredient_id}`}
+                          className="font-semibold text-on-surface hover:text-primary transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {int.ingredient_b.common_name || int.ingredient_b.inci_name}
+                        </Link>
+                        <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${cfg.color} ${cfg.bg}`}>{cfg.label}</span>
+                      </div>
+                      <span
+                        className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                        style={{ fontSize: '14px' }}
+                        aria-hidden="true"
+                      >
+                        expand_more
+                      </span>
+                    </summary>
+                    {(int.description || int.recommendation) && (
+                      <div className="mt-2 pt-2 border-t border-outline-variant/15 space-y-1">
                         {int.description && (
-                          <p className="text-sm text-on-surface-variant mt-1.5">{int.description}</p>
+                          <p className="text-[11px] text-on-surface-variant leading-relaxed">{int.description}</p>
                         )}
                         {int.recommendation && (
-                          <p className="text-xs text-on-surface-variant mt-1 flex items-start gap-1">
-                            <span className="material-icon text-[12px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                          <p className="text-[10px] text-on-surface-variant flex items-start gap-1">
+                            <span className="material-icon text-[10px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
                             {int.recommendation}
                           </p>
                         )}
                       </div>
-                    </div>
-                  </div>
+                    )}
+                  </details>
                 );
               })}
             </div>
-          </section>
+          </AccordionSection>
         )}
 
-        {/* Cross-Reference: Cosmetic Products */}
+        {/* Cross-Reference: Cosmetic Products — collapsed by default, Sprint 2'de kaldırılacak */}
         {cosmeticProducts.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-2 flex items-center gap-2">
-              <span className="material-icon text-primary" aria-hidden="true">spa</span>
-              Bu Bileşenleri İçeren Kozmetikler
-            </h2>
-            <p className="text-sm text-on-surface-variant mb-4">
+          <AccordionSection
+            title="Bu Bileşenleri İçeren Kozmetikler"
+            icon="spa"
+            count={`${cosmeticProducts.length} ürün`}
+            className="mb-4"
+          >
+            <p className="text-[11px] text-on-surface-variant mb-3">
               Bu takviyedeki aktif bileşenleri içeren kozmetik ürünler — dışarıdan da destekle.
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
               {cosmeticProducts.map((cp) => (
                 <Link
                   key={cp.product_id}
                   href={`/urunler/${cp.product_slug}`}
-                  className="curator-card p-3 group hover:border-primary/30 transition-all"
+                  className="curator-card p-2 group hover:border-primary/30 transition-all"
                 >
-                  <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center mb-2 overflow-hidden">
+                  <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center mb-1.5 overflow-hidden">
                     {cp.images?.[0]?.image_url ? (
                       <Image
                         src={cp.images[0].image_url}
                         alt={cp.product_name}
-                        width={120}
-                        height={120}
-                        className="object-contain w-full h-full p-2"
+                        width={80}
+                        height={80}
+                        className="object-contain w-full h-full p-1"
                         unoptimized
                       />
                     ) : (
-                      <span className="material-icon text-outline-variant text-[40px]" aria-hidden="true">spa</span>
+                      <span className="material-icon text-outline-variant text-[28px]" aria-hidden="true">spa</span>
                     )}
                   </div>
                   {cp.brand && (
-                    <p className="label-caps text-outline text-[8px]">{cp.brand.brand_name}</p>
+                    <p className="label-caps text-outline text-[8px] truncate">{cp.brand.brand_name}</p>
                   )}
-                  <p className="text-xs font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2 mt-0.5">
+                  <p className="text-[10px] font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2">
                     {cp.product_name}
                   </p>
                 </Link>
               ))}
             </div>
-          </section>
+          </AccordionSection>
         )}
 
-        {/* Warnings */}
+        {/* Warnings — accordion, kapalı */}
         {detail?.warnings && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-on-surface mb-3">Uyarılar</h2>
-            <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-4">
-              <p className="text-sm text-on-surface-variant leading-relaxed">
+          <AccordionSection title="Uyarılar" icon="warning" className="mb-4">
+            <div className="bg-tertiary-container border border-outline-variant/20 rounded-sm p-3">
+              <p className="text-xs text-on-surface-variant leading-relaxed">
                 {detail.warnings}
               </p>
             </div>
-          </section>
+          </AccordionSection>
         )}
 
         {/* Reviews (B.12) */}

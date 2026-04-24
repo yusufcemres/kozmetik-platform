@@ -196,7 +196,7 @@ export default async function NeedDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(needJsonLd(need)) }}
       />
 
-      <article className="curator-section max-w-[1600px] mx-auto">
+      <article className="curator-section max-w-[1400px] mx-auto">
         {/* Breadcrumb */}
         <nav className="text-outline mb-8 flex items-center gap-2 text-xs uppercase tracking-widest">
           <Link href="/ihtiyaclar" className="hover:text-primary transition-colors">
@@ -297,36 +297,36 @@ export default async function NeedDetailPage({
                 </div>
               }
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {sortedMappings.slice(0, 6).map((m) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {sortedMappings.slice(0, 8).map((m) => {
                   const effect = effectTypeLabel(m.effect_type);
                   const score = Math.round(m.relevance_score || 0);
                   return (
                     <div
                       key={m.mapping_id}
-                      className="curator-card p-4"
+                      className="curator-card p-3"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           {m.ingredient ? (
                             <Link
                               href={`/icerikler/${m.ingredient.ingredient_slug}`}
-                              className="font-medium text-on-surface hover:text-primary transition-colors"
+                              className="text-xs font-medium text-on-surface hover:text-primary transition-colors block truncate"
                             >
                               {m.ingredient.inci_name}
                             </Link>
                           ) : (
-                            <span className="font-medium text-on-surface">
+                            <span className="text-xs font-medium text-on-surface">
                               İçerik #{m.ingredient_id}
                             </span>
                           )}
                           {m.ingredient?.common_name && (
-                            <p className="text-xs text-outline mt-0.5">
+                            <p className="text-[10px] text-outline mt-0.5 truncate">
                               {m.ingredient.common_name}
                             </p>
                           )}
                         </div>
-                        <span className={`text-sm font-bold ${getScoreColor(score)}`}>
+                        <span className={`text-xs font-bold shrink-0 ${getScoreColor(score)}`}>
                           %{score}
                         </span>
                       </div>
@@ -339,18 +339,13 @@ export default async function NeedDetailPage({
                         />
                       </div>
 
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className={`label-caps px-2 py-0.5 rounded-sm ${effect.color}`}>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        <span className={`label-caps text-[9px] px-1.5 py-0.5 rounded-sm ${effect.color}`}>
                           {effect.label}
                         </span>
                         {m.ingredient?.ingredient_group && (
-                          <span className="label-caps text-outline">
+                          <span className="label-caps text-[9px] text-outline">
                             {m.ingredient.ingredient_group}
-                          </span>
-                        )}
-                        {m.evidence_level && (
-                          <span className="label-caps text-outline">
-                            {m.evidence_level.replace(/_/g, ' ')}
                           </span>
                         )}
                       </div>
