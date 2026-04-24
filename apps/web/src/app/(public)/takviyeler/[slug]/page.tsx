@@ -27,6 +27,13 @@ interface Product {
     price_snapshot: number | null;
     is_active: boolean;
   }[];
+  need_scores?: {
+    product_need_score_id: number;
+    need_id: number;
+    need?: { need_id: number; need_name: string; need_slug: string };
+    compatibility_score: number | string;
+    score_reason_summary?: string;
+  }[];
 }
 
 interface FoodSource {
@@ -511,6 +518,50 @@ export default async function SupplementDetailPage({
                   </Link>
                 </div>
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Need Scores — hangi ihtiyaçlara yönelik (kozmetikteki gibi) */}
+        {product.need_scores && product.need_scores.length > 0 && (
+          <section className="mb-4">
+            <h2 className="text-lg font-bold tracking-tight mb-1 text-on-surface">Uyumluluk Skorları</h2>
+            <p className="text-[11px] text-on-surface-variant mb-2 leading-relaxed">
+              <span className="font-medium text-score-high">%70+</span> yüksek,
+              <span className="font-medium text-score-medium"> %40-69</span> orta,
+              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5">
+              {product.need_scores
+                .slice()
+                .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
+                .map((ns) => {
+                  const score = Math.round(Number(ns.compatibility_score));
+                  const colorClass = score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low';
+                  const barClass = score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low';
+                  return (
+                    <div key={ns.product_need_score_id} className="curator-card p-2">
+                      <div className="flex items-start justify-between gap-1">
+                        <p className="text-[11px] font-medium text-on-surface truncate flex-1" title={ns.need?.need_name}>
+                          {ns.need ? (
+                            <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
+                              {ns.need.need_name}
+                            </Link>
+                          ) : (
+                            `İhtiyaç #${ns.need_id}`
+                          )}
+                        </p>
+                        <span className={`text-[11px] font-bold tabular-nums shrink-0 ${colorClass}`}>%{score}</span>
+                      </div>
+                      <div className="mt-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${barClass}`} style={{ width: `${Math.min(100, Math.max(0, score))}%` }} />
+                      </div>
+                      {ns.score_reason_summary && (
+                        <p className="text-[9px] text-outline mt-1 line-clamp-2">{ns.score_reason_summary}</p>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           </section>
         )}
