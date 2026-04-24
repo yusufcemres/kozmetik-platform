@@ -106,14 +106,6 @@ interface Interaction {
   domain_type?: string;
 }
 
-interface CrossRefProduct {
-  product_id: number;
-  product_name: string;
-  product_slug: string;
-  brand?: { brand_name: string };
-  images?: { image_url: string }[];
-}
-
 // === Data ===
 
 async function getProduct(slug: string): Promise<Product | null> {
@@ -166,16 +158,6 @@ async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate 
 async function getInteractionsByIngredient(ingredientId: number): Promise<Interaction[]> {
   try {
     return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`, {
-      next: { revalidate: 300 },
-    } as any);
-  } catch {
-    return [];
-  }
-}
-
-async function getCrossDomainProducts(ingredientId: number, domainType: string, limit = 3): Promise<CrossRefProduct[]> {
-  try {
-    return await apiFetch<CrossRefProduct[]>(`/products/by-ingredient/${ingredientId}?domain_type=${domainType}&limit=${limit}`, {
       next: { revalidate: 300 },
     } as any);
   } catch {
@@ -326,15 +308,14 @@ export default async function SupplementDetailPage({
   );
   const activeLinks = (product.affiliate_links || []).filter((l) => l.is_active);
 
-  // Fetch interactions and cross-domain products for all ingredients
+  // Fetch interactions for all ingredients
   const ingredientIds = nutritionFacts
     .map((nf) => nf.ingredient?.ingredient_id)
     .filter((id): id is number => !!id);
 
-  const [allInteractions, crossRefResults] = await Promise.all([
-    Promise.all(ingredientIds.map((id) => getInteractionsByIngredient(id))),
-    Promise.all(ingredientIds.map((id) => getCrossDomainProducts(id, 'cosmetic', 3))),
-  ]);
+  const allInteractions = await Promise.all(
+    ingredientIds.map((id) => getInteractionsByIngredient(id)),
+  );
 
   // Deduplicate interactions
   const interactionMap = new Map<number, Interaction>();
@@ -344,15 +325,6 @@ export default async function SupplementDetailPage({
     }
   });
   const interactions = Array.from(interactionMap.values());
-
-  // Flatten and deduplicate cross-ref cosmetic products
-  const cosmeticProductMap = new Map<number, CrossRefProduct>();
-  crossRefResults.flat().forEach((p) => {
-    if (!cosmeticProductMap.has(p.product_id)) {
-      cosmeticProductMap.set(p.product_id, p);
-    }
-  });
-  const cosmeticProducts = Array.from(cosmeticProductMap.values()).slice(0, 8);
 
   return (
     <>
@@ -828,50 +800,6 @@ export default async function SupplementDetailPage({
                   </details>
                 );
               })}
-            </div>
-          </AccordionSection>
-        )}
-
-        {/* Cross-Reference: Cosmetic Products — collapsed by default, Sprint 2'de kaldırılacak */}
-        {cosmeticProducts.length > 0 && (
-          <AccordionSection
-            title="Bu Bileşenleri İçeren Kozmetikler"
-            icon="spa"
-            count={`${cosmeticProducts.length} ürün`}
-            className="mb-4"
-          >
-            <p className="text-[11px] text-on-surface-variant mb-3">
-              Bu takviyedeki aktif bileşenleri içeren kozmetik ürünler — dışarıdan da destekle.
-            </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-              {cosmeticProducts.map((cp) => (
-                <Link
-                  key={cp.product_id}
-                  href={`/urunler/${cp.product_slug}`}
-                  className="curator-card p-2 group hover:border-primary/30 transition-all"
-                >
-                  <div className="aspect-square bg-surface-container-low rounded-sm flex items-center justify-center mb-1.5 overflow-hidden">
-                    {cp.images?.[0]?.image_url ? (
-                      <Image
-                        src={cp.images[0].image_url}
-                        alt={cp.product_name}
-                        width={80}
-                        height={80}
-                        className="object-contain w-full h-full p-1"
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="material-icon text-outline-variant text-[28px]" aria-hidden="true">spa</span>
-                    )}
-                  </div>
-                  {cp.brand && (
-                    <p className="label-caps text-outline text-[8px] truncate">{cp.brand.brand_name}</p>
-                  )}
-                  <p className="text-[10px] font-medium text-on-surface group-hover:text-primary transition-colors line-clamp-2">
-                    {cp.product_name}
-                  </p>
-                </Link>
-              ))}
             </div>
           </AccordionSection>
         )}
