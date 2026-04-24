@@ -445,18 +445,16 @@ export default async function SupplementDetailPage({
                     const bd = score.breakdown as Record<string, number>;
                     const val = bd?.[row.key] ?? bd?.[row.key.replace(/_/g, '')] ?? 0;
                     return (
-                      <div key={row.key} className="grid grid-cols-[8rem_1fr_2rem] items-center gap-2">
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{row.label}</div>
-                          <div className="text-[9px] text-outline truncate leading-tight" title={row.desc}>{row.desc}</div>
-                        </div>
-                        <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+                      <div key={row.key} className="flex items-center gap-2">
+                        <span className="w-28 shrink-0 text-[11px] font-medium text-on-surface truncate">{row.label}</span>
+                        <div className="w-20 shrink-0 h-1.5 bg-surface-container rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${val >= 70 ? 'bg-score-high' : val >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
                             style={{ width: `${val}%` }}
                           />
                         </div>
-                        <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="w-7 shrink-0 text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="flex-1 min-w-0 text-[10px] text-outline truncate" title={row.desc}>— {row.desc}</span>
                       </div>
                     );
                   })}
@@ -709,9 +707,9 @@ export default async function SupplementDetailPage({
                       : null;
                     return (
                       <div key={i} className="flex items-baseline gap-1 py-0.5 text-[10px] leading-tight">
-                        <span className="text-on-surface truncate min-w-0">{fs.food_name}</span>
+                        <span className="text-on-surface min-w-0 break-words" title={fs.food_name}>{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
-                          <span className={`tabular-nums font-semibold shrink-0 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          <span className={`tabular-nums font-semibold shrink-0 ml-auto ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
                           </span>
                         )}
@@ -728,9 +726,10 @@ export default async function SupplementDetailPage({
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
-                            <details className="mt-1">
-                              <summary className="text-[9px] text-primary cursor-pointer hover:underline">
-                                +{restFoods.length} gıda
+                            <details className="group/more mt-1">
+                              <summary className="text-[9px] text-primary cursor-pointer hover:underline list-none [&::-webkit-details-marker]:hidden">
+                                <span className="group-open/more:hidden">+{restFoods.length} gıda</span>
+                                <span className="hidden group-open/more:inline">− gizle</span>
                               </summary>
                               <div className="mt-0.5">{restFoods.map(renderFoodRow)}</div>
                             </details>

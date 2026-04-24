@@ -191,6 +191,40 @@ const POPULAR_INGREDIENTS_COSMETIC = [
   { slug: 'panthenol', label: 'Panthenol' },
 ];
 
+/**
+ * Sidebar Section — file-scope tanımlı (sidebar fonksiyonu içinde değil).
+ * Yoksa parent her input keystroke'ta re-render olunca Section component
+ * reference'ı değişir, React unmount+remount yapar, native <details> open
+ * state'i sıfırlanır. (Patron: "+ ya basınca alttakı malzemeler açılıyor
+ * ama + yazısı kalıyor", "harfe basınca kapanıyor".)
+ */
+function Section({ title, children, defaultOpen = false, count }: {
+  title: string; children: React.ReactNode; defaultOpen?: boolean; count?: number;
+}) {
+  return (
+    <details open={defaultOpen} className="group border-b border-outline-variant/15 last:border-b-0">
+      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between py-2.5">
+        <span className="label-caps text-on-surface flex items-center gap-1.5">
+          {title}
+          {count !== undefined && count > 0 && (
+            <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full tabular-nums">
+              {count}
+            </span>
+          )}
+        </span>
+        <span
+          className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
+          style={{ fontSize: '14px' }}
+          aria-hidden="true"
+        >
+          expand_more
+        </span>
+      </summary>
+      <div className="pb-3">{children}</div>
+    </details>
+  );
+}
+
 /** Alt-alta checkbox satırı — multi-select dimension'lar için ortak render. */
 function CheckboxRow({ label, active, onToggle, count }: { label: string; active: boolean; onToggle: () => void; count?: number }) {
   return (
@@ -308,28 +342,6 @@ export default function ProductFilterSidebar({
   const toggleArrayItem = <T extends string | number>(arr: T[], item: T): T[] =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 
-  const Section = ({ title, children, defaultOpen = false, count }: { title: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) => (
-    <details open={defaultOpen} className="group border-b border-outline-variant/15 last:border-b-0">
-      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between py-2.5">
-        <span className="label-caps text-on-surface flex items-center gap-1.5">
-          {title}
-          {count !== undefined && count > 0 && (
-            <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full tabular-nums">
-              {count}
-            </span>
-          )}
-        </span>
-        <span
-          className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
-          style={{ fontSize: '14px' }}
-          aria-hidden="true"
-        >
-          expand_more
-        </span>
-      </summary>
-      <div className="pb-3">{children}</div>
-    </details>
-  );
 
   // Etken madde render — popüler + arama sonuçları birleşik, alt alta list
   const ingredientListItems = (() => {
