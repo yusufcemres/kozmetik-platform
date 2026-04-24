@@ -270,6 +270,20 @@ function platformLabel(platform: string): string {
   return sharedPlatformLabel(platform);
 }
 
+// INCI order fallback — DB'de concentration_band 'unknown' veya boşsa,
+// INCI sırasına göre tahmini bant döndürür. Legend zaten "(INCI sırasına göre tahmini)" diyor.
+function bandFromInciRank(rank: number): 'high' | 'medium' | 'low' | 'trace' {
+  if (rank <= 3) return 'high';
+  if (rank <= 8) return 'medium';
+  if (rank <= 20) return 'low';
+  return 'trace';
+}
+
+function effectiveBand(band: string | null | undefined, rank: number): string {
+  if (band && band !== 'unknown') return band;
+  return bandFromInciRank(rank);
+}
+
 function concentrationLabel(band: string): { label: string; color: string; tooltip: string } {
   const map: Record<string, { label: string; color: string; tooltip: string }> = {
     very_high: {
@@ -957,8 +971,9 @@ export default async function ProductDetailPage({
                         <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
                           {pi.ingredient_display_name}
                         </span>
-                        {pi.concentration_band !== 'unknown' && (() => {
-                          const conc = concentrationLabel(pi.concentration_band);
+                        {(() => {
+                          const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
+                          const conc = concentrationLabel(band);
                           return (
                             <span
                               className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
