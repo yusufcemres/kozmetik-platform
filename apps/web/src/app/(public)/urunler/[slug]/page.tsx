@@ -896,13 +896,19 @@ export default async function ProductDetailPage({
                       flaggedNames.has(displayName.toLowerCase()) ||
                       (pi.ingredient?.inci_name && flaggedNames.has(pi.ingredient.inci_name.toLowerCase()));
 
-                    const cardClass = isCritical
-                      ? 'border-2 border-error bg-error/5'
-                      : isAllergen
-                        ? 'bg-error/5'
-                        : isFragrance
-                          ? 'bg-tertiary-container/30'
-                          : '';
+                    // 3 uyarı seviyesi — her biri kendi border + ikon ile üstteki bayraklarla bağlantılı
+                    let cardClass = '';
+                    let warnIcon: { icon: string; color: string; tooltip: string } | null = null;
+                    if (isCritical) {
+                      cardClass = 'border-2 border-error bg-error/5';
+                      warnIcon = { icon: 'warning', color: 'text-error', tooltip: 'Üstteki güvenlik uyarısı (endokrin/CMR/EU yasaklı)' };
+                    } else if (isAllergen) {
+                      cardClass = 'border border-error/40 bg-error/5';
+                      warnIcon = { icon: 'error', color: 'text-error', tooltip: 'Alerjen — üstteki uyarıda sayılan içerik' };
+                    } else if (isFragrance) {
+                      cardClass = 'border border-score-medium/40 bg-score-medium/5';
+                      warnIcon = { icon: 'spa', color: 'text-score-medium', tooltip: 'Parfüm/koku bileşeni — üstteki uyarıda sayılan içerik' };
+                    }
 
                     const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
                     const conc = concentrationLabel(band);
@@ -916,19 +922,19 @@ export default async function ProductDetailPage({
                           <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
                             {idx + 1}
                           </span>
-                          {isCritical && (
+                          {warnIcon && (
                             <span
-                              className="material-icon text-error shrink-0"
+                              className={`material-icon shrink-0 ${warnIcon.color}`}
                               style={{ fontSize: '14px' }}
                               aria-hidden="true"
-                              title="Bu içerik üstte güvenlik uyarısı aldı"
+                              title={warnIcon.tooltip}
                             >
-                              warning
+                              {warnIcon.icon}
                             </span>
                           )}
                           <span
                             className={`flex-1 min-w-0 text-xs font-medium leading-snug group-open:text-primary transition-colors line-clamp-2 ${
-                              isCritical ? 'text-error font-semibold' : 'text-on-surface'
+                              isCritical ? 'text-error font-semibold' : isAllergen ? 'text-error' : isFragrance ? 'text-score-medium' : 'text-on-surface'
                             }`}
                           >
                             {displayName}
