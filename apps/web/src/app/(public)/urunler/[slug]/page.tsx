@@ -781,18 +781,16 @@ export default async function ProductDetailPage({
                         {Object.entries(score.breakdown).map(([key, val]) => {
                           const meta = breakdownMeta[key] || { label: key, desc: '' };
                           return (
-                            <div key={key} className="grid grid-cols-[7rem_1fr_2rem] items-center gap-2">
-                              <div className="min-w-0">
-                                <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{meta.label}</div>
-                                <div className="text-[9px] text-outline truncate leading-tight" title={meta.desc}>{meta.desc}</div>
-                              </div>
-                              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+                            <div key={key} className="flex items-center gap-2">
+                              <span className="w-28 shrink-0 text-[11px] font-medium text-on-surface truncate leading-tight">{meta.label}</span>
+                              <div className="w-20 shrink-0 h-1.5 bg-surface-container rounded-full overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all ${(val as number) >= 70 ? 'bg-score-high' : (val as number) >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
                                   style={{ width: `${val}%` }}
                                 />
                               </div>
-                              <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val as number}</span>
+                              <span className="w-7 shrink-0 text-[11px] text-right font-semibold text-on-surface tabular-nums">{val as number}</span>
+                              <span className="flex-1 min-w-0 text-[10px] text-outline truncate leading-tight" title={meta.desc}>— {meta.desc}</span>
                             </div>
                           );
                         })}

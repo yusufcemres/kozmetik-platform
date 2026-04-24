@@ -459,18 +459,16 @@ export default async function SupplementDetailPage({
                     const bd = score.breakdown as Record<string, number>;
                     const val = bd?.[row.key] ?? bd?.[row.key.replace(/_/g, '')] ?? 0;
                     return (
-                      <div key={row.key} className="grid grid-cols-[8rem_1fr_2rem] items-center gap-2">
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{row.label}</div>
-                          <div className="text-[9px] text-outline truncate leading-tight" title={row.desc}>{row.desc}</div>
-                        </div>
-                        <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+                      <div key={row.key} className="flex items-center gap-2">
+                        <span className="w-28 shrink-0 text-[11px] font-medium text-on-surface truncate leading-tight">{row.label}</span>
+                        <div className="w-20 shrink-0 h-1.5 bg-surface-container rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${val >= 70 ? 'bg-score-high' : val >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
                             style={{ width: `${val}%` }}
                           />
                         </div>
-                        <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="w-7 shrink-0 text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="flex-1 min-w-0 text-[10px] text-outline truncate leading-tight" title={row.desc}>— {row.desc}</span>
                       </div>
                     );
                   })}
