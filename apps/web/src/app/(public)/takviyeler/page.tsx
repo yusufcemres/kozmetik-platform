@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ScoreOverlayBadge } from '@/components/public/ScoreBadge';
-import ProductFilterSidebar, { FilterState } from '@/components/public/ProductFilterSidebar';
+import ProductFilterSidebar, { FilterState, EMPTY_FILTER_STATE } from '@/components/public/ProductFilterSidebar';
 
 interface SupplementProduct {
   product_id: number;
@@ -42,13 +42,31 @@ function SupplementsListInner() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState<FilterState>({
-    kategori: searchParams.get('kategori') || '',
-    brand_id: searchParams.get('brand_id') || '',
-    sort: searchParams.get('sort') || 'newest',
-    skorMin: searchParams.get('skor_min') ? Number(searchParams.get('skor_min')) : null,
-    skorMax: searchParams.get('skor_max') ? Number(searchParams.get('skor_max')) : null,
-    search: searchParams.get('q') || '',
+  const [filters, setFilters] = useState<FilterState>(() => {
+    const csv = (k: string) => searchParams.get(k)?.split(',').filter(Boolean) || [];
+    const csvNum = (k: string) => csv(k).map(Number).filter((n) => Number.isFinite(n));
+    const num = (k: string) => {
+      const v = searchParams.get(k);
+      return v != null && v !== '' ? Number(v) : null;
+    };
+    return {
+      ...EMPTY_FILTER_STATE,
+      kategori: searchParams.get('kategori') || '',
+      brand_id: searchParams.get('brand_id') || '',
+      sort: searchParams.get('sort') || 'newest',
+      search: searchParams.get('q') || '',
+      ingredient_slugs: csv('etken'),
+      need_ids: csvNum('ihtiyac'),
+      form: csv('form'),
+      certifications: csv('sertifika'),
+      target_audience: csv('hedef'),
+      manufacturer_country: csv('ulke'),
+      skin_type: csv('cilt'),
+      skorMin: num('skor_min'),
+      skorMax: num('skor_max'),
+      fiyatMin: num('fiyat_min'),
+      fiyatMax: num('fiyat_max'),
+    };
   });
   const [scores, setScores] = useState<Record<number, number>>({});
 
@@ -58,9 +76,18 @@ function SupplementsListInner() {
     if (filters.kategori) qs.set('kategori', filters.kategori);
     if (filters.brand_id) qs.set('brand_id', filters.brand_id);
     if (filters.sort !== 'newest') qs.set('sort', filters.sort);
+    if (filters.search) qs.set('q', filters.search);
+    if (filters.ingredient_slugs.length) qs.set('etken', filters.ingredient_slugs.join(','));
+    if (filters.need_ids.length) qs.set('ihtiyac', filters.need_ids.join(','));
+    if (filters.form.length) qs.set('form', filters.form.join(','));
+    if (filters.certifications.length) qs.set('sertifika', filters.certifications.join(','));
+    if (filters.target_audience.length) qs.set('hedef', filters.target_audience.join(','));
+    if (filters.manufacturer_country.length) qs.set('ulke', filters.manufacturer_country.join(','));
+    if (filters.skin_type.length) qs.set('cilt', filters.skin_type.join(','));
     if (filters.skorMin != null) qs.set('skor_min', String(filters.skorMin));
     if (filters.skorMax != null) qs.set('skor_max', String(filters.skorMax));
-    if (filters.search) qs.set('q', filters.search);
+    if (filters.fiyatMin != null) qs.set('fiyat_min', String(filters.fiyatMin));
+    if (filters.fiyatMax != null) qs.set('fiyat_max', String(filters.fiyatMax));
     const url = qs.toString() ? `?${qs.toString()}` : window.location.pathname;
     window.history.replaceState(null, '', url);
   }, [filters]);
@@ -70,11 +97,21 @@ function SupplementsListInner() {
     const params = new URLSearchParams();
     params.set('page', String(page));
     params.set('limit', '12');
-    if (filters.search) params.set('search', filters.search);
-    params.set('sort', filters.sort);
     params.set('domain_type', 'supplement');
+    params.set('sort', filters.sort);
+    if (filters.search) params.set('search', filters.search);
     if (filters.kategori) params.set('category_slug', filters.kategori);
     if (filters.brand_id) params.set('brand_id', filters.brand_id);
+    if (filters.ingredient_slugs.length) params.set('ingredient_slugs', filters.ingredient_slugs.join(','));
+    if (filters.need_ids.length) params.set('need_ids', filters.need_ids.join(','));
+    if (filters.form.length) params.set('form', filters.form.join(','));
+    if (filters.certifications.length) params.set('certifications', filters.certifications.join(','));
+    if (filters.target_audience.length) params.set('target_audience', filters.target_audience.join(','));
+    if (filters.manufacturer_country.length) params.set('manufacturer_country', filters.manufacturer_country.join(','));
+    if (filters.skorMin != null) params.set('score_min', String(filters.skorMin));
+    if (filters.skorMax != null) params.set('score_max', String(filters.skorMax));
+    if (filters.fiyatMin != null) params.set('price_min', String(filters.fiyatMin));
+    if (filters.fiyatMax != null) params.set('price_max', String(filters.fiyatMax));
     const endpoint = `/products?${params.toString()}`;
 
     api
@@ -85,7 +122,7 @@ function SupplementsListInner() {
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [page, filters.kategori, filters.brand_id, filters.search, filters.sort]);
+  }, [page, filters]);
 
   // Fetch scores in parallel for visible products
   useEffect(() => {
@@ -112,19 +149,10 @@ function SupplementsListInner() {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [filters.kategori, filters.brand_id, filters.search, filters.sort, filters.skorMin, filters.skorMax]);
+  }, [filters]);
 
-  // Client-side score filtering (skorMin/skorMax uygulanır)
-  const visibleProducts = useMemo(() => {
-    if (filters.skorMin == null && filters.skorMax == null) return products;
-    return products.filter((p) => {
-      const s = scores[p.product_id];
-      if (s == null) return false;
-      if (filters.skorMin != null && s < filters.skorMin) return false;
-      if (filters.skorMax != null && s > filters.skorMax) return false;
-      return true;
-    });
-  }, [products, scores, filters.skorMin, filters.skorMax]);
+  // Backend artık skor filtresi uyguluyor — visible = products
+  const visibleProducts = products;
 
   const scoreBadgeClass = (v: number) => {
     if (v >= 80) return 'bg-green-500/90 text-white';
@@ -138,9 +166,7 @@ function SupplementsListInner() {
     return null;
   };
 
-  const resetFilters = () => setFilters({
-    kategori: '', brand_id: '', sort: 'newest', skorMin: null, skorMax: null, search: '',
-  });
+  const resetFilters = () => setFilters({ ...EMPTY_FILTER_STATE });
 
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
