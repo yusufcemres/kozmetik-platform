@@ -20,7 +20,7 @@ UPDATE ingredients SET
   food_sources = '[
     {"food_name": "Domuz eti (yağsız)", "amount_per_100g": 1.05, "unit": "mg", "bioavailability": "Yüksek", "note": "En zengin hayvansal kaynak"},
     {"food_name": "Ayçekirdeği", "amount_per_100g": 1.48, "unit": "mg", "bioavailability": "Orta"},
-    {"food_name": "Siyah fasulye (haşlanmış)", "amount_per_100g": 0.24, "unit": "mg", "bioavailability": "Orta", "note": "Antinutrient'ler için ıslat + haşla"},
+    {"food_name": "Siyah fasulye (haşlanmış)", "amount_per_100g": 0.24, "unit": "mg", "bioavailability": "Orta", "note": "Antinutrient''ler için ıslat + haşla"},
     {"food_name": "Sazan balığı", "amount_per_100g": 0.30, "unit": "mg", "bioavailability": "Yüksek"},
     {"food_name": "Tam buğday ekmeği", "amount_per_100g": 0.30, "unit": "mg", "bioavailability": "Orta"}
   ]'::jsonb,
