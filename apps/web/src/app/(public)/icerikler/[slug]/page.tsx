@@ -55,6 +55,16 @@ interface Ingredient {
   evidence_level?: string;
   safety_class?: string;
   safety_note?: string;
+  // Sprint 5 (#14): tartışmalı içerik narrative + safety flags
+  safety_narrative?: string;
+  controversy_summary?: string;
+  cmr_class?: string;
+  iarc_group?: string;
+  endocrine_flag?: boolean;
+  eu_banned?: boolean;
+  eu_restricted?: boolean;
+  sccs_opinion_ref?: string;
+  cir_status?: string;
   food_sources?: FoodSource[];
   daily_recommended_value?: number;
   daily_recommended_unit?: string;
@@ -511,6 +521,103 @@ export default async function IngredientDetailPage({
             </p>
             <p className="text-sm text-on-surface-variant leading-relaxed">{ingredient.safety_note}</p>
           </div>
+        )}
+
+        {/* Sprint 5 (#14): Güvenlik & Tartışma — disputed/regulated içerikler */}
+        {(ingredient.safety_narrative ||
+          ingredient.controversy_summary ||
+          ingredient.endocrine_flag ||
+          ingredient.cmr_class ||
+          ingredient.iarc_group ||
+          ingredient.eu_banned ||
+          ingredient.eu_restricted) && (
+          <section className="mb-8">
+            <div className="curator-card border-l-4 border-score-medium overflow-hidden">
+              <div className="bg-score-medium/5 px-5 py-3 flex items-center gap-2">
+                <span className="material-icon text-score-medium" aria-hidden="true">
+                  warning
+                </span>
+                <h2 className="text-lg font-bold text-on-surface">
+                  Güvenlik & Tartışma
+                </h2>
+              </div>
+
+              <div className="p-5">
+                {/* Regulatory flags */}
+                {(ingredient.endocrine_flag ||
+                  ingredient.cmr_class ||
+                  ingredient.iarc_group ||
+                  ingredient.eu_banned ||
+                  ingredient.eu_restricted) && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {ingredient.endocrine_flag && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-error/10 text-error">
+                        Endokrin Bozucu Şüphesi
+                      </span>
+                    )}
+                    {ingredient.cmr_class && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-error/10 text-error">
+                        CMR {ingredient.cmr_class}
+                      </span>
+                    )}
+                    {ingredient.iarc_group && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-score-medium/10 text-score-medium">
+                        IARC Grup {ingredient.iarc_group}
+                      </span>
+                    )}
+                    {ingredient.eu_banned && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-error/10 text-error">
+                        AB Yasaklı
+                      </span>
+                    )}
+                    {ingredient.eu_restricted && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-score-medium/10 text-score-medium">
+                        AB Kısıtlı
+                      </span>
+                    )}
+                    {ingredient.sccs_opinion_ref && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-surface-container-low text-on-surface-variant">
+                        SCCS {ingredient.sccs_opinion_ref}
+                      </span>
+                    )}
+                    {ingredient.cir_status && (
+                      <span className="label-caps text-[10px] px-2 py-1 rounded-sm bg-surface-container-low text-on-surface-variant">
+                        CIR: {ingredient.cir_status}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Short summary */}
+                {ingredient.controversy_summary && (
+                  <p className="text-sm text-on-surface-variant leading-relaxed mb-4 font-medium">
+                    {ingredient.controversy_summary}
+                  </p>
+                )}
+
+                {/* Narrative — markdown body */}
+                {ingredient.safety_narrative && (
+                  <details open className="group">
+                    <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold text-primary tracking-wide uppercase">
+                        Detaylı Bilgi
+                      </span>
+                      <span
+                        className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
+                        style={{ fontSize: '16px' }}
+                        aria-hidden="true"
+                      >
+                        expand_more
+                      </span>
+                    </summary>
+                    <div className="prose prose-sm max-w-none text-on-surface-variant whitespace-pre-line text-xs leading-relaxed">
+                      {ingredient.safety_narrative}
+                    </div>
+                  </details>
+                )}
+              </div>
+            </div>
+          </section>
         )}
 
         {/* Food Sources */}
