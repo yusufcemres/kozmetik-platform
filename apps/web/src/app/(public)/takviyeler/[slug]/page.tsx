@@ -440,8 +440,10 @@ export default async function SupplementDetailPage({
           <PriceChart productId={product.product_id} />
         </section>
 
-        {/* Skor + Uyumluluk — lg'de yan yana, mobile'da stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(420px,480px)_1fr] gap-3 mb-4 items-start">
+        {/* Skor + Takviye Bilgileri (sol stack) | Uyumluluk Skorları (sağ accordion) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
+        {/* SOL: Score + Takviye Bilgileri stacked */}
+        <div className="space-y-3">
         {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
           <section className="curator-card p-3 md:p-4">
@@ -522,102 +524,112 @@ export default async function SupplementDetailPage({
           </section>
         )}
 
-        {/* Need Scores — hangi ihtiyaçlara yönelik (score ile yan yana lg+) */}
-        {product.need_scores && product.need_scores.length > 0 && (
-          <section>
-            <div className="flex items-baseline justify-between mb-1 gap-2 flex-wrap">
-              <h2 className="text-lg font-bold tracking-tight text-on-surface">Uyumluluk Skorları</h2>
-              <p className="text-[10px] text-on-surface-variant leading-relaxed">
-                <span className="font-medium text-score-high">%70+</span> yüksek
-                <span className="font-medium text-score-medium"> · %40-69</span> orta
-                <span className="font-medium text-score-low"> · %40 altı</span> düşük
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-              {product.need_scores
-                .slice()
-                .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
-                .map((ns) => {
-                  const score = Math.round(Number(ns.compatibility_score));
-                  const colorClass = score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low';
-                  const barClass = score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low';
-                  return (
-                    <div key={ns.product_need_score_id} className="curator-card p-2">
-                      <div className="flex items-start justify-between gap-1">
-                        <p className="text-[11px] font-medium text-on-surface truncate flex-1" title={ns.need?.need_name}>
-                          {ns.need ? (
-                            <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
-                              {ns.need.need_name}
-                            </Link>
-                          ) : (
-                            `İhtiyaç #${ns.need_id}`
-                          )}
-                        </p>
-                        <span className={`text-[11px] font-bold tabular-nums shrink-0 ${colorClass}`}>%{score}</span>
-                      </div>
-                      <div className="mt-1 h-1 bg-surface-container rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${barClass}`} style={{ width: `${Math.min(100, Math.max(0, score))}%` }} />
-                      </div>
-                      {ns.score_reason_summary && (
-                        <p className="text-[9px] text-outline mt-1 line-clamp-2">{ns.score_reason_summary}</p>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          </section>
-        )}
-        </div>
-        {/* /Skor + Uyumluluk grid */}
-
-        {/* Supplement Info */}
+        {/* Takviye Bilgileri — sol stack içinde score altında */}
         {detail && (
-          <section className="mb-8 curator-card p-6">
-            <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-4">Takviye Bilgileri</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <section className="curator-card p-3 md:p-4">
+            <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-2 text-[10px]">Takviye Bilgileri</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
               <div>
-                <span className="label-caps text-outline">Form</span>
-                <p className="font-semibold text-on-surface mt-0.5">{formLabel(detail.form)}</p>
+                <span className="label-caps text-outline text-[9px]">Form</span>
+                <p className="font-semibold text-on-surface text-xs">{formLabel(detail.form)}</p>
               </div>
               <div>
-                <span className="label-caps text-outline">Porsiyon</span>
-                <p className="font-semibold text-on-surface mt-0.5">
+                <span className="label-caps text-outline text-[9px]">Porsiyon</span>
+                <p className="font-semibold text-on-surface text-xs">
                   {detail.serving_size
                     ? `${detail.serving_size} ${detail.serving_unit || ''}`
                     : '-'}
                 </p>
               </div>
               <div>
-                <span className="label-caps text-outline">Adet</span>
-                <p className="font-semibold text-on-surface mt-0.5">
+                <span className="label-caps text-outline text-[9px]">Adet</span>
+                <p className="font-semibold text-on-surface text-xs">
                   {detail.servings_per_container || '-'}
                 </p>
               </div>
               <div>
-                <span className="label-caps text-outline">Sertifika</span>
-                <p className="font-semibold text-on-surface mt-0.5">{detail.certification || '-'}</p>
+                <span className="label-caps text-outline text-[9px]">Sertifika</span>
+                <p className="font-semibold text-on-surface text-xs truncate">{detail.certification || '-'}</p>
               </div>
             </div>
             {detail.recommended_use && (
-              <div className="mt-4 pt-4 border-t border-outline-variant/20">
-                <span className="label-caps text-outline">Önerilen Kullanım</span>
-                <p className="text-sm font-medium text-on-surface mt-0.5">
+              <div className="mt-2 pt-2 border-t border-outline-variant/20">
+                <span className="label-caps text-outline text-[9px]">Önerilen Kullanım</span>
+                <p className="text-xs font-medium text-on-surface mt-0.5 leading-snug">
                   {detail.recommended_use}
                 </p>
               </div>
             )}
-            {detail.manufacturer_country && (
-              <p className="label-caps text-outline mt-3">
-                Üretim: {detail.manufacturer_country}
-              </p>
-            )}
-            {detail.requires_prescription && (
-              <div className="mt-3 label-caps text-error bg-error/10 px-3 py-1.5 rounded-sm inline-block">
-                Reçete gerektirebilir
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {detail.manufacturer_country && (
+                <span className="label-caps text-outline text-[9px]">
+                  Üretim: {detail.manufacturer_country}
+                </span>
+              )}
+              {detail.requires_prescription && (
+                <span className="label-caps text-error bg-error/10 px-2 py-0.5 rounded-sm text-[9px]">
+                  Reçete gerektirebilir
+                </span>
+              )}
+            </div>
           </section>
         )}
+        </div>
+        {/* /SOL stack */}
+
+        {/* SAĞ: Uyumluluk Skorları — accordion, defaultOpen, sol stack yüksekliğine yakın */}
+        {product.need_scores && product.need_scores.length > 0 && (
+          <section className="curator-card p-3 md:p-4">
+            <details open className="group">
+              <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] text-[10px] flex-1">Uyumluluk Skorları</h2>
+                <p className="text-[9px] text-on-surface-variant leading-relaxed">
+                  <span className="font-medium text-score-high">%70+</span> yüksek
+                  <span className="font-medium text-score-medium"> · %40-69</span> orta
+                  <span className="font-medium text-score-low"> · %40 altı</span> düşük
+                </p>
+                <span
+                  className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                  style={{ fontSize: '16px' }}
+                  aria-hidden="true"
+                >
+                  expand_more
+                </span>
+              </summary>
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1">
+                {product.need_scores
+                  .slice()
+                  .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
+                  .map((ns) => {
+                    const score = Math.round(Number(ns.compatibility_score));
+                    const colorClass = score >= 70 ? 'text-score-high' : score >= 40 ? 'text-score-medium' : 'text-score-low';
+                    const barClass = score >= 70 ? 'bg-score-high' : score >= 40 ? 'bg-score-medium' : 'bg-score-low';
+                    return (
+                      <div key={ns.product_need_score_id} className="border border-outline-variant/15 rounded-sm p-1.5">
+                        <div className="flex items-start justify-between gap-1">
+                          <p className="text-[10px] font-medium text-on-surface truncate flex-1 leading-tight" title={ns.need?.need_name}>
+                            {ns.need ? (
+                              <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
+                                {ns.need.need_name}
+                              </Link>
+                            ) : (
+                              `İhtiyaç #${ns.need_id}`
+                            )}
+                          </p>
+                          <span className={`text-[10px] font-bold tabular-nums shrink-0 ${colorClass}`}>%{score}</span>
+                        </div>
+                        <div className="mt-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${barClass}`} style={{ width: `${Math.min(100, Math.max(0, score))}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </details>
+          </section>
+        )}
+        </div>
+        {/* /Skor+Info | Uyumluluk grid */}
 
         {/* Nutrition Facts — accordion, collapsed */}
         <AccordionSection
