@@ -786,9 +786,10 @@ export default async function SupplementDetailPage({
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
-                            <details className="mt-1">
-                              <summary className="text-[9px] text-primary cursor-pointer hover:underline">
-                                +{restFoods.length} gıda
+                            <details className="group/more mt-1">
+                              <summary className="text-[9px] text-primary cursor-pointer hover:underline list-none [&::-webkit-details-marker]:hidden">
+                                <span className="group-open/more:hidden">+{restFoods.length} gıda</span>
+                                <span className="hidden group-open/more:inline">− gizle</span>
                               </summary>
                               <div className="mt-0.5">{restFoods.map(renderFoodRow)}</div>
                             </details>
