@@ -296,6 +296,11 @@ function concentrationLabel(band: string): { label: string; color: string; toolt
       color: 'bg-score-high-bg/50 text-score-high',
       tooltip: 'Yüksek (tahmini %5-10): Formülde ana bileşenlerden biri, INCI sırasında üst sıralarda.',
     },
+    active: {
+      label: 'Aktif',
+      color: 'bg-primary/10 text-primary',
+      tooltip: 'Aktif bileşen: Formülün fonksiyonel amacı için ana etken madde (retinol, niasinamid, SPF filtresi gibi).',
+    },
     medium: {
       label: 'Orta',
       color: 'bg-score-medium-bg text-score-medium',
@@ -860,6 +865,10 @@ export default async function ProductDetailPage({
               <span className="inline-flex items-center gap-1">
                 <span className="label-caps bg-score-high-bg text-score-high px-1.5 py-0.5 rounded-sm">Yüksek</span>
                 <span>%5+</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm">Aktif</span>
+                <span>ana etken</span>
               </span>
               <span className="inline-flex items-center gap-1">
                 <span className="label-caps bg-score-medium-bg text-score-medium px-1.5 py-0.5 rounded-sm">Orta</span>
