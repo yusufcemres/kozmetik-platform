@@ -54,6 +54,8 @@ export class ProductsController {
       price_min: parseNum(query.price_min),
       price_max: parseNum(query.price_max),
       skin_type: splitCsv(query.skin_type),
+      product_types: splitCsv(query.product_types),
+      target_areas: splitCsv(query.target_areas),
     });
     if (includeScore === 'true' && result.data?.length) {
       result.data = await this.service.attachScores(result.data);

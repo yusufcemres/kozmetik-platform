@@ -122,4 +122,14 @@ export class ProductFilterDto extends PaginationDto {
   @IsOptional()
   @IsString()
   skin_type?: string;
+
+  @ApiPropertyOptional({ description: 'Ürün tipi multi (kozmetik): serum,krem,temizleyici,nemlendirici,...' })
+  @IsOptional()
+  @IsString()
+  product_types?: string;
+
+  @ApiPropertyOptional({ description: 'Bölge multi (kozmetik): yüz,vücut,saç,göz,dudak,el' })
+  @IsOptional()
+  @IsString()
+  target_areas?: string;
 }
