@@ -35,31 +35,37 @@ const COUNTRY_MAP: CountryMap = {
   KR: [
     'beauty-of-joseon', 'anua', 'cosrx', 'purito', 'some-by-mi', 'innisfree',
     'laneige', 'skin1004', 'axis-y', 'by-wishtrend', 'benton', 'neogen', 'iunik',
-    'sulwhasoo', 'banila-co', 'round-lab', 'tocobo', 'tonymoly', 'senka',
+    'sulwhasoo', 'banila-co', 'round-lab', 'tocobo', 'tonymoly',
     'haruharu', 'needly', 'numbuzin', 'mizon', 'dr-jart',
+    // 'senka' kaldırıldı — Senka JP (Shiseido markası)
   ],
   JP: [
-    'hada-labo', 'biore', 'shiseido', 'kose', 'melano-cc', 'curel',
+    'hada-labo', 'biore', 'shiseido', 'senka', 'kose', 'melano-cc', 'curel',
     'minon', 'dr-ci-labo', 'naturie',
   ],
   FR: [
     'vichy', 'la-roche-posay', 'avene', 'bioderma', 'nuxe', 'caudalie',
     'filorga', 'lierac', 'klorane', 'embryolisse', 'ducray', 'svr',
-    'noreva', 'uriage', 'rilastil',
+    'noreva', 'uriage',
+    // 'rilastil' kaldırıldı — Rilastil IT (Ganassini Group)
   ],
   DE: [
-    'eucerin', 'weleda', 'babor', 'dr-hauschka', 'nivea', 'paula-s-choice-de',
+    'eucerin', 'babor', 'dr-hauschka', 'nivea', 'paula-s-choice-de',
+    // 'weleda' kaldırıldı — Weleda CH (Swiss origin, 1921)
   ],
   US: [
-    'cerave', 'cetaphil', 'neutrogena', 'aveeno', 'drunk-elephant', 'glow-recipe',
-    'farmacy', 'the-ordinary', 'paula-s-choice', 'mac', 'burt-s-bees',
+    'cerave', 'neutrogena', 'aveeno', 'drunk-elephant', 'glow-recipe',
+    'farmacy', 'paula-s-choice', 'burt-s-bees',
     'murad', 'kiehl-s', 'first-aid-beauty', 'peter-thomas-roth',
+    // 'cetaphil' kaldırıldı — Galderma/CH ama Canada origin; bkz CA
+    // 'the-ordinary' kaldırıldı — Deciem, Toronto/CA
+    // 'mac' kaldırıldı — MAC Cosmetics Toronto/CA (1984)
   ],
   UK: ['liz-earle', 'the-inkey-list', 'elemis'],
-  CA: ['the-ordinary-ca'],
-  IT: ['collistar'],
+  CA: ['the-ordinary-ca', 'the-ordinary', 'mac', 'cetaphil'],
+  IT: ['collistar', 'rilastil'],
   ES: ['sesderma', 'isdin', 'mesoestetic'],
-  CH: ['la-prairie'],
+  CH: ['la-prairie', 'weleda'],
   SE: ['foreo', 'estelle-thild'],
   HU: ['helia-d'],
 };

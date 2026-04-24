@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
@@ -16,6 +16,7 @@ interface Product {
   product_name: string;
   product_slug: string;
   short_description?: string;
+  domain_type?: 'cosmetic' | 'supplement';
   brand?: { brand_name: string };
   category?: { category_name: string };
   images?: { image_url: string }[];
@@ -297,6 +298,12 @@ export default async function SupplementDetailPage({
 }) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
+
+  // Domain guard: cosmetic products must render at /urunler/<slug>, not /takviyeler
+  // Aksi halde takviye şablonu (nutrition facts, takviye skoru) kozmetik ürününde görünür
+  if (product.domain_type === 'cosmetic') {
+    redirect(`/urunler/${product.product_slug}`);
+  }
 
   const [detail, score, reviewsAgg] = await Promise.all([
     getSupplementDetail(product.product_id),
@@ -709,9 +716,9 @@ export default async function SupplementDetailPage({
                       : null;
                     return (
                       <div key={i} className="flex items-baseline gap-1 py-0.5 text-[10px] leading-tight">
-                        <span className="text-on-surface truncate min-w-0">{fs.food_name}</span>
+                        <span className="text-on-surface min-w-0 flex-1 break-words" title={fs.food_name}>{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
-                          <span className={`tabular-nums font-semibold shrink-0 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          <span className={`tabular-nums font-semibold shrink-0 ml-auto pl-1 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
                           </span>
                         )}

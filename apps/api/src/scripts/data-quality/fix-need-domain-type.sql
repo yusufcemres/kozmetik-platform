@@ -63,10 +63,11 @@ WHERE need_slug IN (
 ) AND domain_type IS DISTINCT FROM 'supplement';
 
 -- Both: hem kozmetik hem takviye
+-- (not: canlı DB'de 'sac-tirnak' slug'ı tek birleşik need olarak var — ona da 'both' veriyoruz)
 UPDATE needs
 SET domain_type = 'both'
 WHERE need_slug IN (
-  'sac-sagligi','tirnak-sagligi','cilt-parlakligi','yag-kontrolu'
+  'sac-sagligi','tirnak-sagligi','cilt-parlakligi','yag-kontrolu','sac-tirnak'
 ) AND domain_type IS DISTINCT FROM 'both';
 
 -- === POST-APPLY ÖZET ===

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiFetch, SITE_URL } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
@@ -85,6 +85,7 @@ interface Product {
   product_slug: string;
   product_type_label?: string;
   short_description?: string;
+  domain_type?: 'cosmetic' | 'supplement';
   barcode?: string;
   net_content_value?: number;
   net_content_unit?: string;
@@ -296,6 +297,11 @@ function concentrationLabel(band: string): { label: string; color: string; toolt
       color: 'bg-score-high-bg/50 text-score-high',
       tooltip: 'Yüksek (tahmini %5-10): Formülde ana bileşenlerden biri, INCI sırasında üst sıralarda.',
     },
+    active: {
+      label: 'Aktif',
+      color: 'bg-primary/10 text-primary',
+      tooltip: 'Aktif bileşen: Formülün fonksiyonel amacı için ana etken madde (retinol, niasinamid, SPF filtresi gibi).',
+    },
     medium: {
       label: 'Orta',
       color: 'bg-score-medium-bg text-score-medium',
@@ -406,6 +412,12 @@ export default async function ProductDetailPage({
 }) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
+
+  // Domain guard: supplement products must render at /takviyeler/<slug>, not /urunler
+  // Aksi halde kozmetik şablonu (INCI, cilt safety skoru) takviye ürününde görünür
+  if (product.domain_type === 'supplement') {
+    redirect(`/takviyeler/${product.product_slug}`);
+  }
 
   const keyIngredientIds = (product.ingredients || [])
     .filter((pi: any) => pi.is_key_ingredient || pi.inci_order_rank <= 5)
@@ -860,6 +872,10 @@ export default async function ProductDetailPage({
               <span className="inline-flex items-center gap-1">
                 <span className="label-caps bg-score-high-bg text-score-high px-1.5 py-0.5 rounded-sm">Yüksek</span>
                 <span>%5+</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="label-caps bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm">Aktif</span>
+                <span>ana etken</span>
               </span>
               <span className="inline-flex items-center gap-1">
                 <span className="label-caps bg-score-medium-bg text-score-medium px-1.5 py-0.5 rounded-sm">Orta</span>
