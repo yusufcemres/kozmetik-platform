@@ -87,6 +87,38 @@ async function getTopProducts(needId: number, domainType?: string): Promise<Prod
   }
 }
 
+interface NeedInteraction {
+  interaction_id: number;
+  severity: string;
+  description: string;
+  recommendation: string;
+  ingredient_a: { inci_name: string; ingredient_slug?: string };
+  ingredient_b: { inci_name: string; ingredient_slug?: string };
+}
+
+async function getInteractionsForIngredients(ingredientIds: number[]): Promise<NeedInteraction[]> {
+  if (ingredientIds.length === 0) return [];
+  try {
+    const results: NeedInteraction[] = [];
+    const idsToCheck = ingredientIds.slice(0, 3);
+    for (const id of idsToCheck) {
+      const data = await apiFetch<NeedInteraction[]>(
+        `/interactions/by-ingredient/${id}`,
+        { next: { revalidate: 300 } } as any,
+      );
+      if (data?.length) results.push(...data);
+    }
+    const seen = new Set<number>();
+    return results.filter((r) => {
+      if (seen.has(r.interaction_id)) return false;
+      seen.add(r.interaction_id);
+      return r.severity !== 'none';
+    });
+  } catch {
+    return [];
+  }
+}
+
 // === SEO ===
 
 export async function generateMetadata({
@@ -192,6 +224,42 @@ export default async function NeedDetailPage({
     showSupplement ? getTopProducts(need.need_id, 'supplement') : Promise.resolve([]),
   ]);
   const topScores = cosmeticScores;
+
+  // Sprint 5 (#18): bu ihtiyacın top etken bileşenleri için etkileşim uyarıları
+  const sortedMappingsForInteractions = [...mappings].sort(
+    (a, b) => (b.relevance_score || 0) - (a.relevance_score || 0),
+  );
+  const topIngredientIds = sortedMappingsForInteractions
+    .map((m) => m.ingredient?.ingredient_id)
+    .filter((id): id is number => !!id)
+    .slice(0, 3);
+  const needInteractions = await getInteractionsForIngredients(topIngredientIds);
+
+  // FAQ for #18 — templated, ihtiyaç-spesifik
+  const topIngredientNames = sortedMappingsForInteractions
+    .slice(0, 3)
+    .map((m) => m.ingredient?.common_name || m.ingredient?.inci_name)
+    .filter(Boolean) as string[];
+  const faq = [
+    {
+      q: `${need.need_name} için en etkili içerik nedir?`,
+      a: topIngredientNames.length > 0
+        ? `En yüksek bilimsel kanıta sahip ilk 3 madde: ${topIngredientNames.join(', ')}. Bu maddelerin uygun konsantrasyonda olduğu ürünleri tercih et.`
+        : `Bu ihtiyaç için etkili içerik veritabanı henüz tamamlanmadı. Bilimsel kanıt ekledikçe burada güncellenecek.`,
+    },
+    {
+      q: `Ne kadar sürede sonuç beklemeliyim?`,
+      a: `Çoğu cilt bakım aktifi için 4-12 hafta gerekir. Niasinamid 4 hafta, retinol 8 hafta, peptit 12 hafta sonra farkını gösterir. Tutarlılık tek ürünü değiştirmekten daha önemlidir.`,
+    },
+    {
+      q: `Birden fazla aktif maddeyi birlikte kullanabilir miyim?`,
+      a: `Bazı kombinasyonlar sinerjik (Niasinamid + Hyaluronik Asit), bazıları tahriş edici (Retinol + AHA). Aşağıdaki etkileşim uyarılarını incele veya REVELA Karşılaştır aracını kullan.`,
+    },
+    {
+      q: `Bu ihtiyaç için ne zaman dermatologa gitmeliyim?`,
+      a: `4-6 hafta tutarlı OTC tedavi sonuç vermiyorsa, sorun aniden ağırlaşıyorsa veya yaygınlaşıyorsa, dermatolog kontrolü gerekir. REVELA platformu eğitim amaçlıdır, tıbbi tanı yerine geçmez.`,
+    },
+  ];
 
   const sortedMappings = [...mappings].sort(
     (a, b) => (b.relevance_score || 0) - (a.relevance_score || 0),
@@ -543,6 +611,91 @@ export default async function NeedDetailPage({
             </div>
           </section>
         )}
+
+        {/* Sprint 5 (#18): Etkileşim Uyarıları — bu ihtiyacın top etken bileşenlerinden */}
+        {needInteractions.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+              <span className="material-icon text-score-medium" aria-hidden="true">sync_alt</span>
+              Bu İhtiyaçla Birlikte Dikkat Edilmesi Gerekenler
+            </h2>
+            <p className="text-xs text-on-surface-variant mb-4">
+              Bu ihtiyaç için kullanılan etken bileşenlerin bilinen etkileşimleri.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {needInteractions.slice(0, 6).map((inter) => {
+                const cfg = inter.severity === 'severe'
+                  ? { color: 'text-error', bg: 'bg-error/5 border-error/20', icon: 'error', label: 'Ciddi' }
+                  : inter.severity === 'moderate'
+                  ? { color: 'text-score-medium', bg: 'bg-score-medium/5 border-score-medium/20', icon: 'warning', label: 'Orta' }
+                  : { color: 'text-primary', bg: 'bg-primary/5 border-primary/20', icon: 'info', label: 'Hafif' };
+                return (
+                  <details key={inter.interaction_id} className={`group rounded-sm border px-3 py-2 ${cfg.bg}`}>
+                    <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className={`material-icon ${cfg.color} shrink-0`} style={{ fontSize: '14px' }} aria-hidden="true">{cfg.icon}</span>
+                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
+                        <span className="font-semibold text-on-surface truncate">
+                          {inter.ingredient_a?.inci_name || '?'}
+                        </span>
+                        <span className="text-outline">+</span>
+                        <span className="font-semibold text-on-surface truncate">
+                          {inter.ingredient_b?.inci_name || '?'}
+                        </span>
+                        <span className={`label-caps text-[9px] px-1.5 py-0.5 rounded-sm ${cfg.color}`}>{cfg.label}</span>
+                      </div>
+                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">
+                        expand_more
+                      </span>
+                    </summary>
+                    <div className="mt-2 pt-2 border-t border-outline-variant/15 space-y-1">
+                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{inter.description}</p>
+                      {inter.recommendation && (
+                        <p className="text-[10px] text-primary flex items-start gap-1">
+                          <span className="material-icon text-[10px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                          {inter.recommendation}
+                        </p>
+                      )}
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Sprint 5 (#18): Sıkça Sorulan Sorular — templated, ihtiyaca göre dinamik */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span className="material-icon text-primary" aria-hidden="true">quiz</span>
+            Sıkça Sorulan Sorular
+          </h2>
+          <div className="space-y-2">
+            {faq.map((item, i) => (
+              <details key={i} className="group curator-card px-4 py-3">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-start gap-2">
+                  <span
+                    className="material-icon text-primary mt-0.5 shrink-0"
+                    style={{ fontSize: '16px' }}
+                    aria-hidden="true"
+                  >
+                    help_outline
+                  </span>
+                  <span className="flex-1 text-sm font-semibold text-on-surface">{item.q}</span>
+                  <span
+                    className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0 mt-1"
+                    style={{ fontSize: '14px' }}
+                    aria-hidden="true"
+                  >
+                    expand_more
+                  </span>
+                </summary>
+                <p className="text-xs text-on-surface-variant leading-relaxed mt-3 pt-3 border-t border-outline-variant/15 ml-6">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
 
         {/* Profile CTA — cookie-aware (profil varsa gizlenir) */}
         {!hasSkinProfileCookie() && (
