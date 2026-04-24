@@ -428,32 +428,35 @@ export default async function SupplementDetailPage({
 
         {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
-          <section className="mb-8 curator-card p-6">
-            <div className="flex items-start gap-6 flex-col md:flex-row">
-              <ScoreBadge score={score.overall_score} grade={score.grade} size="lg" />
+          <section className="mb-4 curator-card p-3 md:p-4">
+            <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
+              <ScoreBadge score={score.overall_score} grade={score.grade} size="md" />
               <div className="flex-1 w-full">
-                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-3">REVELA Takviye Skoru</h2>
-                <div className="space-y-2">
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-2 text-[10px]">REVELA Takviye Skoru</h2>
+                <div className="space-y-1">
                   {[
-                    { label: 'Form Kalitesi', key: 'form_quality' },
-                    { label: 'Doz Etkinliği', key: 'dose_efficacy' },
-                    { label: 'Kanıt Seviyesi', key: 'evidence_grade' },
-                    { label: 'Bağımsız Test', key: 'third_party_testing' },
-                    { label: 'Etkileşim', key: 'interaction_safety' },
-                    { label: 'Şeffaflık + Tier', key: 'transparency_and_tier' },
+                    { label: 'Form Kalitesi',   key: 'form_quality',         desc: 'Emilim kolaylığı ve biyoyararlanım (ör. sitrat > oksit)' },
+                    { label: 'Doz Etkinliği',   key: 'dose_efficacy',        desc: 'Kanıta dayalı etkili doz aralığında mı' },
+                    { label: 'Kanıt Seviyesi',  key: 'evidence_grade',       desc: 'Sistematik derleme / RCT / vaka-kontrol / uzman görüşü' },
+                    { label: 'Bağımsız Test',   key: 'third_party_testing',  desc: 'USP / NSF / Labdoor gibi dış laboratuvar doğrulaması' },
+                    { label: 'Etkileşim',       key: 'interaction_safety',   desc: 'Bileşenler arası zararlı etkileşim yok mu' },
+                    { label: 'Şeffaflık + Tier',key: 'transparency_and_tier',desc: 'Marka şeffaflığı + üretim sınıfı (pharma > food-grade)' },
                   ].map((row) => {
                     const bd = score.breakdown as Record<string, number>;
                     const val = bd?.[row.key] ?? bd?.[row.key.replace(/_/g, '')] ?? 0;
                     return (
-                      <div key={row.key} className="flex items-center gap-3 text-sm">
-                        <span className="w-36 text-on-surface-variant">{row.label}</span>
-                        <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                      <div key={row.key} className="grid grid-cols-[8rem_1fr_2rem] items-center gap-2">
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{row.label}</div>
+                          <div className="text-[9px] text-outline truncate leading-tight" title={row.desc}>{row.desc}</div>
+                        </div>
+                        <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${val >= 70 ? 'bg-score-high' : val >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
                             style={{ width: `${val}%` }}
                           />
                         </div>
-                        <span className="w-10 text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
                       </div>
                     );
                   })}
@@ -461,21 +464,21 @@ export default async function SupplementDetailPage({
 
                 {/* "Bu puan neden?" — Explanation with citations */}
                 {score.explanation?.length > 0 && (
-                  <details className="mt-4">
-                    <summary className="text-xs font-semibold text-primary cursor-pointer hover:underline">
+                  <details className="mt-2">
+                    <summary className="text-[10px] font-semibold text-primary cursor-pointer hover:underline">
                       Bu puan neden?
                     </summary>
-                    <ul className="mt-2 space-y-1.5">
+                    <ul className="mt-1 space-y-0.5">
                       {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
-                        <li key={i} className="text-xs text-on-surface-variant leading-relaxed flex items-start gap-1.5">
-                          <span className="material-icon text-sm text-outline mt-0.5 shrink-0" aria-hidden="true">
+                        <li key={i} className="text-[10px] text-on-surface-variant leading-snug flex items-start gap-1">
+                          <span className="material-icon text-[10px] text-outline mt-0.5 shrink-0" aria-hidden="true">
                             {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}
                           </span>
                           <span>
                             {e.reason}
                             {e.citation?.url && (
                               <a href={e.citation.url} target="_blank" rel="noopener noreferrer" className="text-primary ml-1 hover:underline">
-                                <span className="material-icon text-[12px] align-middle" aria-hidden="true">open_in_new</span>
+                                <span className="material-icon text-[10px] align-middle" aria-hidden="true">open_in_new</span>
                               </a>
                             )}
                           </span>
@@ -495,8 +498,8 @@ export default async function SupplementDetailPage({
                   </div>
                 )}
 
-                <div className="flex justify-end mt-3 pt-3 border-t border-outline-variant/20">
-                  <Link href="/nasil-puanliyoruz#supplement" className="text-[10px] text-primary hover:underline">
+                <div className="flex justify-end mt-1.5">
+                  <Link href="/nasil-puanliyoruz#supplement" className="text-[9px] text-primary hover:underline">
                     Metodoloji
                   </Link>
                 </div>
