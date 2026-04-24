@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import ListModal from '@/components/public/ListModal';
 import ProductCarousel from '@/components/public/ProductCarousel';
+import { hasSkinProfileCookie } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -543,21 +544,23 @@ export default async function NeedDetailPage({
           </section>
         )}
 
-        {/* Profile CTA */}
-        <div className="curator-card p-8 text-center mb-8">
-          <h3 className="text-xl headline-tight text-on-surface mb-2">
-            BU İHTİYAÇ SENİNLE İLGİLİ Mİ?
-          </h3>
-          <p className="text-sm text-on-surface-variant mb-6">
-            Cilt profilini oluştur ve her üründe sana özel uyum skoru gör.
-          </p>
-          <Link
-            href="/profilim"
-            className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
-          >
-            PROFİLİMİ OLUŞTUR
-          </Link>
-        </div>
+        {/* Profile CTA — cookie-aware (profil varsa gizlenir) */}
+        {!hasSkinProfileCookie() && (
+          <div className="curator-card p-8 text-center mb-8">
+            <h3 className="text-xl headline-tight text-on-surface mb-2">
+              BU İHTİYAÇ SENİNLE İLGİLİ Mİ?
+            </h3>
+            <p className="text-sm text-on-surface-variant mb-6">
+              Cilt profilini oluştur ve her üründe sana özel uyum skoru gör.
+            </p>
+            <Link
+              href="/profilim"
+              className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
+            >
+              PROFİLİMİ OLUŞTUR
+            </Link>
+          </div>
+        )}
 
         {/* Back Link */}
         <div className="border-t border-outline-variant/20 pt-8">

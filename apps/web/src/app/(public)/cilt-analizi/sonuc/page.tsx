@@ -377,6 +377,7 @@ function ResultsContent() {
               })),
             };
             localStorage.setItem('skin_profile', JSON.stringify(prof));
+            document.cookie = 'has_skin_profile=1; path=/; max-age=31536000; SameSite=Lax';
             window.dispatchEvent(new Event('skin-profile-changed'));
           }
         } catch (err) {
