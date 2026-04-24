@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiFetch, SITE_URL } from '@/lib/api';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
@@ -85,6 +85,7 @@ interface Product {
   product_slug: string;
   product_type_label?: string;
   short_description?: string;
+  domain_type?: 'cosmetic' | 'supplement';
   barcode?: string;
   net_content_value?: number;
   net_content_unit?: string;
@@ -411,6 +412,12 @@ export default async function ProductDetailPage({
 }) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
+
+  // Domain guard: supplement products must render at /takviyeler/<slug>, not /urunler
+  // Aksi halde kozmetik şablonu (INCI, cilt safety skoru) takviye ürününde görünür
+  if (product.domain_type === 'supplement') {
+    redirect(`/takviyeler/${product.product_slug}`);
+  }
 
   const keyIngredientIds = (product.ingredients || [])
     .filter((pi: any) => pi.is_key_ingredient || pi.inci_order_rank <= 5)

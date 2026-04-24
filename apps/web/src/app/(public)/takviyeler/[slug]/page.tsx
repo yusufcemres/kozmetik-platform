@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
@@ -16,6 +16,7 @@ interface Product {
   product_name: string;
   product_slug: string;
   short_description?: string;
+  domain_type?: 'cosmetic' | 'supplement';
   brand?: { brand_name: string };
   category?: { category_name: string };
   images?: { image_url: string }[];
@@ -297,6 +298,12 @@ export default async function SupplementDetailPage({
 }) {
   const product = await getProduct(params.slug);
   if (!product) notFound();
+
+  // Domain guard: cosmetic products must render at /urunler/<slug>, not /takviyeler
+  // Aksi halde takviye şablonu (nutrition facts, takviye skoru) kozmetik ürününde görünür
+  if (product.domain_type === 'cosmetic') {
+    redirect(`/urunler/${product.product_slug}`);
+  }
 
   const [detail, score, reviewsAgg] = await Promise.all([
     getSupplementDetail(product.product_id),
