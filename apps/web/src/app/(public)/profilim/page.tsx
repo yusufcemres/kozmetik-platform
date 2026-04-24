@@ -226,6 +226,8 @@ function ProfilePageInner() {
       updated_at: new Date().toISOString(),
     };
     localStorage.setItem('skin_profile', JSON.stringify(updated));
+    // Cookie sync — SSR sayfaları CTA'yı hemen gizlesin
+    document.cookie = 'has_skin_profile=1; path=/; max-age=31536000; SameSite=Lax';
     window.dispatchEvent(new Event('skin-profile-changed'));
     setProfile(updated);
     setEditing(false);
@@ -542,6 +544,7 @@ function ProfilePageInner() {
                   if (confirm('Tum REVELA verileriniz silinecek (favoriler, rutin, profil, gecmis). Bu islem geri alinamaz. Devam etmek istiyor musunuz?')) {
                     const keys = ['skin_profile', 'kozmetik_favorites', 'kozmetik_routine', 'recently_viewed', 'revela_price_alerts', 'revela_onboarding_seen'];
                     keys.forEach((k) => localStorage.removeItem(k));
+                    document.cookie = 'has_skin_profile=; path=/; max-age=0; SameSite=Lax';
                     window.dispatchEvent(new Event('favorites-changed'));
                     window.dispatchEvent(new Event('routine-changed'));
                     window.dispatchEvent(new Event('recently-viewed-changed'));
@@ -567,6 +570,7 @@ function ProfilePageInner() {
                     await api.delete('/user-auth/me', { token });
                     clearUserToken();
                     ['skin_profile', 'kozmetik_favorites', 'kozmetik_routine', 'recently_viewed', 'revela_price_alerts', 'revela_onboarding_seen'].forEach((k) => localStorage.removeItem(k));
+                    document.cookie = 'has_skin_profile=; path=/; max-age=0; SameSite=Lax';
                     alert('Hesabin silindi. Ana sayfaya yonlendiriliyorsun.');
                     window.location.href = '/';
                   } catch (err: any) {
