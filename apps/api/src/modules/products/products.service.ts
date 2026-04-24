@@ -74,12 +74,175 @@ export class ProductsService {
     target_area?: string; usage_time?: string; product_type?: string; need_id?: number;
     domain_type?: string; ingredient_slug?: string; target_gender?: string;
     sort?: 'newest' | 'oldest' | 'name' | 'name_desc' | 'score';
+    // Sprint 6 (#13): Rich filter dimensions
+    ingredient_slugs?: string[];
+    need_ids?: number[];
+    form?: string[];
+    certifications?: string[];
+    target_audience?: string[];
+    manufacturer_country?: string[];
+    score_min?: number;
+    score_max?: number;
+    price_min?: number;
+    price_max?: number;
+    skin_type?: string[];
   }) {
     const { page, limit, search, brand_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
     const sort = query.sort ?? 'newest';
     let { category_id } = query;
     const { category_slug } = query;
     const where: any = {};
+
+    // Sprint 6: Eğer rich filter aktifse → unified query builder path
+    const hasRichFilter = !!(
+      query.ingredient_slugs?.length ||
+      query.need_ids?.length ||
+      query.form?.length ||
+      query.certifications?.length ||
+      query.target_audience?.length ||
+      query.manufacturer_country?.length ||
+      query.score_min != null ||
+      query.score_max != null ||
+      query.price_min != null ||
+      query.price_max != null
+    );
+
+    if (hasRichFilter) {
+      const qb = this.repo.createQueryBuilder('p')
+        .leftJoinAndSelect('p.brand', 'b')
+        .leftJoinAndSelect('p.category', 'cat')
+        .leftJoinAndSelect('p.label', 'lbl')
+        .leftJoinAndSelect('p.images', 'img')
+        .where('1 = 1');
+
+      if (search) qb.andWhere('p.product_name ILIKE :s', { s: `%${search}%` });
+      if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
+      if (status) qb.andWhere('p.status = :st', { st: status });
+      else qb.andWhere('p.status IN (:...defaultStatuses)', { defaultStatuses: ['published', 'active'] });
+      if (domain_type) qb.andWhere('p.domain_type = :dt', { dt: domain_type });
+      if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
+      if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
+      if (target_gender) qb.andWhere('p.target_gender = :tg', { tg: target_gender });
+
+      // Category resolve (parent + children)
+      if (!category_id && category_slug) {
+        const cat = await this.categoryRepo.findOne({ where: { category_slug }, select: ['category_id'] });
+        if (cat) category_id = cat.category_id;
+        else return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
+      }
+      if (category_id) {
+        const children = await this.categoryRepo.find({
+          where: { parent_category_id: Number(category_id) },
+          select: ['category_id'],
+        });
+        qb.andWhere('p.category_id IN (:...cids)', {
+          cids: [Number(category_id), ...children.map(c => c.category_id)],
+        });
+      }
+
+      // Etken madde slug çoklu (OR — herhangi birini içeren ürün)
+      if (query.ingredient_slugs?.length) {
+        qb.andWhere(
+          'EXISTS (SELECT 1 FROM product_ingredients pi JOIN ingredients ing ON ing.ingredient_id = pi.ingredient_id WHERE pi.product_id = p.product_id AND ing.ingredient_slug IN (:...islugs))',
+          { islugs: query.ingredient_slugs },
+        );
+      }
+
+      // İhtiyaç ID çoklu (OR — uygun skoru ≥40 olan)
+      if (query.need_ids?.length) {
+        qb.andWhere(
+          'EXISTS (SELECT 1 FROM product_need_scores ns WHERE ns.product_id = p.product_id AND ns.need_id IN (:...nids) AND ns.compatibility_score >= 40)',
+          { nids: query.need_ids },
+        );
+      }
+
+      // Form (supplement_details.form)
+      if (query.form?.length) {
+        qb.andWhere(
+          'EXISTS (SELECT 1 FROM supplement_details sd WHERE sd.product_id = p.product_id AND LOWER(sd.form) IN (:...forms))',
+          { forms: query.form.map(f => f.toLowerCase()) },
+        );
+      }
+
+      // Sertifika (text contains, OR semantik)
+      if (query.certifications?.length) {
+        const certClauses = query.certifications.map((c, i) => `sd.certification ILIKE :cert${i}`);
+        const params: Record<string, string> = {};
+        query.certifications.forEach((c, i) => { params[`cert${i}`] = `%${c}%`; });
+        qb.andWhere(
+          `EXISTS (SELECT 1 FROM supplement_details sd WHERE sd.product_id = p.product_id AND (${certClauses.join(' OR ')}))`,
+          params,
+        );
+      }
+
+      // Hedef kitle (target_audience JSONB veya text — kontrol et)
+      if (query.target_audience?.length) {
+        qb.andWhere('p.target_audience IN (:...tas)', { tas: query.target_audience });
+      }
+
+      // Üretim ülkesi (supplement_details.manufacturer_country)
+      if (query.manufacturer_country?.length) {
+        qb.andWhere(
+          'EXISTS (SELECT 1 FROM supplement_details sd WHERE sd.product_id = p.product_id AND sd.manufacturer_country IN (:...mcs))',
+          { mcs: query.manufacturer_country },
+        );
+      }
+
+      // REVELA Skoru aralığı (product_scores.overall_score)
+      if (query.score_min != null || query.score_max != null) {
+        qb.andWhere(
+          `EXISTS (SELECT 1 FROM product_scores ps WHERE ps.product_id = p.product_id
+           AND ps.algorithm_version IN ('supplement-v2','cosmetic-v1')
+           ${query.score_min != null ? 'AND ps.overall_score >= :smin' : ''}
+           ${query.score_max != null ? 'AND ps.overall_score <= :smax' : ''})`,
+          {
+            ...(query.score_min != null ? { smin: query.score_min } : {}),
+            ...(query.score_max != null ? { smax: query.score_max } : {}),
+          },
+        );
+      }
+
+      // Fiyat aralığı (affiliate_links.price_snapshot min)
+      if (query.price_min != null || query.price_max != null) {
+        const conds: string[] = [];
+        if (query.price_min != null) conds.push('al.price_snapshot >= :pmin');
+        if (query.price_max != null) conds.push('al.price_snapshot <= :pmax');
+        qb.andWhere(
+          `EXISTS (SELECT 1 FROM affiliate_links al WHERE al.product_id = p.product_id
+           AND al.is_active = true AND al.price_snapshot IS NOT NULL
+           AND ${conds.join(' AND ')})`,
+          {
+            ...(query.price_min != null ? { pmin: query.price_min } : {}),
+            ...(query.price_max != null ? { pmax: query.price_max } : {}),
+          },
+        );
+      }
+
+      // Sıralama
+      if (sort === 'score') {
+        // Score sort için product_scores join
+        qb.leftJoin(
+          'product_scores',
+          'ps_sort',
+          "ps_sort.product_id = p.product_id AND ps_sort.algorithm_version IN ('supplement-v2','cosmetic-v1')",
+        )
+          .addSelect('COALESCE(ps_sort.overall_score, 0)', 'sort_score')
+          .orderBy('sort_score', 'DESC');
+      } else if (sort === 'oldest') {
+        qb.orderBy('p.created_at', 'ASC');
+      } else if (sort === 'name') {
+        qb.orderBy('p.product_name', 'ASC');
+      } else if (sort === 'name_desc') {
+        qb.orderBy('p.product_name', 'DESC');
+      } else {
+        qb.orderBy('p.created_at', 'DESC');
+      }
+
+      qb.skip((page - 1) * limit).take(limit);
+      const [data, total] = await qb.getManyAndCount();
+      return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    }
+
     if (search) where.product_name = ILike(`%${search}%`);
     if (brand_id) where.brand_id = Number(brand_id);
     if (status) where.status = status;
