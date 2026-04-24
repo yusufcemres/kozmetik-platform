@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { ScoreOverlayBadge } from '@/components/public/ScoreBadge';
+import ProductFilterSidebar, { FilterState } from '@/components/public/ProductFilterSidebar';
 
 interface SupplementProduct {
   product_id: number;
@@ -36,26 +37,44 @@ export default function SupplementsListPage() {
 
 function SupplementsListInner() {
   const searchParams = useSearchParams();
-  const initialKategori = searchParams.get('kategori') || '';
 
   const [products, setProducts] = useState<SupplementProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [kategori, setKategori] = useState(initialKategori);
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<'newest' | 'score' | 'name'>('newest');
+  const [filters, setFilters] = useState<FilterState>({
+    kategori: searchParams.get('kategori') || '',
+    brand_id: searchParams.get('brand_id') || '',
+    sort: searchParams.get('sort') || 'newest',
+    skorMin: searchParams.get('skor_min') ? Number(searchParams.get('skor_min')) : null,
+    skorMax: searchParams.get('skor_max') ? Number(searchParams.get('skor_max')) : null,
+    search: searchParams.get('q') || '',
+  });
   const [scores, setScores] = useState<Record<number, number>>({});
+
+  // Sync filters → URL
+  useEffect(() => {
+    const qs = new URLSearchParams();
+    if (filters.kategori) qs.set('kategori', filters.kategori);
+    if (filters.brand_id) qs.set('brand_id', filters.brand_id);
+    if (filters.sort !== 'newest') qs.set('sort', filters.sort);
+    if (filters.skorMin != null) qs.set('skor_min', String(filters.skorMin));
+    if (filters.skorMax != null) qs.set('skor_max', String(filters.skorMax));
+    if (filters.search) qs.set('q', filters.search);
+    const url = qs.toString() ? `?${qs.toString()}` : window.location.pathname;
+    window.history.replaceState(null, '', url);
+  }, [filters]);
 
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
     params.set('page', String(page));
     params.set('limit', '12');
-    if (search) params.set('search', search);
-    params.set('sort', sort);
+    if (filters.search) params.set('search', filters.search);
+    params.set('sort', filters.sort);
     params.set('domain_type', 'supplement');
-    if (kategori) params.set('category_slug', kategori);
+    if (filters.kategori) params.set('category_slug', filters.kategori);
+    if (filters.brand_id) params.set('brand_id', filters.brand_id);
     const endpoint = `/products?${params.toString()}`;
 
     api
@@ -66,7 +85,7 @@ function SupplementsListInner() {
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [page, kategori, search, sort]);
+  }, [page, filters.kategori, filters.brand_id, filters.search, filters.sort]);
 
   // Fetch scores in parallel for visible products
   useEffect(() => {
@@ -93,7 +112,19 @@ function SupplementsListInner() {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [kategori, search, sort]);
+  }, [filters.kategori, filters.brand_id, filters.search, filters.sort, filters.skorMin, filters.skorMax]);
+
+  // Client-side score filtering (skorMin/skorMax uygulanır)
+  const visibleProducts = useMemo(() => {
+    if (filters.skorMin == null && filters.skorMax == null) return products;
+    return products.filter((p) => {
+      const s = scores[p.product_id];
+      if (s == null) return false;
+      if (filters.skorMin != null && s < filters.skorMin) return false;
+      if (filters.skorMax != null && s > filters.skorMax) return false;
+      return true;
+    });
+  }, [products, scores, filters.skorMin, filters.skorMax]);
 
   const scoreBadgeClass = (v: number) => {
     if (v >= 80) return 'bg-green-500/90 text-white';
@@ -107,10 +138,14 @@ function SupplementsListInner() {
     return null;
   };
 
+  const resetFilters = () => setFilters({
+    kategori: '', brand_id: '', sort: 'newest', skorMin: null, skorMax: null, search: '',
+  });
+
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Sağlık</span>
         <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">TAKVİYE GIDALAR</h1>
         <p className="text-on-surface-variant text-sm mt-2">
@@ -118,78 +153,44 @@ function SupplementsListInner() {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <span className="material-icon absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant text-[20px] pointer-events-none" aria-hidden="true">search</span>
-        <input
-          type="text"
-          placeholder="Takviye ara... (örneğin: omega-3, d vitamini)"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="curator-input pl-12"
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+        <ProductFilterSidebar
+          categories={CATEGORIES.map((c) => ({ slug: c.slug, label: c.label }))}
+          domain="supplement"
+          state={filters}
+          onChange={(patch) => setFilters((prev) => ({ ...prev, ...patch }))}
+          onReset={resetFilters}
+          resultCount={visibleProducts.length}
         />
-      </div>
 
-      {/* Sort */}
-      <div className="flex justify-end mb-4">
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as 'newest' | 'score' | 'name')}
-          className="curator-input !w-auto text-xs py-2"
-        >
-          <option value="newest">En yeni</option>
-          <option value="score">Skora göre (yüksek→düşük)</option>
-          <option value="name">İsme göre (A→Z)</option>
-        </select>
-      </div>
-
-      {/* Category chips */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.slug}
-            onClick={() => setKategori(cat.slug)}
-            className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
-              kategori === cat.slug
-                ? 'bg-on-surface text-surface'
-                : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
-            }`}
-          >
-            <span className="material-icon text-[14px]" aria-hidden="true">{cat.icon}</span>
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="curator-card p-5 animate-pulse">
-              <div className="h-32 bg-surface-container rounded mb-3" />
-              <div className="h-4 bg-surface-container rounded w-2/3 mb-2" />
-              <div className="h-3 bg-surface-container rounded w-full" />
+        <div>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="curator-card p-5 animate-pulse">
+                  <div className="h-32 bg-surface-container rounded mb-3" />
+                  <div className="h-4 bg-surface-container rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-surface-container rounded w-full" />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="text-center py-24">
-          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">medication</span>
-          <p className="text-on-surface-variant">
-            {search ? `"${search}" için sonuç bulunamadı` : 'Bu kategoride henüz ürün yok'}
-          </p>
-          {(search || kategori) && (
-            <button
-              onClick={() => { setSearch(''); setKategori(''); }}
-              className="mt-4 text-primary text-sm hover:underline"
-            >
-              Filtreleri temizle
-            </button>
-          )}
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((p) => {
+          ) : visibleProducts.length === 0 ? (
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">medication</span>
+              <p className="text-on-surface-variant">
+                {filters.search ? `"${filters.search}" için sonuç bulunamadı` : 'Filtrelere uygun ürün yok'}
+              </p>
+              <button
+                onClick={resetFilters}
+                className="mt-4 text-primary text-sm hover:underline"
+              >
+                Filtreleri temizle
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {visibleProducts.map((p) => {
               const img = getImageUrl(p);
               return (
                 <Link
@@ -280,8 +281,10 @@ function SupplementsListInner() {
               </button>
             </div>
           )}
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
