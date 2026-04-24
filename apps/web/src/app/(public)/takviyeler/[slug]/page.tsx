@@ -428,32 +428,35 @@ export default async function SupplementDetailPage({
 
         {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
-          <section className="mb-8 curator-card p-6">
-            <div className="flex items-start gap-6 flex-col md:flex-row">
-              <ScoreBadge score={score.overall_score} grade={score.grade} size="lg" />
+          <section className="mb-4 curator-card p-3 md:p-4">
+            <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
+              <ScoreBadge score={score.overall_score} grade={score.grade} size="md" />
               <div className="flex-1 w-full">
-                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-3">REVELA Takviye Skoru</h2>
-                <div className="space-y-2">
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-2 text-[10px]">REVELA Takviye Skoru</h2>
+                <div className="space-y-1">
                   {[
-                    { label: 'Form Kalitesi', key: 'form_quality' },
-                    { label: 'Doz Etkinliği', key: 'dose_efficacy' },
-                    { label: 'Kanıt Seviyesi', key: 'evidence_grade' },
-                    { label: 'Bağımsız Test', key: 'third_party_testing' },
-                    { label: 'Etkileşim', key: 'interaction_safety' },
-                    { label: 'Şeffaflık + Tier', key: 'transparency_and_tier' },
+                    { label: 'Form Kalitesi',   key: 'form_quality',         desc: 'Emilim kolaylığı ve biyoyararlanım (ör. sitrat > oksit)' },
+                    { label: 'Doz Etkinliği',   key: 'dose_efficacy',        desc: 'Kanıta dayalı etkili doz aralığında mı' },
+                    { label: 'Kanıt Seviyesi',  key: 'evidence_grade',       desc: 'Sistematik derleme / RCT / vaka-kontrol / uzman görüşü' },
+                    { label: 'Bağımsız Test',   key: 'third_party_testing',  desc: 'USP / NSF / Labdoor gibi dış laboratuvar doğrulaması' },
+                    { label: 'Etkileşim',       key: 'interaction_safety',   desc: 'Bileşenler arası zararlı etkileşim yok mu' },
+                    { label: 'Şeffaflık + Tier',key: 'transparency_and_tier',desc: 'Marka şeffaflığı + üretim sınıfı (pharma > food-grade)' },
                   ].map((row) => {
                     const bd = score.breakdown as Record<string, number>;
                     const val = bd?.[row.key] ?? bd?.[row.key.replace(/_/g, '')] ?? 0;
                     return (
-                      <div key={row.key} className="flex items-center gap-3 text-sm">
-                        <span className="w-36 text-on-surface-variant">{row.label}</span>
-                        <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+                      <div key={row.key} className="grid grid-cols-[8rem_1fr_2rem] items-center gap-2">
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{row.label}</div>
+                          <div className="text-[9px] text-outline truncate leading-tight" title={row.desc}>{row.desc}</div>
+                        </div>
+                        <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${val >= 70 ? 'bg-score-high' : val >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
                             style={{ width: `${val}%` }}
                           />
                         </div>
-                        <span className="w-10 text-right font-semibold text-on-surface tabular-nums">{val}</span>
+                        <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val}</span>
                       </div>
                     );
                   })}
@@ -461,21 +464,21 @@ export default async function SupplementDetailPage({
 
                 {/* "Bu puan neden?" — Explanation with citations */}
                 {score.explanation?.length > 0 && (
-                  <details className="mt-4">
-                    <summary className="text-xs font-semibold text-primary cursor-pointer hover:underline">
+                  <details className="mt-2">
+                    <summary className="text-[10px] font-semibold text-primary cursor-pointer hover:underline">
                       Bu puan neden?
                     </summary>
-                    <ul className="mt-2 space-y-1.5">
+                    <ul className="mt-1 space-y-0.5">
                       {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
-                        <li key={i} className="text-xs text-on-surface-variant leading-relaxed flex items-start gap-1.5">
-                          <span className="material-icon text-sm text-outline mt-0.5 shrink-0" aria-hidden="true">
+                        <li key={i} className="text-[10px] text-on-surface-variant leading-snug flex items-start gap-1">
+                          <span className="material-icon text-[10px] text-outline mt-0.5 shrink-0" aria-hidden="true">
                             {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}
                           </span>
                           <span>
                             {e.reason}
                             {e.citation?.url && (
                               <a href={e.citation.url} target="_blank" rel="noopener noreferrer" className="text-primary ml-1 hover:underline">
-                                <span className="material-icon text-[12px] align-middle" aria-hidden="true">open_in_new</span>
+                                <span className="material-icon text-[10px] align-middle" aria-hidden="true">open_in_new</span>
                               </a>
                             )}
                           </span>
@@ -495,8 +498,8 @@ export default async function SupplementDetailPage({
                   </div>
                 )}
 
-                <div className="flex justify-end mt-3 pt-3 border-t border-outline-variant/20">
-                  <Link href="/nasil-puanliyoruz#supplement" className="text-[10px] text-primary hover:underline">
+                <div className="flex justify-end mt-1.5">
+                  <Link href="/nasil-puanliyoruz#supplement" className="text-[9px] text-primary hover:underline">
                     Metodoloji
                   </Link>
                 </div>
@@ -691,7 +694,7 @@ export default async function SupplementDetailPage({
               count={`${filledCount}/${ingredientCards.length} bileşen`}
               className="mb-4"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-1.5">
                 {ingredientCards.map((nf) => {
                   const ing = nf.ingredient!;
                   const dose = Number(nf.amount_per_serving) || 0;
@@ -705,47 +708,38 @@ export default async function SupplementDetailPage({
                       ? Math.round((dose / fs.amount_per_100g) * 100)
                       : null;
                     return (
-                      <div key={i} className="flex items-center gap-2 py-1.5 border-b border-outline-variant/10 last:border-b-0 text-xs">
-                        <span className="flex-1 font-medium text-on-surface truncate">{fs.food_name}</span>
+                      <div key={i} className="flex items-baseline gap-1 py-0.5 text-[10px] leading-tight">
+                        <span className="text-on-surface truncate min-w-0">{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
-                          <span className={`font-semibold tabular-nums ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          <span className={`tabular-nums font-semibold shrink-0 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
                           </span>
-                        )}
-                        {fs.bioavailability && (
-                          <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${
-                            fs.bioavailability === 'Yüksek' ? 'text-score-high bg-score-high/10' :
-                            fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
-                            'text-outline bg-surface-container-low'
-                          }`}>{fs.bioavailability}</span>
                         )}
                       </div>
                     );
                   };
                   return (
-                    <div key={nf.supplement_ingredient_id} className="curator-card p-3">
-                      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-outline-variant/20">
-                        <h3 className="font-semibold text-on-surface text-xs truncate">
-                          {ing.common_name || ing.inci_name}
-                          {dose > 0 && <span className="text-outline font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
-                        </h3>
-                      </div>
+                    <div key={nf.supplement_ingredient_id} className="curator-card p-1.5">
+                      <h3 className="font-semibold text-on-surface text-[10px] truncate mb-1 pb-1 border-b border-outline-variant/15">
+                        {ing.common_name || ing.inci_name}
+                        {dose > 0 && <span className="text-outline font-normal ml-1 text-[9px]">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
+                      </h3>
                       {hasUsableFoods ? (
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
-                            <details className="mt-2">
-                              <summary className="text-[10px] text-primary cursor-pointer hover:underline">
-                                +{restFoods.length} gıda daha
+                            <details className="mt-1">
+                              <summary className="text-[9px] text-primary cursor-pointer hover:underline">
+                                +{restFoods.length} gıda
                               </summary>
-                              <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
+                              <div className="mt-0.5">{restFoods.map(renderFoodRow)}</div>
                             </details>
                           )}
                         </>
                       ) : (
-                        <div className="flex items-center gap-2 py-1.5 text-[11px] text-outline">
-                          <span className="material-icon text-[12px]" aria-hidden="true">hourglass_empty</span>
-                          <span>Doğal kaynak verisi yakında eklenecek</span>
+                        <div className="flex items-center gap-1 py-0.5 text-[10px] text-outline">
+                          <span className="material-icon text-[10px]" aria-hidden="true">hourglass_empty</span>
+                          <span className="truncate">Veri yakında</span>
                         </div>
                       )}
                     </div>
@@ -769,7 +763,7 @@ export default async function SupplementDetailPage({
             count={`${interactions.length} uyarı`}
             className="mb-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5">
               {interactions.map((int) => {
                 const severityConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
                   severe: { color: 'text-error', bg: 'bg-error/10 border-error/20', icon: 'error', label: 'Ciddi' },
@@ -780,36 +774,36 @@ export default async function SupplementDetailPage({
                 };
                 const cfg = severityConfig[int.severity] || severityConfig.mild;
                 return (
-                  <details key={int.interaction_id} className={`group border rounded-sm px-3 py-2 ${cfg.bg}`}>
-                    <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                      <span className={`material-icon ${cfg.color} text-[14px] shrink-0`} aria-hidden="true">{cfg.icon}</span>
-                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
-                        <span className="font-semibold text-on-surface">
+                  <details key={int.interaction_id} className={`group border rounded-sm px-2 py-1.5 ${cfg.bg}`}>
+                    <summary className="flex items-center gap-1 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className={`material-icon ${cfg.color} text-[12px] shrink-0`} aria-hidden="true">{cfg.icon}</span>
+                      <div className="flex-1 min-w-0 flex items-center gap-1 text-[10px]">
+                        <span className="font-semibold text-on-surface truncate">
                           {int.ingredient_a.common_name || int.ingredient_a.inci_name}
                         </span>
-                        <span className={`material-icon text-[12px] ${cfg.color}`} aria-hidden="true">sync_alt</span>
-                        <span className="font-semibold text-on-surface">
+                        <span className={`material-icon text-[10px] shrink-0 ${cfg.color}`} aria-hidden="true">sync_alt</span>
+                        <span className="font-semibold text-on-surface truncate">
                           {int.ingredient_b.common_name || int.ingredient_b.inci_name}
                         </span>
-                        <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${cfg.color} ${cfg.bg}`}>{cfg.label}</span>
+                        <span className={`label-caps text-[8px] px-1 py-0 rounded-sm shrink-0 ${cfg.color}`}>{cfg.label}</span>
                       </div>
                       <span
                         className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
-                        style={{ fontSize: '14px' }}
+                        style={{ fontSize: '12px' }}
                         aria-hidden="true"
                       >
                         expand_more
                       </span>
                     </summary>
                     {(int.description || int.recommendation) && (
-                      <div className="mt-2 pt-2 border-t border-outline-variant/15 space-y-1">
+                      <div className="mt-1 pt-1 border-t border-outline-variant/15">
                         {int.description && (
-                          <p className="text-[11px] text-on-surface-variant leading-relaxed">{int.description}</p>
+                          <p className="text-[10px] text-on-surface-variant leading-snug">{int.description}</p>
                         )}
                         {int.recommendation && (
-                          <p className="text-[10px] text-on-surface-variant flex items-start gap-1">
-                            <span className="material-icon text-[10px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
-                            {int.recommendation}
+                          <p className="text-[9px] text-on-surface-variant mt-0.5 flex items-start gap-0.5">
+                            <span className="material-icon text-[9px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                            <span>{int.recommendation}</span>
                           </p>
                         )}
                       </div>

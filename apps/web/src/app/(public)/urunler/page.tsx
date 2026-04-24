@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BLUR_DATA_URL } from '@/lib/image-placeholder';
 import { api } from '@/lib/api';
+import ProductFilterSidebar, { FilterState, EMPTY_FILTER_STATE } from '@/components/public/ProductFilterSidebar';
 
 interface Product {
   product_id: number;
@@ -37,38 +38,11 @@ const TYPE_ICONS: Record<string, string> = {
   fondöten: 'palette',
 };
 
-const TYPE_CHIPS = [
-  'serum', 'krem', 'temizleyici', 'nemlendirici', 'güneş kremi',
-  'tonik', 'maske', 'göz kremi', 'peeling', 'esans',
-  'dudak bakım', 'fondöten',
-];
-
-const AREA_LABELS: Record<string, string> = {
-  'yüz': 'Yüz', 'göz': 'Göz', 'vücut': 'Vücut', 'dudak': 'Dudak',
-  'saç': 'Saç', 'el': 'El', 'yüz_vücut': 'Yüz & Vücut',
-};
-
 interface PageMeta {
   total: number;
   page: number;
   limit: number;
   totalPages: number;
-}
-
-interface Category {
-  category_id: number;
-  category_name: string;
-  category_slug: string;
-  parent_category_id: number | null;
-  domain_type?: string;
-  children?: Category[];
-}
-
-interface Brand {
-  brand_id: number;
-  brand_name: string;
-  brand_slug: string;
-  product_count: string;
 }
 
 function getScoreColor(score: number): string {
@@ -83,59 +57,71 @@ function getScoreBarColor(score: number): string {
   return 'bg-score-low';
 }
 
+const COSMETIC_CATEGORIES = [
+  { slug: '', label: 'Tümü' },
+  { slug: 'yuz-bakimi', label: 'Yüz Bakımı' },
+  { slug: 'vucut-bakimi', label: 'Vücut Bakımı' },
+  { slug: 'sac-bakimi', label: 'Saç Bakımı' },
+  { slug: 'makyaj', label: 'Makyaj' },
+  { slug: 'gunes-koruyucu', label: 'Güneş Koruyucu' },
+  { slug: 'parfum', label: 'Parfüm' },
+];
+
 function ProductsListContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [meta, setMeta] = useState<PageMeta>({ total: 0, page: 1, limit: 12, totalPages: 1 });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [brandFilter, setBrandFilter] = useState<number | ''>('');
-  const [categoryFilter, setCategoryFilter] = useState<number | ''>('');
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [typeFilter, setTypeFilter] = useState('');
-  const [areaFilter, setAreaFilter] = useState('');
-  const [ingredientSlug, setIngredientSlug] = useState('');
+
+  const [filters, setFilters] = useState<FilterState>(() => {
+    const csv = (k: string) => searchParams.get(k)?.split(',').filter(Boolean) || [];
+    const csvNum = (k: string) => csv(k).map(Number).filter((n) => Number.isFinite(n));
+    const num = (k: string) => {
+      const v = searchParams.get(k);
+      return v != null && v !== '' ? Number(v) : null;
+    };
+    return {
+      ...EMPTY_FILTER_STATE,
+      kategori: searchParams.get('kategori') || searchParams.get('category') || '',
+      brand_id: searchParams.get('brand_id') || '',
+      sort: searchParams.get('sort') || 'newest',
+      search: searchParams.get('q') || '',
+      ingredient_slugs: searchParams.get('ingredient') ? [searchParams.get('ingredient')!] : csv('etken'),
+      need_ids: csvNum('ihtiyac'),
+      product_types: searchParams.get('type') ? [searchParams.get('type')!] : csv('tip'),
+      target_areas: searchParams.get('area') ? [searchParams.get('area')!] : csv('bolge'),
+      certifications: csv('sertifika'),
+      manufacturer_country: csv('ulke'),
+      skin_type: csv('cilt'),
+      skorMin: num('skor_min'),
+      skorMax: num('skor_max'),
+      fiyatMin: num('fiyat_min'),
+      fiyatMax: num('fiyat_max'),
+    };
+  });
 
   useEffect(() => {
-    api.get<Category[]>('/categories/tree').then(setCategories).catch(() => {});
-    api.get<Brand[]>('/products/popular-brands?limit=50').then(setBrands).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const catSlug = searchParams.get('category');
-    const brandSlug = searchParams.get('brand');
-    if (catSlug && categories.length > 0) {
-      // Search both parent and child categories
-      let found: Category | undefined;
-      for (const cat of categories) {
-        if (cat.category_slug === catSlug) { found = cat; break; }
-        const child = cat.children?.find((c) => c.category_slug === catSlug);
-        if (child) { found = child; break; }
-      }
-      if (found) setCategoryFilter(found.category_id);
-    } else if (!catSlug) {
-      setCategoryFilter('');
-    }
-    if (brandSlug && brands.length > 0) {
-      const brand = brands.find((b) => b.brand_slug === brandSlug);
-      if (brand) setBrandFilter(brand.brand_id);
-    } else if (!brandSlug) {
-      setBrandFilter('');
-    }
-
-    const typeParam = searchParams.get('type');
-    if (typeParam) setTypeFilter(typeParam);
-    const areaParam = searchParams.get('area');
-    if (areaParam) setAreaFilter(areaParam);
-    const ingParam = searchParams.get('ingredient');
-    if (ingParam) setIngredientSlug(ingParam);
-  }, [searchParams, categories, brands]);
+    const qs = new URLSearchParams();
+    if (filters.kategori) qs.set('kategori', filters.kategori);
+    if (filters.brand_id) qs.set('brand_id', filters.brand_id);
+    if (filters.sort !== 'newest') qs.set('sort', filters.sort);
+    if (filters.search) qs.set('q', filters.search);
+    if (filters.ingredient_slugs.length) qs.set('etken', filters.ingredient_slugs.join(','));
+    if (filters.need_ids.length) qs.set('ihtiyac', filters.need_ids.join(','));
+    if (filters.product_types.length) qs.set('tip', filters.product_types.join(','));
+    if (filters.target_areas.length) qs.set('bolge', filters.target_areas.join(','));
+    if (filters.certifications.length) qs.set('sertifika', filters.certifications.join(','));
+    if (filters.manufacturer_country.length) qs.set('ulke', filters.manufacturer_country.join(','));
+    if (filters.skin_type.length) qs.set('cilt', filters.skin_type.join(','));
+    if (filters.skorMin != null) qs.set('skor_min', String(filters.skorMin));
+    if (filters.skorMax != null) qs.set('skor_max', String(filters.skorMax));
+    if (filters.fiyatMin != null) qs.set('fiyat_min', String(filters.fiyatMin));
+    if (filters.fiyatMax != null) qs.set('fiyat_max', String(filters.fiyatMax));
+    const url = qs.toString() ? `?${qs.toString()}` : window.location.pathname;
+    window.history.replaceState(null, '', url);
+  }, [filters]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -143,13 +129,22 @@ function ProductsListContent() {
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('limit', '12');
-      if (search) params.set('search', search);
-      if (brandFilter) params.set('brand_id', String(brandFilter));
-      if (categoryFilter) params.set('category_id', String(categoryFilter));
-      if (typeFilter) params.set('product_type', typeFilter);
-      if (areaFilter) params.set('target_area', areaFilter);
-      if (ingredientSlug) params.set('ingredient_slug', ingredientSlug);
       params.set('domain_type', 'cosmetic');
+      params.set('sort', filters.sort);
+      if (filters.search) params.set('search', filters.search);
+      if (filters.kategori) params.set('category_slug', filters.kategori);
+      if (filters.brand_id) params.set('brand_id', filters.brand_id);
+      if (filters.ingredient_slugs.length) params.set('ingredient_slugs', filters.ingredient_slugs.join(','));
+      if (filters.need_ids.length) params.set('need_ids', filters.need_ids.join(','));
+      if (filters.product_types.length) params.set('product_types', filters.product_types.join(','));
+      if (filters.target_areas.length) params.set('target_areas', filters.target_areas.join(','));
+      if (filters.certifications.length) params.set('certifications', filters.certifications.join(','));
+      if (filters.manufacturer_country.length) params.set('manufacturer_country', filters.manufacturer_country.join(','));
+      if (filters.skin_type.length) params.set('skin_type', filters.skin_type.join(','));
+      if (filters.skorMin != null) params.set('score_min', String(filters.skorMin));
+      if (filters.skorMax != null) params.set('score_max', String(filters.skorMax));
+      if (filters.fiyatMin != null) params.set('price_min', String(filters.fiyatMin));
+      if (filters.fiyatMax != null) params.set('price_max', String(filters.fiyatMax));
 
       const data = await api.get<{ data: Product[]; meta: PageMeta }>(
         `/products?${params.toString()}`,
@@ -162,42 +157,27 @@ function ProductsListContent() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, brandFilter, categoryFilter, typeFilter, areaFilter, ingredientSlug]);
+  }, [page, filters]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
     setPage(1);
-    setSearch(searchInput);
-  };
+  }, [filters]);
 
-  const clearFilters = () => {
-    setSearch('');
-    setSearchInput('');
-    setBrandFilter('');
-    setCategoryFilter('');
-    setTypeFilter('');
-    setAreaFilter('');
-    setIngredientSlug('');
-    setPage(1);
-    router.push('/urunler');
-  };
-
-  const parentCats = categories.filter(
-    (c) => !c.parent_category_id && (c.domain_type === 'cosmetic' || !c.domain_type),
-  );
-  const hasFilters = !!search || !!brandFilter || !!categoryFilter || !!typeFilter || !!areaFilter || !!ingredientSlug;
+  const resetFilters = () => setFilters({ ...EMPTY_FILTER_STATE });
 
   return (
     <div className="curator-section max-w-[1600px] mx-auto">
-      {/* Header */}
-      <div className="flex items-end justify-between mb-10">
+      <div className="flex items-end justify-between mb-6">
         <div>
           <span className="label-caps text-outline block mb-2 tracking-[0.3em]">Koleksiyon</span>
           <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface">ÜRÜNLER</h1>
+          <p className="text-on-surface-variant text-sm mt-2">
+            Kozmetik ürünlerin INCI analizi, cilt tipine uyumluluğu ve bilimsel kanıtlı etkinliği
+          </p>
         </div>
         <Link
           href="/karsilastir"
@@ -208,278 +188,182 @@ function ProductsListContent() {
         </Link>
       </div>
 
-      {/* Search + filter */}
-      <div className="flex gap-3 mb-6">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-3">
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Ürün adı veya marka ara..."
-            className="curator-input flex-1"
-          />
-          <button type="submit" className="curator-btn-primary text-[10px] px-6 py-3">
-            Ara
-          </button>
-        </form>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-4 py-3 rounded-md border text-xs transition-all duration-300 ${
-            showFilters || hasFilters
-              ? 'border-primary text-primary bg-primary-container/30'
-              : 'border-outline-variant/30 text-on-surface-variant hover:border-outline'
-          }`}
-        >
-          <span className="material-icon material-icon-sm" aria-hidden="true">tune</span>
-          <span className="hidden sm:inline uppercase tracking-widest">Filtre</span>
-          {hasFilters && <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full">!</span>}
-        </button>
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+        <ProductFilterSidebar
+          categories={COSMETIC_CATEGORIES}
+          domain="cosmetic"
+          state={filters}
+          onChange={(patch) => setFilters((prev) => ({ ...prev, ...patch }))}
+          onReset={resetFilters}
+          resultCount={meta.total}
+        />
 
-      {/* Filter panel */}
-      {showFilters && (
-        <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6 mb-8 animate-slide-up">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label className="label-caps text-on-surface-variant mb-2 block">Kategori</label>
-              <select
-                value={categoryFilter}
-                onChange={(e) => { setCategoryFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
-                className="curator-input"
-              >
-                <option value="">Tüm Kategoriler</option>
-                {parentCats.map((cat) => (
-                  <optgroup key={cat.category_id} label={cat.category_name}>
-                    <option value={cat.category_id}>{cat.category_name} (Tümü)</option>
-                    {cat.children?.map((sub) => (
-                      <option key={sub.category_id} value={sub.category_id}>
-                        {sub.category_name}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label-caps text-on-surface-variant mb-2 block">Marka</label>
-              <select
-                value={brandFilter}
-                onChange={(e) => { setBrandFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
-                className="curator-input"
-              >
-                <option value="">Tüm Markalar</option>
-                {brands.map((b) => (
-                  <option key={b.brand_id} value={b.brand_id}>
-                    {b.brand_name} ({b.product_count})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          {hasFilters && (
-            <button onClick={clearFilters} className="mt-4 label-caps text-error hover:underline underline-offset-4">
-              Filtreleri Temizle
-            </button>
+        <div>
+          {!loading && (
+            <p className="text-xs text-outline mb-4">
+              {meta.total} ürün
+              {filters.search && <span> &mdash; &ldquo;{filters.search}&rdquo; için sonuçlar</span>}
+            </p>
           )}
-        </div>
-      )}
 
-      {/* Quick filter chips — Ürün Tipi */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {TYPE_CHIPS.map((type) => (
-          <button
-            key={type}
-            onClick={() => { setTypeFilter(type === typeFilter ? '' : type); setPage(1); }}
-            className={`px-3 py-1.5 rounded-sm text-xs border transition-colors ${
-              type === typeFilter
-                ? 'bg-primary text-on-primary border-primary'
-                : 'border-outline-variant/30 text-on-surface-variant hover:border-outline hover:text-on-surface'
-            }`}
-          >
-            {type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Results info */}
-      {!loading && (
-        <p className="text-xs text-outline mb-6">
-          {meta.total} ürün bulundu
-          {search && <span> &mdash; &ldquo;{search}&rdquo; için sonuçlar</span>}
-          {typeFilter && <span> &mdash; {typeFilter}</span>}
-          {areaFilter && <span> &mdash; {AREA_LABELS[areaFilter] || areaFilter}</span>}
-          {ingredientSlug && (
-            <span className="ml-2 inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-              <span className="material-icon text-[12px]" aria-hidden="true">science</span>
-              {ingredientSlug.replace(/-/g, ' ')}
-              <button onClick={() => { setIngredientSlug(''); setPage(1); }} className="ml-1 hover:text-error">
-                <span className="material-icon text-[12px]" aria-hidden="true">close</span>
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="curator-card overflow-hidden animate-pulse">
+                  <div className="aspect-[4/5] bg-surface-container" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-2 bg-surface-container rounded w-1/3" />
+                    <div className="h-4 bg-surface-container rounded w-2/3" />
+                    <div className="h-2 bg-surface-container rounded w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-24">
+              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">inventory_2</span>
+              <p className="text-on-surface-variant">
+                {filters.search ? `"${filters.search}" için sonuç bulunamadı` : 'Filtrelere uygun ürün yok'}
+              </p>
+              <button onClick={resetFilters} className="mt-4 label-caps text-primary hover:underline underline-offset-4">
+                Filtreleri Temizle
               </button>
-            </span>
-          )}
-        </p>
-      )}
-
-      {/* Product grid */}
-      {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="curator-card overflow-hidden animate-pulse">
-              <div className="aspect-[4/5] bg-surface-container" />
-              <div className="p-4 space-y-3">
-                <div className="h-2 bg-surface-container rounded w-1/3" />
-                <div className="h-4 bg-surface-container rounded w-2/3" />
-                <div className="h-2 bg-surface-container rounded w-full" />
-              </div>
             </div>
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="text-center py-24">
-          <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">inventory_2</span>
-          <p className="text-on-surface-variant">
-            {hasFilters ? 'Filtrelere uygun ürün bulunamadı' : 'Henüz ürün eklenmemiş'}
-          </p>
-          {hasFilters && (
-            <button onClick={clearFilters} className="mt-4 label-caps text-primary hover:underline underline-offset-4">
-              Filtreleri Temizle
-            </button>
-          )}
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-            {products.map((product) => {
-              const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
-              const isDiceBear = primaryImg?.includes('dicebear') || primaryImg?.includes('placehold.co');
-              const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
-              const avgScore = product.top_need_score ? Math.round(Number(product.top_need_score)) : null;
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {products.map((product) => {
+                  const primaryImg = product.images?.find(i => i.sort_order === 0)?.image_url || product.images?.[0]?.image_url;
+                  const isDiceBear = primaryImg?.includes('dicebear') || primaryImg?.includes('placehold.co');
+                  const hoverImg = product.images?.find(i => i.sort_order === 1)?.image_url;
+                  const avgScore = product.top_need_score ? Math.round(Number(product.top_need_score)) : null;
 
-              return (
-                <Link
-                  key={product.product_id}
-                  href={`/urunler/${product.product_slug}`}
-                  className="curator-card overflow-hidden group"
-                >
-                  <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden relative">
-                    {primaryImg && !isDiceBear ? (
-                      <>
-                        <Image
-                          src={primaryImg}
-                          alt={product.product_name}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          placeholder="blur"
-                          blurDataURL={BLUR_DATA_URL}
-                          className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
-                        />
-                        {hoverImg && (
-                          <Image
-                            src={hoverImg}
-                            alt={`${product.product_name} - detay`}
-                            fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
-                          />
+                  return (
+                    <Link
+                      key={product.product_id}
+                      href={`/urunler/${product.product_slug}`}
+                      className="curator-card overflow-hidden group"
+                    >
+                      <div className="aspect-[4/5] bg-surface-container-low flex items-center justify-center overflow-hidden relative">
+                        {primaryImg && !isDiceBear ? (
+                          <>
+                            <Image
+                              src={primaryImg}
+                              alt={product.product_name}
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                              placeholder="blur"
+                              blurDataURL={BLUR_DATA_URL}
+                              className={`object-contain transition-all duration-500 ${hoverImg ? 'group-hover:opacity-0 group-hover:scale-105' : 'group-hover:scale-105'}`}
+                            />
+                            {hoverImg && (
+                              <Image
+                                src={hoverImg}
+                                alt={`${product.product_name} - detay`}
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                className="object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 scale-105 group-hover:scale-100"
+                              />
+                            )}
+                          </>
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-surface-variant/30 to-surface-variant/10 flex items-center justify-center">
+                            <span className="material-icon text-outline-variant/40 group-hover:text-outline-variant/60 transition-colors" style={{ fontSize: '48px' }} aria-hidden="true">
+                              {TYPE_ICONS[product.product_type_label || ''] || 'category'}
+                            </span>
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-surface-variant/30 to-surface-variant/10 flex items-center justify-center">
-                        <span className="material-icon text-outline-variant/40 group-hover:text-outline-variant/60 transition-colors" style={{ fontSize: '48px' }} aria-hidden="true">
-                          {TYPE_ICONS[product.product_type_label || ''] || 'category'}
-                        </span>
                       </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    {product.brand && (
-                      <p className="label-caps text-outline mb-1">{product.brand.brand_name}</p>
-                    )}
-                    <h3 className="font-semibold text-sm text-on-surface line-clamp-2 tracking-tight">
-                      {product.product_name}
-                    </h3>
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {product.category && (
-                        <span className="label-caps text-outline-variant">
-                          {product.category.category_name}
-                        </span>
-                      )}
-                      {product.product_type_label && (
-                        <span className="label-caps text-primary bg-primary/5 px-1.5 py-0.5 rounded-sm">
-                          {product.product_type_label}
-                        </span>
-                      )}
-                    </div>
-                    {avgScore !== null && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${getScoreBarColor(avgScore)}`}
-                            style={{ width: `${avgScore}%` }}
-                          />
+                      <div className="p-4">
+                        {product.brand && (
+                          <p className="label-caps text-outline mb-1">{product.brand.brand_name}</p>
+                        )}
+                        <h3 className="font-semibold text-sm text-on-surface line-clamp-2 tracking-tight">
+                          {product.product_name}
+                        </h3>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {product.category && (
+                            <span className="label-caps text-outline-variant">
+                              {product.category.category_name}
+                            </span>
+                          )}
+                          {product.product_type_label && (
+                            <span className="label-caps text-primary bg-primary/5 px-1.5 py-0.5 rounded-sm">
+                              {product.product_type_label}
+                            </span>
+                          )}
                         </div>
-                        <span className={`text-[10px] font-bold ${getScoreColor(avgScore)}`}>
-                          %{avgScore}
-                        </span>
+                        {avgScore !== null && (
+                          <div className="mt-3 flex items-center gap-2">
+                            <div className="flex-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${getScoreBarColor(avgScore)}`}
+                                style={{ width: `${avgScore}%` }}
+                              />
+                            </div>
+                            <span className={`text-[10px] font-bold ${getScoreColor(avgScore)}`}>
+                              %{avgScore}
+                            </span>
+                          </div>
+                        )}
+                        {product.top_need_name && (
+                          <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium mt-1.5 inline-block truncate">
+                            {product.top_need_name}
+                          </span>
+                        )}
                       </div>
-                    )}
-                    {product.top_need_name && (
-                      <span className="bg-primary/5 text-primary px-2 py-0.5 rounded-sm text-[10px] font-medium mt-1.5 inline-block truncate">
-                        {product.top_need_name}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                    </Link>
+                  );
+                })}
+              </div>
 
-          {/* Pagination */}
-          {meta.totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-12">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
-              >
-                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
-              </button>
-              {Array.from({ length: Math.min(meta.totalPages, 7) }, (_, i) => {
-                let pageNum: number;
-                if (meta.totalPages <= 7) {
-                  pageNum = i + 1;
-                } else if (page <= 4) {
-                  pageNum = i + 1;
-                } else if (page >= meta.totalPages - 3) {
-                  pageNum = meta.totalPages - 6 + i;
-                } else {
-                  pageNum = page - 3 + i;
-                }
-                return (
+              {meta.totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-12">
                   <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
-                      pageNum === page
-                        ? 'bg-primary text-on-primary'
-                        : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
-                    }`}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
                   >
-                    {pageNum}
+                    <span className="material-icon material-icon-sm" aria-hidden="true">chevron_left</span>
                   </button>
-                );
-              })}
-              <button
-                onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
-                disabled={page === meta.totalPages}
-                className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
-              >
-                <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
-              </button>
-            </div>
+                  {Array.from({ length: Math.min(meta.totalPages, 7) }, (_, i) => {
+                    let pageNum: number;
+                    if (meta.totalPages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= meta.totalPages - 3) {
+                      pageNum = meta.totalPages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`px-3.5 py-2 rounded-md text-xs font-medium transition-colors ${
+                          pageNum === page
+                            ? 'bg-primary text-on-primary'
+                            : 'border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-low'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  <button
+                    onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+                    disabled={page === meta.totalPages}
+                    className="px-3 py-2 rounded-md text-xs border border-outline-variant/30 disabled:opacity-30 hover:bg-surface-container-low transition-colors"
+                  >
+                    <span className="material-icon material-icon-sm" aria-hidden="true">chevron_right</span>
+                  </button>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

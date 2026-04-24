@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { NeedsService } from './needs.service';
 import { CreateNeedDto } from './dto/create-need.dto';
 import { UpdateNeedDto } from './dto/update-need.dto';
-import { PaginationDto } from '@common/dto/pagination.dto';
+import { NeedFilterDto } from './dto/need-filter.dto';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
@@ -27,14 +27,8 @@ export class NeedsController {
 
   @Get()
   @ApiOperation({ summary: 'İhtiyaçları listele' })
-  @ApiQuery({ name: 'need_category', required: false, description: 'skin | body | hair | general_health' })
-  @ApiQuery({ name: 'domain_type', required: false, description: 'cosmetic | supplement' })
-  findAll(
-    @Query() query: PaginationDto,
-    @Query('need_category') need_category?: string,
-    @Query('domain_type') domain_type?: string,
-  ) {
-    return this.service.findAll({ ...query, need_category, domain_type });
+  findAll(@Query() query: NeedFilterDto) {
+    return this.service.findAll(query);
   }
 
   @Get(':id')

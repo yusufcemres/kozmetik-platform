@@ -15,6 +15,8 @@ interface SupplementProduct {
   brand?: { brand_name: string };
   category?: { category_name: string; category_slug: string };
   images?: { image_url: string }[];
+  top_need_name?: string;
+  top_need_score?: number;
 }
 
 const CATEGORIES = [
@@ -253,11 +255,18 @@ function SupplementsListInner() {
                     {p.short_description && (
                       <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mt-2">{p.short_description}</p>
                     )}
-                    {p.category && (
-                      <span className="label-caps text-outline bg-surface-container-low px-2 py-0.5 rounded-sm inline-block mt-3">
-                        {p.category.category_name}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {p.category && (
+                        <span className="label-caps text-outline bg-surface-container-low px-2 py-0.5 rounded-sm">
+                          {p.category.category_name}
+                        </span>
+                      )}
+                      {p.top_need_name && (
+                        <span className="label-caps text-primary bg-primary/5 px-2 py-0.5 rounded-sm">
+                          {p.top_need_name}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               );

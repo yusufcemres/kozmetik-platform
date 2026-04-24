@@ -738,48 +738,52 @@ export default async function ProductDetailPage({
           if (allergenCount > 0) warnings.push(`${allergenCount} alerjen içerik`);
           if (fragranceCount > 0) warnings.push(`${fragranceCount} parfüm/koku bileşeni`);
 
-          const breakdownLabels: Record<string, string> = {
-            active_efficacy: 'Aktif Etkinlik',
-            safety_class: 'Güvenlik Sınıfı',
-            concentration_fit: 'Konsantrasyon',
-            interaction_safety: 'Etkileşim',
-            allergen_load: 'Alerjen Yükü',
-            cmr_endocrine: 'CMR / Endokrin',
-            transparency: 'Şeffaflık',
+          const breakdownMeta: Record<string, { label: string; desc: string }> = {
+            active_efficacy:    { label: 'Aktif Etkinlik',   desc: 'Etken maddenin kanıta dayalı etkisi (retinol/niasinamid gibi)' },
+            safety_class:       { label: 'Güvenlik Sınıfı',  desc: 'CIR/SCCS sınıflandırması — CMR, endokrin, eu-banned flag yok' },
+            concentration_fit:  { label: 'Konsantrasyon',    desc: 'Aktif madde efficacy eşiğinde konsantre mi' },
+            interaction_safety: { label: 'Etkileşim',        desc: 'Bileşenler arası tahriş / etkisizleşme riski' },
+            allergen_load:      { label: 'Alerjen Yükü',     desc: 'AB 26 alerjen parfüm + allergen-flag bileşen sayısı' },
+            cmr_endocrine:      { label: 'CMR / Endokrin',   desc: 'Kanserojen / mutajen / endokrin bozucu flag yok' },
+            transparency:       { label: 'Şeffaflık',        desc: 'INCI listesi açıklığı + konsantrasyon beyanı' },
           };
 
           return (
-            <section className="mb-16" data-analytics-section="safety">
-              <h2 className="text-xl font-bold tracking-tight mb-6 text-on-surface flex items-center gap-2">
-                <span className="material-icon text-primary" aria-hidden="true">shield</span>
+            <section className="mb-6" data-analytics-section="safety">
+              <h2 className="text-lg font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
+                <span className="material-icon text-primary text-[18px]" aria-hidden="true">shield</span>
                 REVELA Güvenlik Skoru
               </h2>
-              <div className="curator-card p-6">
-                <div className="flex items-start gap-6 flex-col md:flex-row">
-                  <ScoreBadge score={safetyScore} grade={grade as any} size="lg" />
+              <div className="curator-card p-3 md:p-4">
+                <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
+                  <ScoreBadge score={safetyScore} grade={grade as any} size="md" />
                   <div className="flex-1 w-full">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`text-sm font-bold ${gradeColor}`}>Sınıf {grade}</span>
-                      <span className="text-xs text-on-surface-variant">— {gradeLabel}</span>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className={`text-[11px] font-bold ${gradeColor}`}>Sınıf {grade}</span>
+                      <span className="text-[10px] text-on-surface-variant">— {gradeLabel}</span>
                     </div>
 
                     {/* Breakdown bars */}
                     {score.breakdown && (
-                      <div className="space-y-2 mb-4">
-                        {Object.entries(score.breakdown).map(([key, val]) => (
-                          <div key={key} className="flex items-center gap-2">
-                            <span className="text-[10px] text-on-surface-variant w-28 shrink-0 text-right">
-                              {breakdownLabels[key] || key}
-                            </span>
-                            <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all ${(val as number) >= 70 ? 'bg-score-high' : (val as number) >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
-                                style={{ width: `${val}%` }}
-                              />
+                      <div className="space-y-1 mb-2">
+                        {Object.entries(score.breakdown).map(([key, val]) => {
+                          const meta = breakdownMeta[key] || { label: key, desc: '' };
+                          return (
+                            <div key={key} className="grid grid-cols-[7rem_1fr_2rem] items-center gap-2">
+                              <div className="min-w-0">
+                                <div className="text-[11px] font-medium text-on-surface truncate leading-tight">{meta.label}</div>
+                                <div className="text-[9px] text-outline truncate leading-tight" title={meta.desc}>{meta.desc}</div>
+                              </div>
+                              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${(val as number) >= 70 ? 'bg-score-high' : (val as number) >= 50 ? 'bg-score-medium' : 'bg-score-low'}`}
+                                  style={{ width: `${val}%` }}
+                                />
+                              </div>
+                              <span className="text-[11px] text-right font-semibold text-on-surface tabular-nums">{val as number}</span>
                             </div>
-                            <span className="text-[10px] font-mono text-on-surface-variant w-8">{val as number}</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 
