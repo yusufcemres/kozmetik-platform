@@ -691,7 +691,7 @@ export default async function SupplementDetailPage({
               count={`${filledCount}/${ingredientCards.length} bileşen`}
               className="mb-4"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                 {ingredientCards.map((nf) => {
                   const ing = nf.ingredient!;
                   const dose = Number(nf.amount_per_serving) || 0;
@@ -705,47 +705,38 @@ export default async function SupplementDetailPage({
                       ? Math.round((dose / fs.amount_per_100g) * 100)
                       : null;
                     return (
-                      <div key={i} className="flex items-center gap-2 py-1.5 border-b border-outline-variant/10 last:border-b-0 text-xs">
-                        <span className="flex-1 font-medium text-on-surface truncate">{fs.food_name}</span>
+                      <div key={i} className="flex items-center gap-1 py-0.5 text-[11px] leading-tight">
+                        <span className="flex-1 text-on-surface truncate">{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
-                          <span className={`font-semibold tabular-nums ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                          <span className={`tabular-nums font-semibold shrink-0 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
                           </span>
-                        )}
-                        {fs.bioavailability && (
-                          <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${
-                            fs.bioavailability === 'Yüksek' ? 'text-score-high bg-score-high/10' :
-                            fs.bioavailability === 'Orta' ? 'text-score-medium bg-score-medium/10' :
-                            'text-outline bg-surface-container-low'
-                          }`}>{fs.bioavailability}</span>
                         )}
                       </div>
                     );
                   };
                   return (
-                    <div key={nf.supplement_ingredient_id} className="curator-card p-3">
-                      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-outline-variant/20">
-                        <h3 className="font-semibold text-on-surface text-xs truncate">
-                          {ing.common_name || ing.inci_name}
-                          {dose > 0 && <span className="text-outline font-normal ml-1">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
-                        </h3>
-                      </div>
+                    <div key={nf.supplement_ingredient_id} className="curator-card p-2">
+                      <h3 className="font-semibold text-on-surface text-[11px] truncate mb-1.5 pb-1.5 border-b border-outline-variant/15">
+                        {ing.common_name || ing.inci_name}
+                        {dose > 0 && <span className="text-outline font-normal ml-1 text-[10px]">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
+                      </h3>
                       {hasUsableFoods ? (
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
-                            <details className="mt-2">
-                              <summary className="text-[10px] text-primary cursor-pointer hover:underline">
-                                +{restFoods.length} gıda daha
+                            <details className="mt-1">
+                              <summary className="text-[9px] text-primary cursor-pointer hover:underline">
+                                +{restFoods.length} gıda
                               </summary>
-                              <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
+                              <div className="mt-0.5">{restFoods.map(renderFoodRow)}</div>
                             </details>
                           )}
                         </>
                       ) : (
-                        <div className="flex items-center gap-2 py-1.5 text-[11px] text-outline">
-                          <span className="material-icon text-[12px]" aria-hidden="true">hourglass_empty</span>
-                          <span>Doğal kaynak verisi yakında eklenecek</span>
+                        <div className="flex items-center gap-1 py-0.5 text-[10px] text-outline">
+                          <span className="material-icon text-[10px]" aria-hidden="true">hourglass_empty</span>
+                          <span className="truncate">Veri yakında</span>
                         </div>
                       )}
                     </div>
