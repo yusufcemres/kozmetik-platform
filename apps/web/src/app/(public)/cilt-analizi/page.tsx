@@ -544,6 +544,7 @@ export default function SkinAnalysisPage() {
       updated_at: new Date().toISOString(),
     };
     localStorage.setItem('skin_profile', JSON.stringify(profile));
+    document.cookie = 'has_skin_profile=1; path=/; max-age=31536000; SameSite=Lax';
     window.dispatchEvent(new Event('skin-profile-changed'));
 
     const sensitivityKeys = Object.entries(quiz.sensitivities)

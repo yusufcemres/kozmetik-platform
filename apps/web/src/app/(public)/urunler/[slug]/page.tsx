@@ -18,6 +18,7 @@ import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import AccordionSection from '@/components/public/AccordionSection';
+import { hasSkinProfileCookie } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -268,6 +269,20 @@ function getLowScoreExplanation(product: Product, avgScore: number): string[] {
 function platformLabel(platform: string): string {
   if (platform === 'other') return 'Diğer';
   return sharedPlatformLabel(platform);
+}
+
+// INCI order fallback — DB'de concentration_band 'unknown' veya boşsa,
+// INCI sırasına göre tahmini bant döndürür. Legend zaten "(INCI sırasına göre tahmini)" diyor.
+function bandFromInciRank(rank: number): 'high' | 'medium' | 'low' | 'trace' {
+  if (rank <= 3) return 'high';
+  if (rank <= 8) return 'medium';
+  if (rank <= 20) return 'low';
+  return 'trace';
+}
+
+function effectiveBand(band: string | null | undefined, rank: number): string {
+  if (band && band !== 'unknown') return band;
+  return bandFromInciRank(rank);
 }
 
 function concentrationLabel(band: string): { label: string; color: string; tooltip: string } {
@@ -628,19 +643,31 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Personal Score CTA */}
-            <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
-              <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
-              <p className="text-lg font-bold text-primary mt-1">
-                Kişisel skorunu gör
-              </p>
-              <p className="text-xs text-outline mt-2">
-                <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
-                  Cilt profili oluştur
-                </Link>{' '}
-                &rarr; sana özel uyumluluk skoru
-              </p>
-            </div>
+            {/* Personal Score CTA — cookie-aware (profil varsa farklı mesaj) */}
+            {hasSkinProfileCookie() ? (
+              <Link
+                href="/profilim"
+                className="block bg-primary/5 border border-primary/20 rounded-md p-4 hover:bg-primary/10 transition-colors"
+              >
+                <p className="label-caps text-primary">Senin Cildine Uyumu</p>
+                <p className="text-sm text-on-surface mt-1">
+                  Profilin kayıtlı &mdash; kişisel skorunu görmek için devam et &rarr;
+                </p>
+              </Link>
+            ) : (
+              <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
+                <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
+                <p className="text-lg font-bold text-primary mt-1">
+                  Kişisel skorunu gör
+                </p>
+                <p className="text-xs text-outline mt-2">
+                  <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
+                    Cilt profili oluştur
+                  </Link>{' '}
+                  &rarr; sana özel uyumluluk skoru
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -957,8 +984,9 @@ export default async function ProductDetailPage({
                         <span className="flex-1 min-w-0 text-xs font-medium text-on-surface group-open:text-primary transition-colors truncate">
                           {pi.ingredient_display_name}
                         </span>
-                        {pi.concentration_band !== 'unknown' && (() => {
-                          const conc = concentrationLabel(pi.concentration_band);
+                        {(() => {
+                          const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
+                          const conc = concentrationLabel(band);
                           return (
                             <span
                               className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}

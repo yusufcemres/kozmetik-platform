@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import ListModal from '@/components/public/ListModal';
 import ProductCarousel from '@/components/public/ProductCarousel';
+import { hasSkinProfileCookie } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -16,6 +17,7 @@ interface Need {
   short_description?: string;
   detailed_description?: string;
   user_friendly_label?: string;
+  domain_type?: string; // 'cosmetic' | 'supplement' | 'both'
 }
 
 interface IngredientMapping {
@@ -178,10 +180,16 @@ export default async function NeedDetailPage({
   const need = await getNeed(params.slug);
   if (!need) notFound();
 
+  // Domain affinity: 'cosmetic' → only cosmetic, 'supplement' → only supplement,
+  // anything else (null/'both') → both. Supplement-oriented needs (bağışıklık, kalp-damar)
+  // gösterdiği kozmetik öneriler semantik olarak anlamsız → gizle.
+  const showCosmetic = need.domain_type !== 'supplement';
+  const showSupplement = need.domain_type !== 'cosmetic';
+
   const [mappings, cosmeticScores, supplementScores] = await Promise.all([
     getMappings(need.need_id),
-    getTopProducts(need.need_id, 'cosmetic'),
-    getTopProducts(need.need_id, 'supplement'),
+    showCosmetic ? getTopProducts(need.need_id, 'cosmetic') : Promise.resolve([]),
+    showSupplement ? getTopProducts(need.need_id, 'supplement') : Promise.resolve([]),
   ]);
   const topScores = cosmeticScores;
 
@@ -361,8 +369,8 @@ export default async function NeedDetailPage({
           )}
         </section>
 
-        {/* Compatible Products — Cosmetics (hidden when no cosmetic products match) */}
-        {topScores.length > 0 && (
+        {/* Compatible Products — Cosmetics (hidden when supplement-only need or no cosmetic products match) */}
+        {showCosmetic && topScores.length > 0 && (
         <section className="mb-10">
           <h2 className="text-xl font-bold text-on-surface mb-4">Kozmetik Öneriler</h2>
           {topScores.length > 0 ? (
@@ -478,8 +486,8 @@ export default async function NeedDetailPage({
         </section>
         )}
 
-        {/* Compatible Products — Supplements */}
-        {supplementScores.length > 0 && (
+        {/* Compatible Products — Supplements (hidden when cosmetic-only need) */}
+        {showSupplement && supplementScores.length > 0 && (
           <section className="mb-10">
             <h2 className="text-xl font-bold text-on-surface mb-4">
               <span className="material-icon text-primary align-middle mr-2" aria-hidden="true">medication</span>
@@ -536,21 +544,23 @@ export default async function NeedDetailPage({
           </section>
         )}
 
-        {/* Profile CTA */}
-        <div className="curator-card p-8 text-center mb-8">
-          <h3 className="text-xl headline-tight text-on-surface mb-2">
-            BU İHTİYAÇ SENİNLE İLGİLİ Mİ?
-          </h3>
-          <p className="text-sm text-on-surface-variant mb-6">
-            Cilt profilini oluştur ve her üründe sana özel uyum skoru gör.
-          </p>
-          <Link
-            href="/profilim"
-            className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
-          >
-            PROFİLİMİ OLUŞTUR
-          </Link>
-        </div>
+        {/* Profile CTA — cookie-aware (profil varsa gizlenir) */}
+        {!hasSkinProfileCookie() && (
+          <div className="curator-card p-8 text-center mb-8">
+            <h3 className="text-xl headline-tight text-on-surface mb-2">
+              BU İHTİYAÇ SENİNLE İLGİLİ Mİ?
+            </h3>
+            <p className="text-sm text-on-surface-variant mb-6">
+              Cilt profilini oluştur ve her üründe sana özel uyum skoru gör.
+            </p>
+            <Link
+              href="/profilim"
+              className="curator-btn-primary text-[10px] px-8 py-3 inline-block"
+            >
+              PROFİLİMİ OLUŞTUR
+            </Link>
+          </div>
+        )}
 
         {/* Back Link */}
         <div className="border-t border-outline-variant/20 pt-8">
