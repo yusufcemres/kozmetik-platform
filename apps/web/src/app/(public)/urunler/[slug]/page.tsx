@@ -18,7 +18,7 @@ import { AllergyAlertBanner } from '@/components/public/AllergyAlertBanner';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import AccordionSection from '@/components/public/AccordionSection';
-import { hasSkinProfileCookie } from '@/lib/skin-profile-server';
+import PersonalScoreInline from '@/components/public/PersonalScoreInline';
 
 // === Types ===
 
@@ -643,31 +643,19 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Personal Score CTA — cookie-aware (profil varsa farklı mesaj) */}
-            {hasSkinProfileCookie() ? (
-              <Link
-                href="/profilim"
-                className="block bg-primary/5 border border-primary/20 rounded-md p-4 hover:bg-primary/10 transition-colors"
-              >
-                <p className="label-caps text-primary">Senin Cildine Uyumu</p>
-                <p className="text-sm text-on-surface mt-1">
-                  Profilin kayıtlı &mdash; kişisel skorunu görmek için devam et &rarr;
-                </p>
-              </Link>
-            ) : (
-              <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
-                <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
-                <p className="text-lg font-bold text-primary mt-1">
-                  Kişisel skorunu gör
-                </p>
-                <p className="text-xs text-outline mt-2">
-                  <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
-                    Cilt profili oluştur
-                  </Link>{' '}
-                  &rarr; sana özel uyumluluk skoru
-                </p>
-              </div>
-            )}
+            {/* Personal Score — inline (Sprint 6 hotfix): localStorage'daki profili
+                client-side okuyup ürünün need_scores'undan kişisel skor hesaplar.
+                Profil yoksa CTA gösterir. */}
+            <PersonalScoreInline
+              needScores={(product.need_scores || []).map((ns) => ({
+                need_id: ns.need_id,
+                need: ns.need,
+                compatibility_score: Number(ns.compatibility_score),
+              }))}
+              hasAllergens={(product.ingredients || []).some((i) => i.ingredient?.allergen_flag)}
+              hasFragrance={(product.ingredients || []).some((i) => i.ingredient?.fragrance_flag)}
+              variant="cosmetic"
+            />
           </div>
         </div>
 

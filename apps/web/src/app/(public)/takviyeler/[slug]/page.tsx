@@ -759,21 +759,13 @@ export default async function SupplementDetailPage({
                     <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                       <span className={`material-icon ${cfg.color} text-[14px] shrink-0`} aria-hidden="true">{cfg.icon}</span>
                       <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
-                        <Link
-                          href={`/icerikler/${int.ingredient_a.ingredient_slug || int.ingredient_a.ingredient_id}`}
-                          className="font-semibold text-on-surface hover:text-primary transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <span className="font-semibold text-on-surface">
                           {int.ingredient_a.common_name || int.ingredient_a.inci_name}
-                        </Link>
+                        </span>
                         <span className={`material-icon text-[12px] ${cfg.color}`} aria-hidden="true">sync_alt</span>
-                        <Link
-                          href={`/icerikler/${int.ingredient_b.ingredient_slug || int.ingredient_b.ingredient_id}`}
-                          className="font-semibold text-on-surface hover:text-primary transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <span className="font-semibold text-on-surface">
                           {int.ingredient_b.common_name || int.ingredient_b.inci_name}
-                        </Link>
+                        </span>
                         <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${cfg.color} ${cfg.bg}`}>{cfg.label}</span>
                       </div>
                       <span
