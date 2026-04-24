@@ -440,9 +440,11 @@ export default async function SupplementDetailPage({
           <PriceChart productId={product.product_id} />
         </section>
 
+        {/* Skor + Uyumluluk — lg'de yan yana, mobile'da stacked */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(420px,480px)_1fr] gap-3 mb-4 items-start">
         {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
         {score && (
-          <section className="mb-4 curator-card p-3 md:p-4">
+          <section className="curator-card p-3 md:p-4">
             <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
               <ScoreBadge score={score.overall_score} grade={score.grade} size="md" />
               <div className="flex-1 w-full">
@@ -520,16 +522,18 @@ export default async function SupplementDetailPage({
           </section>
         )}
 
-        {/* Need Scores — hangi ihtiyaçlara yönelik (kozmetikteki gibi) */}
+        {/* Need Scores — hangi ihtiyaçlara yönelik (score ile yan yana lg+) */}
         {product.need_scores && product.need_scores.length > 0 && (
-          <section className="mb-4">
-            <h2 className="text-lg font-bold tracking-tight mb-1 text-on-surface">Uyumluluk Skorları</h2>
-            <p className="text-[11px] text-on-surface-variant mb-2 leading-relaxed">
-              <span className="font-medium text-score-high">%70+</span> yüksek,
-              <span className="font-medium text-score-medium"> %40-69</span> orta,
-              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5">
+          <section>
+            <div className="flex items-baseline justify-between mb-1 gap-2 flex-wrap">
+              <h2 className="text-lg font-bold tracking-tight text-on-surface">Uyumluluk Skorları</h2>
+              <p className="text-[10px] text-on-surface-variant leading-relaxed">
+                <span className="font-medium text-score-high">%70+</span> yüksek
+                <span className="font-medium text-score-medium"> · %40-69</span> orta
+                <span className="font-medium text-score-low"> · %40 altı</span> düşük
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {product.need_scores
                 .slice()
                 .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
@@ -563,6 +567,8 @@ export default async function SupplementDetailPage({
             </div>
           </section>
         )}
+        </div>
+        {/* /Skor + Uyumluluk grid */}
 
         {/* Supplement Info */}
         {detail && (
