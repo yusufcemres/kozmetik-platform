@@ -8,6 +8,8 @@ import ScoreBadge from '@/components/public/ScoreBadge';
 import PriceChart from '@/components/public/PriceChart';
 import ReviewsBlock from '@/components/public/ReviewsBlock';
 import AccordionSection from '@/components/public/AccordionSection';
+import PersonalScoreInline from '@/components/public/PersonalScoreInline';
+import { getServerSkinProfile } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -312,10 +314,11 @@ export default async function SupplementDetailPage({
     redirect(`/urunler/${product.product_slug}`);
   }
 
-  const [detail, score, reviewsAgg] = await Promise.all([
+  const [detail, score, reviewsAgg, serverSkinProfile] = await Promise.all([
     getSupplementDetail(product.product_id),
     getSupplementScore(product.product_id),
     getReviewsAggregate(product.product_id),
+    getServerSkinProfile(),
   ]);
   const nutritionFacts = (detail?.nutrition_facts || []).sort(
     (a, b) => a.sort_order - b.sort_order,
@@ -577,7 +580,33 @@ export default async function SupplementDetailPage({
         </div>
         {/* /SOL stack */}
 
-        {/* SAĞ: Uyumluluk Skorları — accordion, defaultOpen, sol stack yüksekliğine yakın */}
+        {/* SAĞ stack: Personal Score (üstte) + Uyumluluk Skorları (accordion altta) */}
+        <div className="space-y-3">
+          {/* Personal Score — SSR-friendly */}
+          {product.need_scores && product.need_scores.length > 0 && (
+            <PersonalScoreInline
+              needScores={product.need_scores.map((ns) => ({
+                need_id: ns.need_id,
+                need: ns.need,
+                compatibility_score: Number(ns.compatibility_score),
+              }))}
+              hasAllergens={false}
+              hasFragrance={false}
+              variant="supplement"
+              initialProfile={
+                serverSkinProfile
+                  ? {
+                      skin_type: serverSkinProfile.skin_type ?? undefined,
+                      concerns: serverSkinProfile.concerns ?? [],
+                      sensitivities: serverSkinProfile.sensitivities ?? {},
+                      gender: serverSkinProfile.gender ?? undefined,
+                    }
+                  : null
+              }
+            />
+          )}
+
+        {/* Uyumluluk Skorları — accordion, defaultOpen, sol stack yüksekliğine yakın */}
         {product.need_scores && product.need_scores.length > 0 && (
           <section className="curator-card p-3 md:p-4">
             <details open className="group">
@@ -628,6 +657,8 @@ export default async function SupplementDetailPage({
             </details>
           </section>
         )}
+        </div>
+        {/* /SAĞ stack */}
         </div>
         {/* /Skor+Info | Uyumluluk grid */}
 
