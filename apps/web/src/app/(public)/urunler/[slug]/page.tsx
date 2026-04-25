@@ -18,6 +18,7 @@ import ScoreBadge from '@/components/public/ScoreBadge';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import AccordionSection from '@/components/public/AccordionSection';
 import PersonalScoreInline from '@/components/public/PersonalScoreInline';
+import { getServerSkinProfile } from '@/lib/skin-profile-server';
 
 // === Types ===
 
@@ -430,7 +431,7 @@ export default async function ProductDetailPage({
     .map((pi) => pi.ingredient_id!)
     .slice(0, 5);
 
-  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs, reviewsAgg] = await Promise.all([
+  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs, reviewsAgg, serverSkinProfile] = await Promise.all([
     getSimilarProducts(product.product_id),
     getIngredientInteractions(keyIngredientIds),
     apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 300 } } as any).catch(() => null),
@@ -445,6 +446,7 @@ export default async function ProductDetailPage({
       }),
     ),
     getReviewsAggregate(product.product_id),
+    getServerSkinProfile(),
   ]);
 
   // Deduplicate supplement products
@@ -654,9 +656,9 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Personal Score — inline (Sprint 6 hotfix): localStorage'daki profili
-                client-side okuyup ürünün need_scores'undan kişisel skor hesaplar.
-                Profil yoksa CTA gösterir. */}
+            {/* Personal Score — SSR-friendly: server cookie'den profili çeker, ilk
+                render'da skeleton flash yok; client useEffect localStorage ile
+                taze veriyle override eder (cross-device sync için). */}
             <PersonalScoreInline
               needScores={(product.need_scores || []).map((ns) => ({
                 need_id: ns.need_id,
@@ -666,6 +668,16 @@ export default async function ProductDetailPage({
               hasAllergens={(product.ingredients || []).some((i) => i.ingredient?.allergen_flag)}
               hasFragrance={(product.ingredients || []).some((i) => i.ingredient?.fragrance_flag)}
               variant="cosmetic"
+              initialProfile={
+                serverSkinProfile
+                  ? {
+                      skin_type: serverSkinProfile.skin_type ?? undefined,
+                      concerns: serverSkinProfile.concerns ?? [],
+                      sensitivities: serverSkinProfile.sensitivities ?? {},
+                      gender: serverSkinProfile.gender ?? undefined,
+                    }
+                  : null
+              }
             />
           </div>
         </div>

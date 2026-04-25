@@ -21,6 +21,12 @@ interface PersonalScoreInlineProps {
   hasAllergens?: boolean; // product.ingredients içinde allergen_flag var mı
   hasFragrance?: boolean;
   variant?: 'cosmetic' | 'supplement';
+  /**
+   * Server-side fetched profile (cookie → /skin-profiles API). Mevcut ise
+   * ilk render'da skeleton flash olmaz; client'ta localStorage kontrol edilir
+   * ve fresh ise override edilir.
+   */
+  initialProfile?: SkinProfile | null;
 }
 
 export default function PersonalScoreInline({
@@ -28,21 +34,27 @@ export default function PersonalScoreInline({
   hasAllergens = false,
   hasFragrance = false,
   variant = 'cosmetic',
+  initialProfile,
 }: PersonalScoreInlineProps) {
-  const [profile, setProfile] = useState<SkinProfile | null | undefined>(undefined);
+  // initialProfile geldiyse skeleton flash yok — direkt server-side profil
+  const [profile, setProfile] = useState<SkinProfile | null | undefined>(
+    initialProfile === undefined ? undefined : initialProfile,
+  );
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem('skin_profile');
       if (raw) {
         setProfile(JSON.parse(raw));
-      } else {
+      } else if (initialProfile === undefined) {
+        // localStorage yok + server-side de gelmedi → null (CTA)
         setProfile(null);
       }
+      // initialProfile geldiyse + localStorage yoksa → server'dan gelen kalır
     } catch {
-      setProfile(null);
+      if (initialProfile === undefined) setProfile(null);
     }
-  }, []);
+  }, [initialProfile]);
 
   // İlk render hydration sırasında — undefined → boş alan göster (flash önle)
   if (profile === undefined) {
