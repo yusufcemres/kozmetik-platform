@@ -192,6 +192,50 @@ const POPULAR_INGREDIENTS_COSMETIC = [
 ];
 
 /** Alt-alta checkbox satırı — multi-select dimension'lar için ortak render. */
+/**
+ * File-scope component — DEPENDS ON THIS olmasi cunku kullanici filtreleme arama
+ * input'una her tus vurusunda parent re-render oluyor. Eger Section parent
+ * fonksiyon icinde tanimli olursa her render'da yeni reference uretir, React
+ * native <details>'i unmount/remount eder ve open state kaybolur.
+ *
+ * Patron: 'aramada harfe basinca kapaniyor tekrar tiklayarak aciyorum' (2026-04-24)
+ * Cozum: dosya kapsaminda tanimli kal, prop ile state al.
+ */
+function Section({
+  title,
+  children,
+  defaultOpen = false,
+  count,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  count?: number;
+}) {
+  return (
+    <details open={defaultOpen} className="group border-b border-outline-variant/15 last:border-b-0">
+      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between py-2.5">
+        <span className="label-caps text-on-surface flex items-center gap-1.5">
+          {title}
+          {count !== undefined && count > 0 && (
+            <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full tabular-nums">
+              {count}
+            </span>
+          )}
+        </span>
+        <span
+          className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
+          style={{ fontSize: '14px' }}
+          aria-hidden="true"
+        >
+          expand_more
+        </span>
+      </summary>
+      <div className="pb-3">{children}</div>
+    </details>
+  );
+}
+
 function CheckboxRow({ label, active, onToggle, count }: { label: string; active: boolean; onToggle: () => void; count?: number }) {
   return (
     <button
@@ -307,29 +351,6 @@ export default function ProductFilterSidebar({
 
   const toggleArrayItem = <T extends string | number>(arr: T[], item: T): T[] =>
     arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
-
-  const Section = ({ title, children, defaultOpen = false, count }: { title: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) => (
-    <details open={defaultOpen} className="group border-b border-outline-variant/15 last:border-b-0">
-      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between py-2.5">
-        <span className="label-caps text-on-surface flex items-center gap-1.5">
-          {title}
-          {count !== undefined && count > 0 && (
-            <span className="bg-primary text-on-primary text-[9px] px-1.5 py-0.5 rounded-full tabular-nums">
-              {count}
-            </span>
-          )}
-        </span>
-        <span
-          className="material-icon text-outline-variant group-open:rotate-180 transition-transform"
-          style={{ fontSize: '14px' }}
-          aria-hidden="true"
-        >
-          expand_more
-        </span>
-      </summary>
-      <div className="pb-3">{children}</div>
-    </details>
-  );
 
   // Etken madde render — popüler + arama sonuçları birleşik, alt alta list
   const ingredientListItems = (() => {
