@@ -213,17 +213,6 @@ export default function Header() {
 
         {/* Right icons */}
         <div className="flex items-center gap-5">
-          {/* Theme toggle */}
-          <button
-            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-            className="text-on-surface-variant hover:text-on-surface transition-colors duration-300"
-            title={resolvedTheme === 'dark' ? 'Aydınlık mod' : 'Karanlık mod'}
-          >
-            <span className="material-icon material-icon-sm" aria-hidden="true">
-              {resolvedTheme === 'dark' ? 'light_mode' : 'dark_mode'}
-            </span>
-          </button>
-
           {/* Search */}
           <Link
             href="/ara"
@@ -233,7 +222,7 @@ export default function Header() {
             <span className="material-icon material-icon-sm" aria-hidden="true">search</span>
           </Link>
 
-          {/* Theme toggle */}
+          {/* Theme toggle (tek instance — eski inline button ThemeToggle'a ile birleştirildi) */}
           <ThemeToggle />
 
           {/* Profile */}
