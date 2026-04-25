@@ -450,6 +450,138 @@ export class ProductsService {
   }
 
   /**
+   * Filter facet count'ları — her dimension için aktif (published/active) ürün
+   * sayısı. Frontend filter sidebar'da "(120)" gibi rakamlar göstermek için
+   * tek seferlik (cache'lenebilir) okuma. Domain bazlı; current filter
+   * context'i şimdilik yok — sadece base counts.
+   *
+   * Hafif sorgu: sadece COUNT, JOIN minimal. 5dk Redis cache (controller).
+   */
+  async getFilterFacets(domainType: string) {
+    const baseWhere = `p.domain_type = $1 AND p.status IN ('published','active')`;
+
+    type Row<T> = T & { count: string };
+
+    // Brand facet
+    const brands = await this.repo.query(
+      `SELECT b.brand_id, b.brand_name, b.brand_slug, COUNT(*)::text AS count
+       FROM products p
+       JOIN brands b ON b.brand_id = p.brand_id
+       WHERE ${baseWhere}
+       GROUP BY b.brand_id, b.brand_name, b.brand_slug
+       ORDER BY count DESC, b.brand_name
+       LIMIT 50`,
+      [domainType],
+    );
+
+    // Form facet (sadece supplement)
+    const forms = domainType === 'supplement'
+      ? await this.repo.query(
+          `SELECT LOWER(sd.form) AS form, COUNT(*)::text AS count
+           FROM products p
+           JOIN supplement_details sd ON sd.product_id = p.product_id
+           WHERE ${baseWhere} AND sd.form IS NOT NULL
+           GROUP BY LOWER(sd.form)
+           ORDER BY count DESC`,
+          [domainType],
+        )
+      : [];
+
+    // Manufacturer country
+    const countries = domainType === 'supplement'
+      ? await this.repo.query(
+          `SELECT sd.manufacturer_country AS country, COUNT(*)::text AS count
+           FROM products p
+           JOIN supplement_details sd ON sd.product_id = p.product_id
+           WHERE ${baseWhere} AND sd.manufacturer_country IS NOT NULL
+           GROUP BY sd.manufacturer_country
+           ORDER BY count DESC`,
+          [domainType],
+        )
+      : [];
+
+    // Evidence grade dağılımı
+    const grades = await this.repo.query(
+      `SELECT ps.grade, COUNT(*)::text AS count
+       FROM products p
+       JOIN product_scores ps ON ps.product_id = p.product_id
+         AND ps.algorithm_version IN ('supplement-v2','cosmetic-v1')
+       WHERE ${baseWhere} AND ps.grade IS NOT NULL
+       GROUP BY ps.grade
+       ORDER BY ps.grade`,
+      [domainType],
+    );
+
+    // Top 20 needs
+    const needs = await this.repo.query(
+      `SELECT n.need_id, n.need_name, n.need_slug, COUNT(DISTINCT p.product_id)::text AS count
+       FROM products p
+       JOIN product_need_scores ns ON ns.product_id = p.product_id AND ns.compatibility_score >= 40
+       JOIN needs n ON n.need_id = ns.need_id
+       WHERE ${baseWhere}
+       GROUP BY n.need_id, n.need_name, n.need_slug
+       ORDER BY count DESC
+       LIMIT 20`,
+      [domainType],
+    );
+
+    // Top 30 ingredients (etken madde popüler)
+    const ingredients = await this.repo.query(
+      `SELECT ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug,
+              COUNT(DISTINCT p.product_id)::text AS count
+       FROM products p
+       JOIN product_ingredients pi ON pi.product_id = p.product_id
+       JOIN ingredients ing ON ing.ingredient_id = pi.ingredient_id
+       WHERE ${baseWhere}
+       GROUP BY ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug
+       ORDER BY count DESC
+       LIMIT 30`,
+      [domainType],
+    );
+
+    // Total
+    const totalRow = await this.repo.query(
+      `SELECT COUNT(*)::text AS count FROM products p WHERE ${baseWhere}`,
+      [domainType],
+    );
+
+    return {
+      domain_type: domainType,
+      total: parseInt(totalRow[0]?.count || '0', 10),
+      brands: brands.map((r: Row<{ brand_id: number; brand_name: string; brand_slug: string }>) => ({
+        brand_id: Number(r.brand_id),
+        brand_name: r.brand_name,
+        brand_slug: r.brand_slug,
+        count: parseInt(r.count, 10),
+      })),
+      forms: forms.map((r: Row<{ form: string }>) => ({ form: r.form, count: parseInt(r.count, 10) })),
+      manufacturer_country: countries.map((r: Row<{ country: string }>) => ({
+        country: r.country,
+        count: parseInt(r.count, 10),
+      })),
+      evidence_grade: grades.map((r: Row<{ grade: string }>) => ({
+        grade: r.grade,
+        count: parseInt(r.count, 10),
+      })),
+      needs: needs.map((r: Row<{ need_id: number; need_name: string; need_slug: string }>) => ({
+        need_id: Number(r.need_id),
+        need_name: r.need_name,
+        need_slug: r.need_slug,
+        count: parseInt(r.count, 10),
+      })),
+      ingredients: ingredients.map(
+        (r: Row<{ ingredient_id: number; inci_name: string; common_name: string | null; ingredient_slug: string }>) => ({
+          ingredient_id: Number(r.ingredient_id),
+          inci_name: r.inci_name,
+          common_name: r.common_name,
+          ingredient_slug: r.ingredient_slug,
+          count: parseInt(r.count, 10),
+        }),
+      ),
+    };
+  }
+
+  /**
    * Attach precomputed scores to a product list (eliminates N+1 score fetches).
    */
   async attachScores(products: Product[]): Promise<(Product & { score?: { overall_score: number; grade: string; algorithm_version: string } })[]> {
