@@ -47,6 +47,10 @@ export interface FilterState {
   skin_type: string[];
   product_types: string[];
   target_areas: string[];
+  // Round 2 ek dimension'lar
+  evidence_grade: string[]; // A,B,C,D,F
+  safety_flags: string[];   // cmr_free, endocrine_free, eu_banned_free, fragrance_free
+  allergen_count_max: number | null; // 0 = alerjensiz, null = filtre yok
 }
 
 export const EMPTY_FILTER_STATE: FilterState = {
@@ -67,6 +71,9 @@ export const EMPTY_FILTER_STATE: FilterState = {
   skin_type: [],
   product_types: [],
   target_areas: [],
+  evidence_grade: [],
+  safety_flags: [],
+  allergen_count_max: null,
 };
 
 interface ProductFilterSidebarProps {
@@ -427,6 +434,76 @@ export default function ProductFilterSidebar({
           })}
         </div>
       </Section>
+
+      <Section title="Harf Notu" count={state.evidence_grade.length}>
+        <div className="flex flex-wrap gap-1">
+          {[
+            { value: 'A', color: 'text-score-high' },
+            { value: 'B', color: 'text-score-high' },
+            { value: 'C', color: 'text-score-medium' },
+            { value: 'D', color: 'text-score-low' },
+            { value: 'F', color: 'text-score-low' },
+          ].map((g) => {
+            const active = state.evidence_grade.includes(g.value);
+            return (
+              <button
+                key={g.value}
+                onClick={() => onChange({ evidence_grade: toggleArrayItem(state.evidence_grade, g.value) })}
+                className={`text-xs font-bold w-7 h-7 rounded-sm border transition-colors ${
+                  active
+                    ? 'bg-primary text-on-primary border-primary'
+                    : `border-outline-variant/30 ${g.color} hover:border-primary/50`
+                }`}
+              >
+                {g.value}
+              </button>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section title="Güvenlik" count={state.safety_flags.length}>
+        <div className="space-y-0.5">
+          {[
+            { value: 'cmr_free', label: 'CMR-free (kanserojen/mutajen yok)' },
+            { value: 'endocrine_free', label: 'Endokrin bozucu yok' },
+            { value: 'eu_banned_free', label: 'AB yasaklı içerik yok' },
+            { value: 'fragrance_free', label: 'Parfümsüz' },
+          ].map((f) => (
+            <CheckboxRow
+              key={f.value}
+              label={f.label}
+              active={state.safety_flags.includes(f.value)}
+              onToggle={() => onChange({ safety_flags: toggleArrayItem(state.safety_flags, f.value) })}
+            />
+          ))}
+        </div>
+      </Section>
+
+      {domain === 'cosmetic' && (
+        <Section title="Alerjen Yükü" count={state.allergen_count_max != null ? 1 : 0}>
+          <div className="flex flex-wrap gap-1">
+            {[
+              { value: 0, label: '0 (alerjensiz)' },
+              { value: 2, label: '≤ 2' },
+              { value: 5, label: '≤ 5' },
+            ].map((b) => {
+              const active = state.allergen_count_max === b.value;
+              return (
+                <button
+                  key={b.value}
+                  onClick={() => onChange({ allergen_count_max: active ? null : b.value })}
+                  className={`text-[10px] px-2 py-1 rounded-sm border transition-colors ${
+                    active ? 'bg-primary text-on-primary border-primary' : 'border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
+                  }`}
+                >
+                  {b.label}
+                </button>
+              );
+            })}
+          </div>
+        </Section>
+      )}
 
       <Section title="Etken Madde" count={state.ingredient_slugs.length}>
         <div className="relative mb-1.5">

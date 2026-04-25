@@ -56,6 +56,10 @@ export class ProductsController {
       skin_type: splitCsv(query.skin_type),
       product_types: splitCsv(query.product_types),
       target_areas: splitCsv(query.target_areas),
+      // Round 2: ek filter dimension'ları
+      evidence_grade: splitCsv(query.evidence_grade),
+      safety_flags: splitCsv(query.safety_flags),
+      allergen_count_max: parseNum(query.allergen_count_max),
     });
     if (includeScore === 'true' && result.data?.length) {
       result.data = await this.service.attachScores(result.data);

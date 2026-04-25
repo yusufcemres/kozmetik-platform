@@ -99,6 +99,10 @@ function ProductsListContent() {
       skorMax: num('skor_max'),
       fiyatMin: num('fiyat_min'),
       fiyatMax: num('fiyat_max'),
+      // Round 2
+      evidence_grade: csv('grade'),
+      safety_flags: csv('guvenlik'),
+      allergen_count_max: num('alerjen_max'),
     };
   });
 
@@ -119,6 +123,9 @@ function ProductsListContent() {
     if (filters.skorMax != null) qs.set('skor_max', String(filters.skorMax));
     if (filters.fiyatMin != null) qs.set('fiyat_min', String(filters.fiyatMin));
     if (filters.fiyatMax != null) qs.set('fiyat_max', String(filters.fiyatMax));
+    if (filters.evidence_grade.length) qs.set('grade', filters.evidence_grade.join(','));
+    if (filters.safety_flags.length) qs.set('guvenlik', filters.safety_flags.join(','));
+    if (filters.allergen_count_max != null) qs.set('alerjen_max', String(filters.allergen_count_max));
     const url = qs.toString() ? `?${qs.toString()}` : window.location.pathname;
     window.history.replaceState(null, '', url);
   }, [filters]);
@@ -145,6 +152,9 @@ function ProductsListContent() {
       if (filters.skorMax != null) params.set('score_max', String(filters.skorMax));
       if (filters.fiyatMin != null) params.set('price_min', String(filters.fiyatMin));
       if (filters.fiyatMax != null) params.set('price_max', String(filters.fiyatMax));
+      if (filters.evidence_grade.length) params.set('evidence_grade', filters.evidence_grade.join(','));
+      if (filters.safety_flags.length) params.set('safety_flags', filters.safety_flags.join(','));
+      if (filters.allergen_count_max != null) params.set('allergen_count_max', String(filters.allergen_count_max));
 
       const data = await api.get<{ data: Product[]; meta: PageMeta }>(
         `/products?${params.toString()}`,
