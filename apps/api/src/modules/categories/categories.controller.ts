@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Body, Controller, Delete, Get, Header, Param, ParseIntPipe,
   Post, Put, Query, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -26,12 +26,14 @@ export class CategoriesController {
   }
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800')
   @ApiOperation({ summary: 'Kategorileri listele' })
   findAll(@Query() query: PaginationDto) {
     return this.service.findAll(query);
   }
 
   @Get('tree')
+  @Header('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800')
   @ApiOperation({ summary: 'Kategori ağacı' })
   getTree() {
     return this.service.getTree();

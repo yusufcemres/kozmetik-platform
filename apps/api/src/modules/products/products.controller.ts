@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Body, Controller, Delete, Get, Header, Param, ParseIntPipe,
   Post, Put, Query, Req, UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -68,7 +68,8 @@ export class ProductsController {
   }
 
   @Get('filter-facets')
-  @ApiOperation({ summary: 'Filter sidebar için dimension count\'ları (cache 5dk)' })
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=3600')
+  @ApiOperation({ summary: 'Filter sidebar için dimension count\'ları (cache 15dk edge)' })
   @ApiQuery({ name: 'domain_type', required: true, description: 'cosmetic | supplement' })
   filterFacets(@Query('domain_type') domainType: string) {
     if (!['cosmetic', 'supplement'].includes(domainType)) {
@@ -78,6 +79,7 @@ export class ProductsController {
   }
 
   @Get('top-scored')
+  @Header('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=3600')
   @ApiOperation({ summary: 'En yüksek skorlu ürünler' })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'brand_id', required: false })
@@ -113,6 +115,7 @@ export class ProductsController {
   }
 
   @Get('popular-brands')
+  @Header('Cache-Control', 'public, max-age=600, s-maxage=1800, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Popüler markalar (ürün sayısına göre)' })
   @ApiQuery({ name: 'limit', required: false })
   findPopularBrands(@Query('limit') limit?: string) {
