@@ -92,8 +92,9 @@ export default function TermsPage() {
         </Section>
 
         <Section title="9. İletişim">
+          {/* TODO: revela.com.tr domain alındığında info@revela.com.tr'a güncelle */}
           <p>
-            Kullanım koşullarıyla ilgili sorularınız için <strong>info@revela.com.tr</strong> adresine
+            Kullanım koşullarıyla ilgili sorularınız için <strong>info@sololabstr.com</strong> adresine
             e-posta gönderebilirsiniz.
           </p>
         </Section>

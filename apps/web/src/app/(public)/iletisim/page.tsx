@@ -19,26 +19,28 @@ export default function ContactPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
         {[
+          // TODO: revela.com.tr domain alındığında info@revela.com.tr'a güncelle
+          // Şu an info@sololabstr.com (SoloLabs Google Workspace, aktif/reachable)
           {
             icon: 'mail',
             title: 'E-posta',
             desc: 'Genel sorular ve geri bildirim',
-            value: 'info@revela.com.tr',
-            href: 'mailto:info@revela.com.tr',
+            value: 'info@sololabstr.com',
+            href: 'mailto:info@sololabstr.com',
           },
           {
             icon: 'handshake',
             title: 'İş Birliği',
             desc: 'Marka ve iş ortaklığı teklifleri',
-            value: 'isbirligi@revela.com.tr',
-            href: 'mailto:isbirligi@revela.com.tr',
+            value: 'info@sololabstr.com',
+            href: 'mailto:info@sololabstr.com?subject=İş%20Birliği',
           },
           {
             icon: 'bug_report',
             title: 'Hata Bildirimi',
             desc: 'Teknik sorunlar ve veri düzeltmeleri',
-            value: 'destek@revela.com.tr',
-            href: 'mailto:destek@revela.com.tr',
+            value: 'info@sololabstr.com',
+            href: 'mailto:info@sololabstr.com?subject=Hata%20Bildirimi',
           },
         ].map((item) => (
           <a

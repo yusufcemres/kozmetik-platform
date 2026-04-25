@@ -87,8 +87,9 @@ export default function PrivacyPage() {
         </Section>
 
         <Section title="8. İletişim">
+          {/* TODO: revela.com.tr domain alındığında info@revela.com.tr'a güncelle */}
           <p>
-            KVKK kapsamındaki talepleriniz için <strong>info@revela.com.tr</strong> adresine
+            KVKK kapsamındaki talepleriniz için <strong>info@sololabstr.com</strong> adresine
             e-posta gönderebilirsiniz. Başvurularınız en geç 30 gün içinde yanıtlanacaktır.
           </p>
         </Section>
