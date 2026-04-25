@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Body, Controller, Delete, Get, Header, Param, ParseIntPipe,
   Post, Put, Query, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -26,18 +26,21 @@ export class NeedsController {
   }
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'İhtiyaçları listele' })
   findAll(@Query() query: NeedFilterDto) {
     return this.service.findAll(query);
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'İhtiyaç detay (ID)' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 
   @Get('slug/:slug')
+  @Header('Cache-Control', 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'İhtiyaç detay (slug)' })
   findBySlug(@Param('slug') slug: string) {
     return this.service.findBySlug(slug);

@@ -120,10 +120,11 @@ export class ProductsService {
     );
 
     if (hasRichFilter) {
+      // Listing'de ProductLabel join'i kaldırıldı (egress optimize) — text-heavy
+      // (claim_texts_json, warning_text vb.) sadece detay sayfasında gerekli
       const qb = this.repo.createQueryBuilder('p')
         .leftJoinAndSelect('p.brand', 'b')
         .leftJoinAndSelect('p.category', 'cat')
-        .leftJoinAndSelect('p.label', 'lbl')
         .leftJoinAndSelect('p.images', 'img')
         .where('1 = 1');
 
@@ -357,7 +358,6 @@ export class ProductsService {
         .innerJoin('pi.ingredient', 'ing', 'ing.ingredient_slug = :slug', { slug: ingredient_slug })
         .leftJoinAndSelect('p.brand', 'b')
         .leftJoinAndSelect('p.category', 'cat')
-        .leftJoinAndSelect('p.label', 'lbl')
         .leftJoinAndSelect('p.images', 'img');
 
       if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
@@ -379,7 +379,6 @@ export class ProductsService {
         .innerJoin('p.need_scores', 'ns', 'ns.need_id = :nid', { nid: Number(need_id) })
         .leftJoinAndSelect('p.brand', 'b')
         .leftJoinAndSelect('p.category', 'cat')
-        .leftJoinAndSelect('p.label', 'lbl')
         .leftJoinAndSelect('p.images', 'img');
 
       if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
@@ -402,14 +401,12 @@ export class ProductsService {
       const qb = this.repo.createQueryBuilder('p')
         .leftJoinAndSelect('p.brand', 'b')
         .leftJoinAndSelect('p.category', 'cat')
-        .leftJoinAndSelect('p.label', 'lbl')
         .leftJoinAndSelect('p.images', 'img')
         .leftJoin('p.need_scores', 'ns')
         .addSelect('COALESCE(AVG(ns.compatibility_score), 0)', 'avg_score')
         .groupBy('p.product_id')
         .addGroupBy('b.brand_id')
         .addGroupBy('cat.category_id')
-        .addGroupBy('lbl.product_label_id')
         .addGroupBy('img.image_id')
         .orderBy('avg_score', 'DESC');
 
