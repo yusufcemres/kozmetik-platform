@@ -288,6 +288,25 @@ export default function ProductFilterSidebar({
   const fetchedBrands = useRef(false);
   const fetchedNeeds = useRef(false);
 
+  // Facet counts (mount'ta tek call, dimension başına count map'i)
+  const [facets, setFacets] = useState<{
+    brands: Map<number, number>;
+    forms: Map<string, number>;
+    countries: Map<string, number>;
+    grades: Map<string, number>;
+    needs: Map<number, number>;
+    ingredients: Map<string, number>;
+  } | null>(null);
+  const fetchedFacets = useRef(false);
+
+  // 'Bana göre' — kullanıcı profili varsa concerns/sensitivities'i otomatik filter
+  const [userProfile, setUserProfile] = useState<{
+    concerns: number[];
+    skin_type?: string;
+    sensitivities: Record<string, boolean>;
+  } | null>(null);
+  const fetchedProfile = useRef(false);
+
   useEffect(() => {
     if (fetchedBrands.current) return;
     fetchedBrands.current = true;
@@ -305,6 +324,77 @@ export default function ProductFilterSidebar({
       .get<{ data: Need[] }>(`/needs${dt}&limit=50`)
       .then((res) => setNeeds(res.data || []))
       .catch(() => setNeeds([]));
+  }, [domain]);
+
+  // 'Bana göre' — localStorage'dan profili oku (skin_profile_id cookie'sinden de
+  // backend'e fetch edebilirdik ama hızlı UX için localStorage yeterli)
+  useEffect(() => {
+    if (fetchedProfile.current) return;
+    fetchedProfile.current = true;
+    try {
+      const raw = localStorage.getItem('skin_profile');
+      if (raw) {
+        const p = JSON.parse(raw);
+        setUserProfile({
+          concerns: Array.isArray(p.concerns) ? p.concerns : [],
+          skin_type: typeof p.skin_type === 'string' ? p.skin_type : undefined,
+          sensitivities: p.sensitivities && typeof p.sensitivities === 'object' ? p.sensitivities : {},
+        });
+      }
+    } catch {
+      setUserProfile(null);
+    }
+  }, []);
+
+  // 'Bana göre' aktif mi: state.need_ids profile.concerns ile birebir aynı mı
+  const banaGoreActive = !!(
+    userProfile &&
+    userProfile.concerns.length > 0 &&
+    userProfile.concerns.length === state.need_ids.length &&
+    userProfile.concerns.every((id) => state.need_ids.includes(id))
+  );
+
+  function applyBanaGore() {
+    if (!userProfile) return;
+    const sensitivityToFlag: string[] = [];
+    if (userProfile.sensitivities.fragrance) sensitivityToFlag.push('fragrance_free');
+    onChange({
+      need_ids: [...userProfile.concerns],
+      ...(domain === 'cosmetic' && userProfile.skin_type
+        ? { skin_type: [userProfile.skin_type] }
+        : {}),
+      ...(sensitivityToFlag.length ? { safety_flags: sensitivityToFlag } : {}),
+    });
+  }
+
+  function clearBanaGore() {
+    onChange({ need_ids: [], skin_type: [], safety_flags: [] });
+  }
+
+  // Tek seferlik filter facet count fetch — mount'ta her dimension için count'lar
+  useEffect(() => {
+    if (fetchedFacets.current) return;
+    fetchedFacets.current = true;
+    api
+      .get<{
+        brands: Array<{ brand_id: number; count: number }>;
+        forms: Array<{ form: string; count: number }>;
+        manufacturer_country: Array<{ country: string; count: number }>;
+        evidence_grade: Array<{ grade: string; count: number }>;
+        needs: Array<{ need_id: number; count: number }>;
+        ingredients: Array<{ ingredient_slug: string; count: number }>;
+      }>(`/products/filter-facets?domain_type=${domain}`)
+      .then((res) => {
+        setFacets({
+          brands: new Map(res.brands.map((b) => [b.brand_id, b.count])),
+          forms: new Map(res.forms.map((f) => [f.form, f.count])),
+          countries: new Map(res.manufacturer_country.map((c) => [c.country, c.count])),
+          grades: new Map(res.evidence_grade.map((g) => [g.grade, g.count])),
+          needs: new Map(res.needs.map((n) => [n.need_id, n.count])),
+          ingredients: new Map(res.ingredients.map((i) => [i.ingredient_slug, i.count])),
+        });
+      })
+      .catch(() => setFacets(null));
   }, [domain]);
 
   useEffect(() => {
@@ -379,6 +469,33 @@ export default function ProductFilterSidebar({
 
   const content = (
     <div className="space-y-1">
+      {/* 'Bana göre' toggle — profil varsa */}
+      {userProfile && userProfile.concerns.length > 0 && (
+        <button
+          onClick={banaGoreActive ? clearBanaGore : applyBanaGore}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-sm border text-xs transition-colors mb-1 ${
+            banaGoreActive
+              ? 'bg-primary/5 border-primary text-primary'
+              : 'bg-surface border-outline-variant/30 text-on-surface hover:border-primary/50'
+          }`}
+          title={
+            banaGoreActive
+              ? 'Bana göre filtre aktif — kapatmak için tıkla'
+              : `${userProfile.concerns.length} ihtiyacın için otomatik filtrele`
+          }
+        >
+          <span className="flex items-center gap-1.5 font-medium">
+            <span className="material-icon text-[14px]" aria-hidden="true">
+              {banaGoreActive ? 'check_circle' : 'person'}
+            </span>
+            Bana Göre
+          </span>
+          <span className="text-[9px] text-outline">
+            {userProfile.concerns.length} ihtiyaç
+          </span>
+        </button>
+      )}
+
       {activeCount > 0 && (
         <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
           <span className="text-xs text-on-surface-variant">
@@ -445,17 +562,22 @@ export default function ProductFilterSidebar({
             { value: 'F', color: 'text-score-low' },
           ].map((g) => {
             const active = state.evidence_grade.includes(g.value);
+            const cnt = facets?.grades.get(g.value);
             return (
               <button
                 key={g.value}
                 onClick={() => onChange({ evidence_grade: toggleArrayItem(state.evidence_grade, g.value) })}
-                className={`text-xs font-bold w-7 h-7 rounded-sm border transition-colors ${
+                className={`text-[10px] font-bold px-1.5 h-7 rounded-sm border transition-colors flex items-center gap-1 ${
                   active
                     ? 'bg-primary text-on-primary border-primary'
                     : `border-outline-variant/30 ${g.color} hover:border-primary/50`
                 }`}
+                title={cnt != null ? `${cnt} ürün` : undefined}
               >
-                {g.value}
+                <span className="text-xs">{g.value}</span>
+                {cnt != null && cnt > 0 && (
+                  <span className="text-[8px] opacity-70 tabular-nums">({cnt})</span>
+                )}
               </button>
             );
           })}
@@ -533,6 +655,7 @@ export default function ProductFilterSidebar({
               label={ing.label}
               active={state.ingredient_slugs.includes(ing.slug)}
               onToggle={() => onChange({ ingredient_slugs: toggleArrayItem(state.ingredient_slugs, ing.slug) })}
+              count={facets?.ingredients.get(ing.slug)}
             />
           ))}
           {ingredientSearch.length >= 2 && ingredientResults.length === 0 && (
@@ -558,6 +681,7 @@ export default function ProductFilterSidebar({
               label={n.need_name}
               active={state.need_ids.includes(n.need_id)}
               onToggle={() => onChange({ need_ids: toggleArrayItem(state.need_ids, n.need_id) })}
+              count={facets?.needs.get(n.need_id)}
             />
           ))}
         </div>
@@ -587,6 +711,7 @@ export default function ProductFilterSidebar({
                 label={f.label}
                 active={state.form.includes(f.value)}
                 onToggle={() => onChange({ form: toggleArrayItem(state.form, f.value) })}
+                count={facets?.forms.get(f.value)}
               />
             ))}
           </div>
@@ -613,7 +738,7 @@ export default function ProductFilterSidebar({
               label={b.brand_name}
               active={state.brand_id === String(b.brand_id)}
               onToggle={() => onChange({ brand_id: state.brand_id === String(b.brand_id) ? '' : String(b.brand_id) })}
-              count={b.product_count}
+              count={facets?.brands.get(b.brand_id) ?? b.product_count}
             />
           ))}
           {filteredBrands.length > 80 && (
