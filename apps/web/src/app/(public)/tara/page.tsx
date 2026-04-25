@@ -13,11 +13,17 @@ export default function TaraPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanLoopRef = useRef<number | null>(null);
+  const phaseRef = useRef<Phase>('idle');
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [hint, setHint] = useState('Ürünü çerçeveye hizala');
+
+  // Phase ref senkronizasyonu — async closure'larda doğru değer için
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   const stopCamera = useCallback(() => {
     if (scanLoopRef.current !== null) {
@@ -28,40 +34,21 @@ export default function TaraPage() {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   }, []);
 
   useEffect(() => () => stopCamera(), [stopCamera]);
 
-  const startCamera = async () => {
-    setPhase('permission');
-    setError('');
-    setResult(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setPhase('scanning');
-      setHint('Ürünü çerçeveye hizala — otomatik taranır');
-      loopBarcode();
-    } catch (err: any) {
-      setPhase('error');
-      setError(err.message || 'Kamera erişimi reddedildi');
-    }
-  };
-
   const loopBarcode = useCallback(() => {
-    if (!videoRef.current || phase === 'processing' || phase === 'result') return;
+    if (!videoRef.current) return;
     const video = videoRef.current;
     let attempts = 0;
 
     const tick = async () => {
-      if (!streamRef.current) return;
+      // phaseRef ile gerçek-zamanlı phase kontrolü
+      if (!streamRef.current || phaseRef.current === 'processing' || phaseRef.current === 'result') return;
       attempts++;
       try {
         const found = await detectBarcodeFromVideo(video);
@@ -69,16 +56,104 @@ export default function TaraPage() {
           await handleDetected({ barcode: found.rawValue });
           return;
         }
-      } catch {}
+      } catch {
+        // sessizce yoksay (bazı frame'lerde detector hata verebilir)
+      }
 
-      // After ~3s of no barcode, hint about manual capture
       if (attempts === 20) {
         setHint('Barkod yoksa "Çek" butonu ile ürünü fotoğrafla');
       }
       scanLoopRef.current = requestAnimationFrame(tick);
     };
     scanLoopRef.current = requestAnimationFrame(tick);
-  }, [phase]);
+  }, []);
+
+  const startCamera = async () => {
+    setError('');
+    setResult(null);
+    // ÖNEMLİ: phase'i 'scanning' yap → video element render olur → videoRef.current dolar
+    // Eskiden 'permission' state video element'i render etmiyordu → ref NULL → kamera bağlanamıyordu
+    setPhase('scanning');
+    setHint('Kamera açılıyor…');
+
+    // React render'ın commit olmasını bekle (mobile Safari için kritik)
+    await new Promise((r) => requestAnimationFrame(r));
+    await new Promise((r) => requestAnimationFrame(r));
+
+    let stream: MediaStream;
+    try {
+      // HTTPS kontrolü (yerel dev'de http://localhost OK)
+      const isSecure = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (!isSecure) {
+        throw new Error('Kamera erişimi için HTTPS gerekli. https:// üzerinden tekrar dene.');
+      }
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Tarayıcın kamera erişimini desteklemiyor. Chrome veya Safari güncel sürümünü dene.');
+      }
+
+      try {
+        // Önce arka kamera (mobilde ürün taraması için)
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+      } catch (envErr: any) {
+        // Arka kamera yoksa (laptop, tablet ön kameralı) → ön kameraya düş
+        if (envErr.name === 'OverconstrainedError' || envErr.name === 'NotFoundError') {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        } else {
+          throw envErr;
+        }
+      }
+    } catch (err: any) {
+      setPhase('error');
+      // Kullanıcı dostu mesajlar
+      const name = err.name || '';
+      let msg = err.message || 'Kamera erişimi reddedildi.';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        msg = 'Kamera izni reddedildi. Tarayıcı ayarlarından bu siteye kamera izni vermen gerekiyor.';
+      } else if (name === 'NotFoundError') {
+        msg = 'Cihazında kullanılabilir kamera bulunamadı.';
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        msg = 'Kamera başka bir uygulama tarafından kullanılıyor olabilir. Diğer uygulamaları kapat ve tekrar dene.';
+      }
+      setError(msg);
+      return;
+    }
+
+    streamRef.current = stream;
+
+    // Video element'i bağla — bu noktada phase 'scanning' olduğu için DOM'da var
+    if (!videoRef.current) {
+      // Aşırı nadir: render commit edilmemiş. Bir kere daha bekle.
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      try {
+        // iOS Safari: play() user gesture içinde olmalı (bu zaten button click'inden geldi)
+        await videoRef.current.play();
+      } catch (playErr: any) {
+        // iOS bazen autoplay reject eder — track'leri durdurma, kullanıcıya bildir
+        console.warn('video.play() failed:', playErr);
+        // Çoğu zaman zaten oynuyor, sadece promise reject ediyor — devam
+      }
+    } else {
+      // Hala null — beklenmeyen durum
+      stopCamera();
+      setPhase('error');
+      setError('Video element başlatılamadı. Sayfayı yenileyip tekrar dene.');
+      return;
+    }
+
+    setHint('Ürünü çerçeveye hizala — otomatik taranır');
+    loopBarcode();
+  };
 
   const handleDetected = async (body: { barcode?: string; image_base64?: string; image_mime?: string }) => {
     setPhase('processing');
@@ -89,7 +164,6 @@ export default function TaraPage() {
       setResult(res);
       setPhase('result');
 
-      // Auto-redirect on high confidence match
       if (res.status === 'matched' && res.confidence >= 0.8) {
         setTimeout(() => router.push(`/urunler/${res.product!.product_slug}?scan=1`), 1400);
       }
@@ -112,6 +186,9 @@ export default function TaraPage() {
     setError('');
     setPhase('idle');
   };
+
+  // Video container görünür mü? scanning + processing + (transition için) permission de dahil
+  const showVideo = phase === 'scanning' || phase === 'processing';
 
   return (
     <div className="min-h-screen bg-surface">
@@ -163,25 +240,22 @@ export default function TaraPage() {
               </div>
             </div>
 
-            <button onClick={startCamera} className="curator-btn-primary text-sm px-8 py-3">
+            <button
+              onClick={startCamera}
+              className="curator-btn-primary text-sm px-8 py-3"
+              type="button"
+            >
               <span className="material-icon material-icon-sm mr-2" aria-hidden="true">photo_camera</span>
               Kamerayı Aç
             </button>
+            <p className="text-[10px] text-outline mt-2">
+              İlk açılışta tarayıcı kamera izni soracak — &quot;İzin ver&quot; demen yeterli.
+            </p>
           </div>
         )}
 
-        {/* Permission state */}
-        {phase === 'permission' && (
-          <div className="curator-card p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <span className="material-icon text-primary text-[32px]" aria-hidden="true">photo_camera</span>
-            </div>
-            <p className="text-sm text-on-surface-variant">Kamera izni isteniyor…</p>
-          </div>
-        )}
-
-        {/* Scanning / processing state */}
-        {(phase === 'scanning' || phase === 'processing') && (
+        {/* Scanning / processing — video container always rendered when active */}
+        {showVideo && (
           <div className="space-y-4">
             <div className="relative aspect-[3/4] sm:aspect-video bg-black rounded-sm overflow-hidden">
               <video
@@ -189,6 +263,7 @@ export default function TaraPage() {
                 className="w-full h-full object-cover"
                 playsInline
                 muted
+                autoPlay
               />
               {/* Scan frame overlay */}
               <div className="absolute inset-0 pointer-events-none">
@@ -209,6 +284,7 @@ export default function TaraPage() {
               <button
                 onClick={() => { stopCamera(); reset(); }}
                 className="px-5 py-3 text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm hover:bg-surface-container-low transition-colors"
+                type="button"
               >
                 İptal
               </button>
@@ -216,6 +292,7 @@ export default function TaraPage() {
                 onClick={capturePhoto}
                 disabled={phase === 'processing'}
                 className="curator-btn-primary text-sm px-6 py-3 disabled:opacity-50"
+                type="button"
               >
                 <span className="material-icon material-icon-sm mr-2" aria-hidden="true">photo_camera</span>
                 Çek
@@ -295,6 +372,7 @@ export default function TaraPage() {
               <button
                 onClick={reset}
                 className="curator-btn-primary text-sm px-6 py-3"
+                type="button"
               >
                 Yeni Tarama
               </button>
@@ -316,11 +394,19 @@ export default function TaraPage() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-on-surface mb-2">Bir sorun oldu</h2>
-              <p className="text-sm text-on-surface-variant">{error}</p>
+              <p className="text-sm text-on-surface-variant leading-relaxed">{error}</p>
             </div>
-            <button onClick={reset} className="curator-btn-primary text-sm px-6 py-3">
-              Tekrar Dene
-            </button>
+            <div className="flex items-center justify-center gap-3">
+              <button onClick={reset} className="curator-btn-primary text-sm px-6 py-3" type="button">
+                Tekrar Dene
+              </button>
+              <Link
+                href="/urunler"
+                className="px-5 py-3 text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm hover:bg-surface-container-low transition-colors"
+              >
+                Katalogda Ara
+              </Link>
+            </div>
           </div>
         )}
       </div>
