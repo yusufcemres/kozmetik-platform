@@ -88,6 +88,10 @@ export class ProductsService {
     skin_type?: string[];
     product_types?: string[];
     target_areas?: string[];
+    // Round 2: ek dimension'lar
+    evidence_grade?: string[];
+    safety_flags?: string[];
+    allergen_count_max?: number;
   }) {
     const { page, limit, search, brand_id, status, target_area, usage_time, product_type, need_id, domain_type, ingredient_slug, target_gender } = query;
     const sort = query.sort ?? 'newest';
@@ -109,7 +113,10 @@ export class ProductsService {
       query.price_max != null ||
       query.skin_type?.length ||
       query.product_types?.length ||
-      query.target_areas?.length
+      query.target_areas?.length ||
+      query.evidence_grade?.length ||
+      query.safety_flags?.length ||
+      query.allergen_count_max != null
     );
 
     if (hasRichFilter) {
@@ -233,6 +240,56 @@ export class ProductsService {
       // Bölge / target_area (kozmetik)
       if (query.target_areas?.length) {
         qb.andWhere('p.target_area IN (:...tareas)', { tareas: query.target_areas });
+      }
+
+      // === Round 2: ek filter dimension'ları ===
+
+      // Evidence grade (product_scores.grade A/B/C/D/F)
+      if (query.evidence_grade?.length) {
+        qb.andWhere(
+          `EXISTS (SELECT 1 FROM product_scores ps_g WHERE ps_g.product_id = p.product_id
+           AND ps_g.algorithm_version IN ('supplement-v2','cosmetic-v1')
+           AND ps_g.grade IN (:...grades))`,
+          { grades: query.evidence_grade.map((g) => g.toUpperCase()) },
+        );
+      }
+
+      // Güvenlik bayrakları (toggle): seçili olanlar HARİÇ tutulur
+      if (query.safety_flags?.length) {
+        const flags = new Set(query.safety_flags);
+        const conds: string[] = [];
+        if (flags.has('cmr_free')) {
+          conds.push('ing.cmr_class IS NOT NULL');
+        }
+        if (flags.has('endocrine_free')) {
+          conds.push('ing.endocrine_flag = true');
+        }
+        if (flags.has('eu_banned_free')) {
+          conds.push('ing.eu_banned = true');
+        }
+        if (flags.has('fragrance_free')) {
+          conds.push('ing.fragrance_flag = true');
+        }
+        if (conds.length > 0) {
+          qb.andWhere(
+            `NOT EXISTS (
+              SELECT 1 FROM product_ingredients pi_sf
+              JOIN ingredients ing ON ing.ingredient_id = pi_sf.ingredient_id
+              WHERE pi_sf.product_id = p.product_id AND (${conds.join(' OR ')})
+            )`,
+          );
+        }
+      }
+
+      // Maks alerjen sayısı: 0 = alerjensiz, N = en fazla N adet alerjen
+      if (query.allergen_count_max != null) {
+        qb.andWhere(
+          `(SELECT COUNT(*) FROM product_ingredients pi_a
+            JOIN ingredients ing_a ON ing_a.ingredient_id = pi_a.ingredient_id
+            WHERE pi_a.product_id = p.product_id AND ing_a.allergen_flag = true
+          ) <= :amax`,
+          { amax: query.allergen_count_max },
+        );
       }
 
       // Sıralama

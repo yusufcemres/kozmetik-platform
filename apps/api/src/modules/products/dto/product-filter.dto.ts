@@ -132,4 +132,25 @@ export class ProductFilterDto extends PaginationDto {
   @IsOptional()
   @IsString()
   target_areas?: string;
+
+  // === Round 2 (#13 follow-up): ek filter dimension'ları ===
+
+  @ApiPropertyOptional({ description: 'REVELA skor harf notu multi: A,B,C,D,F' })
+  @IsOptional()
+  @IsString()
+  evidence_grade?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Güvenlik bayrağı toggle (içerikte olmamasını istediğin riskler): ' +
+      'cmr_free,endocrine_free,eu_banned_free,fragrance_free',
+  })
+  @IsOptional()
+  @IsString()
+  safety_flags?: string;
+
+  @ApiPropertyOptional({ description: 'Maks alerjen sayısı (ürün içerisindeki, 0=alerjensiz)' })
+  @IsOptional()
+  @IsString()
+  allergen_count_max?: string;
 }
