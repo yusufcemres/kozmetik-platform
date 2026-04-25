@@ -46,55 +46,61 @@ export default function AiSearchPage() {
   }
 
   return (
-    <main className="container mx-auto max-w-3xl px-4 py-12">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold">AI Arama</h1>
-        <p className="mt-2 text-neutral-600">
+    <article className="curator-section max-w-[1400px] mx-auto">
+      <header className="mb-6">
+        <h1 className="text-2xl md:text-3xl headline-tight text-on-surface mb-1">AI Arama</h1>
+        <p className="text-sm text-on-surface-variant">
           Doğal dilde sor: "rozam var ne iyi gelir", "hamilelikte güvenli içerikler", "akne için başlangıç".
         </p>
       </header>
 
-      <form onSubmit={submit} className="flex gap-2">
+      <form onSubmit={submit} className="flex gap-2 mb-6">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ne arıyorsun?"
-          className="flex-1 rounded-xl border border-neutral-300 px-4 py-3 text-base focus:border-neutral-900 focus:outline-none"
+          className="flex-1 rounded-sm border border-outline-variant/30 bg-surface-container-low px-4 py-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
         />
         <button
           type="submit"
-          disabled={loading}
-          className="rounded-xl bg-neutral-900 px-6 py-3 text-white disabled:opacity-50"
+          disabled={loading || !query.trim()}
+          className="curator-btn-primary text-[10px] px-6 py-3 disabled:opacity-50"
         >
           {loading ? '...' : 'Ara'}
         </button>
       </form>
 
-      {err && <p className="mt-4 text-sm text-red-600">{err}</p>}
+      {err && (
+        <div className="mb-4 bg-error/5 border border-error/20 rounded-sm p-3 flex items-start gap-2">
+          <span className="material-icon text-error text-[16px] mt-0.5" aria-hidden="true">error</span>
+          <p className="text-xs text-error leading-relaxed">{err}</p>
+        </div>
+      )}
 
       {result && result.type === 'shortcut' && (
-        <section className="mt-10 space-y-6">
-          <div className="rounded-xl border border-neutral-200 p-6">
-            <h2 className="text-xl font-semibold">{result.title}</h2>
-            <p className="mt-2 text-neutral-700">{result.description}</p>
+        <section className="space-y-4">
+          <div className="curator-card p-4">
+            <h2 className="text-lg font-bold text-on-surface mb-1">{result.title}</h2>
+            <p className="text-sm text-on-surface-variant leading-relaxed">{result.description}</p>
             {result.caution && (
-              <p className="mt-3 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-900">
-                ⚠ {result.caution}
-              </p>
+              <div className="mt-3 bg-score-medium/5 border border-score-medium/20 rounded-sm p-2 flex items-start gap-2">
+                <span className="material-icon text-score-medium text-[14px] mt-0.5" aria-hidden="true">warning</span>
+                <p className="text-xs text-score-medium leading-relaxed">{result.caution}</p>
+              </div>
             )}
           </div>
 
           {result.products.length > 0 && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold uppercase text-neutral-500">Önerilen ürünler</h3>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <h3 className="label-caps text-outline mb-2">Önerilen ürünler</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {result.products.map((p) => (
                   <Link
                     key={p.product_id}
                     href={`/urunler/${p.slug}`}
-                    className="rounded-lg border border-neutral-200 p-3 hover:border-neutral-900"
+                    className="curator-card p-2 hover:border-primary/30 transition-colors"
                   >
-                    {p.product_name}
+                    <p className="text-[11px] font-medium text-on-surface line-clamp-2 leading-tight">{p.product_name}</p>
                   </Link>
                 ))}
               </div>
@@ -103,13 +109,13 @@ export default function AiSearchPage() {
 
           {result.ingredients.length > 0 && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold uppercase text-neutral-500">İlgili içerikler</h3>
-              <ul className="flex flex-wrap gap-2">
+              <h3 className="label-caps text-outline mb-2">İlgili içerikler</h3>
+              <ul className="flex flex-wrap gap-1.5">
                 {result.ingredients.map((i) => (
                   <li key={i.ingredient_id}>
                     <Link
                       href={`/icerikler/${i.inci_slug}`}
-                      className="rounded-full border border-neutral-300 px-3 py-1 text-sm hover:border-neutral-900"
+                      className="inline-flex items-center px-2.5 py-1 rounded-sm border border-outline-variant/30 text-xs text-on-surface hover:border-primary hover:text-primary transition-colors"
                     >
                       {i.inci_name}
                     </Link>
@@ -121,13 +127,16 @@ export default function AiSearchPage() {
 
           {result.posts.length > 0 && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold uppercase text-neutral-500">Okuma önerileri</h3>
-              <ul className="space-y-2">
+              <h3 className="label-caps text-outline mb-2">Okuma önerileri</h3>
+              <ul className="space-y-1.5">
                 {result.posts.map((b) => (
-                  <li key={b.post_id}>
-                    <Link href={`/blog/${b.slug}`} className="text-neutral-900 hover:underline">
+                  <li key={b.post_id} className="curator-card p-2">
+                    <Link href={`/rehber/${b.slug}`} className="text-sm font-medium text-on-surface hover:text-primary transition-colors">
                       {b.title}
                     </Link>
+                    {b.excerpt && (
+                      <p className="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2">{b.excerpt}</p>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -137,23 +146,29 @@ export default function AiSearchPage() {
       )}
 
       {result && result.type === 'fallback' && (
-        <section className="mt-10">
-          <p className="mb-4 text-sm text-neutral-500">
+        <section>
+          <p className="text-xs text-on-surface-variant mb-3">
             Spesifik bir rehber bulamadık ama eşleşen ürünler şunlar:
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {result.products.map((p) => (
               <Link
                 key={p.product_id}
                 href={`/urunler/${p.slug}`}
-                className="rounded-lg border border-neutral-200 p-3 hover:border-neutral-900"
+                className="curator-card p-2 hover:border-primary/30 transition-colors"
               >
-                {p.product_name}
+                <p className="text-[11px] font-medium text-on-surface line-clamp-2 leading-tight">{p.product_name}</p>
               </Link>
             ))}
           </div>
         </section>
       )}
-    </main>
+
+      {result && result.type === 'empty' && (
+        <div className="bg-surface-container-low rounded-sm p-6 text-center text-sm text-on-surface-variant">
+          Bu sorgu için sonuç bulunamadı. Daha genel bir terim dene.
+        </div>
+      )}
+    </article>
   );
 }
