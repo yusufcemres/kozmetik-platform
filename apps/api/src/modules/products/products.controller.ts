@@ -67,6 +67,16 @@ export class ProductsController {
     return result;
   }
 
+  @Get('filter-facets')
+  @ApiOperation({ summary: 'Filter sidebar için dimension count\'ları (cache 5dk)' })
+  @ApiQuery({ name: 'domain_type', required: true, description: 'cosmetic | supplement' })
+  filterFacets(@Query('domain_type') domainType: string) {
+    if (!['cosmetic', 'supplement'].includes(domainType)) {
+      return { error: 'domain_type cosmetic veya supplement olmalı' };
+    }
+    return this.service.getFilterFacets(domainType);
+  }
+
   @Get('top-scored')
   @ApiOperation({ summary: 'En yüksek skorlu ürünler' })
   @ApiQuery({ name: 'limit', required: false })
