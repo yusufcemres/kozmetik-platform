@@ -682,53 +682,8 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Need Scores — 3-col grid, minimal cards */}
-        {product.need_scores && product.need_scores.length > 0 && (
-          <section className="mb-10" data-analytics-section="scores">
-            <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface">Uyumluluk Skorları</h2>
-            <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">
-              <span className="font-medium text-score-high">%70+</span> yüksek,
-              <span className="font-medium text-score-medium"> %40-69</span> orta,
-              <span className="font-medium text-score-low"> %40 altı</span> düşük uyum.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-              {product.need_scores.map((ns) => {
-                const score = Math.round(Number(ns.compatibility_score));
-                return (
-                  <div
-                    key={ns.product_need_score_id}
-                    className="curator-card p-3"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-medium text-on-surface truncate">
-                        {ns.need ? (
-                          <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
-                            {ns.need.need_name}
-                          </Link>
-                        ) : (
-                          `İhtiyaç #${ns.need_id}`
-                        )}
-                      </p>
-                      <span className={`text-sm font-bold shrink-0 ${getScoreColor(score)}`}>
-                        %{score}
-                      </span>
-                    </div>
-                    <div className="mt-2 h-1 bg-surface-container rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${getScoreBarColor(score)}`}
-                        style={{ width: getScoreBarWidth(score) }}
-                      />
-                    </div>
-                    {ns.score_reason_summary && (
-                      <p className="text-[9px] text-outline mt-1 line-clamp-2">{ns.score_reason_summary}</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
+        {/* Safety Score (sol) | Uyumluluk Skorları (sağ) — takviye paritesi 2-col grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6 items-start">
         {/* Safety Score — Evidence-Based (cosmetic-v1) */}
         {sortedIngredients.length > 0 && (() => {
           // Fallback inline calc — API skoru varsa o kullanılır
@@ -865,6 +820,59 @@ export default async function ProductDetailPage({
             </section>
           );
         })()}
+
+        {/* SAĞ kolon: Uyumluluk Skorları (need_scores) — accordion */}
+        {product.need_scores && product.need_scores.length > 0 && (
+          <section className="curator-card p-3 md:p-4">
+            <details open className="group">
+              <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] text-[10px] flex-1">Uyumluluk Skorları</h2>
+                <p className="text-[9px] text-on-surface-variant leading-relaxed">
+                  <span className="font-medium text-score-high">%70+</span> yüksek
+                  <span className="font-medium text-score-medium"> · %40-69</span> orta
+                  <span className="font-medium text-score-low"> · %40 altı</span> düşük
+                </p>
+                <span
+                  className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                  style={{ fontSize: '16px' }}
+                  aria-hidden="true"
+                >
+                  expand_more
+                </span>
+              </summary>
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1">
+                {product.need_scores
+                  .slice()
+                  .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
+                  .map((ns) => {
+                    const score = Math.round(Number(ns.compatibility_score));
+                    return (
+                      <div key={ns.product_need_score_id} className="border border-outline-variant/15 rounded-sm p-1.5">
+                        <div className="flex items-start justify-between gap-1">
+                          <p className="text-[10px] font-medium text-on-surface truncate flex-1 leading-tight" title={ns.need?.need_name}>
+                            {ns.need ? (
+                              <Link href={`/ihtiyaclar/${ns.need.need_slug}`} className="hover:text-primary transition-colors">
+                                {ns.need.need_name}
+                              </Link>
+                            ) : (
+                              `İhtiyaç #${ns.need_id}`
+                            )}
+                          </p>
+                          <span className={`text-[10px] font-bold tabular-nums shrink-0 ${getScoreColor(score)}`}>%{score}</span>
+                        </div>
+                        <div className="mt-1 h-1 bg-surface-container rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${getScoreBarColor(score)}`} style={{ width: `${Math.min(100, Math.max(0, score))}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </details>
+          </section>
+        )}
+
+        </div>
+        {/* /Safety Score | Uyumluluk Skorları grid */}
 
         {/* INCI Ingredients */}
         <section className="mb-16" data-analytics-section="inci">

@@ -662,12 +662,17 @@ export default async function SupplementDetailPage({
         </div>
         {/* /Skor+Info | Uyumluluk grid */}
 
+        {/* ALT 2-col grid: SOL [Besin, Hangi Gıdalarda] | SAĞ [Bileşenler, Etkileşim]
+            Auto-flow row → mevcut sıra 1-2-3-4 doğal olarak istenen yerleşimi yapar */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
+
         {/* Nutrition Facts — accordion, collapsed */}
         <AccordionSection
           title="Besin Değerleri (Nutrition Facts)"
           icon="science"
           count={nutritionFacts.length > 0 ? `${nutritionFacts.length} madde` : undefined}
-          className="mb-4"
+          className="mb-0"
+          compact
         >
           {nutritionFacts.length > 0 ? (
             <div className="curator-card overflow-hidden">
@@ -745,7 +750,8 @@ export default async function SupplementDetailPage({
               title="Bu Bileşenler Ne İşe Yarar?"
               icon="biotech"
               count={`${filledCount}/${cards.length} bileşen`}
-              className="mb-4"
+              className="mb-0"
+              compact
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {cards.map((nf) => {
@@ -797,7 +803,8 @@ export default async function SupplementDetailPage({
               title="Bu Bileşenleri Hangi Gıdalarda Bulabilirsiniz?"
               icon="restaurant"
               count={`${filledCount}/${ingredientCards.length} bileşen`}
-              className="mb-4"
+              className="mb-0"
+              compact
             >
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-1.5">
                 {ingredientCards.map((nf) => {
@@ -867,7 +874,8 @@ export default async function SupplementDetailPage({
             title="Etkileşim Uyarıları"
             icon="sync_alt"
             count={`${interactions.length} uyarı`}
-            className="mb-4"
+            className="mb-0"
+            compact
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5">
               {interactions.map((int) => {
@@ -920,6 +928,8 @@ export default async function SupplementDetailPage({
             </div>
           </AccordionSection>
         )}
+        </div>
+        {/* /ALT 2-col grid */}
 
         {/* Warnings — accordion, kapalı */}
         {detail?.warnings && (
