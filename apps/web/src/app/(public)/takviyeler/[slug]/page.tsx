@@ -806,7 +806,7 @@ export default async function SupplementDetailPage({
               className="mb-0"
               compact
             >
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {ingredientCards.map((nf) => {
                   const ing = nf.ingredient!;
                   const dose = Number(nf.amount_per_serving) || 0;
@@ -820,8 +820,8 @@ export default async function SupplementDetailPage({
                       ? Math.round((dose / fs.amount_per_100g) * 100)
                       : null;
                     return (
-                      <div key={i} className="flex items-baseline gap-1 py-0.5 text-[10px] leading-tight">
-                        <span className="text-on-surface min-w-0 flex-1 break-words" title={fs.food_name}>{fs.food_name}</span>
+                      <div key={i} className="flex items-baseline gap-1.5 py-0.5 text-xs leading-snug">
+                        <span className="text-on-surface min-w-0 flex-1 break-words">{fs.food_name}</span>
                         {dose > 0 && neededGrams !== null && (
                           <span className={`tabular-nums font-semibold shrink-0 ml-auto pl-1 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
                             ~{neededGrams}g
@@ -831,28 +831,28 @@ export default async function SupplementDetailPage({
                     );
                   };
                   return (
-                    <div key={nf.supplement_ingredient_id} className="curator-card p-1.5">
-                      <h3 className="font-semibold text-on-surface text-[10px] truncate mb-1 pb-1 border-b border-outline-variant/15">
+                    <div key={nf.supplement_ingredient_id} className="curator-card p-2.5">
+                      <h3 className="font-semibold text-on-surface text-xs mb-1.5 pb-1.5 border-b border-outline-variant/15 leading-tight">
                         {ing.common_name || ing.inci_name}
-                        {dose > 0 && <span className="text-outline font-normal ml-1 text-[9px]">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
+                        {dose > 0 && <span className="text-outline font-normal ml-1.5 text-[10px]">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
                       </h3>
                       {hasUsableFoods ? (
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
-                            <details className="group/more mt-1">
-                              <summary className="text-[9px] text-primary cursor-pointer hover:underline list-none [&::-webkit-details-marker]:hidden">
+                            <details className="group/more mt-1.5">
+                              <summary className="text-[10px] text-primary cursor-pointer hover:underline list-none [&::-webkit-details-marker]:hidden">
                                 <span className="group-open/more:hidden">+{restFoods.length} gıda</span>
                                 <span className="hidden group-open/more:inline">− gizle</span>
                               </summary>
-                              <div className="mt-0.5">{restFoods.map(renderFoodRow)}</div>
+                              <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
                             </details>
                           )}
                         </>
                       ) : (
-                        <div className="flex items-center gap-1 py-0.5 text-[10px] text-outline">
-                          <span className="material-icon text-[10px]" aria-hidden="true">hourglass_empty</span>
-                          <span className="truncate">Veri yakında</span>
+                        <div className="flex items-center gap-1 py-0.5 text-xs text-outline">
+                          <span className="material-icon text-[12px]" aria-hidden="true">hourglass_empty</span>
+                          <span>Veri yakında</span>
                         </div>
                       )}
                     </div>
@@ -877,7 +877,7 @@ export default async function SupplementDetailPage({
             className="mb-0"
             compact
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {interactions.map((int) => {
                 const severityConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
                   severe: { color: 'text-error', bg: 'bg-error/10 border-error/20', icon: 'error', label: 'Ciddi' },
@@ -888,35 +888,37 @@ export default async function SupplementDetailPage({
                 };
                 const cfg = severityConfig[int.severity] || severityConfig.mild;
                 return (
-                  <details key={int.interaction_id} className={`group border rounded-sm px-2 py-1.5 ${cfg.bg}`}>
-                    <summary className="flex items-center gap-1 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                      <span className={`material-icon ${cfg.color} text-[12px] shrink-0`} aria-hidden="true">{cfg.icon}</span>
-                      <div className="flex-1 min-w-0 flex items-center gap-1 text-[10px]">
-                        <span className="font-semibold text-on-surface truncate">
-                          {int.ingredient_a.common_name || int.ingredient_a.inci_name}
-                        </span>
-                        <span className={`material-icon text-[10px] shrink-0 ${cfg.color}`} aria-hidden="true">sync_alt</span>
-                        <span className="font-semibold text-on-surface truncate">
-                          {int.ingredient_b.common_name || int.ingredient_b.inci_name}
-                        </span>
-                        <span className={`label-caps text-[8px] px-1 py-0 rounded-sm shrink-0 ${cfg.color}`}>{cfg.label}</span>
+                  <details key={int.interaction_id} className={`group border rounded-sm px-2.5 py-2 ${cfg.bg}`}>
+                    <summary className="flex items-start gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className={`material-icon ${cfg.color} text-[16px] shrink-0 mt-0.5`} aria-hidden="true">{cfg.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs leading-snug">
+                          <span className="font-semibold text-on-surface break-words">
+                            {int.ingredient_a.common_name || int.ingredient_a.inci_name}
+                          </span>
+                          <span className={`material-icon text-[12px] shrink-0 ${cfg.color}`} aria-hidden="true">sync_alt</span>
+                          <span className="font-semibold text-on-surface break-words">
+                            {int.ingredient_b.common_name || int.ingredient_b.inci_name}
+                          </span>
+                        </div>
+                        <span className={`label-caps text-[10px] mt-1 inline-block px-1.5 py-0.5 rounded-sm ${cfg.color}`}>{cfg.label}</span>
                       </div>
                       <span
                         className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
-                        style={{ fontSize: '12px' }}
+                        style={{ fontSize: '16px' }}
                         aria-hidden="true"
                       >
                         expand_more
                       </span>
                     </summary>
                     {(int.description || int.recommendation) && (
-                      <div className="mt-1 pt-1 border-t border-outline-variant/15">
+                      <div className="mt-2 pt-2 border-t border-outline-variant/15">
                         {int.description && (
-                          <p className="text-[10px] text-on-surface-variant leading-snug">{int.description}</p>
+                          <p className="text-xs text-on-surface-variant leading-relaxed">{int.description}</p>
                         )}
                         {int.recommendation && (
-                          <p className="text-[9px] text-on-surface-variant mt-0.5 flex items-start gap-0.5">
-                            <span className="material-icon text-[9px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                          <p className="text-xs text-on-surface-variant mt-1 flex items-start gap-1">
+                            <span className="material-icon text-[12px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
                             <span>{int.recommendation}</span>
                           </p>
                         )}
