@@ -91,6 +91,7 @@ interface Product {
   net_content_value?: number;
   net_content_unit?: string;
   target_area?: string;
+  target_audience?: string;
   usage_time_hint?: string;
   status: string;
   brand?: Brand;
@@ -1034,6 +1035,142 @@ export default async function ProductDetailPage({
           )}
         </section>
 
+        {/* ALT 2-col grid: Ürün Bilgileri | Bu İçerikler Ne İşe Yarar */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
+
+        {/* Ürün Bilgileri — kompakt info */}
+        <AccordionSection
+          title="Ürün Bilgileri"
+          icon="info"
+          className="mb-0"
+          compact
+          defaultOpen
+        >
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {product.category && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Kategori</span>
+                <p className="font-semibold text-on-surface mt-0.5">{product.category.category_name}</p>
+              </div>
+            )}
+            {product.product_type_label && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Ürün Tipi</span>
+                <p className="font-semibold text-on-surface mt-0.5">{product.product_type_label}</p>
+              </div>
+            )}
+            {product.target_area && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Bölge</span>
+                <p className="font-semibold text-on-surface mt-0.5 capitalize">{product.target_area}</p>
+              </div>
+            )}
+            {product.target_audience && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Hedef Kitle</span>
+                <p className="font-semibold text-on-surface mt-0.5 capitalize">{product.target_audience}</p>
+              </div>
+            )}
+            {product.net_content_value != null && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Net İçerik</span>
+                <p className="font-semibold text-on-surface mt-0.5">
+                  {product.net_content_value} {product.net_content_unit || ''}
+                </p>
+              </div>
+            )}
+            {product.barcode && (
+              <div>
+                <span className="label-caps text-outline text-[9px]">Barkod</span>
+                <p className="font-semibold text-on-surface mt-0.5 text-[10px] font-mono">{product.barcode}</p>
+              </div>
+            )}
+          </div>
+
+          {product.label?.claim_texts_json && Array.isArray(product.label.claim_texts_json) && product.label.claim_texts_json.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-outline-variant/15">
+              <span className="label-caps text-outline text-[9px] block mb-1.5">Marka İddiaları</span>
+              <div className="flex flex-wrap gap-1">
+                {(product.label.claim_texts_json as string[]).map((claim, i) => (
+                  <span key={i} className="text-[10px] bg-primary/5 text-primary px-2 py-0.5 rounded-sm">
+                    {claim}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {product.label?.usage_instructions && (
+            <div className="mt-3 pt-3 border-t border-outline-variant/15">
+              <span className="label-caps text-outline text-[9px] block mb-1">Kullanım</span>
+              <p className="text-xs text-on-surface-variant leading-relaxed">{product.label.usage_instructions}</p>
+            </div>
+          )}
+
+          {product.label?.warning_text && (
+            <div className="mt-3 pt-3 border-t border-outline-variant/15">
+              <span className="label-caps text-outline text-[9px] block mb-1 flex items-center gap-1">
+                <span className="material-icon text-score-medium" style={{ fontSize: '12px' }} aria-hidden="true">warning</span>
+                Uyarı
+              </span>
+              <p className="text-xs text-on-surface-variant leading-relaxed">{product.label.warning_text}</p>
+            </div>
+          )}
+        </AccordionSection>
+
+        {/* Bu İçerikler Ne İşe Yarar */}
+        {(() => {
+          const cards = sortedIngredients.filter((pi) => pi.ingredient?.function_summary || pi.ingredient_display_name);
+          if (cards.length === 0) return null;
+          const filledCount = cards.filter((pi) => pi.ingredient?.function_summary).length;
+          return (
+            <AccordionSection
+              title="Bu İçerikler Ne İşe Yarar?"
+              icon="biotech"
+              count={`${filledCount}/${cards.length} bileşen`}
+              className="mb-0"
+              compact
+              defaultOpen
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {cards.slice(0, 12).map((pi) => {
+                  const ing = pi.ingredient;
+                  const display = pi.ingredient_display_name || ing?.inci_name || '';
+                  const hasSummary = !!ing?.function_summary;
+                  const Wrapper = ing ? Link : 'div' as any;
+                  const wrapperProps = ing
+                    ? { href: `/icerikler/${ing.ingredient_slug}`, className: 'curator-card p-2 group hover:border-primary/30 transition-all block' }
+                    : { className: 'curator-card p-2' };
+                  return (
+                    <Wrapper key={pi.product_ingredient_id} {...wrapperProps}>
+                      <div className="flex items-start gap-1.5">
+                        <span className="material-icon text-primary text-[12px] shrink-0 mt-0.5" aria-hidden="true">biotech</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-xs text-on-surface group-hover:text-primary transition-colors leading-tight">
+                            {display}
+                          </p>
+                          {hasSummary ? (
+                            <p className="text-[10px] text-on-surface-variant leading-snug mt-0.5 line-clamp-3">
+                              {ing!.function_summary}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] text-outline italic mt-0.5">
+                              Açıklama yakında
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Wrapper>
+                  );
+                })}
+              </div>
+            </AccordionSection>
+          );
+        })()}
+
+        </div>
+        {/* /ALT 2-col grid */}
+
         {/* Ingredient Interactions — accordion, 2-col, minimal */}
         {relevantInteractions.length > 0 && (
           <AccordionSection
@@ -1042,7 +1179,7 @@ export default async function ProductDetailPage({
             count={`${relevantInteractions.length} uyarı`}
             className="mb-6"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {relevantInteractions.slice(0, 6).map((inter) => {
                 const severityConfig = inter.severity === 'severe'
                   ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kaçınılmalı' }
@@ -1050,30 +1187,32 @@ export default async function ProductDetailPage({
                   ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli' }
                   : { icon: 'info', color: 'border-outline-variant/20 bg-surface-container-low', badge: 'bg-surface-container text-on-surface-variant', label: 'Bilgi' };
                 return (
-                  <details key={inter.interaction_id} className={`group rounded-sm border px-3 py-2 ${severityConfig.color}`}>
-                    <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                      <span className="material-icon text-on-surface-variant shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">{severityConfig.icon}</span>
-                      <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap text-xs">
-                        <span className="font-semibold text-on-surface truncate">
-                          {inter.ingredient_a?.inci_name || '?'}
-                        </span>
-                        <span className="text-outline">+</span>
-                        <span className="font-semibold text-on-surface truncate">
-                          {inter.ingredient_b?.inci_name || '?'}
-                        </span>
-                        <span className={`label-caps px-1.5 py-0.5 rounded-sm text-[9px] ${severityConfig.badge}`}>
+                  <details key={inter.interaction_id} className={`group rounded-sm border px-2.5 py-2 ${severityConfig.color}`}>
+                    <summary className="flex items-start gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className="material-icon text-on-surface-variant shrink-0 mt-0.5" style={{ fontSize: '16px' }} aria-hidden="true">{severityConfig.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs leading-snug">
+                          <span className="font-semibold text-on-surface break-words">
+                            {inter.ingredient_a?.inci_name || '?'}
+                          </span>
+                          <span className="text-outline">+</span>
+                          <span className="font-semibold text-on-surface break-words">
+                            {inter.ingredient_b?.inci_name || '?'}
+                          </span>
+                        </div>
+                        <span className={`label-caps mt-1 inline-block px-1.5 py-0.5 rounded-sm text-[10px] ${severityConfig.badge}`}>
                           {severityConfig.label}
                         </span>
                       </div>
-                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">
+                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '16px' }} aria-hidden="true">
                         expand_more
                       </span>
                     </summary>
                     <div className="mt-2 pt-2 border-t border-outline-variant/15">
-                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{inter.description}</p>
+                      <p className="text-xs text-on-surface-variant leading-relaxed">{inter.description}</p>
                       {inter.recommendation && (
-                        <p className="text-[10px] text-primary mt-1 flex items-start gap-1">
-                          <span className="material-icon text-[10px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                        <p className="text-xs text-primary mt-1 flex items-start gap-1">
+                          <span className="material-icon text-[12px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
                           {inter.recommendation}
                         </p>
                       )}
