@@ -3,6 +3,8 @@ import SafeImage from '@/components/public/SafeImage';
 import { apiFetch } from '@/lib/api';
 import ProductCarousel from '@/components/public/ProductCarousel';
 import NewsletterForm from '@/components/public/NewsletterForm';
+import HeroScanAnimation from '@/components/public/HeroScanAnimation';
+import OnboardingModal from '@/components/public/OnboardingModal';
 
 // === Types ===
 
@@ -174,60 +176,73 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* 1. Hero — Google style */}
-      <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 text-center">
-        {/* Logo */}
-        <div className="mb-2">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-primary leading-none">
-            REVELA
-          </h1>
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-outline mt-2">
-            Kozmetik · Takviye · Bakım Analizi
-          </p>
+      {/* Onboarding modal — ilk ziyarette gösterilir, localStorage flag */}
+      <OnboardingModal />
+
+      {/* 1. Hero — split layout: animasyon (sol) + arama (sağ) — Oasis-vari product showcase */}
+      <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-4 sm:px-6 lg:px-12 py-8 lg:py-12 max-w-[1400px] mx-auto">
+        {/* SOL: Hero scan animation — REVELA'nın ne yaptığını gösterir */}
+        <div className="w-full lg:w-1/2 order-2 lg:order-1">
+          <HeroScanAnimation />
         </div>
 
-        {/* Search bar */}
-        <form action="/ara" className="w-full max-w-xl mt-10">
-          <div className="relative">
-            <span className="material-icon text-outline absolute left-5 top-1/2 -translate-y-1/2 text-[22px]" aria-hidden="true">search</span>
-            <input
-              type="text"
-              name="q"
-              placeholder="Ürün, marka veya içerik ara..."
-              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-14 pr-5 py-4 text-sm sm:text-base text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 focus:shadow-lg transition-all"
-            />
+        {/* SAĞ: Wordmark + arama + stats */}
+        <div className="w-full lg:w-1/2 order-1 lg:order-2 text-center lg:text-left">
+          <div className="mb-4 lg:mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tighter text-primary leading-none">
+              REVELA
+            </h1>
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-outline mt-2">
+              Kozmetik · Takviye · Bakım Analizi
+            </p>
+            <p className="text-on-surface-variant text-sm sm:text-base mt-4 lg:mt-5 max-w-md mx-auto lg:mx-0 leading-relaxed">
+              Kozmetik ve takviyelerin INCI içeriğini analiz et, cildine ve ihtiyaçlarına uyumlu ürünleri bilimsel kanıtlarla keşfet.
+            </p>
           </div>
-        </form>
 
-        {/* Popular searches */}
-        <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 mt-5">
-          <span className="text-xs text-outline">Popüler:</span>
-          {['Retinol', 'Niacinamide', 'Vitamin C', 'Hyaluronic Acid', 'SPF'].map((term) => (
-            <Link
-              key={term}
-              href={`/urunler?search=${encodeURIComponent(term)}`}
-              className="text-xs text-on-surface-variant hover:text-primary transition-colors underline underline-offset-2"
-            >
-              {term}
-            </Link>
-          ))}
-        </div>
-
-        {/* Stats — compact inline */}
-        <div className="flex flex-wrap justify-center items-center gap-x-6 sm:gap-x-10 gap-y-3 mt-16 text-center">
-          {[
-            { label: 'Kozmetik', value: latest.meta?.total || 0 },
-            { label: 'Takviye', value: supplementCount || 0 },
-            { label: 'İçerik', value: ingredientCount || 0 },
-            { label: 'Marka', value: brandCount || 0 },
-          ].map((s) => (
-            <div key={s.label} className="flex items-baseline gap-1.5">
-              <span className="text-base sm:text-lg font-extrabold tracking-tight text-on-surface">
-                {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}+
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-outline">{s.label}</span>
+          {/* Search bar */}
+          <form action="/ara" className="w-full max-w-xl mx-auto lg:mx-0 mt-6 lg:mt-8">
+            <div className="relative">
+              <span className="material-icon text-outline absolute left-5 top-1/2 -translate-y-1/2 text-[22px]" aria-hidden="true">search</span>
+              <input
+                type="text"
+                name="q"
+                placeholder="Ürün, marka veya içerik ara..."
+                className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-14 pr-5 py-4 text-sm sm:text-base text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 focus:shadow-lg transition-all"
+              />
             </div>
-          ))}
+          </form>
+
+          {/* Popular searches */}
+          <div className="flex flex-wrap justify-center lg:justify-start items-center gap-x-3 gap-y-1 mt-4">
+            <span className="text-xs text-outline">Popüler:</span>
+            {['Retinol', 'Niacinamide', 'Vitamin C', 'Hyaluronic Acid', 'SPF'].map((term) => (
+              <Link
+                key={term}
+                href={`/urunler?search=${encodeURIComponent(term)}`}
+                className="text-xs text-on-surface-variant hover:text-primary transition-colors underline underline-offset-2"
+              >
+                {term}
+              </Link>
+            ))}
+          </div>
+
+          {/* Stats — compact inline */}
+          <div className="flex flex-wrap justify-center lg:justify-start items-center gap-x-6 sm:gap-x-8 gap-y-3 mt-8 lg:mt-10">
+            {[
+              { label: 'Kozmetik', value: latest.meta?.total || 0 },
+              { label: 'Takviye', value: supplementCount || 0 },
+              { label: 'İçerik', value: ingredientCount || 0 },
+              { label: 'Marka', value: brandCount || 0 },
+            ].map((s) => (
+              <div key={s.label} className="flex items-baseline gap-1.5">
+                <span className="text-base sm:text-lg font-extrabold tracking-tight text-on-surface">
+                  {s.value > 999 ? `${(s.value / 1000).toFixed(1)}K` : s.value}+
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-outline">{s.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
