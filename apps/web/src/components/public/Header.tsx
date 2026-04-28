@@ -274,7 +274,7 @@ export default function Header() {
 
     {/* Mobile overlay menu */}
     {mobileOpen && (
-      <div id="mobile-nav-menu" className="md:hidden fixed inset-0 top-[65px] z-[60] bg-[#111111] overflow-y-auto pb-24">
+      <div id="mobile-nav-menu" className="md:hidden fixed inset-0 top-[65px] z-[60] bg-surface dark:bg-surface overflow-y-auto pb-24">
         <nav className="px-6 py-8 space-y-1">
           {NAV_SECTIONS.map((section) => {
             const isActive = isSectionActive(section);
@@ -287,11 +287,11 @@ export default function Header() {
                   className={`flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
                     isActive
                       ? 'bg-primary text-on-primary font-semibold'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                   }`}
                 >
                   <span className="uppercase tracking-widest text-xs">{section.label}</span>
-                  <span className="material-icon material-icon-sm text-white/30" aria-hidden="true">
+                  <span className="material-icon material-icon-sm text-outline-variant" aria-hidden="true">
                     arrow_forward
                   </span>
                 </Link>
@@ -305,13 +305,13 @@ export default function Header() {
                   onClick={() => setMobileOpenSection(isSectionOpen ? null : section.key)}
                   className={`w-full flex items-center justify-between px-4 py-4 rounded-md transition-all duration-300 ${
                     isActive || isSectionOpen
-                      ? 'bg-white/10 text-white font-semibold'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      ? 'bg-surface-container text-on-surface font-semibold'
+                      : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                   }`}
                 >
                   <span className="uppercase tracking-widest text-xs">{section.label}</span>
                   <span
-                    className={`material-icon material-icon-sm text-white/50 transition-transform duration-200 ${isSectionOpen ? 'rotate-180' : ''}`}
+                    className={`material-icon material-icon-sm text-outline transition-transform duration-200 ${isSectionOpen ? 'rotate-180' : ''}`}
                     aria-hidden="true"
                   >
                     expand_more
@@ -329,7 +329,7 @@ export default function Header() {
                           className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ${
                             itemActive
                               ? 'bg-primary text-on-primary font-semibold'
-                              : 'text-white/60 hover:bg-white/10 hover:text-white'
+                              : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                           }`}
                         >
                           <span className="material-icon text-[18px]" aria-hidden="true">{item.icon}</span>
@@ -348,11 +348,11 @@ export default function Header() {
             );
           })}
 
-          <div className="h-px bg-white/10 my-6" />
+          <div className="h-px bg-outline-variant/30 my-6" />
 
           <Link
             href="/profilim"
-            className="flex items-center gap-3 px-4 py-4 text-white/70 hover:text-white transition-colors"
+            className="flex items-center gap-3 px-4 py-4 text-on-surface-variant hover:text-on-surface transition-colors"
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">person</span>
             <span className="uppercase tracking-widest text-xs">Profilim</span>
@@ -363,11 +363,11 @@ export default function Header() {
             )}
           </Link>
 
-          <div className="h-px bg-white/10 my-4" />
+          <div className="h-px bg-outline-variant/30 my-4" />
 
           <button
             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-            className="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white transition-colors w-full"
+            className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-on-surface transition-colors w-full"
           >
             <span className="material-icon material-icon-sm" aria-hidden="true">
               {resolvedTheme === 'dark' ? 'light_mode' : 'dark_mode'}

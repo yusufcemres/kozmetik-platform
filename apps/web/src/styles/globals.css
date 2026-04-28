@@ -105,27 +105,27 @@
   --color-on-tertiary: #1e1c17;
   --color-on-tertiary-container: #c5c1b7;
 
-  /* Surface — dark tones */
-  --color-surface: #121212;
-  --color-surface-bright: #1e1e1e;
-  --color-surface-dim: #0e0e0e;
-  --color-surface-container-lowest: #0a0a0a;
-  --color-surface-container-low: #1a1a1a;
-  --color-surface-container: #1e1e1e;
-  --color-surface-container-high: #252525;
-  --color-surface-container-highest: #2c2c2c;
-  --color-surface-tint: #e8e4e3;
-  --color-surface-variant: #2c2c2c;
+  /* Surface — Ink Blue dark tones (logo navy background ile senkron) */
+  --color-surface: #0E1722;
+  --color-surface-bright: #1B2D45;
+  --color-surface-dim: #060B12;
+  --color-surface-container-lowest: #060B12;
+  --color-surface-container-low: #131E2D;
+  --color-surface-container: #1B2D45;
+  --color-surface-container-high: #253854;
+  --color-surface-container-highest: #2D4360;
+  --color-surface-tint: #A5B8D0;
+  --color-surface-variant: #253854;
 
-  /* On Surface — light tones */
-  --color-on-surface: #e4e2e0;
-  --color-on-surface-variant: #a0a4a1;
-  --color-on-background: #e4e2e0;
-  --color-background: #121212;
+  /* On Surface — cream tones (Ink Blue üzerinde) */
+  --color-on-surface: #E4E8EE;
+  --color-on-surface-variant: #A5AEBC;
+  --color-on-background: #E4E8EE;
+  --color-background: #0E1722;
 
-  /* Outline */
-  --color-outline: #8a8e8b;
-  --color-outline-variant: #454845;
+  /* Outline — bluish */
+  --color-outline: #8492A6;
+  --color-outline-variant: #455066;
 
   /* Error */
   --color-error: #ffb4ab;
