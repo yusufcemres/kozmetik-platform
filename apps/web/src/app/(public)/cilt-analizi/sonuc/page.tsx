@@ -427,7 +427,15 @@ function ResultsContent() {
   if (skinFeel === 'reactive') insights.push('Reaktif cildinde bariyer onarımı öncelikli — centella asiatica ve panthenol yatıştırıcı etkiler sunar.');
 
   // === Supplement Tips ===
-  const supplementTips: { icon: string; title: string; description: string; ingredients: string[]; warning?: string }[] = [];
+  // searchQuery → /takviyeler?q={searchQuery} ile ilgili takviye listesine yönlendirir.
+  const supplementTips: {
+    icon: string;
+    title: string;
+    description: string;
+    ingredients: string[];
+    searchQuery: string;
+    warning?: string;
+  }[] = [];
 
   if (sun === 'low' || climate === 'cold_dry') {
     supplementTips.push({
@@ -435,6 +443,7 @@ function ResultsContent() {
       title: 'D Vitamini',
       description: 'Düşük güneş maruziyeti D vitamini eksikliği riski oluşturur. D vitamini cilt bariyeri ve bağışıklık için kritiktir.',
       ingredients: ['D3 Vitamini (Kolekalsiferol)', '1000-2000 IU/gün'],
+      searchQuery: 'd vitamini',
     });
   }
 
@@ -444,6 +453,7 @@ function ResultsContent() {
       title: 'Omega-3 Yağ Asitleri',
       description: 'Kuru ve pullu ciltlerde omega-3 cilt bariyerini içeriden destekler, inflamasyonu azaltır.',
       ingredients: ['Balık Yağı / Alg Yağı', 'EPA + DHA min 500mg/gün'],
+      searchQuery: 'omega 3',
     });
   }
 
@@ -453,6 +463,7 @@ function ResultsContent() {
       title: 'Çinko',
       description: 'Çinko sebum üretimini düzenler ve akne ile bağlantılı inflamasyonu azaltır.',
       ingredients: ['Çinko Bisglisinat', '15-30mg/gün'],
+      searchQuery: 'çinko',
     });
   }
 
@@ -462,6 +473,7 @@ function ResultsContent() {
       title: 'Kolajen Peptitleri',
       description: '35 yaşından itibaren kolajen üretimi azalır. Oral kolajen cilt elastikiyetini ve nemini destekler.',
       ingredients: ['Hidrolize Kolajen Tip I & III', '5-10g/gün'],
+      searchQuery: 'kolajen',
     });
   }
 
@@ -471,6 +483,7 @@ function ResultsContent() {
       title: 'Probiyotik',
       description: 'Yüksek stres ve işlenmiş gıda tüketimi bağırsak-cilt aksını bozar. Probiyotikler cilt inflamasyonunu azaltabilir.',
       ingredients: ['Lactobacillus + Bifidobacterium', 'Min 10 milyar CFU/gün'],
+      searchQuery: 'probiyotik',
     });
   }
 
@@ -480,6 +493,7 @@ function ResultsContent() {
       title: 'C Vitamini Takviyesi',
       description: 'Sigara kullanımı C vitamini depolarını hızla tüketir. C vitamini kolajen sentezi ve antioksidan savunma için şart.',
       ingredients: ['Askorbik Asit / Ester-C', '500-1000mg/gün'],
+      searchQuery: 'c vitamini',
       warning: 'Sigara cildin en büyük düşmanı — bırakmak her takviyeden etkili.',
     });
   }
@@ -490,6 +504,7 @@ function ResultsContent() {
       title: 'Oral Hyaluronik Asit',
       description: 'Düşük su tüketimi cilt nemini direkt etkiler. Oral HA cildin nem tutma kapasitesini artırır.',
       ingredients: ['Hyaluronik Asit', '120-240mg/gün'],
+      searchQuery: 'hyaluronik',
     });
   }
 
@@ -499,6 +514,7 @@ function ResultsContent() {
       title: 'Biotin (B7)',
       description: 'Saç, tırnak ve cilt sağlığını destekler. Özellikle sıkılaştırma hedefinde keratin üretimini artırır.',
       ingredients: ['Biotin (D-Biotin)', '2500-5000 mcg/gün'],
+      searchQuery: 'biotin',
     });
   }
 
@@ -508,6 +524,7 @@ function ResultsContent() {
       title: 'Magnezyum',
       description: 'Hareketsiz yaşam ve stres magnezyum depolarını tüketir. Magnezyum cilt onarımı ve uyku kalitesini destekler.',
       ingredients: ['Magnezyum Bisglisinat', '200-400mg/gün (akşam)'],
+      searchQuery: 'magnezyum',
     });
   }
 
@@ -633,26 +650,40 @@ function ResultsContent() {
 
           <ProductCarousel>
             {supplementTips.map((tip) => (
-              <div key={tip.title} className="curator-card p-4 border-l-2 border-l-primary/40 snap-start shrink-0 w-[280px] sm:w-[320px]">
+              <Link
+                key={tip.title}
+                href={`/takviyeler?q=${encodeURIComponent(tip.searchQuery)}`}
+                className="group curator-card p-4 border-l-2 border-l-primary/40 snap-start shrink-0 w-[280px] sm:w-[320px] hover:border-l-primary hover:bg-surface-container-low transition-colors block"
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="material-icon text-primary" aria-hidden="true">{tip.icon}</span>
-                  <h3 className="font-bold text-on-surface text-sm">{tip.title}</h3>
+                  <h3 className="font-bold text-on-surface text-sm flex-1">{tip.title}</h3>
+                  <span
+                    className="material-icon text-outline-variant group-hover:text-primary group-hover:translate-x-0.5 transition-all"
+                    style={{ fontSize: '16px' }}
+                    aria-hidden="true"
+                  >
+                    arrow_forward
+                  </span>
                 </div>
                 <p className="text-xs text-on-surface-variant leading-relaxed mb-3">{tip.description}</p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   {tip.ingredients.map((ing) => (
                     <span key={ing} className="bg-primary/5 text-primary px-2 py-1 rounded-sm text-[10px] font-medium">
                       {ing}
                     </span>
                   ))}
                 </div>
+                <p className="text-[10px] text-primary font-semibold uppercase tracking-wider opacity-70 group-hover:opacity-100 transition-opacity">
+                  {tip.title} içeren takviyeleri gör →
+                </p>
                 {tip.warning && (
                   <div className="mt-2 flex items-start gap-1.5 bg-score-medium/10 rounded-sm p-2">
                     <span className="material-icon text-score-medium text-[14px] mt-0.5 shrink-0" aria-hidden="true">warning_amber</span>
                     <p className="text-[10px] text-score-medium leading-relaxed">{tip.warning}</p>
                   </div>
                 )}
-              </div>
+              </Link>
             ))}
           </ProductCarousel>
 
