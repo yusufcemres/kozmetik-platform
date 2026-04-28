@@ -958,12 +958,15 @@ export default async function ProductDetailPage({
                       flaggedNames.has(displayName.toLowerCase()) ||
                       (pi.ingredient?.inci_name && flaggedNames.has(pi.ingredient.inci_name.toLowerCase()));
 
+                    // 3 seviye uyarı görseli (üstteki skor uyarılarıyla bağlantı):
+                    // - isCritical (CMR/endokrin/eu-banned/harmful)         → tam kırmızı border + warning ikonu
+                    // - isAllergen / isFragrance (DB allergen_flag/fragrance_flag) → yarı kırmızı border + chip rozet
                     const cardClass = isCritical
                       ? 'border-2 border-error bg-error/5'
                       : isAllergen
-                        ? 'bg-error/5'
+                        ? 'border-2 border-error/50 bg-error/5'
                         : isFragrance
-                          ? 'bg-tertiary-container/30'
+                          ? 'border-2 border-error/50 bg-tertiary-container/30'
                           : '';
 
                     const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
