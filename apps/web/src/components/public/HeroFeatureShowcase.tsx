@@ -53,6 +53,7 @@ function formatStat(n: number): string {
 export default function HeroFeatureShowcase({ stats }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
@@ -60,6 +61,14 @@ export default function HeroFeatureShowcase({ stats }: Props) {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // TARA → ARA → ANALİZ ET animated word-morph (her 2sn'de döner).
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setActiveStep((prev) => (prev + 1) % SCAN_STEPS.length);
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [activeStep]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -108,27 +117,37 @@ export default function HeroFeatureShowcase({ stats }: Props) {
             REVELA
           </h1>
 
-          {/* Slogan: TARA · ARA · ANALİZ ET */}
-          <div className="flex items-center justify-center gap-2 sm:gap-4 lg:gap-6 mt-5 sm:mt-7 flex-wrap">
-            {SCAN_STEPS.map((step, idx) => (
-              <div key={step.key} className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-                <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Slogan: TARA → ARA → ANALİZ ET — animated word-morph */}
+          <div className="flex items-center justify-center mt-5 sm:mt-7">
+            <span className="text-base sm:text-lg lg:text-xl font-medium text-on-surface-variant tracking-tight">
+              Bilim destekli
+            </span>
+            <span className="relative flex justify-start overflow-hidden h-9 sm:h-10 lg:h-12 w-[180px] sm:w-[230px] lg:w-[280px] ml-2 sm:ml-3">
+              {SCAN_STEPS.map((step, idx) => (
+                <motion.span
+                  key={step.key}
+                  className="absolute inset-0 flex items-center justify-start gap-1.5 sm:gap-2 font-extrabold uppercase tracking-tight"
+                  initial={{ opacity: 0, y: -60 }}
+                  transition={{ type: 'spring', stiffness: 60, damping: 12 }}
+                  animate={
+                    activeStep === idx
+                      ? { y: 0, opacity: 1 }
+                      : { y: activeStep > idx ? -60 : 60, opacity: 0 }
+                  }
+                >
                   <span
                     className={`material-icon ${step.color}`}
-                    style={{ fontSize: '20px' }}
+                    style={{ fontSize: '22px' }}
                     aria-hidden="true"
                   >
                     {step.icon}
                   </span>
-                  <span className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight text-on-surface uppercase">
+                  <span className="text-base sm:text-lg lg:text-xl text-primary">
                     {step.title}
                   </span>
-                </div>
-                {idx < SCAN_STEPS.length - 1 && (
-                  <span className="text-outline-variant text-base sm:text-lg">·</span>
-                )}
-              </div>
-            ))}
+                </motion.span>
+              ))}
+            </span>
           </div>
 
           {/* Tagline */}
