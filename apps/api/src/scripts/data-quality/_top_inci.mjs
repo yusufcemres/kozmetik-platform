@@ -1,0 +1,12 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT i.inci_name, i.ingredient_slug, i.common_name, COUNT(*) AS uses FROM ingredients i JOIN product_ingredients pi ON pi.ingredient_id=i.ingredient_id WHERE i.domain_type='cosmetic' AND (i.common_name IS NULL OR i.common_name='') GROUP BY i.ingredient_id ORDER BY uses DESC LIMIT 60`);
+console.log('top 60 INCI without common_name:');
+for (const x of r.rows) console.log(`${x.uses.padStart(4)} | ${x.ingredient_slug.padEnd(40)} | ${x.inci_name}`);
+await c.end();
