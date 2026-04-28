@@ -1027,18 +1027,23 @@ export default async function ProductDetailPage({
                             >
                               {conc.label}
                             </span>
-                            {/* Uyarı rozetleri — kapalı kart üzerinde de görünür. Bir bileşen birden fazla flag taşıyabilir (ör. Parfum hem allergen hem fragrance). */}
+                            {/* Uyarı rozeti — kapalı kart üzerinde de görünür. Çoklu flag tek combined rozet ile (4-col grid'de yer dar). */}
                             {isCritical && (
                               <span className="label-caps text-[9px] bg-error text-on-error px-1 py-0.5 rounded-sm font-bold shrink-0">
                                 UYARI
                               </span>
                             )}
-                            {isAllergen && (
+                            {!isCritical && isAllergen && isFragrance && (
+                              <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30" title="Hem allerjen hem parfüm/koku bileşeni">
+                                PARFÜM·ALERJEN
+                              </span>
+                            )}
+                            {!isCritical && isAllergen && !isFragrance && (
                               <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
                                 ALERJEN
                               </span>
                             )}
-                            {isFragrance && (
+                            {!isCritical && !isAllergen && isFragrance && (
                               <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
                                 PARFÜM
                               </span>
