@@ -19,8 +19,13 @@ import { api } from '@/lib/api';
 
 interface Suggestion {
   type: 'product' | 'ingredient' | 'brand' | 'need' | 'category';
-  label: string;
+  name: string;
   slug: string;
+  // Optional product extras
+  score?: number;
+  grade?: string;
+  // Legacy / generic
+  label?: string;
   meta?: string;
 }
 
@@ -91,7 +96,8 @@ export default function HeroSearchAutocomplete() {
         need: `/ihtiyaclar/${s.slug}`,
         category: `/urunler?kategori=${encodeURIComponent(s.slug)}`,
       };
-      router.push(routes[s.type] || `/ara?q=${encodeURIComponent(s.label)}`);
+      const fallback = s.name || s.label || '';
+      router.push(routes[s.type] || `/ara?q=${encodeURIComponent(fallback)}`);
       setOpen(false);
     },
     [router],
@@ -141,7 +147,7 @@ export default function HeroSearchAutocomplete() {
         className="relative"
       >
         <span
-          className="material-icon text-zinc-400 absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none"
+          className="material-icon text-outline absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none"
           style={{ fontSize: '22px' }}
           aria-hidden="true"
         >
@@ -156,7 +162,7 @@ export default function HeroSearchAutocomplete() {
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
           placeholder="Ürün, marka veya içerik ara — örn. niacinamide, retinol"
-          className="w-full bg-white/5 hover:bg-white/[0.07] border border-white/10 focus:border-white/30 rounded-full pl-14 pr-32 sm:pr-36 py-4 sm:py-5 text-base text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all backdrop-blur-md"
+          className="w-full bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 focus:border-primary rounded-full pl-14 pr-32 sm:pr-36 py-4 sm:py-5 text-base text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           autoComplete="off"
           aria-autocomplete="list"
           aria-controls="hero-search-dropdown"
@@ -164,7 +170,7 @@ export default function HeroSearchAutocomplete() {
 
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 rounded-full bg-white text-zinc-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors active:scale-95"
+          className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 rounded-full bg-primary text-on-primary px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-primary-dim transition-colors active:scale-95"
         >
           <span className="hidden sm:inline">Ara</span>
           <span className="material-icon" style={{ fontSize: '18px' }} aria-hidden="true">
@@ -177,12 +183,12 @@ export default function HeroSearchAutocomplete() {
       {showDropdown && (
         <div
           id="hero-search-dropdown"
-          className="absolute top-full left-0 right-0 mt-2 rounded-2xl border border-white/10 bg-zinc-900/95 backdrop-blur-xl shadow-2xl overflow-hidden z-50"
+          className="absolute top-full left-0 right-0 mt-2 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-2xl overflow-hidden z-50"
           role="listbox"
         >
           {/* Loading */}
           {loading && query.trim().length >= 2 && (
-            <div className="px-5 py-4 text-sm text-zinc-400 flex items-center gap-2">
+            <div className="px-5 py-4 text-sm text-on-surface-variant flex items-center gap-2">
               <span className="material-icon animate-spin" style={{ fontSize: '16px' }} aria-hidden="true">
                 progress_activity
               </span>
@@ -196,6 +202,10 @@ export default function HeroSearchAutocomplete() {
               {suggestions.map((s, idx) => {
                 const meta = typeMeta[s.type];
                 const active = idx === activeIdx;
+                const displayName = s.name || s.label || '';
+                const scoreInfo = s.type === 'product' && s.score != null
+                  ? `Skor: %${s.score}${s.grade ? ` · ${s.grade}` : ''}`
+                  : s.meta;
                 return (
                   <li key={`${s.type}-${s.slug}-${idx}`} role="option" aria-selected={active}>
                     <button
@@ -203,21 +213,23 @@ export default function HeroSearchAutocomplete() {
                       onClick={() => navigateToSuggestion(s)}
                       onMouseEnter={() => setActiveIdx(idx)}
                       className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
-                        active ? 'bg-white/10' : 'hover:bg-white/5'
+                        active ? 'bg-surface-container' : 'hover:bg-surface-container-low'
                       }`}
                     >
                       <span
-                        className="material-icon text-zinc-400 shrink-0"
+                        className="material-icon text-primary shrink-0"
                         style={{ fontSize: '18px' }}
                         aria-hidden="true"
                       >
                         {meta.icon}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium truncate">{s.label}</p>
-                        {s.meta && <p className="text-[11px] text-zinc-500 truncate">{s.meta}</p>}
+                        <p className="text-sm text-on-surface font-medium truncate">{displayName}</p>
+                        {scoreInfo && (
+                          <p className="text-[11px] text-on-surface-variant truncate">{scoreInfo}</p>
+                        )}
                       </div>
-                      <span className="text-[10px] uppercase tracking-wider text-zinc-500 shrink-0">
+                      <span className="text-[10px] uppercase tracking-wider text-outline shrink-0 font-semibold">
                         {meta.label}
                       </span>
                     </button>
@@ -229,12 +241,12 @@ export default function HeroSearchAutocomplete() {
 
           {/* Empty state for actual query */}
           {showEmpty && (
-            <div className="px-5 py-4 text-sm text-zinc-400">
+            <div className="px-5 py-4 text-sm text-on-surface-variant">
               <p>"{query}" için sonuç yok.</p>
               <button
                 type="button"
                 onClick={() => submitSearch(query)}
-                className="text-xs text-white hover:underline mt-1"
+                className="text-xs text-primary hover:underline mt-1 font-semibold"
               >
                 Yine de aramayı dene →
               </button>
@@ -244,7 +256,7 @@ export default function HeroSearchAutocomplete() {
           {/* Popular when empty */}
           {showPopular && (
             <div className="p-4">
-              <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-2">
+              <p className="text-[10px] uppercase tracking-widest text-outline mb-2">
                 Popüler aramalar
               </p>
               <div className="flex flex-wrap gap-2">
@@ -253,7 +265,7 @@ export default function HeroSearchAutocomplete() {
                     key={p}
                     href={`/urunler?search=${encodeURIComponent(p)}`}
                     onClick={() => setOpen(false)}
-                    className="text-xs bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full px-3 py-1.5 transition-colors"
+                    className="text-xs bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/30 rounded-full px-3 py-1.5 transition-colors"
                   >
                     {p}
                   </Link>

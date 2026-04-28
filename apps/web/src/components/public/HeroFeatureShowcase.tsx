@@ -138,7 +138,7 @@ export default function HeroFeatureShowcase({ stats }: Props) {
           </p>
 
           {/* Search */}
-          <div className="mt-7 sm:mt-9 [&_input]:!bg-surface-container-low [&_input]:!text-on-surface [&_input]:!border-outline-variant/40 [&_input]:!placeholder:!text-outline [&_button[type=submit]]:!bg-primary [&_button[type=submit]]:!text-on-primary [&_.material-icon]:!text-outline">
+          <div className="mt-7 sm:mt-9">
             <HeroSearchAutocomplete />
           </div>
 
