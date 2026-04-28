@@ -133,21 +133,17 @@ export default function Header() {
     <>
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="flex justify-between items-center w-full px-3 sm:px-6 lg:px-12 py-3 sm:py-4 max-w-full">
-        {/* Logo: sadece R icon (lockup'tan crop) + büyük REVELA wordmark text */}
+        {/* Logo: standalone R icon (square, transparent) + büyük REVELA wordmark text */}
         <Link href="/" className="flex items-center gap-2.5 leading-none" aria-label="REVELA">
-          {/* R icon — rounded square (transparent PNG, lockup'un solunu kırp) */}
-          <span className="block h-9 w-9 sm:h-10 sm:w-10 overflow-hidden shrink-0">
-            <img
-              src="/revela_light_transparent.png"
-              alt=""
-              className="h-full w-auto max-w-none block dark:hidden"
-            />
-            <img
-              src="/revela_darkmode_transparent.png"
-              alt=""
-              className="h-full w-auto max-w-none hidden dark:block"
-            />
-          </span>
+          {/* R icon — icon-only PNG (rounded square, navy bg + white R, both modes uyumlu) */}
+          <Image
+            src="/revela-icon.png"
+            alt=""
+            width={44}
+            height={44}
+            priority
+            className="h-10 sm:h-11 w-10 sm:w-11 shrink-0 object-contain"
+          />
           {/* REVELA wordmark — text, brand color, larger */}
           <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-primary leading-none">
             REVELA
