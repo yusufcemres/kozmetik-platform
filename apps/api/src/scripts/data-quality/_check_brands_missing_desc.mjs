@@ -1,0 +1,11 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT b.brand_name, b.brand_slug, b.country_of_origin, COUNT(p.product_id) AS prod_count FROM brands b LEFT JOIN products p ON p.brand_id=b.brand_id AND p.status='published' WHERE b.is_active=true AND (b.brand_description IS NULL OR length(b.brand_description) < 50) GROUP BY b.brand_id ORDER BY prod_count DESC LIMIT 60`);
+for (const x of r.rows) console.log(`${String(x.prod_count).padStart(4)} | ${x.brand_slug.padEnd(35)} | ${x.country_of_origin || 'N/A'} | ${x.brand_name}`);
+await c.end();
