@@ -974,40 +974,47 @@ export default async function ProductDetailPage({
                         key={pi.product_ingredient_id}
                         className={`group curator-card px-3 py-2 ${cardClass}`}
                       >
-                        <summary className="flex items-center gap-1.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                          <span className="label-caps text-outline text-[9px] w-5 text-right shrink-0">
-                            {idx + 1}
-                          </span>
-                          {isCritical && (
+                        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                          {/* Üst: sıra no + konsantrasyon badge + chevron */}
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="label-caps text-outline text-[9px] shrink-0">
+                              {idx + 1}
+                            </span>
                             <span
-                              className="material-icon text-error shrink-0"
+                              className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
+                              title={conc.tooltip}
+                            >
+                              {conc.label}
+                            </span>
+                            <span className="flex-1" />
+                            <span
+                              className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
                               style={{ fontSize: '14px' }}
                               aria-hidden="true"
-                              title="Bu içerik üstte güvenlik uyarısı aldı"
                             >
-                              warning
+                              expand_more
                             </span>
-                          )}
-                          <span
-                            className={`flex-1 min-w-0 text-xs font-medium leading-snug group-open:text-primary transition-colors line-clamp-2 ${
-                              isCritical ? 'text-error font-semibold' : 'text-on-surface'
-                            }`}
-                          >
-                            {displayName}
-                          </span>
-                          <span
-                            className={`label-caps text-[9px] px-1 py-0.5 rounded-sm shrink-0 ${conc.color}`}
-                            title={conc.tooltip}
-                          >
-                            {conc.label}
-                          </span>
-                          <span
-                            className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
-                            style={{ fontSize: '14px' }}
-                            aria-hidden="true"
-                          >
-                            expand_more
-                          </span>
+                          </div>
+                          {/* Alt: isim full-width */}
+                          <div className="flex items-start gap-1.5">
+                            {isCritical && (
+                              <span
+                                className="material-icon text-error shrink-0"
+                                style={{ fontSize: '14px' }}
+                                aria-hidden="true"
+                                title="Bu içerik üstte güvenlik uyarısı aldı"
+                              >
+                                warning
+                              </span>
+                            )}
+                            <span
+                              className={`flex-1 min-w-0 text-xs font-medium leading-snug group-open:text-primary transition-colors break-words ${
+                                isCritical ? 'text-error font-semibold' : 'text-on-surface'
+                              }`}
+                            >
+                              {displayName}
+                            </span>
+                          </div>
                         </summary>
                         <div className="mt-2 pt-2 border-t border-outline-variant/15">
                           <div className="flex items-center gap-1 mb-1.5 flex-wrap">

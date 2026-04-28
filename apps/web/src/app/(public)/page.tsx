@@ -178,7 +178,7 @@ export default async function HomePage() {
       <section className="min-h-[calc(100vh-57px)] sm:min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 text-center">
         {/* Logo */}
         <div className="mb-2">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-on-surface leading-none">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-primary leading-none">
             REVELA
           </h1>
           <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-outline mt-2">
