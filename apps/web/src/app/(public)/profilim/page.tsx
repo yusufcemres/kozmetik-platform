@@ -4,53 +4,13 @@ import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { api, API_BASE_URL } from '@/lib/api';
+import { api } from '@/lib/api';
 import {
   getFavorites, removeFavorite, FavoriteItem,
   getRoutine, addToRoutine, removeFromRoutine, reorderRoutine,
   Routine, RoutineProduct,
 } from '@/lib/favorites';
-
-/**
- * Profil backend sync — fire-and-forget. localStorage hala source-of-truth,
- * ama backend'de de tutarak server-side personal scoring + cross-device
- * (anonymous_id cookie ile) kapısı açılır.
- *
- * Idempotent: yoksa POST, varsa PUT.
- */
-async function syncProfileToBackend(profile: {
-  anonymous_id: string;
-  skin_type: string;
-  concerns: number[];
-  sensitivities: Record<string, boolean>;
-  age_range?: string;
-  gender?: string;
-}): Promise<void> {
-  const body = {
-    anonymous_id: profile.anonymous_id,
-    skin_type: profile.skin_type,
-    concerns: profile.concerns,
-    sensitivities: profile.sensitivities,
-    age_range: profile.age_range,
-    gender: profile.gender,
-  };
-  try {
-    const putRes = await fetch(`${API_BASE_URL}/skin-profiles/${profile.anonymous_id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (putRes.status === 404) {
-      await fetch(`${API_BASE_URL}/skin-profiles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    }
-  } catch {
-    // Sessizce yoksay
-  }
-}
+import { saveSkinProfile, migrateExistingProfile } from '@/lib/profile-sync';
 import { getPriceAlerts, removePriceAlert, PriceAlert } from '@/components/public/PriceAlertButton';
 import PushToggle from '@/components/public/PushToggle';
 import { getUserToken, clearUserToken } from '@/lib/user-auth';
@@ -188,22 +148,15 @@ function ProfilePageInner() {
       if (stored) {
         const parsed = JSON.parse(stored) as SkinProfile;
         setProfile(parsed);
-        // Migration shim: profil localStorage'da var ama cookie/backend kaydı yoksa,
-        // ilk load'da cookie set + backend sync — eski kullanıcılar için tek seferlik
-        if (parsed?.anonymous_id) {
-          const hasIdCookie = document.cookie.includes('skin_profile_id=');
-          if (!hasIdCookie) {
-            document.cookie = `skin_profile_id=${parsed.anonymous_id}; path=/; max-age=31536000; SameSite=Lax`;
-            void syncProfileToBackend({
-              anonymous_id: parsed.anonymous_id,
-              skin_type: parsed.skin_type,
-              concerns: parsed.concerns || [],
-              sensitivities: parsed.sensitivities || {},
-              age_range: parsed.age_range,
-              gender: parsed.gender,
-            });
-          }
-        }
+        // Migration shim: localStorage'da profil var ama cookie/backend yoksa senkron et
+        migrateExistingProfile({
+          anonymous_id: parsed.anonymous_id,
+          skin_type: parsed.skin_type,
+          concerns: parsed.concerns || [],
+          sensitivities: parsed.sensitivities || {},
+          age_range: parsed.age_range,
+          gender: parsed.gender,
+        });
       }
     } catch {}
     setFavorites(getFavorites());
@@ -275,24 +228,15 @@ function ProfilePageInner() {
   };
 
   const saveProfile = () => {
-    const existing = profile || { anonymous_id: crypto.randomUUID() };
-    const updated: SkinProfile = {
-      ...existing,
-      anonymous_id: existing.anonymous_id || crypto.randomUUID(),
+    const existing = profile || ({} as SkinProfile);
+    const updated = saveSkinProfile({
+      anonymous_id: existing.anonymous_id,
       skin_type: editSkinType,
       concerns: editConcerns,
       sensitivities: editSensitivities,
       gender: editGender || undefined,
-      updated_at: new Date().toISOString(),
-    };
-    localStorage.setItem('skin_profile', JSON.stringify(updated));
-    // Cookie sync — SSR sayfaları CTA'yı hemen gizlesin
-    document.cookie = 'has_skin_profile=1; path=/; max-age=31536000; SameSite=Lax';
-    // Anonymous ID cookie — server-side fetch için
-    document.cookie = `skin_profile_id=${updated.anonymous_id}; path=/; max-age=31536000; SameSite=Lax`;
-    // Backend sync — fire-and-forget, hata bloke etmez (localStorage source-of-truth)
-    void syncProfileToBackend(updated);
-    window.dispatchEvent(new Event('skin-profile-changed'));
+      age_range: existing.age_range,
+    }) as SkinProfile;
     setProfile(updated);
     setEditing(false);
   };

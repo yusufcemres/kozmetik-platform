@@ -683,8 +683,10 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Safety Score (sol) | Uyumluluk Skorları (sağ) — takviye paritesi 2-col grid */}
+        {/* SOL: REVELA Skoru + Uyumluluk Skorları (stacked) | SAĞ: INCI Listesi (full-height) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6 items-start">
+        {/* SOL kolon wrapper: REVELA + Uyumluluk Skorları stacked */}
+        <div className="space-y-3">
         {/* Safety Score — Evidence-Based (cosmetic-v1) */}
         {sortedIngredients.length > 0 && (() => {
           // Fallback inline calc — API skoru varsa o kullanılır
@@ -822,7 +824,7 @@ export default async function ProductDetailPage({
           );
         })()}
 
-        {/* SAĞ kolon: Uyumluluk Skorları (need_scores) — accordion */}
+        {/* Uyumluluk Skorları (need_scores) — sol kolonda REVELA Skoru'nun altında */}
         {product.need_scores && product.need_scores.length > 0 && (
           <section className="curator-card p-3 md:p-4">
             <details open className="group">
@@ -873,10 +875,10 @@ export default async function ProductDetailPage({
         )}
 
         </div>
-        {/* /Safety Score | Uyumluluk Skorları grid */}
+        {/* /SOL kolon */}
 
-        {/* INCI Ingredients */}
-        <section className="mb-16" data-analytics-section="inci">
+        {/* SAĞ kolon: INCI Ingredients */}
+        <section data-analytics-section="inci">
           <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">
             İçerik Listesi (INCI)
             {sortedIngredients.length > 0 && (
@@ -1034,6 +1036,9 @@ export default async function ProductDetailPage({
             </div>
           )}
         </section>
+
+        </div>
+        {/* /Üst grid: SOL (REVELA + Uyumluluk) | SAĞ (INCI) */}
 
         {/* ALT 2-col grid: Ürün Bilgileri | Bu İçerikler Ne İşe Yarar */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
@@ -1222,40 +1227,6 @@ export default async function ProductDetailPage({
               })}
             </div>
           </AccordionSection>
-        )}
-
-        {/* Label Info */}
-        {product.label && (
-          <section className="mb-16" data-analytics-section="claims">
-            {product.label.usage_instructions && (
-              <div className="mb-6">
-                <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">Kullanım</h2>
-                <p className="text-on-surface-variant text-sm leading-relaxed bg-surface-container-low rounded-md p-5">
-                  {product.label.usage_instructions}
-                </p>
-              </div>
-            )}
-            {product.label.claim_texts_json && product.label.claim_texts_json.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3 text-on-surface">Ürün İddiaları</h3>
-                <div className="text-on-surface-variant text-sm leading-relaxed bg-tertiary-container/30 rounded-md p-5">
-                  <ul className="list-disc list-inside space-y-1">
-                    {product.label.claim_texts_json.map((claim, i) => (
-                      <li key={i}>{claim}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-            {product.label.warning_text && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3 text-on-surface">Uyarılar</h3>
-                <p className="text-on-surface-variant text-sm leading-relaxed bg-error/5 rounded-md p-5 border border-error/20">
-                  {product.label.warning_text}
-                </p>
-              </div>
-            )}
-          </section>
         )}
 
         {/* Affiliate Links */}

@@ -33,6 +33,8 @@ const COUNTRY_FLAGS: Record<string, string> = {
   CH: '\u{1F1E8}\u{1F1ED}',
   CA: '\u{1F1E8}\u{1F1E6}',
   HU: '\u{1F1ED}\u{1F1FA}',
+  GR: '\u{1F1EC}\u{1F1F7}',
+  HK: '\u{1F1ED}\u{1F1F0}',
 };
 
 const COUNTRY_LABELS: Record<string, string> = {
@@ -49,6 +51,8 @@ const COUNTRY_LABELS: Record<string, string> = {
   CH: 'Isvicre',
   CA: 'Kanada',
   HU: 'Macaristan',
+  GR: 'Yunanistan',
+  HK: 'Hong Kong',
 };
 
 function brandInitial(name: string): string {
@@ -214,27 +218,27 @@ export default function BrandsPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                   {grouped[letter]
                     .sort((a, b) => a.brand_name.localeCompare(b.brand_name))
                     .map((brand) => (
                       <Link
                         key={brand.brand_id}
                         href={`/markalar/${brand.brand_slug}`}
-                        className="curator-card flex items-center gap-4 px-4 py-3.5 group hover:bg-surface-container-low transition-colors duration-200"
+                        className="curator-card flex items-center gap-2.5 px-3 py-2 group hover:bg-surface-container-low transition-colors duration-200"
                       >
                         {/* Logo / Initial */}
-                        <div className="w-12 h-12 rounded-lg bg-surface-container-low border border-outline-variant/15 flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-9 h-9 rounded-md bg-surface-container-low border border-outline-variant/15 flex items-center justify-center shrink-0 overflow-hidden">
                           {brand.logo_url ? (
                             <Image
                               src={brand.logo_url}
                               alt={brand.brand_name}
-                              width={40}
-                              height={40}
+                              width={32}
+                              height={32}
                               className="object-contain"
                             />
                           ) : (
-                            <span className="text-lg font-bold text-primary/60">
+                            <span className="text-sm font-bold text-primary/60">
                               {brandInitial(brand.brand_name)}
                             </span>
                           )}
@@ -242,31 +246,23 @@ export default function BrandsPage() {
 
                         {/* Brand info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-on-surface group-hover:text-primary transition-colors truncate">
+                          <p className="text-xs font-semibold text-on-surface group-hover:text-primary transition-colors truncate leading-tight">
                             {brand.brand_name}
                           </p>
-                          <div className="flex items-center gap-2 mt-0.5">
+                          <div className="flex items-center gap-1.5 mt-0.5">
                             {brand.country_of_origin &&
                               COUNTRY_FLAGS[brand.country_of_origin] && (
-                                <span className="text-xs">
+                                <span className="text-[10px]">
                                   {COUNTRY_FLAGS[brand.country_of_origin]}
                                 </span>
                               )}
                             {brand.product_count !== undefined && brand.product_count > 0 && (
-                              <span className="label-caps text-outline text-[10px]">
-                                {brand.product_count} ürün
+                              <span className="label-caps text-outline text-[9px]">
+                                {brand.product_count}
                               </span>
                             )}
                           </div>
                         </div>
-
-                        {/* Arrow */}
-                        <span
-                          className="material-icon material-icon-sm text-outline-variant/50 group-hover:text-primary transition-colors shrink-0"
-                          aria-hidden="true"
-                        >
-                          arrow_forward
-                        </span>
                       </Link>
                     ))}
                 </div>

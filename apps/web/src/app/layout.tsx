@@ -73,10 +73,11 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('revela_theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
-        {/* Sync skin_profile in localStorage → has_skin_profile cookie, so SSR knows to hide "Cilt profili oluştur" CTAs */}
+        {/* Sync skin_profile in localStorage → has_skin_profile + skin_profile_id cookies (SSR personal score için).
+            skin_profile_id eksikse anonymous_id'den senkronize ederek getServerSkinProfile()'ın çalışmasını sağlar. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=localStorage.getItem('skin_profile');document.cookie='has_skin_profile='+(p?'1':'')+';path=/;max-age='+(p?31536000:0)+';SameSite=Lax'}catch(e){}})()`,
+            __html: `(function(){try{var p=localStorage.getItem('skin_profile');document.cookie='has_skin_profile='+(p?'1':'')+';path=/;max-age='+(p?31536000:0)+';SameSite=Lax';if(p){var id=null;try{id=JSON.parse(p).anonymous_id}catch(e){}if(id&&document.cookie.indexOf('skin_profile_id=')<0){document.cookie='skin_profile_id='+id+';path=/;max-age=31536000;SameSite=Lax'}}}catch(e){}})()`,
           }}
         />
         {/* Google Analytics 4 with Consent Mode v2 */}
