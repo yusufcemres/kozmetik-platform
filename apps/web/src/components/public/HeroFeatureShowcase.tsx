@@ -53,7 +53,6 @@ function formatStat(n: number): string {
 export default function HeroFeatureShowcase({ stats }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
@@ -61,14 +60,6 @@ export default function HeroFeatureShowcase({ stats }: Props) {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-
-  // TARA → ARA → ANALİZ ET animated word-morph (her 2sn'de döner).
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setActiveStep((prev) => (prev + 1) % SCAN_STEPS.length);
-    }, 2000);
-    return () => clearTimeout(t);
-  }, [activeStep]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -97,10 +88,10 @@ export default function HeroFeatureShowcase({ stats }: Props) {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 pb-8 sm:pt-16">
-        {/* Header — slogan + REVELA */}
+        {/* Header — REVELA + 3 step (yan yana, REVELA solda 3 kelime sağda) */}
         <motion.div
           style={{ y: translate }}
-          className="text-center max-w-4xl mx-auto mb-8 sm:mb-12"
+          className="text-center max-w-5xl mx-auto mb-8 sm:mb-12"
         >
           {/* Trust badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-outline-variant/30 bg-surface-container-low px-3 py-1.5 mb-5">
@@ -112,42 +103,40 @@ export default function HeroFeatureShowcase({ stats }: Props) {
             </span>
           </div>
 
-          {/* REVELA wordmark */}
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tighter text-primary leading-[0.9]">
-            REVELA
-          </h1>
+          {/* REVELA solda + 3 step (TARA/ARA/ANALİZ ET) sağda alt alta staggered */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 lg:gap-12">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tighter text-primary leading-[0.9]">
+              REVELA
+            </h1>
 
-          {/* Slogan: TARA → ARA → ANALİZ ET — animated word-morph */}
-          <div className="flex items-center justify-center mt-5 sm:mt-7">
-            <span className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight uppercase text-on-surface">
-              Bilim destekli
-            </span>
-            <span className="relative flex justify-start overflow-hidden h-9 sm:h-10 lg:h-12 w-[180px] sm:w-[230px] lg:w-[280px] ml-2 sm:ml-3">
+            {/* 3 step — REVELA height'a hizalı, alt alta staggered fade-in */}
+            <div className="flex flex-col items-start justify-center gap-1.5 sm:gap-2 lg:gap-3">
               {SCAN_STEPS.map((step, idx) => (
-                <motion.span
+                <motion.div
                   key={step.key}
-                  className="absolute inset-0 flex items-center justify-start gap-1.5 sm:gap-2 font-extrabold uppercase tracking-tight"
-                  initial={{ opacity: 0, y: -60 }}
-                  transition={{ type: 'spring', stiffness: 60, damping: 12 }}
-                  animate={
-                    activeStep === idx
-                      ? { y: 0, opacity: 1 }
-                      : { y: activeStep > idx ? -60 : 60, opacity: 0 }
-                  }
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: 0.3 + idx * 0.35,
+                    type: 'spring',
+                    stiffness: 60,
+                    damping: 14,
+                  }}
+                  className="flex items-center gap-2 sm:gap-2.5 lg:gap-3"
                 >
                   <span
                     className={`material-icon ${step.color}`}
-                    style={{ fontSize: '22px' }}
+                    style={{ fontSize: 'clamp(20px, 3vw, 32px)' }}
                     aria-hidden="true"
                   >
                     {step.icon}
                   </span>
-                  <span className="text-base sm:text-lg lg:text-xl text-primary">
+                  <span className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold uppercase tracking-tight text-on-surface">
                     {step.title}
                   </span>
-                </motion.span>
+                </motion.div>
               ))}
-            </span>
+            </div>
           </div>
 
           {/* Tagline */}
