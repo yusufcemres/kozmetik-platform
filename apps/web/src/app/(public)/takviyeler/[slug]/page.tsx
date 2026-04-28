@@ -392,56 +392,64 @@ export default async function SupplementDetailPage({
             </h1>
 
             {product.short_description && (
-              <p className="text-on-surface-variant leading-relaxed mb-4">
+              <p className="text-on-surface-variant leading-relaxed mb-6">
                 {product.short_description}
               </p>
             )}
 
-            {/* Quick price section */}
-            {activeLinks.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-4">
-                {activeLinks.map((link) => {
-                  const pInfo = PLATFORM_INFO[link.platform];
-                  const branded = !!pInfo;
-                  return (
-                    <a
-                      key={link.affiliate_link_id}
-                      href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer nofollow sponsored"
-                      aria-label={`${platformLabel(link.platform)}'de aç`}
-                      className={
-                        branded
-                          ? 'inline-flex items-center gap-2 rounded-sm px-4 py-2.5 transition-all hover:brightness-95 shadow-sm'
-                          : 'inline-flex items-center gap-2 border border-outline-variant/30 rounded-sm px-4 py-2.5 hover:border-primary hover:bg-primary/5 transition-all'
-                      }
-                      style={
-                        branded
-                          ? { backgroundColor: pInfo.color, color: pInfo.textColor }
-                          : undefined
-                      }
-                    >
-                      <span className="font-semibold text-sm">{platformLabel(link.platform)}</span>
-                      {link.price_snapshot ? (
-                        <span className="text-lg font-bold">{formatPrice(link.price_snapshot)}</span>
-                      ) : (
-                        <span className={branded ? 'text-sm opacity-80' : 'text-sm text-outline'}>
-                          Fiyat bilgisi yok
-                        </span>
-                      )}
-                      <span className="material-icon text-[16px]" aria-hidden="true">arrow_forward</span>
-                    </a>
-                  );
-                })}
+            {/* Genel REVELA Skoru (üstte özet) */}
+            {score && (
+              <div className={`rounded-md border p-5 mb-4 ${
+                score.overall_score >= 70 ? 'bg-score-high-bg border-score-high-border' :
+                score.overall_score >= 40 ? 'bg-score-medium-bg border-score-medium-border' :
+                'bg-score-low-bg border-score-low-border'
+              }`}>
+                <p className="label-caps text-on-surface-variant mb-1">REVELA Skoru</p>
+                <p className={`text-4xl headline-tight ${
+                  score.overall_score >= 70 ? 'text-score-high' :
+                  score.overall_score >= 40 ? 'text-score-medium' :
+                  'text-score-low'
+                }`}>
+                  %{score.overall_score}
+                </p>
+                <div className="mt-3 h-2 bg-surface-container rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${
+                      score.overall_score >= 70 ? 'bg-score-high' :
+                      score.overall_score >= 40 ? 'bg-score-medium' :
+                      'bg-score-low'
+                    }`}
+                    style={{ width: `${Math.min(100, Math.max(0, score.overall_score))}%` }}
+                  />
+                </div>
               </div>
+            )}
+
+            {/* Senin İhtiyaçlarına Uyumu — SSR-friendly */}
+            {product.need_scores && product.need_scores.length > 0 && (
+              <PersonalScoreInline
+                needScores={product.need_scores.map((ns) => ({
+                  need_id: ns.need_id,
+                  need: ns.need,
+                  compatibility_score: Number(ns.compatibility_score),
+                }))}
+                hasAllergens={false}
+                hasFragrance={false}
+                variant="supplement"
+                initialProfile={
+                  serverSkinProfile
+                    ? {
+                        skin_type: serverSkinProfile.skin_type ?? undefined,
+                        concerns: serverSkinProfile.concerns ?? [],
+                        sensitivities: serverSkinProfile.sensitivities ?? {},
+                        gender: serverSkinProfile.gender ?? undefined,
+                      }
+                    : null
+                }
+              />
             )}
           </div>
         </div>
-
-        {/* Price history chart (B.11) */}
-        <section className="mb-8">
-          <PriceChart productId={product.product_id} />
-        </section>
 
         {/* Skor + Takviye Bilgileri (sol stack) | Uyumluluk Skorları (sağ accordion) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
@@ -592,31 +600,8 @@ export default async function SupplementDetailPage({
         </div>
         {/* /SOL stack */}
 
-        {/* SAĞ stack: Personal Score (üstte) + Uyumluluk Skorları (accordion altta) */}
+        {/* SAĞ stack: Uyumluluk Skorları (accordion) — Personal Score üstte header'a taşındı */}
         <div className="space-y-3">
-          {/* Personal Score — SSR-friendly */}
-          {product.need_scores && product.need_scores.length > 0 && (
-            <PersonalScoreInline
-              needScores={product.need_scores.map((ns) => ({
-                need_id: ns.need_id,
-                need: ns.need,
-                compatibility_score: Number(ns.compatibility_score),
-              }))}
-              hasAllergens={false}
-              hasFragrance={false}
-              variant="supplement"
-              initialProfile={
-                serverSkinProfile
-                  ? {
-                      skin_type: serverSkinProfile.skin_type ?? undefined,
-                      concerns: serverSkinProfile.concerns ?? [],
-                      sensitivities: serverSkinProfile.sensitivities ?? {},
-                      gender: serverSkinProfile.gender ?? undefined,
-                    }
-                  : null
-              }
-            />
-          )}
 
         {/* Uyumluluk Skorları — accordion, defaultOpen, sol stack yüksekliğine yakın */}
         {product.need_scores && product.need_scores.length > 0 && (
@@ -955,6 +940,65 @@ export default async function SupplementDetailPage({
             </div>
           </AccordionSection>
         )}
+
+        {/* Nereden Alınır — Fiyat Takip + satış noktaları (header'dan alta taşındı) */}
+        <section className="mb-10" data-analytics-section="purchase">
+          <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface flex items-center gap-2">
+            <span className="material-icon text-primary text-[18px]" aria-hidden="true">shopping_bag</span>
+            Nereden Alınır?
+          </h2>
+
+          {/* Fiyat geçmiş grafiği */}
+          <div className="mb-4">
+            <PriceChart productId={product.product_id} />
+          </div>
+
+          {/* Satış noktaları */}
+          {activeLinks.length > 0 ? (
+            <div className="curator-card overflow-hidden divide-y divide-outline-variant/15">
+              {activeLinks.map((link) => {
+                const pInfo = PLATFORM_INFO[link.platform];
+                const branded = !!pInfo;
+                return (
+                  <a
+                    key={link.affiliate_link_id}
+                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow sponsored"
+                    aria-label={`${platformLabel(link.platform)}'de aç`}
+                    className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {branded && (
+                        <span
+                          className="w-9 h-9 rounded-md flex items-center justify-center font-bold text-sm shrink-0"
+                          style={{ backgroundColor: pInfo.color, color: pInfo.textColor }}
+                        >
+                          {platformLabel(link.platform).slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="font-semibold text-sm text-on-surface">{platformLabel(link.platform)}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {link.price_snapshot ? (
+                        <span className="text-base font-bold text-on-surface">{formatPrice(link.price_snapshot)}</span>
+                      ) : (
+                        <span className="text-xs text-outline">Fiyat bilgisi yok</span>
+                      )}
+                      <span className="material-icon text-outline-variant text-[18px]" aria-hidden="true">arrow_forward</span>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="curator-card p-6 text-center">
+              <span className="material-icon text-outline-variant/40 mb-2 block" style={{ fontSize: '36px' }} aria-hidden="true">store</span>
+              <p className="text-sm text-on-surface-variant font-medium">Bu ürün için satış linkleri doğrulanıyor...</p>
+              <p className="text-xs text-outline mt-1">Yakında güncel satış noktaları burada listelenecek.</p>
+            </div>
+          )}
+        </section>
 
         {/* Reviews (B.12) */}
         <ReviewsBlock productId={product.product_id} />
