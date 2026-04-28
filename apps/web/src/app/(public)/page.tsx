@@ -3,7 +3,7 @@ import SafeImage from '@/components/public/SafeImage';
 import { apiFetch } from '@/lib/api';
 import ProductCarousel from '@/components/public/ProductCarousel';
 import NewsletterForm from '@/components/public/NewsletterForm';
-import HeroTrust from '@/components/public/HeroTrust';
+import HeroFeatureShowcase from '@/components/public/HeroFeatureShowcase';
 import OnboardingModal from '@/components/public/OnboardingModal';
 
 // === Types ===
@@ -179,8 +179,8 @@ export default async function HomePage() {
       {/* Onboarding modal — ilk ziyarette gösterilir, localStorage flag */}
       <OnboardingModal />
 
-      {/* 1. Hero — Glassmorphism trust hero (Ink Blue background, glass cards) */}
-      <HeroTrust
+      {/* 1. Hero — Beyaz tema + Aceternity 3D scroll-tilt + TARA·ARA·ANALİZ ET slogan + mobile scan showcase */}
+      <HeroFeatureShowcase
         stats={{
           kozmetik: latest.meta?.total || 0,
           takviye: supplementCount || 0,
