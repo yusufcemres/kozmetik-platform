@@ -447,13 +447,24 @@ export default async function SupplementDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
         {/* SOL: Score + Takviye Bilgileri stacked */}
         <div className="space-y-3">
-        {/* REVELA Supplement Skoru (v2 — Evidence-Based) */}
+        {/* REVELA Supplement Skoru (v2 — Evidence-Based) — accordion */}
         {score && (
           <section className="curator-card p-3 md:p-4">
+            <details open className="group">
+              <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden mb-2">
+                <span className="material-icon text-primary text-[16px]" aria-hidden="true">shield</span>
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] text-[10px] flex-1">REVELA Takviye Skoru</h2>
+                <span
+                  className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                  style={{ fontSize: '16px' }}
+                  aria-hidden="true"
+                >
+                  expand_more
+                </span>
+              </summary>
             <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
               <ScoreBadge score={score.overall_score} grade={score.grade} size="md" />
               <div className="flex-1 w-full">
-                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] mb-2 text-[10px]">REVELA Takviye Skoru</h2>
                 <div className="space-y-1">
                   {[
                     { label: 'Form Kalitesi',   key: 'form_quality',         desc: 'Emilim kolaylığı ve biyoyararlanım (ör. sitrat > oksit)' },
@@ -524,6 +535,7 @@ export default async function SupplementDetailPage({
                 </div>
               </div>
             </div>
+            </details>
           </section>
         )}
 

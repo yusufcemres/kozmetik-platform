@@ -731,12 +731,19 @@ export default async function ProductDetailPage({
           };
 
           return (
-            <section className="mb-6" data-analytics-section="safety">
-              <h2 className="text-lg font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
-                <span className="material-icon text-primary text-[18px]" aria-hidden="true">shield</span>
-                REVELA Güvenlik Skoru
-              </h2>
-              <div className="curator-card p-3 md:p-4">
+            <section className="curator-card p-3 md:p-4" data-analytics-section="safety">
+              <details open className="group">
+                <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden mb-2">
+                  <span className="material-icon text-primary text-[18px]" aria-hidden="true">shield</span>
+                  <h2 className="text-lg font-bold tracking-tight text-on-surface flex-1">REVELA Güvenlik Skoru</h2>
+                  <span
+                    className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                    style={{ fontSize: '18px' }}
+                    aria-hidden="true"
+                  >
+                    expand_more
+                  </span>
+                </summary>
                 <div className="flex items-start gap-3 md:gap-4 flex-col md:flex-row">
                   <ScoreBadge score={safetyScore} grade={grade as any} size="md" />
                   <div className="flex-1 w-full">
@@ -819,7 +826,7 @@ export default async function ProductDetailPage({
                     </div>
                   </div>
                 </div>
-              </div>
+              </details>
             </section>
           );
         })()}
@@ -877,16 +884,27 @@ export default async function ProductDetailPage({
         </div>
         {/* /SOL kolon */}
 
-        {/* SAĞ kolon: INCI Ingredients */}
-        <section data-analytics-section="inci">
-          <h2 className="text-xl font-bold tracking-tight mb-3 text-on-surface">
-            İçerik Listesi (INCI)
-            {sortedIngredients.length > 0 && (
-              <span className="text-sm font-normal text-outline ml-2">
-                {sortedIngredients.length} madde
+        {/* SAĞ kolon: INCI Ingredients — accordion */}
+        <section data-analytics-section="inci" className="curator-card p-3 md:p-4">
+          <details open className="group">
+            <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden mb-3">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">science</span>
+              <h2 className="text-xl font-bold tracking-tight text-on-surface flex-1">
+                İçerik Listesi (INCI)
+                {sortedIngredients.length > 0 && (
+                  <span className="text-sm font-normal text-outline ml-2">
+                    {sortedIngredients.length} madde
+                  </span>
+                )}
+              </h2>
+              <span
+                className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                style={{ fontSize: '18px' }}
+                aria-hidden="true"
+              >
+                expand_more
               </span>
-            )}
-          </h2>
+            </summary>
           {sortedIngredients.length > 0 && (
             <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-on-surface-variant bg-surface-container-low border border-outline-variant/20 rounded-md px-3 py-2">
               <span className="label-caps text-outline">İçerik Yoğunluğu</span>
@@ -919,10 +937,15 @@ export default async function ProductDetailPage({
             // Üstteki güvenlik uyarılarındaki ingredient'lar (endokrin/CMR/EU yasaklı) burada
             // KIRMIZI BORDER + ⚠ ünlem ikonu ile flag'leniyor → görsel bağlantı.
             (() => {
+              // Üstteki güvenlik uyarılarındaki TÜM bileşenler (CMR/endokrin/EU yasaklı + alerjen + parfüm)
+              // INCI listesinde kırmızı border + UYARI rozetiyle bağlanır.
               const flaggedNames = new Set<string>([
                 ...(cosmeticScore?.flags?.eu_banned ?? []),
                 ...(cosmeticScore?.flags?.cmr ?? []),
                 ...(cosmeticScore?.flags?.endocrine ?? []),
+                ...(cosmeticScore?.flags?.harmful ?? []),
+                ...(cosmeticScore?.flags?.allergens ?? []),
+                ...(cosmeticScore?.flags?.fragrances ?? []),
               ].map((s: string) => s.toLowerCase()));
 
               return (
@@ -1035,13 +1058,17 @@ export default async function ProductDetailPage({
               INCI analizi henüz yapılmamış
             </div>
           )}
+          </details>
         </section>
 
         </div>
         {/* /Üst grid: SOL (REVELA + Uyumluluk) | SAĞ (INCI) */}
 
-        {/* ALT 2-col grid: Ürün Bilgileri | Bu İçerikler Ne İşe Yarar */}
+        {/* ALT 2-col grid: SOL (Ürün Bilgileri + İçerik Etkileşimleri stacked) | SAĞ (Bu İçerikler Ne İşe Yarar) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4 items-start">
+
+        {/* SOL kolon wrapper: Ürün Bilgileri + İçerik Etkileşimleri stacked */}
+        <div className="space-y-3">
 
         {/* Ürün Bilgileri — kompakt info */}
         <AccordionSection
@@ -1123,6 +1150,63 @@ export default async function ProductDetailPage({
           )}
         </AccordionSection>
 
+        {/* İçerik Etkileşimleri — ALT grid SOL kolonda, Ürün Bilgileri'nin altında */}
+        {relevantInteractions.length > 0 && (
+          <AccordionSection
+            title="İçerik Etkileşimleri"
+            icon="sync_alt"
+            count={`${relevantInteractions.length} uyarı`}
+            className="mb-0"
+            compact
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {relevantInteractions.slice(0, 6).map((inter) => {
+                const severityConfig = inter.severity === 'severe'
+                  ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kaçınılmalı' }
+                  : inter.severity === 'moderate'
+                  ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli' }
+                  : { icon: 'info', color: 'border-outline-variant/20 bg-surface-container-low', badge: 'bg-surface-container text-on-surface-variant', label: 'Bilgi' };
+                return (
+                  <details key={inter.interaction_id} className={`group rounded-sm border px-2 py-1.5 ${severityConfig.color}`}>
+                    <summary className="flex items-start gap-1.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <span className="material-icon text-on-surface-variant shrink-0 mt-0.5" style={{ fontSize: '14px' }} aria-hidden="true">{severityConfig.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 flex-wrap text-[11px] leading-snug">
+                          <span className="font-semibold text-on-surface break-words">
+                            {inter.ingredient_a?.inci_name || '?'}
+                          </span>
+                          <span className="text-outline">+</span>
+                          <span className="font-semibold text-on-surface break-words">
+                            {inter.ingredient_b?.inci_name || '?'}
+                          </span>
+                        </div>
+                        <span className={`label-caps mt-0.5 inline-block px-1 py-0.5 rounded-sm text-[9px] ${severityConfig.badge}`}>
+                          {severityConfig.label}
+                        </span>
+                      </div>
+                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '14px' }} aria-hidden="true">
+                        expand_more
+                      </span>
+                    </summary>
+                    <div className="mt-1.5 pt-1.5 border-t border-outline-variant/15">
+                      <p className="text-[11px] text-on-surface-variant leading-snug">{inter.description}</p>
+                      {inter.recommendation && (
+                        <p className="text-[11px] text-primary mt-1 flex items-start gap-1">
+                          <span className="material-icon text-[11px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
+                          {inter.recommendation}
+                        </p>
+                      )}
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
+          </AccordionSection>
+        )}
+
+        </div>
+        {/* /SOL kolon (Ürün Bilgileri + İçerik Etkileşimleri) */}
+
         {/* Bu İçerikler Ne İşe Yarar */}
         {(() => {
           const cards = sortedIngredients.filter((pi) => pi.ingredient?.function_summary || pi.ingredient_display_name);
@@ -1175,59 +1259,6 @@ export default async function ProductDetailPage({
 
         </div>
         {/* /ALT 2-col grid */}
-
-        {/* Ingredient Interactions — accordion, 2-col, minimal */}
-        {relevantInteractions.length > 0 && (
-          <AccordionSection
-            title="İçerik Etkileşimleri"
-            icon="sync_alt"
-            count={`${relevantInteractions.length} uyarı`}
-            className="mb-6"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              {relevantInteractions.slice(0, 6).map((inter) => {
-                const severityConfig = inter.severity === 'severe'
-                  ? { icon: 'block', color: 'border-error/30 bg-error/5', badge: 'bg-error/10 text-error', label: 'Kaçınılmalı' }
-                  : inter.severity === 'moderate'
-                  ? { icon: 'warning', color: 'border-score-medium-border bg-score-medium-bg/30', badge: 'bg-score-medium-bg text-score-medium', label: 'Dikkatli' }
-                  : { icon: 'info', color: 'border-outline-variant/20 bg-surface-container-low', badge: 'bg-surface-container text-on-surface-variant', label: 'Bilgi' };
-                return (
-                  <details key={inter.interaction_id} className={`group rounded-sm border px-2.5 py-2 ${severityConfig.color}`}>
-                    <summary className="flex items-start gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                      <span className="material-icon text-on-surface-variant shrink-0 mt-0.5" style={{ fontSize: '16px' }} aria-hidden="true">{severityConfig.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap text-xs leading-snug">
-                          <span className="font-semibold text-on-surface break-words">
-                            {inter.ingredient_a?.inci_name || '?'}
-                          </span>
-                          <span className="text-outline">+</span>
-                          <span className="font-semibold text-on-surface break-words">
-                            {inter.ingredient_b?.inci_name || '?'}
-                          </span>
-                        </div>
-                        <span className={`label-caps mt-1 inline-block px-1.5 py-0.5 rounded-sm text-[10px] ${severityConfig.badge}`}>
-                          {severityConfig.label}
-                        </span>
-                      </div>
-                      <span className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0" style={{ fontSize: '16px' }} aria-hidden="true">
-                        expand_more
-                      </span>
-                    </summary>
-                    <div className="mt-2 pt-2 border-t border-outline-variant/15">
-                      <p className="text-xs text-on-surface-variant leading-relaxed">{inter.description}</p>
-                      {inter.recommendation && (
-                        <p className="text-xs text-primary mt-1 flex items-start gap-1">
-                          <span className="material-icon text-[12px] mt-0.5 shrink-0" aria-hidden="true">lightbulb</span>
-                          {inter.recommendation}
-                        </p>
-                      )}
-                    </div>
-                  </details>
-                );
-              })}
-            </div>
-          </AccordionSection>
-        )}
 
         {/* Affiliate Links */}
         {activeLinks.length === 0 && (
