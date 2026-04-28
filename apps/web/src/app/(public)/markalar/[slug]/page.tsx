@@ -13,6 +13,11 @@ interface Brand {
   country_of_origin?: string;
   website_url?: string;
   logo_url?: string;
+  // Migration 028 — enrichment alanları
+  brand_description?: string | null;
+  founded_year?: number | null;
+  signature_categories?: string[] | null;
+  tagline?: string | null;
 }
 
 interface ProductImage {
@@ -155,6 +160,10 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
               {brand.brand_name}
             </h1>
 
+            {brand.tagline && (
+              <p className="text-sm text-primary font-medium italic mb-1.5">"{brand.tagline}"</p>
+            )}
+
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-on-surface-variant">
               {brand.country_of_origin && (
                 <span className="inline-flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-sm border border-outline-variant/20">
@@ -162,6 +171,12 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
                     <span>{COUNTRY_FLAGS[brand.country_of_origin]}</span>
                   )}
                   <span>{COUNTRY_LABELS[brand.country_of_origin] || brand.country_of_origin}</span>
+                </span>
+              )}
+              {brand.founded_year && (
+                <span className="inline-flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-sm border border-outline-variant/20">
+                  <span className="material-icon text-primary text-[12px]" aria-hidden="true">event</span>
+                  {brand.founded_year}
                 </span>
               )}
               <span className="inline-flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-sm border border-outline-variant/20">
@@ -185,8 +200,28 @@ export default async function BrandDetailPage({ params }: { params: Promise<{ sl
                 </a>
               )}
             </div>
+
+            {brand.signature_categories && brand.signature_categories.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1 mt-2">
+                <span className="label-caps text-on-surface-variant text-[9px] mr-1">Öne çıkan:</span>
+                {brand.signature_categories.map((cat) => (
+                  <span key={cat} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-sm font-medium">
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Marka açıklaması */}
+        {brand.brand_description && (
+          <div className="mt-4 pt-4 border-t border-outline-variant/15">
+            <p className="text-sm text-on-surface-variant leading-relaxed">
+              {brand.brand_description}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Top Scored Highlight */}

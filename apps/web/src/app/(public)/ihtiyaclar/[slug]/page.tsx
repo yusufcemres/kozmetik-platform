@@ -18,6 +18,11 @@ interface Need {
   detailed_description?: string;
   user_friendly_label?: string;
   domain_type?: string; // 'cosmetic' | 'supplement' | 'both'
+  // Migration 029 — enrichment alanları
+  faq_json?: Array<{ q: string; a: string }> | null;
+  skin_type_affinity?: Record<string, number> | null;
+  interaction_warnings?: Array<{ ingredient_a: string; ingredient_b: string; warning: string }> | null;
+  confused_with_json?: Array<{ name: string; difference: string }> | null;
 }
 
 interface IngredientMapping {
@@ -240,7 +245,11 @@ export default async function NeedDetailPage({
     .slice(0, 3)
     .map((m) => m.ingredient?.common_name || m.ingredient?.inci_name)
     .filter(Boolean) as string[];
-  const faq = [
+  // FAQ — DB seed (need.faq_json) öncelikli; yoksa templated fallback.
+  const seedFaq = need.faq_json && Array.isArray(need.faq_json) && need.faq_json.length > 0
+    ? need.faq_json
+    : null;
+  const faq = seedFaq ?? [
     {
       q: `${need.need_name} için en etkili içerik nedir?`,
       a: topIngredientNames.length > 0
@@ -664,7 +673,84 @@ export default async function NeedDetailPage({
           </section>
         )}
 
-        {/* Sprint 5 (#18): Sıkça Sorulan Sorular — templated, ihtiyaca göre dinamik */}
+        {/* Cilt tipi uyumu — DB seed (skin_type_affinity) */}
+        {need.skin_type_affinity && Object.keys(need.skin_type_affinity).length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-lg font-bold text-on-surface mb-1 flex items-center gap-2">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">face</span>
+              Cilt Tipi Uyumu
+            </h2>
+            <p className="text-[11px] text-on-surface-variant mb-2">
+              Bu ihtiyaç hangi cilt tipinde daha sık görülür / daha relevan.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {Object.entries(need.skin_type_affinity).map(([type, score]) => {
+                const labels: Record<string, string> = {
+                  dry: 'Kuru', oily: 'Yağlı', combination: 'Karma', sensitive: 'Hassas', normal: 'Normal',
+                };
+                const color = score >= 80 ? 'text-score-high' : score >= 50 ? 'text-score-medium' : 'text-outline';
+                const bg = score >= 80 ? 'bg-score-high' : score >= 50 ? 'bg-score-medium' : 'bg-outline-variant';
+                return (
+                  <div key={type} className="curator-card p-3 text-center">
+                    <p className="label-caps text-on-surface-variant text-[10px] mb-1">{labels[type] || type}</p>
+                    <p className={`text-2xl font-extrabold tabular-nums ${color}`}>%{score}</p>
+                    <div className="h-1 bg-surface-container rounded-full overflow-hidden mt-1.5">
+                      <div className={`h-full ${bg} rounded-full`} style={{ width: `${score}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Etkileşim uyarıları — DB seed (interaction_warnings) */}
+        {need.interaction_warnings && need.interaction_warnings.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-lg font-bold text-on-surface mb-1 flex items-center gap-2">
+              <span className="material-icon text-score-medium text-[18px]" aria-hidden="true">warning_amber</span>
+              Bu İhtiyaçta Dikkat Edilmesi Gerekenler
+            </h2>
+            <p className="text-[11px] text-on-surface-variant mb-2">
+              Aktif maddeler arasında bilinen etkileşim ve kullanım kuralları.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {need.interaction_warnings.map((w, i) => (
+                <div key={i} className="curator-card p-3 border-l-2 border-l-score-medium">
+                  <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                    <span className="text-xs font-bold text-on-surface">{w.ingredient_a}</span>
+                    <span className="text-outline">+</span>
+                    <span className="text-xs font-bold text-on-surface">{w.ingredient_b}</span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant leading-relaxed">{w.warning}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Sık karıştırılan ihtiyaçlar — DB seed (confused_with_json) */}
+        {need.confused_with_json && need.confused_with_json.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-lg font-bold text-on-surface mb-1 flex items-center gap-2">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">compare_arrows</span>
+              Sıkça Karıştırılan İhtiyaçlar
+            </h2>
+            <p className="text-[11px] text-on-surface-variant mb-2">
+              {need.need_name} ile karıştırılan başka ihtiyaçlar — ayırt edici noktalar.
+            </p>
+            <div className="space-y-1.5">
+              {need.confused_with_json.map((c, i) => (
+                <div key={i} className="curator-card p-3">
+                  <p className="text-xs font-bold text-on-surface mb-1">{need.need_name} <span className="text-outline">vs</span> {c.name}</p>
+                  <p className="text-[11px] text-on-surface-variant leading-relaxed">{c.difference}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Sprint 5 (#18): Sıkça Sorulan Sorular — DB seed (need.faq_json) öncelikli, yoksa templated */}
         <section className="mb-6">
           <h2 className="text-lg font-bold text-on-surface mb-2 flex items-center gap-2">
             <span className="material-icon text-primary text-[18px]" aria-hidden="true">quiz</span>

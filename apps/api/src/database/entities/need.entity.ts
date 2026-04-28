@@ -35,6 +35,19 @@ export class Need {
   @Column({ type: 'varchar', length: 200, nullable: true })
   user_friendly_label: string; // e.g. "Sivilce eğilimli ciltler için"
 
+  // Migration 029 — need zenginleştirme
+  @Column({ type: 'jsonb', nullable: true })
+  faq_json: Array<{ q: string; a: string }> | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  skin_type_affinity: Record<string, number> | null; // {dry: 0-100, oily, ...}
+
+  @Column({ type: 'jsonb', nullable: true })
+  interaction_warnings: Array<{ ingredient_a: string; ingredient_b: string; warning: string }> | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  confused_with_json: Array<{ name: string; difference: string }> | null;
+
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
