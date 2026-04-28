@@ -1,0 +1,123 @@
+{
+  "_source_note": "CeraVe Wave 4 — 3 yeni urun (cerave.com 2026-04-27)",
+  "_source_url": "https://www.cerave.com",
+  "products": [
+    {
+      "product_name": "CeraVe Foaming Cleanser Bar",
+      "product_slug": "cerave-foaming-cleanser-bar",
+      "brand_slug": "cerave",
+      "domain_type": "cosmetic",
+      "category_slug": "temizleme",
+      "short_description": "Normal-yağlı ciltler için sabunsuz, kaolin ve niasinamid içeren temizleme barı. Kir ve fazla yağı temizlerken cilt bariyerini korur.",
+      "net_content_value": 128,
+      "net_content_unit": "g",
+      "target_area": "face",
+      "product_type_label": "Temizleme Barı",
+      "inci": [
+        {"display_name": "Sodium Cocoyl Isethionate", "slug": null},
+        {"display_name": "Stearic Acid", "slug": null},
+        {"display_name": "Water", "slug": "water"},
+        {"display_name": "Sodium Isethionate", "slug": null},
+        {"display_name": "Titanium Dioxide", "slug": null},
+        {"display_name": "Kaolin", "slug": null, "highlighted": true},
+        {"display_name": "Cocamidopropyl Hydroxysultaine", "slug": null},
+        {"display_name": "Potassium Phosphate", "slug": null},
+        {"display_name": "Ceramide NP", "slug": "ceramide-np", "highlighted": true},
+        {"display_name": "Ceramide AP", "slug": null, "highlighted": true},
+        {"display_name": "Ceramide EOP", "slug": null, "highlighted": true},
+        {"display_name": "Sodium Hyaluronate", "slug": "sodium-hyaluronate"},
+        {"display_name": "Niacinamide", "slug": "niacinamide", "highlighted": true}
+      ],
+      "usage": "Cildi ılık suyla ıslatın, dairesel hareketlerle yumuşakça masaj yapın, bolca durulayın. Yüz ve vücutta kullanılabilir.",
+      "warning": "Göz temasından kaçının.",
+      "claims": [
+        "Sabunsuz",
+        "Non-komedojenik",
+        "Koku ve paraben içermez",
+        "Kurutmaz",
+        "Cilt bariyerini onarır",
+        "Fazla yağı emer",
+        "Yüz ve vücut için uygun"
+      ],
+      "image_url": null,
+      "source_url": "https://www.cerave.com/skincare/cleansers/foaming-cleanser-bar",
+      "external_source_name": "CeraVe US (Resmi)"
+    },
+    {
+      "product_name": "CeraVe Hydrating Makeup Removing Plant-Based Wipes",
+      "product_slug": "cerave-hydrating-makeup-removing-wipes",
+      "brand_slug": "cerave",
+      "domain_type": "cosmetic",
+      "category_slug": "makyaj-temizleyici",
+      "short_description": "Bitki bazlı liflerden üretilen, biyobozunur, makyaj ve kiri nemlendirme dengesini koruyarak temizleyen ıslak mendil.",
+      "net_content_value": 25,
+      "net_content_unit": "adet",
+      "target_area": "face",
+      "product_type_label": "Makyaj Temizleme Mendili",
+      "inci": [
+        {"display_name": "Aqua / Water / Eau", "slug": "water"},
+        {"display_name": "Isohexadecane", "slug": null},
+        {"display_name": "Isopropyl Myristate", "slug": null},
+        {"display_name": "Glycerin", "slug": "glycerin"},
+        {"display_name": "PEG-7 Glyceryl Cocoate", "slug": null},
+        {"display_name": "Hexylene Glycol", "slug": null},
+        {"display_name": "Dicaprylyl Ether", "slug": null},
+        {"display_name": "Ceramide NP", "slug": "ceramide-np", "highlighted": true},
+        {"display_name": "Ceramide AP", "slug": null, "highlighted": true},
+        {"display_name": "Ceramide EOP", "slug": null, "highlighted": true}
+      ],
+      "usage": "Yüze yumuşakça sürerek makyaj, kir ve yağı temizleyin. Durulamaya gerek yok.",
+      "warning": "Mendili tuvalete veya doğal alanlara atmayın. Ev kompostuna atılabilir.",
+      "claims": [
+        "Su geçirmez maskara dahil uzun süreli makyajı temizler",
+        "Non-komedojenik ve koku içermez",
+        "NEA (Egzama Vakfı) onaylı",
+        "Oftalmolojik test edilmiş; kontakt lens kullanıcılarına uygun",
+        "Ev kompostunda biyobozunur (OK compost HOME sertifikalı)"
+      ],
+      "image_url": "https://www.cerave.com/-/media/project/loreal/brand-sites/cerave/americas/us/skincare/cleansers/hydrating-makeup-removing-plant-based-wipes/hydrating-makeup-removing-plant-based-wipes_front.jpg",
+      "source_url": "https://www.cerave.com/skincare/cleansers/hydrating-makeup-removing-plant-based-wipes",
+      "external_source_name": "CeraVe US (Resmi)"
+    },
+    {
+      "product_name": "CeraVe Acne Foaming Cream Wash 10% BP",
+      "product_slug": "cerave-acne-foaming-cream-wash",
+      "brand_slug": "cerave",
+      "domain_type": "cosmetic",
+      "category_slug": "sivilce-bakim",
+      "short_description": "%10 benzoil peroksit (OTC en yüksek konsantrasyon) ile maksimum güçte akne yıkama. Hyaluronik asit, niasinamid ve seramidlerle cilt bariyerini korur.",
+      "net_content_value": 150,
+      "net_content_unit": "ml",
+      "target_area": "face",
+      "product_type_label": "%10 BP Akne Yıkama",
+      "inci": [
+        {"display_name": "Benzoyl Peroxide 10% (Active)", "slug": null, "highlighted": true},
+        {"display_name": "Water", "slug": "water"},
+        {"display_name": "Glycerin", "slug": "glycerin"},
+        {"display_name": "Propylene Glycol", "slug": null},
+        {"display_name": "Cocamidopropyl Hydroxysultaine", "slug": null},
+        {"display_name": "Sodium C14-16 Olefin Sulfonate", "slug": null},
+        {"display_name": "Potassium Hydroxide", "slug": null},
+        {"display_name": "Ceramide NP", "slug": "ceramide-np", "highlighted": true},
+        {"display_name": "Ceramide AP", "slug": null, "highlighted": true},
+        {"display_name": "Ceramide EOP", "slug": null, "highlighted": true},
+        {"display_name": "Niacinamide", "slug": "niacinamide", "highlighted": true},
+        {"display_name": "Sodium Hyaluronate", "slug": "sodium-hyaluronate", "highlighted": true}
+      ],
+      "usage": "Sabah ve akşam ıslak cilde inci tanesi büyüklüğünde uygulayın. Yaklaşık 30 saniye köpürünceye kadar masaj yapın. Ilık suyla bolca durulayın. Önce günde 1 kez başlayın, tolere edildikçe günde 2 keze çıkın. Sonra hafif nemlendirici ve güneş kremi.",
+      "warning": "Aşırı kuruluk yapabilir; günde 1 kez ile başlayın. Göz çevresinden kaçının. Kumaş ve saçta beyazlatma etkisi var; sadece beyaz havlu kullanın. Güneş hassasiyetini arttırır; SPF 30+ kullanın ve 2 saatte bir yenileyin.",
+      "claims": [
+        "Sivilce, beyaz nokta ve siyah noktayı temizler",
+        "Yeni akne oluşumunu önler",
+        "Cildin iyileşmesi için zaman tanır",
+        "Non-komedojenik",
+        "Paraben içermez",
+        "Koku içermez",
+        "HSA/FSA uygun"
+      ],
+      "image_url": null,
+      "source_url": "https://www.cerave.com/skincare/cleansers/facial-cleansers/-acne-foaming-cream-wash-",
+      "external_source_name": "CeraVe US (Resmi)"
+    }
+  ]
+}

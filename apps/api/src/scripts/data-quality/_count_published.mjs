@@ -1,0 +1,11 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT domain_type, status, COUNT(*) FROM products GROUP BY domain_type, status ORDER BY domain_type, status`);
+for (const row of r.rows) console.log(`${row.domain_type} ${row.status}: ${row.count}`);
+await c.end();

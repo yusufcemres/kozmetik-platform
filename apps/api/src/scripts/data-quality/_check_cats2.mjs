@@ -1,0 +1,12 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT category_slug, category_name FROM categories ORDER BY category_slug`);
+console.log(`Total cats: ${r.rows.length}`);
+for (const row of r.rows) console.log(`${row.category_slug}\t${row.category_name}`);
+await c.end();
