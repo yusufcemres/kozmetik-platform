@@ -138,7 +138,7 @@ export default function HeroSearchAutocomplete() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-2xl mx-auto lg:mx-0">
+    <div ref={containerRef} className="relative w-full max-w-3xl mx-auto lg:mx-0">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -162,7 +162,7 @@ export default function HeroSearchAutocomplete() {
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
           placeholder="Ürün, marka veya içerik ara — örn. niacinamide, retinol"
-          className="w-full bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 focus:border-primary rounded-full pl-14 pr-32 sm:pr-36 py-4 sm:py-5 text-base text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          className="w-full bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 focus:border-primary rounded-full pl-14 pr-36 sm:pr-44 py-5 sm:py-6 text-base sm:text-lg text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           autoComplete="off"
           aria-autocomplete="list"
           aria-controls="hero-search-dropdown"
