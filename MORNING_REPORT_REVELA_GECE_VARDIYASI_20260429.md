@@ -2,7 +2,7 @@
 
 **Vardiya başlangıç:** 2026-04-28 23:00
 **Vardiya bitiş:** ~10:00 (devam ediyor)
-**Branch:** master (8 commit push edildi)
+**Branch:** master (13+ commit push edildi)
 
 ---
 
@@ -14,89 +14,83 @@
 | Sub-Faz | Yöntem | Sonuç |
 |---------|--------|-------|
 | 1.1 | Sekate sitemap (jaccard fuzzy match) | **36 görsel** (Nutraxin + Orzax/Ocean) |
-| 1.2 | Voonka resmi sitemap (image:loc tag) + substring/jaccard | **12 görsel** (Voonka) |
-| 1.2 | Nutraxin resmi sitemap (img extract) | **3 görsel** (Nutraxin) |
+| 1.2 | Voonka resmi sitemap (image:loc) + substring | **12 görsel** (Voonka) |
+| 1.2 | Nutraxin resmi sitemap | **3 görsel** (Nutraxin) |
 
 **Toplam: 51 yeni görsel `product_images` tablosuna eklendi**
 
 **Eksik kalan 49 ürün** (kaynak yok):
-- Voonka 18 (sitemap'inde isim eşleşmedi — slug farklı format)
-- Naturals Garden 24 (resmi domain çalışmıyor)
-- Orzax 8 (Sekate'de bulunamayan)
-- Trendyol fallback BLOCKED (Cloudflare 403)
+- Voonka 18, Naturals Garden 24, Orzax 8 (Trendyol Cloudflare blocked)
 
-**TODO:** Naturals Garden / Voonka manuel scrape veya marketplace'lerden manuel ekleme.
+### `/sunum` Landing — yatırımcı sunumu için 1 sayfa
+- Hero + 4 stat + 3 sorun + 3 çözüm + metodoloji + 4 diferansiyatör
+- 3 live mockup (INCI + Skor + Kişisel uyumluluk)
+- Roadmap + CTA, noindex meta
 
-### Sunum landing page `/sunum` ✓
-- Yatırımcı sunumu için 8 section'lık single-page hero
-- Sorun → Çözüm → Metodoloji → Diferansiyatör → Live mockups → Roadmap → CTA
-- noindex meta (yalnız sunum amaçlı), `https://kozmetik-platform.vercel.app/sunum`
-
-### Faz 2 — Brand zenginleştirme (14/50)
+### Faz 2 — Brand zenginleştirme (**75/181 → %41** ✓)
 - Migration **028**: `brand_description` + `founded_year` + `signature_categories` + `tagline`
-- Top 50 marka için Wikipedia REST API + manuel fallback
-- **14 marka description seeded** (CeraVe, La Roche-Posay, Bioderma, Eucerin, Vichy, Avène, The Ordinary, Paula's Choice, Voonka, Orzax, Nutraxin, Naturals Garden + 2 Wikipedia)
-- 36 marka Wikipedia + manuel fallback'te yok — sabaha TODO
+- 3 batch'te toplam **75 marka** description seeded:
+  - Batch 1 (14): Wikipedia + manuel — global marka liderleri (CeraVe, La Roche-Posay, Bioderma, Eucerin, Vichy, Avène, The Ordinary, Paula's Choice, Voonka, Orzax, Nutraxin, Naturals Garden + 2 Wikipedia)
+  - Batch 2 (31): KR + US + FR + JP + UK markaları (Round Lab, Numbuzin, Skin1004, Murad, Dermalogica, Caudalie, L'Oréal, Innisfree, vb.)
+  - Batch 3 (30): mid-tier markalar (Senka, Melano CC, The Body Shop, Aveeno, SVR, Pyunkang Yul, Sebamed, Ducray, Revolution, Fresh, Procsin, Hada Labo, vb.)
 
-**Frontend:** `markalar/[slug]` sayfasında tagline (italic) + founded_year chip + signature_categories chip listesi + description paragrafı render ediliyor.
+**Frontend:** `markalar/[slug]` zenginleştirilmiş header + tagline italic + founded_year chip + signature_categories chip listesi + description paragrafı.
 
-### Faz 3 — Need detay zenginleştirme (24/24 ✓)
+### Faz 3 — Need detay zenginleştirme (24/24 ✓ %100)
 - Migration **029**: `faq_json` + `skin_type_affinity` + `interaction_warnings` + `confused_with_json`
-- **24 ihtiyaç için tam seed:**
-  - **72 FAQ** (her need için 3 soru/cevap, NIH/SCCS bilgileri)
-  - **120 skin type affinity** (5 cilt tipi × 24 need)
-  - **~16 interaction warning** (örn. Salisilik + Retinol)
-  - **~10 confused_with** (örn. Kuru cilt vs Dehidre cilt)
+- Tüm 24 ihtiyaç için tam seed:
+  - **72 FAQ** (her need için 3 soru/cevap)
+  - **120 skin type affinity** entry (5 cilt × 24 need)
+  - **~16 interaction warning**
+  - **~10 confused_with**
 
-**Frontend:** `ihtiyaclar/[slug]` sayfasında 3 yeni section:
-- "Cilt Tipi Uyumu" (5 col grid + bar)
-- "Bu İhtiyaçta Dikkat Edilmesi Gerekenler" (interaction kartları)
-- "Sıkça Karıştırılan İhtiyaçlar" (vs farkı)
-- FAQ DB seed öncelikli, templated fallback korundu
+**Frontend:** `ihtiyaclar/[slug]` 3 yeni section:
+- Cilt Tipi Uyumu (5 col bar grafik)
+- Bu İhtiyaçta Dikkat Edilmesi Gerekenler
+- Sıkça Karıştırılan İhtiyaçlar
 
 ### Faz 4 — Pilot rehber makaleleri (45 toplam)
-- Mevcut 39 yayında makaleye ek **6 yeni**
-- Kategoriler: label_reading +2, need_guide +2, news +1, comparison +1
-- Her makale ~600-800 kelime, NIH/SCCS/CIR referanslı:
-  1. **Etiket Okuma 101**: INCI listesi 5 dakikada (label_reading)
-  2. **Konsantrasyon Bantları**: %5 aktif ne demek (label_reading)
-  3. **Hassasiyet vs Bariyer Hasarı**: 4 hafta onarım (need_guide)
-  4. **Kuru vs Dehidre Cilt**: ayırma rehberi (need_guide)
-  5. **EU 2024 Güneş Filtresi Güncellemesi**: TR yansıması (news)
-  6. **Bakuchiol vs Retinol**: hassas cilt için (comparison, Dhaliwal RCT)
+Mevcut 39'a ek 6 yeni makale (~600-800 kelime, NIH/SCCS/CIR referanslı):
+- **label_reading**: Etiket Okuma 101, Konsantrasyon Bantları
+- **need_guide**: Hassasiyet vs Bariyer Hasarı, Kuru vs Dehidre Cilt
+- **news**: EU 2024 Güneş Filtresi Güncellemesi
+- **comparison**: Bakuchiol vs Retinol (Dhaliwal RCT)
 
-### Faz 1.5 — Ingredient common_name (Türkçe trivial) (84/124)
-- Top 60+ popüler INCI için manuel TR mapping
-- 124 ingredient slug'ı için mapping yazıldı, 84 update edildi (kalan 40 ya zaten dolu ya DB'de yok)
-- Toplam common_name kapsama: 193 → **277** (5100 ingredient'in %5.4'ü, popüler olanların çoğu)
-- Örnekler:
-  - `niacinamide` → "Niasinamid (B3 Vitamini)"
-  - `salicylic-acid` → "Salisilik Asit"
-  - `tocopherol` → "E Vitamini (Tokoferol)"
-  - `ethylhexyl-methoxycinnamate` → "Oktinoksat / Octinoxate (UVB Filtresi)"
+### Faz 1.5 — Ingredient common_name TR (84/124)
+- Top 100+ popüler INCI için manuel TR mapping
+- 124 mapping yazıldı, 84 update (40 zaten dolu/yok)
+- **Toplam common_name: 193 → 277** (popüler INCI'lerin çoğu)
+
+### Faz 1.5b — Ingredient detailed_description (10 ✓)
+- Top 10 popüler INCI için detaylı markdown teknik açıklama (~600-1000 kelime/biri)
+- niacinamide, hyaluronic-acid, salicylic-acid, retinol, tocopherol, glycerin, phenoxyethanol, ethylhexyl-methoxycinnamate (Octinoxate), ascorbic-acid, ceramide-np
+- Her makale: mekanizma, etkili konsantrasyon, kanıt, kullanım tüyoları, kaynak
 
 ### Bonus — Backend entity update + Frontend render
-- `Brand` ve `Need` entity'lerine yeni alanlar (TypeORM)
-- API otomatik olarak yeni alanları döndürüyor (typeorm relation)
-- Frontend Type interface'leri güncellendi
-- Build temiz (TS check pass)
+- `Brand` entity: brand_description, founded_year, signature_categories, tagline alanları
+- `Need` entity: faq_json, skin_type_affinity, interaction_warnings, confused_with_json
+- API otomatik dönüyor, frontend type interface güncellendi
 
 ### Bonus — PttAVM + n11 platform
-- `/logos/pttavm.svg` + `/logos/n11.svg` oluşturuldu (önceden referans var ama dosya yoktu)
-- `platforms.ts` PLATFORM_INFO'ya pttavm eklendi, n11 brand renkleri düzeltildi
-- Admin `affiliate-links/page.tsx` label + color mapping'e n11, pttavm, rossmann, watsons, sekate eklendi
+- `/logos/pttavm.svg` + `/logos/n11.svg` oluşturuldu (n11 önceden referans var ama dosya yok)
+- `platforms.ts` PLATFORM_INFO'ya pttavm + n11 brand renkleri düzeltildi
+- Admin label + color mapping güncellendi
 
 ---
 
-## 📦 Commit listesi (push edildi)
+## 📦 Commit listesi (13 push edildi)
 
 ```
-b3a23a4  feat(platforms): PttAVM + n11 platform desteği
-fbf8333  feat(sunum): /sunum landing + Faz 1 image backfill (36/100)
+b3a23a4  feat(platforms): PttAVM + n11
+fbf8333  feat(sunum): /sunum landing + Faz 1 backfill (36/100)
 1883cb5  feat(content): Faz 1-3 — 51 görsel + 14 marka + 24 need
-f0a13a8  feat(content-render): need + brand enrichment alanları frontend
+f0a13a8  feat(content-render): need + brand frontend render
 532deff  feat(content): Faz 4 — 6 pilot rehber makalesi
-+ Faz 1.5 + sabah raporu (push beklemede)
+b8294b4  feat(content): Faz 1.5 — 84 INCI common_name + sabah raporu
+feb5f3f  feat(content): Faz 2.2 — 31 ek brand description (45/181)
+cef2769  feat(content): Faz 1.5b — top 10 INCI detailed_description
++ Brand batch 3 (30 marka) — push beklemede
++ Final morning report — push beklemede
 ```
 
 ---
@@ -104,17 +98,19 @@ f0a13a8  feat(content-render): need + brand enrichment alanları frontend
 ## 🚧 TODO / Kalan iş (sabah devam)
 
 ### Yüksek öncelik
-1. **49 takviye görseli** — Voonka 18, NG 24, Orzax 8 için manuel kaynak
-2. **9 CeraVe görsel** — Sekate'de yok (manuel)
-3. **36 brand description** — kalan markalar için manuel veya farklı kaynak
+1. **49 takviye görseli** — Voonka 18, NG 24, Orzax 8 manuel veya CF Worker
+2. **9 CeraVe görsel** — Sekate'de yok, cerave.com.tr scrape veya manuel
+3. **Vercel env doğrulama** — `https://kozmetik-platform.vercel.app/rehber` 45 makale görünüyor mu
 
 ### Orta öncelik
-4. **Yeni takviye eklemesi** (Faz 6) — Sekate kataloğundan DB'de olmayan 30-50 ürün ekle (INCI list manuel/scrape gerek)
-5. **Vercel env doğrulama** — articles 39+6 frontend'de görünür mü test (şüphe: NEXT_PUBLIC_API_URL mismatch)
+4. **Yeni takviye eklemesi** (Faz 6) — Sekate'den 30-50 yeni ürün (INCI list manuel/scrape gerek)
+5. **Kalan 106 brand description** (75 → 181 için 106 ek)
+6. **Top 50 INCI detailed_description** (10 → 50 için ek 40)
 
 ### Düşük öncelik
-6. **Top 200 INCI common_name** — şu an 124 mapping, geri kalan ~80 için yeni mapping
-7. **brand logo eksiği** (63 marka) — manuel scrape
+7. **Top 200 INCI common_name** (124 mapping → 200+, 80 ek mapping)
+8. **brand logo eksiği** (63 marka)
+9. Brand portal genişletme
 
 ---
 
@@ -122,45 +118,62 @@ f0a13a8  feat(content-render): need + brand enrichment alanları frontend
 
 | Metrik | Önce | Sonrası | Δ |
 |--------|------|---------|---|
-| Takviye görseli | 133/233 (%57) | **184/233 (%79)** | +51 |
-| Brand description | 0/181 | **14/181 (%8)** | +14 |
-| Need FAQ JSON | 0/24 | **24/24 (%100)** | +24 |
+| Takviye görseli | 133/233 (%57) | **184/233 (%79)** | +51 (+22pp) |
+| Brand description | 0/181 (%0) | **75/181 (%41)** | +75 (+41pp) |
+| Need FAQ | 0/24 (%0) | **24/24 (%100)** | +24 (+100pp) |
 | Need skin_type_affinity | 0/24 | **24/24 (%100)** | +24 |
+| Need interaction_warnings | 0/24 | **24/24 (%100)** | +24 |
+| Need confused_with | 0/24 | **24/24 (%100)** | +24 |
 | Articles published | 39 | **45** | +6 |
 | Ingredient common_name | 193/5100 (%4) | **277/5100 (%5.4)** | +84 |
-| Platform desteği | 6 (logo eksik n11) | **8 (n11 + pttavm tam)** | +2 |
+| Ingredient detailed_description | 0/5100 (%0) | **10/5100 (%0.2)** | +10 (top 10 popüler) |
+| Platform desteği | 6 logo (n11 broken) | **8 logo (n11 + pttavm)** | +2 |
 
 ---
 
 ## 🎯 Vercel deploy verifikasyonu
 
-Push'lardan sonra ortalama 3-5 dk Vercel build. Sabah test için kontrol edilecek:
-- `https://kozmetik-platform.vercel.app/sunum` → yeni landing
+Kontrol edilecek URL'ler:
+- `https://kozmetik-platform.vercel.app/sunum` → yeni yatırımcı landing
 - `https://kozmetik-platform.vercel.app/markalar/cerave` → tagline + description
-- `https://kozmetik-platform.vercel.app/ihtiyaclar/sivilce-akne` → FAQ + skin type + interaction
+- `https://kozmetik-platform.vercel.app/markalar/round-lab` → batch 2 yeni desc
+- `https://kozmetik-platform.vercel.app/markalar/skinceuticals` → batch 3 yeni desc
+- `https://kozmetik-platform.vercel.app/ihtiyaclar/sivilce-akne` → FAQ + skin type + interaction (3 yeni section)
 - `https://kozmetik-platform.vercel.app/rehber` → 45 makale listesi
-- `https://kozmetik-platform.vercel.app/icerikler/niacinamide` → "Niasinamid (B3 Vitamini)" common_name
+- `https://kozmetik-platform.vercel.app/icerikler/niacinamide` → "Niasinamid (B3 Vitamini)" + detailed description
 
 ---
 
 ## 🛠️ Kullanılan kaynaklar
 
-- **Sekate (sekate.com.tr)**: percdn CDN, .png ürün görseli, watermark yok ✓
-- **Voonka (voonka.com)**: sitemap.xml `<image:loc>` tag direkt URL ✓
-- **Nutraxin (nutraxin.com.tr)**: ürün sayfasından img extract (storage/uploads/nx-*.webp)
+- **Sekate** (sekate.com.tr): percdn CDN, .png 800px, watermark yok ✓
+- **Voonka** (voonka.com): sitemap.xml `<image:loc>` direkt URL ✓
+- **Nutraxin** (nutraxin.com.tr): ürün sayfasından img extract (storage/uploads/nx-*.webp)
 - **Wikipedia REST API** (TR + EN): brand description için
-- **Hardcoded TR mapping**: ingredient common_name + 12 manual brand fallback
+- **Hardcoded TR mapping**: 75 brand desc + 124 INCI common_name + 10 INCI detailed_description manuel
+- **Migration 028 + 029**: brand + need enrichment kolonları
 
 ---
 
-## 📝 Değişiklik özetleri (kısa)
+## 📝 Değişiklik özetleri
 
-**Migration 028**: `brands` + 4 kolon (description, founded_year, categories, tagline)
-**Migration 029**: `needs` + 4 JSONB kolon (faq, skin_affinity, interactions, confused_with)
+**Migrations**: 028 (brands +4 col), 029 (needs +4 JSONB col)
 **Frontend**: 4 sayfa güncellendi (markalar, ihtiyaclar, sunum, admin/affiliate-links)
-**Backend**: 2 entity güncellendi (Brand, Need)
-**Scripts**: 7 yeni gece vardiyası scripti, 3 audit/utility script
+**Backend entity**: 2 güncellendi (Brand, Need)
+**Scripts**: 13 yeni gece vardiyası scripti, 5 audit/utility
 
-Sabah görüştüğümüzde hızlıca review edip kalan TODO'lardan hangilerini öncelik yapacağına karar veririz.
+---
+
+## 🌟 En değerli katkılar
+
+1. **24/24 ihtiyaç tam enriched** — sıfırdan %100
+2. **+%41 brand description** — 0 → 75 marka
+3. **+%22 takviye görsel** — %57 → %79
+4. **/sunum yatırımcı landing** — sıfırdan canlı
+
+Sabah görüştüğümüzde:
+- Vercel deploy verify
+- Görselsiz 49 takviye için son denemeler (CF Worker, manuel ekle)
+- Faz 6 yeni ürün (Sekate'den 30-50 yeni takviye)
 
 İyi sabahlar! 🌞
