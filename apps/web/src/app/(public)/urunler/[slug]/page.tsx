@@ -959,14 +959,15 @@ export default async function ProductDetailPage({
                       (pi.ingredient?.inci_name && flaggedNames.has(pi.ingredient.inci_name.toLowerCase()));
 
                     // 3 seviye uyarı görseli (üstteki skor uyarılarıyla bağlantı):
-                    // - isCritical (CMR/endokrin/eu-banned/harmful)         → tam kırmızı border + warning ikonu
-                    // - isAllergen / isFragrance (DB allergen_flag/fragrance_flag) → yarı kırmızı border + chip rozet
+                    // - isCritical (CMR/endokrin/eu-banned/harmful)         → tam kırmızı border + warning ikonu + UYARI rozet
+                    // - isAllergen / isFragrance (DB allergen_flag/fragrance_flag) → tam kırmızı border + warning ikonu + chip rozet
+                    const hasWarning = isCritical || isAllergen || isFragrance;
                     const cardClass = isCritical
                       ? 'border-2 border-error bg-error/5'
                       : isAllergen
-                        ? 'border-2 border-error/50 bg-error/5'
+                        ? 'border-2 border-error bg-error/5'
                         : isFragrance
-                          ? 'border-2 border-error/50 bg-tertiary-container/30'
+                          ? 'border-2 border-error bg-tertiary-container/30'
                           : '';
 
                     const band = effectiveBand(pi.concentration_band, pi.inci_order_rank);
@@ -978,7 +979,7 @@ export default async function ProductDetailPage({
                         className={`group curator-card px-3 py-2 ${cardClass}`}
                       >
                         <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                          {/* Üst: sıra no + konsantrasyon badge + chevron */}
+                          {/* Üst: sıra no + konsantrasyon badge + uyarı rozeti + chevron */}
                           <div className="flex items-center gap-1.5 mb-1">
                             <span className="label-caps text-outline text-[9px] shrink-0">
                               {idx + 1}
@@ -989,6 +990,22 @@ export default async function ProductDetailPage({
                             >
                               {conc.label}
                             </span>
+                            {/* Uyarı rozet — kapalı kart üzerinde de görünür */}
+                            {isCritical && (
+                              <span className="label-caps text-[9px] bg-error text-on-error px-1 py-0.5 rounded-sm font-bold shrink-0">
+                                UYARI
+                              </span>
+                            )}
+                            {!isCritical && isAllergen && (
+                              <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
+                                ALERJEN
+                              </span>
+                            )}
+                            {!isCritical && !isAllergen && isFragrance && (
+                              <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
+                                PARFÜM
+                              </span>
+                            )}
                             <span className="flex-1" />
                             <span
                               className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
@@ -1000,7 +1017,7 @@ export default async function ProductDetailPage({
                           </div>
                           {/* Alt: isim full-width */}
                           <div className="flex items-start gap-1.5">
-                            {isCritical && (
+                            {hasWarning && (
                               <span
                                 className="material-icon text-error shrink-0"
                                 style={{ fontSize: '14px' }}
