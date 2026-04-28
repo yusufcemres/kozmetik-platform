@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Topikal kullanım için jel ürünü (cilde masajla uygulanır), oral takviye değil. Ayrıca aktif bileşenlerin miktarları (hyaluronik asit, Boswellia, zencefil yağı vb.) belirtilmemiş, dozaj parse edilemiyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Topikal kullanım için jel ürünü (cilde masajla uygulanır), oral takviye değil. Ayrıca aktif bileşenlerin miktarları (hyaluronik asit, Boswellia, zencefil yağı vb.) belirtilmemiş, dozaj parse edilemiyor."
+  }
+}

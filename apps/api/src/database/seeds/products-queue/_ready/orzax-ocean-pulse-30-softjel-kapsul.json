@@ -1,0 +1,59 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Pulse Omega 3 + CoQ10 + D3 + K2 30 Softjel Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Pulse her softjel kapsülünde yüksek saflıkta omega 3 (EPA + DHA), aktif form CoQ10 (ubikinol), D3 ve K2 vitamini içerir. IFOS 5 yıldız kalite onaylı balık yağı, 30 kapsüllük kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 330,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 220,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "coenzyme-q10",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 1000,
+        "unit": "IU",
+        "daily_value_percentage": 500
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 75,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-pulse-30-softjel-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Pulse.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

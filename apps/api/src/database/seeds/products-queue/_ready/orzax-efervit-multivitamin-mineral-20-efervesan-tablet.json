@@ -1,0 +1,264 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Efervit Multivitamin Mineral 20 Efervesan Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Efervit Multivitamin Mineral, 12 vitamin ve 5 mineral içeren efervesan gıda takviyesidir. Aktif B12 (MecobalActive) içerir. Laktoz, glüten ve koruyucu içermez. 20 efervesan tablet.",
+    "net_content_value": 20,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "calcium",
+        "amount_per_serving": 120,
+        "unit": "mg",
+        "daily_value_percentage": 15
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 12,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "copper",
+        "amount_per_serving": 1000,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 75,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 55,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 10,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "pantothenic-acid",
+        "amount_per_serving": 6,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "manganese",
+        "amount_per_serving": 2,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "riboflavin",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "thiamine",
+        "amount_per_serving": 1.1,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/efervit-multivitamin-mineral-20-efervesan-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Efervit_Vitamin_Mineral.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "pantothenic-acid",
+      "inci_name": "Pantothenic Acid",
+      "common_name": "B5 Vitamini (Pantotenik Asit)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Pantotenik asit (B5 vitamini), koenzim A'nın yapı taşıdır; karbonhidrat, yağ ve protein metabolizmasında enerji üretimi, steroid hormon ve nörotransmitter sentezinde kritik rol oynar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "manganese",
+      "inci_name": "Manganese",
+      "common_name": "Manganez",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Manganez, kemik oluşumu, kan pıhtılaşması ve antioksidan enzim (Mn-SOD) fonksiyonları için gerekli bir eser mineraldir; amino asit, kolesterol ve karbonhidrat metabolizmasında koenzim görevi görür.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.8,
+      "effective_dose_max": 2.3,
+      "effective_dose_unit": "mg",
+      "ul_dose": 11,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Kabuklu yemişler",
+          "amount_per_100g": 2,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Baklagiller",
+          "amount_per_100g": 1.5,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "riboflavin",
+      "inci_name": "Riboflavin",
+      "common_name": "B2 Vitamini (Riboflavin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Riboflavin (B2 vitamini), FAD ve FMN koenzimlerinin öncüsüdür; hücresel enerji üretimi, yağ asidi oksidasyonu, glutatyon metabolizması ve normal görme fonksiyonu için gereklidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 1.3,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "thiamine",
+      "inci_name": "Thiamine",
+      "common_name": "B1 Vitamini (Tiamin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Tiamin (B1 vitamini), karbonhidrat metabolizması ve enerji üretiminde koenzim olarak görev yapar; sinir sistemi, kas ve kalp fonksiyonlarının normal işleyişi için gereklidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 1.2,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

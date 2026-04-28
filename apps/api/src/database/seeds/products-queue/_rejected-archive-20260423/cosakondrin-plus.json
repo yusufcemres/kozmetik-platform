@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: İçerik maddelerinin (glukozamin sülfat, kondroitin sülfat, MSM, tip II kolajen, ilave vitamin/mineraller) porsiyon başı sayısal dozajları ham veride belirtilmemiş; ingredients parse edilemiyor.",
+  "doc": {
+    "skip": true,
+    "reason": "İçerik maddelerinin (glukozamin sülfat, kondroitin sülfat, MSM, tip II kolajen, ilave vitamin/mineraller) porsiyon başı sayısal dozajları ham veride belirtilmemiş; ingredients parse edilemiyor."
+  }
+}

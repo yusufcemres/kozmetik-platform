@@ -1,0 +1,98 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "İmunol Sambucus Şurup 150 ml",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "İmunol Sambucus Şurup her 5 ml'de 100 mg kara mürver ekstresi, 60 mg C vitamini, 50 mg üzüm çekirdeği ekstresi ve 5 mg çinko sağlar. Vişne aromalı, glüten içermez. 4-10 yaş çocuklar için 5 ml, yetişkinler için 10 ml önerilir.",
+    "net_content_value": 150,
+    "net_content_unit": "ml",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "ml",
+      "certification": "Gluten-Free"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 60,
+        "unit": "mg",
+        "daily_value_percentage": 75
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/imunol-sambucus-surup/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Imunol_Sambucus.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "elderberry-extract",
+      "inci_name": "Sambucus nigra",
+      "common_name": "Kara Mürver Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Kara mürver (Sambucus nigra), antosiyanin ve flavonoidler açısından zengin bir bitkisel ekstredir. Bağışıklık sistemini destekleme, antiviral aktivite ve üst solunum yolu enfeksiyonlarında semptom süresini kısaltma ile ilişkilendirilmiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30670267/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 1200,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "grape-seed-extract",
+      "inci_name": "Vitis vinifera seed extract",
+      "common_name": "Üzüm Çekirdeği Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Üzüm çekirdeği ekstresi, proantosiyanidin (OPC) bakımından zengin bir polifenol kaynağıdır. Antioksidan kapasite, damar sağlığı desteği ve serbest radikal hasarına karşı koruyucu etkiler ile ilişkilendirilmektedir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27144345/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 300,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Sindirim enzimleri (Proteaz, Amilaz, Lipaz, Glukoamilaz, Laktaz, Selülaz, Malt Diastaz, İnvertaz, Alfa Galaktosidaz) REVELA hazır ingredient listesinde yok. Bu enzimler için evidence_grade + NIH/PubMed citation + effective_dose aralıkları onboarding aşamasında güvenilir kaynakla doldurulmadan ingredients_to_create'e eklenemez; ürünün aktif madde profilinin tamamı listede bulunmadığından SKIP.",
+  "doc": {
+    "skip": true,
+    "reason": "Sindirim enzimleri (Proteaz, Amilaz, Lipaz, Glukoamilaz, Laktaz, Selülaz, Malt Diastaz, İnvertaz, Alfa Galaktosidaz) REVELA hazır ingredient listesinde yok. Bu enzimler için evidence_grade + NIH/PubMed citation + effective_dose aralıkları onboarding aşamasında güvenilir kaynakla doldurulmadan ingredients_to_create'e eklenemez; ürünün aktif madde profilinin tamamı listede bulunmadığından SKIP."
+  }
+}

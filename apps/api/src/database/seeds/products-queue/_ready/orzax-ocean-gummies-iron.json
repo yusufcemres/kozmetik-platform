@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies Iron Çiğnenebilir Jel Form 30 Adet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Gummies Iron, mikroenkapsülasyon teknolojisi ile üretilmiş lipozomal demir içeren çiğnenebilir jel formdur. Her jelde 8,5 mg demir bulunur. Çilek aromalı, 30 adetlik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "iron",
+        "amount_per_serving": 17,
+        "unit": "mg",
+        "daily_value_percentage": 121
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-iron/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Gummies_Iron.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

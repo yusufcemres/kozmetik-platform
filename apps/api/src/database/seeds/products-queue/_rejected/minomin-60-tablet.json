@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada aktif maddelerin (Black Cohosh, Panax Ginseng, Soya İzoflavonları, vitaminler, mineraller) porsiyon başına sayısal dozajları belirtilmemiş. İçerik listesi ve miktarlar olmadan ingredient parsing ve DV% hesaplaması yapılamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada aktif maddelerin (Black Cohosh, Panax Ginseng, Soya İzoflavonları, vitaminler, mineraller) porsiyon başına sayısal dozajları belirtilmemiş. İçerik listesi ve miktarlar olmadan ingredient parsing ve DV% hesaplaması yapılamaz."
+  }
+}

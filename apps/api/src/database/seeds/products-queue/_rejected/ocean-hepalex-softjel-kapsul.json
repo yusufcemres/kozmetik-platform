@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif maddelerin porsiyon başı dozajları (milk thistle, enginar, karahindiba, kolin, ALA, L-glutatyon, E vitamini miktarları) ürün açıklamasında belirtilmemiş. Sayısal dozaj olmadan ingredient parse edilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif maddelerin porsiyon başı dozajları (milk thistle, enginar, karahindiba, kolin, ALA, L-glutatyon, E vitamini miktarları) ürün açıklamasında belirtilmemiş. Sayısal dozaj olmadan ingredient parse edilemez."
+  }
+}

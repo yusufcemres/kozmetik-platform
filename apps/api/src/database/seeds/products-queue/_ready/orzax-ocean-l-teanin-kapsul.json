@@ -1,0 +1,69 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean L-Teanin 200 mg Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean L-Teanin, her kapsülde 200 mg L-teanin sağlayan bir gıda takviyesidir. Yeşil çay yapraklarından elde edilen bu aminoasit, Vcaps bitkisel kapsül teknolojisi ile üretilmiştir. 11 yaş ve üzeri için günde 1 kapsül.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-theanine",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-l-teanin-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_L_Teanin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-theanine",
+      "inci_name": "L-Theanine",
+      "common_name": "L-Teanin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino-acid",
+      "function_summary": "L-teanin, yeşil çay yapraklarında doğal olarak bulunan bir aminoasittir. Alfa beyin dalgası aktivitesini artırarak rahatlama hissi sağlarken zihinsel odaklanmayı destekler; kafeinin uyarıcı etkilerini dengelemeye yardımcı olur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31623400/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil çay",
+          "amount_per_100g": 25,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Siyah çay",
+          "amount_per_100g": 20,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

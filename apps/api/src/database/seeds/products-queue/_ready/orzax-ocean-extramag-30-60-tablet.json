@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean ExtraMag Üçlü Magnezyum + P5P 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean ExtraMag her tablette magnezyum malat, bisglisinat ve sitrat karışımından 200 mg elementel magnezyum ile B6 vitamininin aktif formu P-5-P'den 10 mg sağlar. 30 tabletlik kutu, glüten ve laktoz içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 53
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-extramag-30-60-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_ExtraMag_Uclu_Kombinasyon_30.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

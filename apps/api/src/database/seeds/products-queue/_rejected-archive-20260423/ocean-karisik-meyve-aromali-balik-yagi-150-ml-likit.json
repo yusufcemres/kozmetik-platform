@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Balık yağı ürünü olmasına rağmen ham veride EPA/DHA veya toplam omega-3 dozajı belirtilmemiş. 5 mL porsiyon başına aktif madde miktarı bilinmediği için ingredients şeması doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Balık yağı ürünü olmasına rağmen ham veride EPA/DHA veya toplam omega-3 dozajı belirtilmemiş. 5 mL porsiyon başına aktif madde miktarı bilinmediği için ingredients şeması doldurulamaz."
+  }
+}

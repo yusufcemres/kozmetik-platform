@@ -1,0 +1,138 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Methyl Balance 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Methyl Balance, her kapsülde aktif formda B12 (Metilkobalamin 1000 µg), B6 (P-5-P 10 mg), B2 (R-5-P 25 mg) ile 500 mg Betain, 50 mg L-Serin ve 10 mg Çinko Bisglisinat içeren metilasyon destek formülüdür. 30 kapsül.",
+    "net_content_value": 30,
+    "net_content_unit": "kapsül",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "kapsül",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "betaine-hcl",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "l-serine",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "riboflavin-5-phosphate",
+        "amount_per_serving": 25,
+        "unit": "mg",
+        "daily_value_percentage": 1786
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 1000,
+        "unit": "mcg",
+        "daily_value_percentage": 40000
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-methyl-balance-30-60-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Methyl_Balance_30.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-serine",
+      "inci_name": "L-Serine",
+      "common_name": "L-Serin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino_acid",
+      "function_summary": "L-Serin, fosfolipid sentezi, metilasyon döngüsü ve nörotransmitter üretiminde görev alan proteinojenik amino asittir. Homosistein metabolizmasında glisin üretimi için substrat görevi görür ve merkezi sinir sistemi fonksiyonlarına katkı sağlar.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30766851/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 3000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Et ve tavuk",
+          "amount_per_100g": 500,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Süt ürünleri",
+          "amount_per_100g": 200,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "riboflavin-5-phosphate",
+      "inci_name": "Riboflavin-5-Phosphate",
+      "common_name": "B2 Vitamini (Riboflavin-5-Fosfat)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Riboflavin-5-Fosfat, B2 vitamininin aktif koenzim formudur (FMN). Enerji metabolizması, hücresel redoks reaksiyonları, MTHFR aracılı folat döngüsü ve homosistein metabolizmasında kritik rol oynar. Mitokondriyel enerji üretimine katkı sağlar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.4,
+      "effective_dose_max": 100,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

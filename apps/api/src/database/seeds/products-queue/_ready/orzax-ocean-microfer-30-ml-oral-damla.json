@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Microfer 30 ml Oral Damla",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Microfer Damla, mikroenkapsülasyon teknolojisi ile üretilmiş demir içeren bir takviye edici gıdadır. Çocuklar için günde 1 ml önerilir. Gluten, laktoz ve renklendirici içermez; 30 ml oral damla formundadır.",
+    "net_content_value": 30,
+    "net_content_unit": "mL",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "drop",
+      "serving_size": 1,
+      "serving_unit": "mL",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "iron-bisglycinate",
+        "amount_per_serving": 7,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-microfer-30-ml-oral-damla/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Microfer-1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

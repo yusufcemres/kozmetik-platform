@@ -1,0 +1,80 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Iodine Damla 30 ml",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Iodine Damla, her bir damlasında 150 mcg iyot içeren damla formunda gıda takviyesidir. 30 ml'lik şişede toplam 600 damla bulunur. 11 yaş ve üzeri bireyler için uygundur.",
+    "net_content_value": 30,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "drop",
+      "serving_size": 1,
+      "serving_unit": "drop",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 150,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-iodine-damla-30ml/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Iodine.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "iodine",
+      "ingredient_name_en": "Iodine",
+      "category": "mineral",
+      "function_summary": "İyot, tiroid hormonlarının (T3 ve T4) sentezi için zorunlu bir eser mineraldir; bazal metabolizma, büyüme, nörolojik gelişim ve enerji metabolizmasının normal işleyişine katkı sağlar.",
+      "effective_dose_min": 150,
+      "effective_dose_max": 150,
+      "ul_dose": 1100,
+      "evidence_grade": "A",
+      "inci_name": "İyot",
+      "common_name": "İyot",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Iodine-HealthProfessional/",
+          "title": "Iodine — Health Professional Fact Sheet, NIH Office of Dietary Supplements"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29546679/",
+          "title": "Iodine deficiency and its relation to thyroid function"
+        }
+      ],
+      "effective_dose_unit": "mcg",
+      "ingredient_group": "mineral",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Deniz yosunu",
+          "amount_per_100g": 232,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Morina",
+          "amount_per_100g": 99,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Süt",
+          "amount_per_100g": 56,
+          "unit": "mcg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

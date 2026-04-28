@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: D-Riboz hazır ingredient listesinde yok ve ingredient_to_create için yeterli evidence-based dozaj aralığı (effective_dose_min/max) ile NIH/PubMed sitasyonu bu ham veride bulunmuyor. Tek aktif madde olduğu için ürün oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "D-Riboz hazır ingredient listesinde yok ve ingredient_to_create için yeterli evidence-based dozaj aralığı (effective_dose_min/max) ile NIH/PubMed sitasyonu bu ham veride bulunmuyor. Tek aktif madde olduğu için ürün oluşturulamaz."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada Kalsiyum, Magnezyum, mineral ve vitamin içerdiği belirtilmiş ancak hiçbir aktif madde için sayısal dozaj (mg/mcg/IU) verilmemiş. Ingredient listesi ve miktarları parse edilemediği için REVELA onboarding şeması doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada Kalsiyum, Magnezyum, mineral ve vitamin içerdiği belirtilmiş ancak hiçbir aktif madde için sayısal dozaj (mg/mcg/IU) verilmemiş. Ingredient listesi ve miktarları parse edilemediği için REVELA onboarding şeması doldurulamaz."
+  }
+}

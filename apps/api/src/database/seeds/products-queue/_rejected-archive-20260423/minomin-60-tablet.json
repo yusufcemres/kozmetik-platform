@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada aktif madde dozajları belirtilmemiş. Black Cohosh Root Ekstraktı, Panax Ginseng Ekstraktı, Soya İzoflavonları ve vitamin/mineral içeriği mg/mcg bazında verilmemiş, bu nedenle ingredient amount_per_serving değerleri üretilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada aktif madde dozajları belirtilmemiş. Black Cohosh Root Ekstraktı, Panax Ginseng Ekstraktı, Soya İzoflavonları ve vitamin/mineral içeriği mg/mcg bazında verilmemiş, bu nedenle ingredient amount_per_serving değerleri üretilemez."
+  }
+}

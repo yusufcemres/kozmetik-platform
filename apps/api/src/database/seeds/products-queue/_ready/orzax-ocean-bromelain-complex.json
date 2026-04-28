@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Bromelain Complex 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Bromelain Complex her 2 tablette 1500 mg bromelain (3600 GDU/g), yeşil çay ekstresi, kiraz meyve sapı ve maydanoz ekstresi içerir. Laktoz, glüten, koruyucu ve tatlandırıcı içermez. 30 tabletlik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "bromelain",
+        "amount_per_serving": 1500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-bromelain-complex/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Bromelain_Complex.webp"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "bromelain",
+      "category": "enzyme",
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "ul_dose": null,
+      "evidence_grade": "B",
+      "function_summary": "Ananas sapından elde edilen proteolitik enzim kompleksidir; protein sindirimine yardımcı olur ve post-operatif ödem, sinüzit ve yumuşak doku inflamasyonunda destekleyici etki gösterdiği klinik çalışmalarla bildirilmiştir.",
+      "inci_name": "Bromelain",
+      "common_name": "Bromelain",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27544536/",
+          "title": "Bromelain: a review of its mechanisms, actions and clinical applications"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "ingredient_group": "enzyme",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

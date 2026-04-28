@@ -1,0 +1,192 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Bigflor Probiyotik 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "probiyotik",
+    "short_description": "Bigflor Kapsül, her porsiyonda 5 milyar CFU Saccharomyces boulardii ve 3,5 milyar CFU çoklu probiyotik karışımı (L. acidophilus, L. rhamnosus, B. longum, S. thermophilus) sağlar. Toplam 8,5 milyar CFU içeren 30 kapsüllük gıda takviyesidir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "saccharomyces-boulardii",
+        "amount_per_serving": 5,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "lactobacillus-acidophilus",
+        "amount_per_serving": 0.875,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "lactobacillus-rhamnosus",
+        "amount_per_serving": 0.875,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "bifidobacterium-longum",
+        "amount_per_serving": 0.875,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "streptococcus-thermophilus",
+        "amount_per_serving": 0.875,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/bigflor-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Bigflor_10_Kapsul-1.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "saccharomyces-boulardii",
+      "inci_name": "Saccharomyces boulardii",
+      "common_name": "Saccharomyces Boulardii",
+      "domain_type": "supplement",
+      "ingredient_group": "probiotic",
+      "function_summary": "Saccharomyces boulardii, antibiyotik ilişkili ishal ve akut gastroenterit tedavisinde klinik kanıtı güçlü olan probiyotik mayadır. Bağırsak bariyerini destekler ve patojen kolonizasyonunu azaltır.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20458757/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 2,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "B_CFU",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Yoğurt",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        },
+        {
+          "food_name": "Kefir",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "lactobacillus-rhamnosus",
+      "inci_name": "Lactobacillus rhamnosus",
+      "common_name": "Lactobacillus Rhamnosus",
+      "domain_type": "supplement",
+      "ingredient_group": "probiotic",
+      "function_summary": "Lactobacillus rhamnosus, bağırsak mikrobiyotasını dengeleyen, immün fonksiyonu destekleyen ve akut ishal sürecini kısaltmada klinik kanıtları bulunan bir probiyotik suşudur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30741841/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "B_CFU",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Yoğurt",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        },
+        {
+          "food_name": "Kefir",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "bifidobacterium-longum",
+      "inci_name": "Bifidobacterium longum",
+      "common_name": "Bifidobacterium Longum",
+      "domain_type": "supplement",
+      "ingredient_group": "probiotic",
+      "function_summary": "Bifidobacterium longum, kolon mikrobiyotasının baskın üyelerinden biridir; bağırsak geçirgenliğini azaltır, immün modülasyon sağlar ve sindirim sağlığını destekleyen klinik verileri mevcuttur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31470536/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "B_CFU",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Yoğurt",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        },
+        {
+          "food_name": "Kefir",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "streptococcus-thermophilus",
+      "inci_name": "Streptococcus thermophilus",
+      "common_name": "Streptococcus Thermophilus",
+      "domain_type": "supplement",
+      "ingredient_group": "probiotic",
+      "function_summary": "Streptococcus thermophilus, laktoz sindirimini iyileştiren ve çoklu suş probiyotik kombinasyonlarında bağırsak sağlığını destekleyen laktik asit bakterisidir; özellikle laktoz intoleransında klinik fayda gösterir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29470689/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "B_CFU",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Yoğurt",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        },
+        {
+          "food_name": "Kefir",
+          "amount_per_100g": 1,
+          "unit": "CFU"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

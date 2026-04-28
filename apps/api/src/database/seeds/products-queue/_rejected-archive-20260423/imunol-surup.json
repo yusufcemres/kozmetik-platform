@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (Beta Glukan, Ekinezya, Propolis, vitamin ve mineraller) sayısal dozajları belirtilmemiş. Her 5 ml'deki mg/mcg/IU miktarları olmadan ingredients parse edilemez ve DV% hesaplanamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (Beta Glukan, Ekinezya, Propolis, vitamin ve mineraller) sayısal dozajları belirtilmemiş. Her 5 ml'deki mg/mcg/IU miktarları olmadan ingredients parse edilemez ve DV% hesaplanamaz."
+  }
+}

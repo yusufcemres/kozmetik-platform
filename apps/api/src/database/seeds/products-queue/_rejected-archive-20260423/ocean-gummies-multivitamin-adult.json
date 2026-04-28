@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında içerdiği 11 vitamin ve 2 mineralin spesifik isimleri ve dozajları (mg/mcg/IU cinsinden miktarları) belirtilmemiş. Ingredient listesi ve sayısal dozaj bilgisi olmadan REVELA onboarding şeması doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında içerdiği 11 vitamin ve 2 mineralin spesifik isimleri ve dozajları (mg/mcg/IU cinsinden miktarları) belirtilmemiş. Ingredient listesi ve sayısal dozaj bilgisi olmadan REVELA onboarding şeması doldurulamaz."
+  }
+}

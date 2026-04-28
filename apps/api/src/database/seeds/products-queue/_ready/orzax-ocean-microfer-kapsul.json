@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Microfer 17 mg Demir + C Vitamini 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Microfer, mikroenkapsülasyon teknolojisiyle üretilmiş her kapsülde 17 mg demir ve 80 mg C vitamini sağlayan gıda takviyesidir. Glüten, şeker, tatlandırıcı ve koruyucu içermez. 60 kapsüllük kutu.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "iron",
+        "amount_per_serving": 17,
+        "unit": "mg",
+        "daily_value_percentage": 121
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-microfer-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Microfer_Kapsul.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif madde listesi ve dozaj bilgisi bulunmuyor. Sadece 'vitamin, mineral ve bitkisel ekstreler' şeklinde genel ifade var, spesifik içerikler ve miktarları belirtilmemiş.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif madde listesi ve dozaj bilgisi bulunmuyor. Sadece 'vitamin, mineral ve bitkisel ekstreler' şeklinde genel ifade var, spesifik içerikler ve miktarları belirtilmemiş."
+  }
+}

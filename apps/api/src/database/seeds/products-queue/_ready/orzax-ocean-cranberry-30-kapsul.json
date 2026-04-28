@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Cranberry 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Cranberry, Kanada menşeli patentli Vaccinium macrocarpon (turna yemişi) standardize ekstresi içerir. Her 2 kapsülde 36 mg PAC (proantosiyanidin) sağlar. BL-DMAC analiz metoduyla içerik garantilidir. 30 kapsüllük kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 2,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cranberry-extract",
+        "amount_per_serving": 36,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-cranberry-30-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Cranberry-1.webp"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "cranberry-extract",
+      "inci_name": "Vaccinium macrocarpon",
+      "common_name": "Turna Yemişi (Cranberry) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Cranberry (Vaccinium macrocarpon) ekstresi, içerdiği proantosiyanidinler (PAC) sayesinde üriner sistem sağlığını destekler; E. coli bakterilerinin idrar yolu epitel hücrelerine tutunmasını azaltarak tekrarlayan idrar yolu enfeksiyonlarının önlenmesinde kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23076891/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 36,
+      "effective_dose_max": 72,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

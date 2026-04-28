@@ -1,0 +1,354 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean VM Arginin PS Likit 150 ml",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean VM Arginin PS Likit, her 5 ml porsiyonda 300 mg L-Arjinin, 10 mg fosfatidilserin, multivitamin ve mineraller ile aktif B12 (metilkobalamin) içeren likit gıda takviyesidir. Glüten içermez.",
+    "net_content_value": 150,
+    "net_content_unit": "ml",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "ml",
+      "certification": "gluten-free"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-arginine",
+        "amount_per_serving": 300,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 12,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 7.5,
+        "unit": "mg",
+        "daily_value_percentage": 75
+      },
+      {
+        "ingredient_slug": "phosphatidylserine",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 30,
+        "unit": "mcg",
+        "daily_value_percentage": 40
+      },
+      {
+        "ingredient_slug": "pantothenic-acid",
+        "amount_per_serving": 6,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 400,
+        "unit": "IU",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "retinol",
+        "amount_per_serving": 500,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "manganese",
+        "amount_per_serving": 1,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "riboflavin",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "thiamine",
+        "amount_per_serving": 1.1,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "folic-acid",
+        "amount_per_serving": 200,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "molybdenum",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 75,
+        "unit": "mcg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 55,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "chromium-picolinate",
+        "amount_per_serving": 6,
+        "unit": "mcg",
+        "daily_value_percentage": 15
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vm-arginin-ps-likit/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_VM_Arginin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "pantothenic-acid",
+      "inci_name": "Pantothenic Acid",
+      "common_name": "B5 Vitamini (Pantotenik Asit)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Pantotenik asit (B5 vitamini), koenzim A'nın bileşeni olarak enerji metabolizmasında, yağ asidi sentezinde ve sinir sistemi işlevinde rol oynar; ayrıca zihinsel performansa katkı sağlar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "manganese",
+      "inci_name": "Manganese",
+      "common_name": "Manganez",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Manganez, kemik oluşumu, bağ dokusu sentezi, karbonhidrat-lipid metabolizması ve oksidatif strese karşı korumada kritik rol oynayan bir eser mineraldir; çeşitli enzimlerin kofaktörüdür.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.8,
+      "effective_dose_max": 2.3,
+      "effective_dose_unit": "mg",
+      "ul_dose": 11,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Kabuklu yemişler",
+          "amount_per_100g": 2,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Baklagiller",
+          "amount_per_100g": 1.5,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "riboflavin",
+      "inci_name": "Riboflavin",
+      "common_name": "B2 Vitamini (Riboflavin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Riboflavin (B2 vitamini), enerji üretimi için gerekli FAD ve FMN koenzimlerinin öncüsüdür; hücresel solunum, cilt-mukoza sağlığı ve kırmızı kan hücresi üretiminde merkezi rol oynar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 1.6,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "thiamine",
+      "inci_name": "Thiamine",
+      "common_name": "B1 Vitamini (Tiamin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Tiamin (B1 vitamini), karbonhidrat ve dallı zincirli amino asit metabolizmasında gerekli olan tiamin pirofosfat koenziminin öncüsüdür; sinir sistemi ve kalp işlevinin sürdürülmesinde önemlidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 1.5,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "folic-acid",
+      "inci_name": "Folic Acid",
+      "common_name": "Folik Asit (B9 Vitamini)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Folik asit (B9 vitamini), DNA sentezi, hücre bölünmesi ve kırmızı kan hücresi oluşumu için gereklidir; gebelik öncesi ve erken dönemde nöral tüp defektleri riskini azaltmada kritik öneme sahiptir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 200,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mcg",
+      "ul_dose": 1000,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "molybdenum",
+      "inci_name": "Molybdenum",
+      "common_name": "Molibden",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Molibden, sülfür içeren amino asitlerin metabolizması, ürik asit üretimi ve detoksifikasyon süreçlerinde rol alan sülfit oksidaz, ksantin oksidaz gibi enzimlerin kofaktörü olan eser mineraldir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 45,
+      "effective_dose_max": 50,
+      "effective_dose_unit": "mcg",
+      "ul_dose": 2000,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Kabuklu yemişler",
+          "amount_per_100g": 2,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Baklagiller",
+          "amount_per_100g": 1.5,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

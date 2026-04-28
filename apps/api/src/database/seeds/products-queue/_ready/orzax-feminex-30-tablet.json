@@ -1,0 +1,122 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Orzax Feminex 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Orzax Feminex, kadınlara özel formüle edilmiş bir gıda takviyesidir. Her tablette 200 mg kalsiyum, 75 mg magnezyum, 50 mg ginseng ekstresi, 40 mg Vitex agnus castus, 25 mg Vitis vinifera ve 10 mg B6 vitamini içerir. 30 tabletlik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "calcium",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 25
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 75,
+        "unit": "mg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "ginsenosides",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitex-agnus-castus-extract",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitis-vinifera-extract",
+        "amount_per_serving": 25,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/feminex-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Feminex.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "vitex-agnus-castus-extract",
+      "inci_name": "Vitex agnus-castus",
+      "common_name": "Hayıt (Vitex Agnus Castus) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Hayıt (Vitex agnus-castus) ekstresi, geleneksel olarak kadın üreme sağlığı ve premenstrüel sendrom (PMS) semptomlarını hafifletmek amacıyla kullanılan bir bitkisel takviyedir. Dopaminerjik aktivite göstererek prolaktin düzeylerini dengeleyebilir ve menstrüel döngü düzenini destekleyebilir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23136064/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 20,
+      "effective_dose_max": 40,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "vitis-vinifera-extract",
+      "inci_name": "Vitis vinifera",
+      "common_name": "Üzüm Çekirdeği (Vitis Vinifera) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Üzüm çekirdeği (Vitis vinifera) ekstresi, oligomerik proantosiyanidin (OPC) kompleksi açısından zengin güçlü bir antioksidandır. Kapiller geçirgenliği azaltarak venöz dolaşımı destekler, oksidatif stresle mücadele eder ve kardiyovasküler sağlığa katkı sağlayabilir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27524444/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 300,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

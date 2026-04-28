@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif maddelerin (sitikolin, üridin monofosfat, fosfotidilserin, B1, B2, B6, B12) porsiyon başı sayısal dozajları açıklamada belirtilmemiş (sadece sitikolin 250 mg verilmiş, diğerleri için miktar yok). Ayrıca sitikolin, üridin monofosfat, fosfotidilserin DB'de hazır ingredient listesinde yok ve bunlar için evidence_grade + citation gerektiren tam şema oluşturulması gerekli, ancak ürün dozaj verisi eksik olduğu için güvenilir ingredient tablosu kurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif maddelerin (sitikolin, üridin monofosfat, fosfotidilserin, B1, B2, B6, B12) porsiyon başı sayısal dozajları açıklamada belirtilmemiş (sadece sitikolin 250 mg verilmiş, diğerleri için miktar yok). Ayrıca sitikolin, üridin monofosfat, fosfotidilserin DB'de hazır ingredient listesinde yok ve bunlar için evidence_grade + citation gerektiren tam şema oluşturulması gerekli, ancak ürün dozaj verisi eksik olduğu için güvenilir ingredient tablosu kurulamaz."
+  }
+}

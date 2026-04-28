@@ -1,0 +1,103 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Polysitol Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Polysitol her saşede 2000 mg miyo-inositol, 500 mg L-arginin, 100 mg L-karnitin ve 30.64 mg E vitamini içerir. Quatrefolic aktif folat formülü ile saşe formunda kolay tüketim sağlar.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-arginine",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 30.64,
+        "unit": "mg",
+        "daily_value_percentage": 255
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-polysitol-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Web_Ocean_Polysitol_Yenilendi_1.webp"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "myo-inositol",
+      "inci_name": "Myo-Inositol",
+      "common_name": "Miyo-İnositol",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Miyo-inositol, hücre zarı fosfolipitlerinin yapı taşı olan bir şeker alkolüdür. İnsülin sinyal iletimini destekler, yumurtalık fonksiyonu ve hormonal dengeye katkı sağlar; PCOS yönetiminde ve üreme sağlığında sıklıkla değerlendirilir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30308762/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 2000,
+      "effective_dose_max": 4000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "l-carnitine",
+      "inci_name": "L-Carnitine",
+      "common_name": "L-Karnitin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino_acid",
+      "function_summary": "L-Karnitin, uzun zincirli yağ asitlerinin mitokondriye taşınmasında görev alan bir amino asit türevidir. Enerji metabolizmasını, sperm kalitesini ve kas fonksiyonunu destekler; üreme sağlığı formülasyonlarında yaygın kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Et ve tavuk",
+          "amount_per_100g": 500,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Süt ürünleri",
+          "amount_per_100g": 200,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

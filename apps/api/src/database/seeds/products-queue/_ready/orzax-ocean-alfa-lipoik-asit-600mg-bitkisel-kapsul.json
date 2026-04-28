@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Alfa Lipoik Asit 600 mg Bitkisel Kapsül 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Alfa Lipoik Asit 600 mg, her kapsülde 600 mg R-Alfa Lipoik Asit içeren tek bileşenli takviye edici gıdadır. Şeker, glüten, koruyucu ve tatlandırıcı içermez; Vcaps bitkisel kapsül teknolojisiyle üretilmiştir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "alpha-lipoic-acid",
+        "amount_per_serving": 600,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-alfa-lipoik-asit-600mg-bitkisel-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_ALA_600.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Hyaluronik asit ve C vitamini dozları (mg miktarları) ham veride belirtilmemiş; sayısal madde içeriği olmadan geçerli ingredient kaydı oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Hyaluronik asit ve C vitamini dozları (mg miktarları) ham veride belirtilmemiş; sayısal madde içeriği olmadan geçerli ingredient kaydı oluşturulamaz."
+  }
+}

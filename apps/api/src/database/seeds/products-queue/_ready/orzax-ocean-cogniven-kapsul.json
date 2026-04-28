@@ -1,0 +1,144 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Cogniven Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Cogniven her kapsülde Cognizin patentli 250 mg sitikolin, üridin monofosfat, fosfotidilserin (PS) ile B1, B2, B6 ve metilkobalamin B12 vitaminleri içeren bilişsel destek takviyesidir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "citicoline",
+        "amount_per_serving": 250,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "uridine-monophosphate",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "phosphatidylserine",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-cogniven-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Cogniven-1.webp"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "citicoline",
+      "inci_name": "Cytidine 5'-diphosphocholine",
+      "common_name": "Sitikolin (CDP-Kolin)",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Sitikolin (CDP-kolin), beyin hücre zarlarının yapı taşı olan fosfatidilkolin sentezinde rol oynayan doğal bir bileşiktir. Bilişsel fonksiyon, hafıza ve dikkat desteği için kullanılır; nörotransmitter asetilkolin üretimini destekler.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26179182/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 250,
+      "effective_dose_max": 1000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "uridine-monophosphate",
+      "inci_name": "Uridine 5'-monophosphate",
+      "common_name": "Üridin Monofosfat",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Üridin monofosfat, RNA'nın yapı taşı olan bir nükleotiddir. Beyinde sinaptik fosfolipid sentezini destekleyerek bilişsel fonksiyon, hafıza ve nöronal membran sağlığı için takviye olarak kullanılır.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18614746/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "phosphatidylserine",
+      "inci_name": "Phosphatidylserine",
+      "common_name": "Fosfatidilserin (PS)",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Fosfatidilserin, hücre zarlarında bulunan bir fosfolipiddir ve özellikle beyin hücrelerinde yüksek konsantrasyonda bulunur. Bilişsel fonksiyon, hafıza, odaklanma ve yaşa bağlı bilişsel gerileme desteği için kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25933483/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 300,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

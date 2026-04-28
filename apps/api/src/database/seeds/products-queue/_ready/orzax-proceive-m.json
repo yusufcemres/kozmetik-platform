@@ -1,0 +1,310 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Proceive M Saşe 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Proceive M, her saşede 1500 mg L-karnitin, 250 mg L-arjinin, 100 mg Koenzim Q10, 50 mg glutatyon ile vitamin, mineral ve bitkisel ekstreler içeren erkeklere yönelik sıvı gıda takviyesidir.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-arginine",
+        "amount_per_serving": 250,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 150,
+        "unit": "mg",
+        "daily_value_percentage": 188
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 75,
+        "unit": "mg",
+        "daily_value_percentage": 625
+      },
+      {
+        "ingredient_slug": "coenzyme-q10",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "ginsenosides",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 60,
+        "unit": "mg",
+        "daily_value_percentage": 16
+      },
+      {
+        "ingredient_slug": "l-glutathione",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 15,
+        "unit": "mg",
+        "daily_value_percentage": 150
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 2,
+        "unit": "mg",
+        "daily_value_percentage": 143
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 91
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 400,
+        "unit": "IU",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "l-carnitine",
+        "amount_per_serving": 1500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "oat-extract",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "furostanol-saponins",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "grape-seed-extract",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "pine-bark-extract",
+        "amount_per_serving": 1.5,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "beta-carotene",
+        "amount_per_serving": 1.5,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/proceive-m/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Proceive_M.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-carnitine",
+      "inci_name": "L-Carnitine",
+      "common_name": "L-Karnitin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino_acid",
+      "function_summary": "L-Karnitin, uzun zincirli yağ asitlerinin mitokondriye taşınmasında görev alan bir amino asit türevidir; enerji metabolizması, egzersiz performansı ve sperm kalitesi üzerindeki etkileri araştırılmıştır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "effective_dose_unit": "mg",
+      "ul_dose": 3000,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Et ve tavuk",
+          "amount_per_100g": 500,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Süt ürünleri",
+          "amount_per_100g": 200,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "oat-extract",
+      "inci_name": "Avena sativa extract",
+      "common_name": "Yulaf Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Yulaf ekstresi (Avena sativa), avenantramid ve beta-glukan gibi bileşenler içerir; antioksidan etki, libido desteği ve genel canlılık üzerindeki etkileri geleneksel ve modern çalışmalarda ele alınmıştır.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21883487/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 1500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "furostanol-saponins",
+      "inci_name": "Furostanol Saponins (Trigonella foenum-graecum)",
+      "common_name": "Furostanol Saponinler",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Furostanol saponinler özellikle çemen otundan (Trigonella foenum-graecum) elde edilen steroidal saponin bileşikleridir; testosteron düzeyleri, libido ve erkek üreme sağlığı üzerindeki etkileri klinik çalışmalarda incelenmiştir.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21312304/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 600,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "grape-seed-extract",
+      "inci_name": "Vitis vinifera seed extract",
+      "common_name": "Üzüm Çekirdeği Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Üzüm çekirdeği ekstresi, proantosiyanidin ve polifenol içeriği nedeniyle güçlü antioksidan özellik gösterir; damar sağlığı, kan basıncı regülasyonu ve oksidatif stres azaltımında araştırılmıştır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27324590/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "pine-bark-extract",
+      "inci_name": "Pinus pinaster bark extract",
+      "common_name": "Sahil Çamı (Pycnogenol) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Sahil çamı (Pinus pinaster) kabuğu ekstresi, Pycnogenol olarak da bilinir ve proantosiyanidin açısından zengindir; endotel fonksiyonu, dolaşım sağlığı ve antioksidan savunma üzerindeki etkileri klinik çalışmalarla desteklenmiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22782502/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 200,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "beta-carotene",
+      "inci_name": "Beta-Carotene",
+      "common_name": "Beta Karoten",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Beta karoten, vücutta A vitaminine dönüşebilen bir provitamin karotenoid olup antioksidan etkileri, göz sağlığı ve bağışıklık sistemi desteği açısından önemli bir mikro besindir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.5,
+      "effective_dose_max": 15,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

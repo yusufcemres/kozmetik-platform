@@ -1,0 +1,202 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies Multivitamin Kids 30 Jel",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Gummies Multivitamin Kids, 4-10 yaş çocuklar için 9 vitamin, 3 mineral ve inositol içeren çiğnenebilir jel formda takviyedir. Portakal ve çilek aromalıdır; glikoz şurubu, jelatin, yapay tatlandırıcı ve koruyucu içermez. 30 jel.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 8,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 6,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 3,
+        "unit": "mg",
+        "daily_value_percentage": 30
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 0.7,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 100,
+        "unit": "mcg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 30,
+        "unit": "mcg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 200,
+        "unit": "IU",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b12",
+        "amount_per_serving": 1.25,
+        "unit": "mcg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "retinol",
+        "amount_per_serving": 200,
+        "unit": "mcg",
+        "daily_value_percentage": 25
+      },
+      {
+        "ingredient_slug": "pantothenic-acid",
+        "amount_per_serving": 3,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "manganese",
+        "amount_per_serving": 0.4,
+        "unit": "mg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "inositol",
+        "amount_per_serving": 0.01,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-multivitamin-kids/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/Ocean_Gummies_Kids_MV.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "pantothenic-acid",
+      "inci_name": "Pantothenic Acid",
+      "common_name": "Pantotenik Asit (B5 Vitamini)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Pantotenik asit (B5 vitamini), koenzim A (CoA) sentezinde kritik rol oynar; yağ, karbonhidrat ve protein metabolizmasında enerji üretimini destekler, hormon ve nörotransmitter sentezine katkı sağlar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "manganese",
+      "inci_name": "Manganese",
+      "common_name": "Manganez",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Manganez, kemik oluşumu, amino asit, kolesterol ve karbonhidrat metabolizması ile antioksidan süperoksit dismutaz (MnSOD) enziminin aktivitesinde görev alan esansiyel bir eser mineraldir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.8,
+      "effective_dose_max": 2.3,
+      "effective_dose_unit": "mg",
+      "ul_dose": 11,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Kabuklu yemişler",
+          "amount_per_100g": 2,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Baklagiller",
+          "amount_per_100g": 1.5,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "inositol",
+      "inci_name": "Inositol",
+      "common_name": "İnositol",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "İnositol (myo-inositol), hücre zarının fosfolipid yapısında bulunan ve insülin sinyalizasyonu, nörotransmitter iletimi ile yağ metabolizmasında ikincil haberci olarak görev yapan şeker alkolüdür.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30055544/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 4000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

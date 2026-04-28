@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean ExtraMag Magnezyum Bisglisinat + P5P 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean ExtraMag her 2 tabletlik porsiyonda magnezyum bisglisinattan gelen 240 mg magnezyum ve 10 mg P5P formunda B6 vitamini sağlar. Şelatlı form sayesinde GI toleransı yüksektir.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium-bisglycinate",
+        "amount_per_serving": 240,
+        "unit": "mg",
+        "daily_value_percentage": 64
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-extramag-magnezyum-bisglisinat-p5p/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/04/Ocean_Bisglisinat.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

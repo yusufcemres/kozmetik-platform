@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Demir dozajı (mg cinsinden madde başı miktar) ham veride belirtilmemiş; ingredients amount_per_serving alanı sayısal olarak doldurulamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Demir dozajı (mg cinsinden madde başı miktar) ham veride belirtilmemiş; ingredients amount_per_serving alanı sayısal olarak doldurulamıyor."
+  }
+}

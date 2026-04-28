@@ -1,0 +1,76 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Efervit Sambucus Nigra Kara Mürver 20 Efervesan Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Efervit Sambucus Nigra her efervesan tablette 200 mg kara mürver ekstresi, 80 mg C vitamini ve 10 mg çinko sağlar. Hızlı çözünen, tortu bırakmayan 20 tabletlik bağışıklık destek formülü.",
+    "net_content_value": 20,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "elderberry-extract",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/efervit-sambucus-nigra/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Efervit_Sambucus-1.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "elderberry-extract",
+      "inci_name": "Sambucus nigra",
+      "common_name": "Kara Mürver Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Kara mürver (Sambucus nigra), antosiyaninler ve flavonoidler açısından zengin bir bitkisel ekstredir. Üst solunum yolu enfeksiyonlarında bağışıklık desteği ve antioksidan etki amacıyla geleneksel olarak kullanılır; klinik çalışmalar soğuk algınlığı süresini kısaltabildiğini göstermiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30670267/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 150,
+      "effective_dose_max": 600,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

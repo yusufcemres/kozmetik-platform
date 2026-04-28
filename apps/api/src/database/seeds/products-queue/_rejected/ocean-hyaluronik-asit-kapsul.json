@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ingredient dozajları belirtilmemiş — Hyaluronik Asit ve C vitamini miktarları (mg) açıklamada yok, porsiyon başı doz hesaplanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ingredient dozajları belirtilmemiş — Hyaluronik Asit ve C vitamini miktarları (mg) açıklamada yok, porsiyon başı doz hesaplanamıyor."
+  }
+}

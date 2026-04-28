@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: L-Arginine ingredient slug'ı hazır listede yok ve tek aktif madde olduğu için ingredients_to_create ile eklenmesi gerekir; ancak talimat gereği hazır listeden seçim öncelikli ve yeterli kanıt/citation verisi ham üründe bulunmuyor.",
+  "doc": {
+    "skip": true,
+    "reason": "L-Arginine ingredient slug'ı hazır listede yok ve tek aktif madde olduğu için ingredients_to_create ile eklenmesi gerekir; ancak talimat gereği hazır listeden seçim öncelikli ve yeterli kanıt/citation verisi ham üründe bulunmuyor."
+  }
+}

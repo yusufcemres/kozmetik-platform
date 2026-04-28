@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Picozinc 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Picozinc, her tablette pikolinat formunda çinko içeren bir gıda takviyesidir. 11 yaş ve üzeri bireyler için günde 1 tablet önerilir. Glüten, laktoz, şeker, renklendirici ve koruyucu içermez. 30 tabletlik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "zinc-picolinate",
+        "amount_per_serving": 15,
+        "unit": "mg",
+        "daily_value_percentage": 150
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-picozinc-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Picozinc.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Methyl Folat 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Methyl Folat, her tablette Quatrefolic patentli aktif formda (5-MTHF) 400 mcg folat içeren 30 tabletlik bir gıda takviyesidir. 11 yaş ve üzeri bireyler için günde 1 tablet önerilir.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-methyl-folat-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Methyl_Folat.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "methylfolate",
+      "inci_name": "L-5-Methyltetrahydrofolate (Quatrefolic)",
+      "common_name": "Metilfolat (Aktif Folat)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Metilfolat (5-MTHF), folatın biyolojik olarak aktif formudur. DNA sentezi, hücre bölünmesi, homosistein metabolizması ve kırmızı kan hücresi oluşumunda rol oynar. Özellikle MTHFR gen varyasyonu taşıyan bireylerde ve hamilelik öncesi/sırasında nöral tüp defektlerinin önlenmesinde kritik öneme sahiptir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24494987/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 400,
+      "effective_dose_max": 800,
+      "effective_dose_unit": "mcg",
+      "ul_dose": 1000,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Mercimek",
+          "amount_per_100g": 181,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Ispanak",
+          "amount_per_100g": 194,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Brokoli",
+          "amount_per_100g": 63,
+          "unit": "mcg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

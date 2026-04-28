@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin D3 1000 IU Sprey 20 ml",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin D3 1000 IU Sprey, her puf başına Quali-D patentli 1000 IU (25 mcg) D3 vitamini sağlar. Taşıyıcı olarak zeytinyağı kullanılır; koruyucu, tatlandırıcı ve ilave şeker içermez. 20 ml'lik sprey formda, 11 yaş üzeri kullanıma uygundur.",
+    "net_content_value": 20,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "spray",
+      "serving_size": 1,
+      "serving_unit": "spray",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 1000,
+        "unit": "IU",
+        "daily_value_percentage": 500
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-d3-1000-iu-sprey/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Web_Ocean_D3_1000IU_Sprey_Yenilendi_1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

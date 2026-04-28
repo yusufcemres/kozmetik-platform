@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Bigflor Probiyotik 10 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "probiyotik",
+    "short_description": "Bigflor Probiyotik saşe, porsiyon başına 3 milyar CFU içeren çoklu suş probiyotik takviyesidir. Bifidobacterium ve Lactobacillus türleri ile Streptococcus thermophilus içerir. 4-10 yaş çocuklar ve yetişkinler için 10 saşelik kutu.",
+    "net_content_value": 10,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "bifidobacterium-lactis",
+        "amount_per_serving": 1,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "lactobacillus-acidophilus",
+        "amount_per_serving": 1,
+        "unit": "B_CFU",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/bigflor-probiyotik-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Bigflor_10_Sase.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

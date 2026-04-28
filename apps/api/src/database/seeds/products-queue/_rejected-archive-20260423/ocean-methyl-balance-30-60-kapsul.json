@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif maddelerin porsiyon başı dozajları (B12, B6, B2, Betain, L-serin, Çinko Bisglisinat) açıklamada belirtilmemiş; sayısal ingredient bilgisi olmadan şema tamamlanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif maddelerin porsiyon başı dozajları (B12, B6, B2, Betain, L-serin, Çinko Bisglisinat) açıklamada belirtilmemiş; sayısal ingredient bilgisi olmadan şema tamamlanamıyor."
+  }
+}

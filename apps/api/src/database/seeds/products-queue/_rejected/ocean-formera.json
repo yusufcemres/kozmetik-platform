@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (CLA, L-Karnitin, kafein, yeşil çay, Glucomannan, Kitosan) sayısal dozajları belirtilmemiş. Porsiyon başı mg değerleri olmadan ingredient parse edilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (CLA, L-Karnitin, kafein, yeşil çay, Glucomannan, Kitosan) sayısal dozajları belirtilmemiş. Porsiyon başı mg değerleri olmadan ingredient parse edilemez."
+  }
+}

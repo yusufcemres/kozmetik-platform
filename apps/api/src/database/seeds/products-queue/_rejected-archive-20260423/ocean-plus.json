@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Omega-3 (EPA/DHA) miktarları ham veride belirtilmemiş; dozaj bilgisi olmadan ingredient amount_per_serving alanı doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Omega-3 (EPA/DHA) miktarları ham veride belirtilmemiş; dozaj bilgisi olmadan ingredient amount_per_serving alanı doldurulamaz."
+  }
+}

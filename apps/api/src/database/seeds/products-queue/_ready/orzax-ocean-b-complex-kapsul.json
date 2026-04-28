@@ -1,0 +1,215 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean B Complex 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean B Complex, 8 farklı B grubu vitamini ile birlikte kolin ve miyo-inositol içerir. Aktif formda B12 (metilkobalamin), folat (metilfolat) ve B6 (P5P) sunar. Bitkisel Vcaps kapsül, 60 kapsüllük kutu.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 313
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 2000
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 100,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-b-complex-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/B_Complex.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "vitamin-b1",
+      "inci_name": "Thiamine",
+      "common_name": "B1 Vitamini (Tiamin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "B1 vitamini (tiamin), karbonhidrat metabolizmasında koenzim olarak görev alır; enerji üretimi, sinir sistemi fonksiyonları ve kalp sağlığı için gereklidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 100,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "vitamin-b2",
+      "inci_name": "Riboflavin",
+      "common_name": "B2 Vitamini (Riboflavin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "B2 vitamini (riboflavin), FAD ve FMN koenzimlerinin ön maddesidir; enerji metabolizması, hücresel solunum ve antioksidan savunmada kritik rol oynar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "vitamin-b5",
+      "inci_name": "Pantothenic Acid",
+      "common_name": "B5 Vitamini (Pantotenik Asit)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "B5 vitamini (pantotenik asit), Koenzim A'nın yapıtaşıdır; yağ asidi metabolizması, enerji üretimi ve steroid hormon sentezi için gereklidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5,
+      "effective_dose_max": 100,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "myo-inositol",
+      "inci_name": "Myo-Inositol",
+      "common_name": "Miyo-İnositol",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Miyo-inositol, hücre zarı fosfolipitlerinin bileşenidir; insülin sinyali, yumurtalık fonksiyonu ve nörotransmitter düzenlemesinde rol oynar, PCOS'ta yaygın kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27808588/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 4000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "choline",
+      "inci_name": "Choline",
+      "common_name": "Kolin",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Kolin, fosfatidilkolin ve asetilkolin sentezi için gerekli bir besindir; karaciğer fonksiyonu, beyin gelişimi, hafıza ve kas kontrolü için kritik öneme sahiptir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 20,
+      "effective_dose_max": 550,
+      "effective_dose_unit": "mg",
+      "ul_dose": 3500,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

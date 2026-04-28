@@ -1,0 +1,100 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Betain HCl + Pepsin 120 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Betain HCl + Pepsin, her tabletinde 654 mg Betain Hidroklorür ve 50 mg Pepsin içeren tablet formunda gıda takviyesidir. 120 tabletlik kutu, yetişkinler için günde 3 kez 1-2 tablet kullanıma uygundur.",
+    "net_content_value": 120,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "betaine-hcl",
+        "amount_per_serving": 654,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "pepsin",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-betain-hclpepsin-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Betain_Pepsin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "betaine-hcl",
+      "category": "digestive_aid",
+      "function_summary": "Betain hidroklorür, mide asidi üretimini destekleyerek protein sindirimi ve mineral emilimine yardımcı olan bir bileşiktir. Düşük mide asidi (hipoklorhidri) durumlarında sindirim desteği amacıyla kullanılır.",
+      "effective_dose_min": 600,
+      "effective_dose_max": 2500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "ul_dose_unit": "mg",
+      "evidence_grade": "C",
+      "inci_name": "Betain Hidroklorür",
+      "common_name": "Betain Hidroklorür",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23590228/",
+          "title": "Betaine hydrochloride and gastric acidity - pharmacokinetic study"
+        }
+      ],
+      "ingredient_group": "other",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "pepsin",
+      "category": "digestive_enzyme",
+      "function_summary": "Pepsin, midede protein sindirimini başlatan proteolitik bir enzimdir. Proteinleri daha küçük peptidlere parçalayarak sindirim sürecine katkı sağlar ve genellikle betain HCl ile kombine kullanılır.",
+      "effective_dose_min": 25,
+      "effective_dose_max": 200,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "ul_dose_unit": "mg",
+      "evidence_grade": "C",
+      "inci_name": "Pepsin",
+      "common_name": "Pepsin",
+      "evidence_citations": [
+        {
+          "source": "NIH",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK537005/",
+          "title": "Physiology, Pepsin - StatPearls"
+        }
+      ],
+      "ingredient_group": "enzyme",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

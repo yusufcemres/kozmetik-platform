@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean ExtraMag Magnezyum Sitrat Saşe 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean ExtraMag Magnezyum Sitrat her saşede 250 mg elementel magnezyum (sitrat formu) ve 10 mg B6 vitamininin aktif formu P-5-P sağlar. Çilek aromalı, stevia ile tatlandırılmış, ilave şeker içermez. 30 saşelik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium-citrate",
+        "amount_per_serving": 250,
+        "unit": "mg",
+        "daily_value_percentage": 67
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 714
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-extramag-magnezyum-sitrat-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Extramag_Sase.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

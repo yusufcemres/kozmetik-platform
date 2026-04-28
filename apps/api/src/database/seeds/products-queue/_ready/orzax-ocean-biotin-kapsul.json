@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Biotin 5000 mcg Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Biotin, her kapsülde 5000 mcg biotin (B7 vitamini) içeren bir gıda takviyesidir. Vcaps bitkisel kapsül teknolojisi ile üretilmiş, kolay yutulabilir yapıdadır. Yetişkinler için günde 1 kapsül kullanım önerilir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 5000,
+        "unit": "mcg",
+        "daily_value_percentage": 10000
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-biotin-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Biotin.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

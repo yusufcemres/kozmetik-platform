@@ -1,0 +1,99 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Resveratrol 200 mg 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Resveratrol, her kapsülde 205 mg Japon Poligonumu (Polygonum cuspidatum) ekstresinden elde edilen 200 mg Trans Resveratrol içerir. Vegan uyumlu VCaps kapsüllerde üretilmiş, şeker, koruyucu ve glüten içermeyen bir gıda takviyesidir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "trans-resveratrol",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "japanese-knotweed-extract",
+        "amount_per_serving": 205,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-resveratrol-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Resveratrol.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "trans-resveratrol",
+      "evidence_grade": "B",
+      "effective_dose_min": 150,
+      "effective_dose_max": 500,
+      "unit": "mg",
+      "ul_dose": 1500,
+      "function_summary": "Trans-resveratrol, üzüm ve Japon poligonumunda bulunan bir polifenol stilbenoiddir; antioksidan aktivite gösterir, SIRT1 yolaklarını aktive ederek kardiyovasküler sağlık, endotel fonksiyonu ve metabolik parametreler üzerinde olumlu etkiler ile ilişkilendirilmiştir.",
+      "inci_name": "Trans Resveratrol",
+      "common_name": "Trans Resveratrol",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28158936/",
+          "title": "Resveratrol: A Double-Edged Sword in Health Benefits"
+        },
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Resveratrol-HealthProfessional/",
+          "title": "Resveratrol Fact Sheet"
+        }
+      ],
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "japanese-knotweed-extract",
+      "evidence_grade": "C",
+      "effective_dose_min": 200,
+      "effective_dose_max": 600,
+      "unit": "mg",
+      "ul_dose": null,
+      "function_summary": "Polygonum cuspidatum (Japon poligonumu) kökü, doğal trans-resveratrol ve emodin gibi polifenoller açısından zengindir; geleneksel olarak dolaşım ve iltihaplanma desteği için kullanılır ve modern takviyelerde resveratrol kaynağı olarak standardize edilir.",
+      "inci_name": "Japon Poligonumu Ekstresi (Polygonum cuspidatum)",
+      "common_name": "Japon Poligonumu Ekstresi (Polygonum cuspidatum)",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23333625/",
+          "title": "Polygonum cuspidatum and its active components: a review of pharmacological effects"
+        }
+      ],
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

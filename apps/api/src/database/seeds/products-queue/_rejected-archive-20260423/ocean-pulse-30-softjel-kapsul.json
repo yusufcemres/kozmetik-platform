@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada omega 3, CoQ10 (ubikinol), D3 ve K2 vitaminleri belirtilmiş ancak hiçbir madde için sayısal dozaj (mg/mcg/IU) bilgisi verilmemiş. Ingredients parse edilemediği için REVELA onboarding şartlarını karşılamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada omega 3, CoQ10 (ubikinol), D3 ve K2 vitaminleri belirtilmiş ancak hiçbir madde için sayısal dozaj (mg/mcg/IU) bilgisi verilmemiş. Ingredients parse edilemediği için REVELA onboarding şartlarını karşılamıyor."
+  }
+}

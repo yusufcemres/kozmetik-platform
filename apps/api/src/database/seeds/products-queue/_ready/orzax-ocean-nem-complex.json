@@ -1,0 +1,104 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean NemComplex 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean NemComplex her tablette 300 mg yumurta kabuğu zarı ekstresi, 100 mg akgünlük (boswellia) ekstresi ve 50 mg zerdeçal içerir. Kemik ve eklem desteğine yönelik 30 tabletlik formülasyon.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "eggshell-membrane",
+        "amount_per_serving": 300,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "boswellia-serrata",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "curcuma-longa-extract",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-nem-complex/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_NemComplex.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "eggshell-membrane",
+      "inci_name": "Eggshell Membrane",
+      "common_name": "Yumurta Kabuğu Zarı Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Yumurta kabuğu zarı ekstresi; kollajen, glukozamin, kondroitin ve hiyalüronik asit gibi doğal bileşenler içerir. Eklem konforu, esneklik ve hareket kabiliyeti desteği amacıyla kullanılır; kıkırdak yapı taşlarına katkı sağladığı ileri sürülür.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19851510/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "boswellia-serrata",
+      "inci_name": "Boswellia serrata",
+      "common_name": "Akgünlük (Boswellia) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Boswellia serrata (akgünlük), boswellik asitler açısından zengin bitkisel bir ekstredir. Geleneksel kullanımda ve klinik çalışmalarda eklem konforu, esneklik ve inflamatuvar yanıtın modülasyonu amacıyla değerlendirilmiştir; 5-lipoksigenaz enzim aktivitesini etkilediği bildirilmiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18667054/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

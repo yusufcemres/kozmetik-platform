@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin C 1000 mg 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin C 1000 mg, her tablette 1000 mg C vitamini ve 100 mg turunçgil bioflavonoidleri (limon, portakal, mandalina, greyfurt) içeren 30 tabletlik gıda takviyesidir. 11 yaş üzeri için günde 1 tablet.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 1000,
+        "unit": "mg",
+        "daily_value_percentage": 1250
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-c-1000mg-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Vitamin_C.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Plus Omega-3 30 Softjel",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Plus, her softjel kapsülde 780 mg toplam Omega-3 (384 mg EPA + 252 mg DHA) sağlar. Trigliserid formda, küçük cins balıkların gövde yağından üretilmiş, IFOS 5 yıldız sertifikalı, limon aromalı 30 softjel kapsül.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 384,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 252,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-plus/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Plus_50_1500x1500px.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

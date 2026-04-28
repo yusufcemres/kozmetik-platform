@@ -1,0 +1,69 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Passiflora İncarnata 300 mg 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Passiflora İncarnata, her kapsülünde 300 mg Passiflora incarnata ekstresi içeren bitkisel gıda takviyesidir. Patentli Vcaps® kapsül formunda, 30 kapsüllük kutu. Glüten, koruyucu ve tatlandırıcı içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "gluten-free"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "passiflora-incarnata-extract",
+        "amount_per_serving": 300,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-passiflora-incarnata-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Passiflora_Kapsul.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "passiflora-incarnata-extract",
+      "inci_name": "Passiflora incarnata",
+      "common_name": "Çarkıfelek (Passiflora) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Passiflora incarnata, GABA-erjik sistem üzerinden etki gösterdiği düşünülen geleneksel bir bitkidir; hafif anksiyete, huzursuzluk ve uyku kalitesi desteği amacıyla kullanılır. Flavonoidler ve alkaloidler içerir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21294203/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "EMA",
+          "url": "https://www.ema.europa.eu/en/medicines/herbal/passiflorae-herba",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 250,
+      "effective_dose_max": 800,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

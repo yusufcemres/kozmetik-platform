@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada vitamin ve mineraller listelenmiş ancak her bir madde için sayısal dozaj bilgisi (mg/mcg/IU) verilmemiştir. Ayrıca Panax ginseng miktarı da belirtilmemiştir. Ingredient-level dozaj olmadan REVELA ingest yapılamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada vitamin ve mineraller listelenmiş ancak her bir madde için sayısal dozaj bilgisi (mg/mcg/IU) verilmemiştir. Ayrıca Panax ginseng miktarı da belirtilmemiştir. Ingredient-level dozaj olmadan REVELA ingest yapılamaz."
+  }
+}

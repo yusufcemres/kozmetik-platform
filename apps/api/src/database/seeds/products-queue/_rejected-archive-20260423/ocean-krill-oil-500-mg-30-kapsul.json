@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında krill oil miktarı (500 mg başlıktan çıkarılabilir) belirtilmiş ancak EPA ve DHA dozajları ayrı olarak verilmemiş. Fosfolipit içeriği ve astaksantin miktarı da yok. Sayısal dozaj bilgisi yetersiz olduğundan ingredients parse edilemiyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında krill oil miktarı (500 mg başlıktan çıkarılabilir) belirtilmiş ancak EPA ve DHA dozajları ayrı olarak verilmemiş. Fosfolipit içeriği ve astaksantin miktarı da yok. Sayısal dozaj bilgisi yetersiz olduğundan ingredients parse edilemiyor."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean L-Glutatyon 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean L-Glutatyon, biyolojik olarak indirgenmiş (reduced) formda L-glutatyon içeren bir gıda takviyesidir. Her tablette 250 mg L-glutatyon sağlar. 30 tabletlik kutu, yetişkinler için günde 1 tablet kullanım içindir.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-glutathione",
+        "amount_per_serving": 250,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-l-glutatyon-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_LGluytatyon.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-glutathione",
+      "inci_name": "L-Glutathione",
+      "common_name": "L-Glutatyon",
+      "domain_type": "supplement",
+      "ingredient_group": "antioxidant",
+      "function_summary": "L-Glutatyon, glutamat, sistein ve glisinden oluşan endojen bir tripeptid antioksidandır. Hücresel redoks dengesinin korunması, serbest radikallerin nötralizasyonu ve karaciğerde Faz II detoksifikasyon reaksiyonlarında kofaktör olarak görev yapar; ayrıca C ve E vitaminlerinin rejenerasyonuna katkıda bulunur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25262571/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 250,
+      "effective_dose_max": 1000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

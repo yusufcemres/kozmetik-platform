@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında içerik maddelerinin (vitamin, mineral, bitkisel ekstreler) isimleri ve dozajları belirtilmemiş. Sadece 'vitamin, mineral ve bitkisel ekstrelerden oluşan özel formül' ifadesi mevcut, ancak hangi maddelerin hangi dozlarda bulunduğu bilinmiyor. Ingredients parse edilemediği için REVELA onboarding JSON'u üretilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında içerik maddelerinin (vitamin, mineral, bitkisel ekstreler) isimleri ve dozajları belirtilmemiş. Sadece 'vitamin, mineral ve bitkisel ekstrelerden oluşan özel formül' ifadesi mevcut, ancak hangi maddelerin hangi dozlarda bulunduğu bilinmiyor. Ingredients parse edilemediği için REVELA onboarding JSON'u üretilemez."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean 5-HTP 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean 5-HTP, Griffonia simplicifolia tohumlarından elde edilen ve her kapsülde 100 mg 5-HTP içeren bir gıda takviyesidir. Vcaps bitkisel kapsül teknolojisiyle üretilmiştir. 11 yaş ve üzeri için günlük 1-2 kapsül kullanıma uygundur.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "5-htp",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-5-htp-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_5HTP.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "5-htp",
+      "inci_name": "5-Hydroxytryptophan",
+      "common_name": "5-HTP (5-Hidroksitriptofan)",
+      "domain_type": "supplement",
+      "ingredient_group": "amino-acid",
+      "function_summary": "5-HTP, Griffonia simplicifolia tohumlarından elde edilen ve vücutta serotonin üretiminin doğrudan öncüsü olarak işlev gören bir amino asit türevidir. Ruh hali desteği, uyku kalitesi ve iştah düzenlemesi alanlarında araştırılmaktadır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9727088/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 300,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Griffonia simplicifolia tohumu",
+          "amount_per_100g": 5000,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

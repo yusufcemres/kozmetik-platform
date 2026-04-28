@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Turna yemişi (Cranberry / Vaccinium macrocarpon) ekstresi ve PAC (proantosiyanidin) hazır ingredient slug listesinde bulunmuyor. Yeni ingredient oluşturmak için yeterli dozaj referansı (effective_dose_min/max, UL) ve kesin evidence_grade bilgisi mevcut değil; sadece 36 mg PAC/2 kapsül belirtilmiş, genel cranberry ekstresi dozajı verilmemiş.",
+  "doc": {
+    "skip": true,
+    "reason": "Turna yemişi (Cranberry / Vaccinium macrocarpon) ekstresi ve PAC (proantosiyanidin) hazır ingredient slug listesinde bulunmuyor. Yeni ingredient oluşturmak için yeterli dozaj referansı (effective_dose_min/max, UL) ve kesin evidence_grade bilgisi mevcut değil; sadece 36 mg PAC/2 kapsül belirtilmiş, genel cranberry ekstresi dozajı verilmemiş."
+  }
+}

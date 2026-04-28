@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında sadece iki bileşenin (kara mürver 100 mg, üzüm çekirdeği ekstresi 50 mg) dozajı verilmiş; 'mineral ve vitamin içeren' ifadesi var ancak hangi vitamin/mineraller ve dozajları belirtilmemiş. Ayrıca kara mürver (sambucus) ve üzüm çekirdeği ekstresi hazır ingredient listesinde bulunmuyor ve tam evidence_citations ile ingredients_to_create şeması için yeterli bağımsız dozaj/güvenlik verisi ham inputta yok. Eksik bileşen profili nedeniyle ürün atlanıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında sadece iki bileşenin (kara mürver 100 mg, üzüm çekirdeği ekstresi 50 mg) dozajı verilmiş; 'mineral ve vitamin içeren' ifadesi var ancak hangi vitamin/mineraller ve dozajları belirtilmemiş. Ayrıca kara mürver (sambucus) ve üzüm çekirdeği ekstresi hazır ingredient listesinde bulunmuyor ve tam evidence_citations ile ingredients_to_create şeması için yeterli bağımsız dozaj/güvenlik verisi ham inputta yok. Eksik bileşen profili nedeniyle ürün atlanıyor."
+  }
+}

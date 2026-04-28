@@ -1,0 +1,156 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Orzax Minomin 60 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Orzax Minomin, menopoz dönemindeki kadınlar için geliştirilmiş bir gıda takviyesidir. Her 2 tablette 400 mg kalsiyum, 100 mg Panax ginseng, 50 mg soya izoflavonları, 40 mg black cohosh ekstraktı, folik asit, B12 ve D3 vitamini içerir. 60 tabletlik kutu.",
+    "net_content_value": 60,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "calcium",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "panax-ginseng-extract",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "soy-isoflavones",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "black-cohosh-extract",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      },
+      {
+        "ingredient_slug": "vitamin-b12",
+        "amount_per_serving": 12,
+        "unit": "mcg",
+        "daily_value_percentage": 480
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 400,
+        "unit": "IU",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/minomin-60-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Minomin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "panax-ginseng-extract",
+      "inci_name": "Panax ginseng",
+      "common_name": "Panax Ginseng Ekstraktı",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Panax ginseng (Asya ginsengi), ginsenozitler içeren adaptojen bir bitkidir. Yorgunlukla mücadele, bilişsel performans, enerji metabolizması ve menopoz dönemi semptomlarının hafifletilmesinde geleneksel olarak kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29156362/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 200,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "soy-isoflavones",
+      "inci_name": "Glycine max isoflavones",
+      "common_name": "Soya İzoflavonları",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Soya izoflavonları (genistein, daidzein, glisitein) fitoöstrojen grubunda yer alır. Menopoz semptomları (sıcak basması, gece terlemeleri) ve kemik sağlığı üzerinde östrojen benzeri etkiler gösterdiği çalışmalarda bildirilmiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22573443/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 40,
+      "effective_dose_max": 100,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "black-cohosh-extract",
+      "inci_name": "Cimicifuga racemosa",
+      "common_name": "Black Cohosh (Karayılan Otu) Ekstraktı",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Black cohosh (Cimicifuga racemosa), menopoz dönemindeki sıcak basmaları, gece terlemeleri ve ruh hali dalgalanmaları gibi vazomotor semptomları hafifletmek amacıyla kullanılan bir bitkisel takviyedir. Etki mekanizması serotonerjik ve GABAerjik yolakları kapsar.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/BlackCohosh-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 20,
+      "effective_dose_max": 80,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Çörek Otu Yağı Sıvı 150 ml",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Çörek Otu Yağı, soğuk sıkım tekniği ile elde edilen %100 yerli üretim likit formda bir gıda takviyesidir. 150 ml şişede, günlük 5 ml porsiyonla kullanıma uygundur.",
+    "net_content_value": 150,
+    "net_content_unit": "ml",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "ml",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "black-seed-oil",
+        "amount_per_serving": 5000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-corek-otu-yagi-sivi/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Corekotu_Likit.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Efervit Defence 20 Efervesan Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Efervit Defence, her efervesan tablette C vitamini, D3 vitamini ve çinko sağlayan bağışıklık destek takviyesidir. Hızlı çözünür, tortu bırakmaz. 20 efervesan tabletlik kutu, yetişkinler için günlük 1 tablet kullanıma uygundur.",
+    "net_content_value": 20,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 625
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 1000,
+        "unit": "IU",
+        "daily_value_percentage": 500
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/efervit-defence-20-efervesan-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Efervit_Defence-1.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

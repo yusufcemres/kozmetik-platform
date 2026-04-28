@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Day2Day The Collagen MultiBalance Hindistan Cevizi Aromalı Toz",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Day2Day The Collagen MultiBalance, porsiyon başına 10.000 mg hidrolize Tip 1, 2, 3, 5 ve 10 kolajen peptitleri, inülin prebiyotik lif, hyaluronik asit ve C vitamini içeren hindistan cevizi aromalı toz formdur.",
+    "net_content_value": 300,
+    "net_content_unit": "g",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "powder",
+      "serving_size": 10,
+      "serving_unit": "g",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "hydrolyzed-collagen",
+        "amount_per_serving": 10000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "ascorbic-acid",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/day2day-the-collagen-multibalance/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Multibalance.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

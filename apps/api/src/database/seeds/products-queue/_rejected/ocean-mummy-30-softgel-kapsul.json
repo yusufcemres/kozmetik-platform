@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Multivitamin/multimineral ürünü ancak açıklamada her bir vitamin/mineralin (folat, B12, omega-3 EPA/DHA) dozajı belirtilmemiş. Sadece D3 için 1000 IU verilmiş; diğer aktif maddelerin miktarı olmadan ingredient şeması doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Multivitamin/multimineral ürünü ancak açıklamada her bir vitamin/mineralin (folat, B12, omega-3 EPA/DHA) dozajı belirtilmemiş. Sadece D3 için 1000 IU verilmiş; diğer aktif maddelerin miktarı olmadan ingredient şeması doldurulamaz."
+  }
+}

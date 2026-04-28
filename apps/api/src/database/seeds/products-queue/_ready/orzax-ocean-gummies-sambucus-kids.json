@@ -1,0 +1,70 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies Sambucus Kids 30 Gummy",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Gummies Sambucus Kids, 4-10 yaş çocuklar için çiğnenebilir jel formda takviye. Her 2 gummy'de 50 mg kara mürver ekstresi, 45 mg C vitamini ve 3.75 mg çinko içerir. Karışık meyve aromalı, 30 gummy.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 45,
+        "unit": "mg",
+        "daily_value_percentage": 56
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 3.75,
+        "unit": "mg",
+        "daily_value_percentage": 38
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-sambucus-kids/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/Ocean_Gummies_Kids_Sambucus.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "elderberry-extract",
+      "inci_name": "Sambucus nigra fruit extract",
+      "common_name": "Kara Mürver Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Kara mürver (Sambucus nigra) antosiyaninler ve flavonoidler bakımından zengin bir bitki ekstresidir. Bağışıklık sistemi desteği, üst solunum yolu enfeksiyonları ve soğuk algınlığı semptomlarının süresini kısaltmak için geleneksel olarak kullanılır. Antioksidan etkiler gösterir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30670267/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 1200,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

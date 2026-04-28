@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Topikal jel ürünü (cilt üzerine masaj ile uygulanıyor) — oral takviye değil, REVELA supplement ingest kapsamı dışında. Ayrıca dozaj bilgisi yok.",
+  "doc": {
+    "skip": true,
+    "reason": "Topikal jel ürünü (cilt üzerine masaj ile uygulanıyor) — oral takviye değil, REVELA supplement ingest kapsamı dışında. Ayrıca dozaj bilgisi yok."
+  }
+}

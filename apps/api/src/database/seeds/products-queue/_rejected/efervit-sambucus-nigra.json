@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Sambucus Nigra (kara mürver), C vitamini ve çinko içerdiği belirtiliyor ancak her aktif madde için sayısal dozaj bilgisi (mg/mcg) verilmemiş. Dozajsız ingredient kaydı yapılamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Sambucus Nigra (kara mürver), C vitamini ve çinko içerdiği belirtiliyor ancak her aktif madde için sayısal dozaj bilgisi (mg/mcg) verilmemiş. Dozajsız ingredient kaydı yapılamaz."
+  }
+}

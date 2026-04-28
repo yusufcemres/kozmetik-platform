@@ -1,0 +1,69 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Enzymes Lactase Damla 20 ml",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Enzymes Lactase, laktoz sindirimine destek olmak için geliştirilmiş laktaz enzimi damlasıdır. Her damlada 165U laktaz enzimi içerir; süt veya mamaya kolayca eklenebilir. 20 ml damla formunda, şeker, glüten ve koruyucu içermez.",
+    "net_content_value": 20,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "drop",
+      "serving_size": 8,
+      "serving_unit": "drop",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "lactase-enzyme",
+        "amount_per_serving": 1320,
+        "unit": "U",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-enzymes-lactase-damla-20-ml/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Lactase.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "lactase-enzyme",
+      "inci_name": "Lactase",
+      "common_name": "Laktaz Enzimi",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Laktaz, süt ve süt ürünlerindeki laktozu glukoz ve galaktoza parçalayan bir sindirim enzimidir. Laktoz intoleransı olan bireylerde sütlü ürün tüketimi sonrası görülen şişkinlik, gaz ve ishal gibi gastrointestinal şikayetlerin azaltılmasına yardımcı olur.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20404298/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "NIH_ODS",
+          "url": "https://www.ncbi.nlm.nih.gov/books/NBK532285/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 3000,
+      "effective_dose_max": 9000,
+      "effective_dose_unit": "U",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

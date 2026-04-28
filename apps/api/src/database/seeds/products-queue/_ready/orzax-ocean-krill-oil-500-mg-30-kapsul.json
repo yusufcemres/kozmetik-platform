@@ -1,0 +1,81 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Krill Oil 500 mg 30 Softjel Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Krill Oil, sürdürülebilir kaynaklardan avlanmış Antarktika krillinden elde edilen fosfolipit formda omega-3 (EPA ve DHA) içeren gıda takviyesidir. Her softjel kapsül 500 mg krill yağı sağlar. 30 softjel kapsüllük kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "krill-oil",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 75,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 45,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-krill-oil-500-mg-30-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Krill_Oil.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "krill-oil",
+      "inci_name": "Euphausia superba oil",
+      "common_name": "Krill Yağı",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Krill yağı, Antarktika krillinden (Euphausia superba) elde edilen ve fosfolipit formunda EPA ve DHA omega-3 yağ asitleri ile astaksantin içeren bir deniz kaynaklı yağdır. Fosfolipit formu sayesinde biyoyararlanımı yüksektir; kalp-damar sağlığı, lipit profili ve eklem sağlığı üzerinde destekleyici etkileri araştırılmıştır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25920414/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 3000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

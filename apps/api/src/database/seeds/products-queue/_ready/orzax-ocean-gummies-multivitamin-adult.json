@@ -1,0 +1,162 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies Multivitamin Adult 30 Çiğnenebilir Jel",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Gummies Multivitamin Adult, 11 yaş ve üzeri için günlük 2 çiğnenebilir jelde 11 vitamin ve 2 mineral sağlar. Şeftali aromalı, jelatin ve yapay renklendirici içermez. 30 jellik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 7.68,
+        "unit": "mg",
+        "daily_value_percentage": 64
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 2,
+        "unit": "mg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "retinol",
+        "amount_per_serving": 450,
+        "unit": "mcg",
+        "daily_value_percentage": 56
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      },
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 84,
+        "unit": "mcg",
+        "daily_value_percentage": 56
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 10,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-multivitamin-adult/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Gummies_Multivitamin_Adult.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "pantothenic-acid",
+      "inci_name": "Pantothenic Acid",
+      "common_name": "B5 Vitamini (Pantotenik Asit)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Pantotenik asit (B5 vitamini), koenzim A sentezi için gerekli suda çözünen bir vitamindir. Enerji metabolizmasında, yağ asitlerinin sentezi ve yıkımında, steroid hormonların ve nörotransmitterlerin üretiminde kritik rol oynar.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "thiamine",
+      "inci_name": "Thiamine",
+      "common_name": "B1 Vitamini (Tiamin)",
+      "domain_type": "supplement",
+      "ingredient_group": "vitamin",
+      "function_summary": "Tiamin (B1 vitamini), karbonhidrat metabolizmasında tiamin pirofosfat koenzimi olarak görev yapan suda çözünen bir vitamindir. Enerji üretimi, sinir sistemi fonksiyonu ve kas koordinasyonu için gereklidir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1.1,
+      "effective_dose_max": 1.2,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Yeşil yapraklı sebzeler",
+          "amount_per_100g": 0.5,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Tam tahıllar",
+          "amount_per_100g": 0.3,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

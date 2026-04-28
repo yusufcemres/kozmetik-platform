@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında demir (iron) miktarı (mg) belirtilmemiş. Ingredient dozajı olmadan REVELA ingest şeması doldurulamaz; aktif madde listesi ve porsiyon başı mg değeri eksik.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında demir (iron) miktarı (mg) belirtilmemiş. Ingredient dozajı olmadan REVELA ingest şeması doldurulamaz; aktif madde listesi ve porsiyon başı mg değeri eksik."
+  }
+}

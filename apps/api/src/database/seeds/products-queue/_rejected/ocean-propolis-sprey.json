@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Propolis ekstresi hazır ingredient listesinde yok ve yeni ingredient oluşturmak için yeterli güvenilir doz aralığı (effective_dose_min/max) verisi standardize değil; ayrıca ürün tek aktif bileşenli ve hazır slug eşleşmesi sağlanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Propolis ekstresi hazır ingredient listesinde yok ve yeni ingredient oluşturmak için yeterli güvenilir doz aralığı (effective_dose_min/max) verisi standardize değil; ayrıca ürün tek aktif bileşenli ve hazır slug eşleşmesi sağlanamıyor."
+  }
+}

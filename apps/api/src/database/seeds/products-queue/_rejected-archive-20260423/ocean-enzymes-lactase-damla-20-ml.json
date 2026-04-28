@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Laktaz enzimi (lactase) DB'deki hazır ingredient listesinde yok ve güvenilir dozlama/effective dose aralığı için yeterli standart referans (NIH ODS gibi) bulunmuyor. Ayrıca ürün açıklamasında porsiyon başı toplam laktaz miktarı damla sayısına göre değişken (28 damla × 165U = geniş aralık) ve REVELA şemasındaki net sayısal amount_per_serving + unit eşlemesi için standart birim (mg/mcg/IU/B_CFU) dönüşümü güvenilir şekilde yapılamıyor (U = FCC laktaz ünitesi, şema dışı).",
+  "doc": {
+    "skip": true,
+    "reason": "Laktaz enzimi (lactase) DB'deki hazır ingredient listesinde yok ve güvenilir dozlama/effective dose aralığı için yeterli standart referans (NIH ODS gibi) bulunmuyor. Ayrıca ürün açıklamasında porsiyon başı toplam laktaz miktarı damla sayısına göre değişken (28 damla × 165U = geniş aralık) ve REVELA şemasındaki net sayısal amount_per_serving + unit eşlemesi için standart birim (mg/mcg/IU/B_CFU) dönüşümü güvenilir şekilde yapılamıyor (U = FCC laktaz ünitesi, şema dışı)."
+  }
+}
