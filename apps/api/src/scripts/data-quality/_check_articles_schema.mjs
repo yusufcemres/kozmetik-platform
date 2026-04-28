@@ -1,0 +1,17 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const cols = await c.query(`SELECT column_name, data_type FROM information_schema.columns WHERE table_name='content_articles' ORDER BY ordinal_position`);
+console.log('content_articles schema:');
+for (const x of cols.rows) console.log(`  ${x.column_name.padEnd(25)} ${x.data_type}`);
+const total = await c.query(`SELECT COUNT(*) FROM content_articles`);
+console.log(`Total content_articles: ${total.rows[0].count}`);
+const byType = await c.query(`SELECT content_type, status, COUNT(*) FROM content_articles GROUP BY content_type, status ORDER BY content_type`);
+console.log('By type+status:');
+for (const r of byType.rows) console.log(`  ${r.content_type.padEnd(25)} | ${r.status.padEnd(15)} | ${r.count}`);
+await c.end();
