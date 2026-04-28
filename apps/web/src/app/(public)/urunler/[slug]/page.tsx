@@ -713,12 +713,30 @@ export default async function ProductDetailPage({
           if (allergenCount === 0) highlights.push('Alerjen içermiyor');
           if (fragranceCount === 0) highlights.push('Parfümsüz');
 
-          const warnings: string[] = [];
-          if ((score.flags?.eu_banned?.length ?? 0) > 0) warnings.push(`⚠ AB'de yasaklı: ${score.flags.eu_banned.join(', ')}`);
-          if ((score.flags?.cmr?.length ?? 0) > 0) warnings.push(`CMR içerik: ${score.flags.cmr.join(', ')}`);
-          if ((score.flags?.endocrine?.length ?? 0) > 0) warnings.push(`Endokrin bozucu: ${score.flags.endocrine.join(', ')}`);
-          if (allergenCount > 0) warnings.push(`${allergenCount} alerjen içerik`);
-          if (fragranceCount > 0) warnings.push(`${fragranceCount} parfüm/koku bileşeni`);
+          // Allergen/parfüm bileşen isimlerini topla — pill açılınca kullanıcı "hangisi" görsün.
+          const ingNameOf = (pi: typeof sortedIngredients[number]) =>
+            pi.ingredient_display_name || pi.ingredient?.inci_name || pi.ingredient?.ingredient_slug || '';
+          const allergenNames = sortedIngredients
+            .filter((pi) => pi.ingredient?.allergen_flag)
+            .map(ingNameOf)
+            .filter(Boolean);
+          const fragranceNames = sortedIngredients
+            .filter((pi) => pi.ingredient?.fragrance_flag)
+            .map(ingNameOf)
+            .filter(Boolean);
+
+          type WarningPill = { label: string; names?: string[] };
+          const warnings: WarningPill[] = [];
+          if ((score.flags?.eu_banned?.length ?? 0) > 0)
+            warnings.push({ label: `⚠ AB'de yasaklı`, names: score.flags.eu_banned });
+          if ((score.flags?.cmr?.length ?? 0) > 0)
+            warnings.push({ label: `CMR içerik`, names: score.flags.cmr });
+          if ((score.flags?.endocrine?.length ?? 0) > 0)
+            warnings.push({ label: `Endokrin bozucu`, names: score.flags.endocrine });
+          if (allergenCount > 0)
+            warnings.push({ label: `${allergenCount} alerjen içerik`, names: allergenNames });
+          if (fragranceCount > 0)
+            warnings.push({ label: `${fragranceCount} parfüm/koku bileşeni`, names: fragranceNames });
 
           const breakdownMeta: Record<string, { label: string; desc: string }> = {
             active_efficacy:    { label: 'Aktif Etkinlik',   desc: 'Etken maddenin kanıta dayalı etkisi (retinol/niasinamid gibi)' },
@@ -782,12 +800,31 @@ export default async function ProductDetailPage({
                           {h}
                         </span>
                       ))}
-                      {warnings.map((w) => (
-                        <span key={w} className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm">
-                          <span className="material-icon text-sm" aria-hidden="true">warning</span>
-                          {w}
-                        </span>
-                      ))}
+                      {warnings.map((w) => {
+                        const hasNames = (w.names?.length ?? 0) > 0;
+                        if (!hasNames) {
+                          return (
+                            <span key={w.label} className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm">
+                              <span className="material-icon text-sm" aria-hidden="true">warning</span>
+                              {w.label}
+                            </span>
+                          );
+                        }
+                        return (
+                          <details key={w.label} className="group/wpill">
+                            <summary className="inline-flex items-center gap-1 text-xs bg-score-low/10 text-score-low px-2 py-1 rounded-sm cursor-pointer hover:bg-score-low/15 list-none [&::-webkit-details-marker]:hidden">
+                              <span className="material-icon text-sm" aria-hidden="true">warning</span>
+                              {w.label}
+                              <span className="material-icon text-[14px] group-open/wpill:rotate-180 transition-transform" aria-hidden="true">expand_more</span>
+                            </summary>
+                            <div className="mt-1.5 pl-2 border-l-2 border-score-low/30 text-[11px] text-on-surface-variant space-y-0.5">
+                              {w.names!.map((n) => (
+                                <div key={n} className="leading-tight">• {n}</div>
+                              ))}
+                            </div>
+                          </details>
+                        );
+                      })}
                     </div>
 
                     {/* Explanation — "Bu puan neden?" */}
@@ -990,18 +1027,18 @@ export default async function ProductDetailPage({
                             >
                               {conc.label}
                             </span>
-                            {/* Uyarı rozet — kapalı kart üzerinde de görünür */}
+                            {/* Uyarı rozetleri — kapalı kart üzerinde de görünür. Bir bileşen birden fazla flag taşıyabilir (ör. Parfum hem allergen hem fragrance). */}
                             {isCritical && (
                               <span className="label-caps text-[9px] bg-error text-on-error px-1 py-0.5 rounded-sm font-bold shrink-0">
                                 UYARI
                               </span>
                             )}
-                            {!isCritical && isAllergen && (
+                            {isAllergen && (
                               <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
                                 ALERJEN
                               </span>
                             )}
-                            {!isCritical && !isAllergen && isFragrance && (
+                            {isFragrance && (
                               <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
                                 PARFÜM
                               </span>
