@@ -53,6 +53,8 @@ function formatStat(n: number): string {
 export default function HeroFeatureShowcase({ stats }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  // Loop cycle: 0=hepsi gizli → 1=TARA → 2=TARA+ARA → 3=3'ü açık → 4=hepsi gizli (reset) → 0...
+  const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
@@ -60,6 +62,16 @@ export default function HeroFeatureShowcase({ stats }: Props) {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // 3 kelime staggered açılır → tamamen açılınca bekler → kapanır → döngü.
+  useEffect(() => {
+    // Her cycle adımı için bekleme süresi (ms): kelime gelişleri 500, hepsi açık 1800, kapanış 500.
+    const ticks = [500, 500, 500, 1800, 500];
+    const t = setTimeout(() => {
+      setCycle((c) => (c + 1) % ticks.length);
+    }, ticks[cycle]);
+    return () => clearTimeout(t);
+  }, [cycle]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -103,39 +115,45 @@ export default function HeroFeatureShowcase({ stats }: Props) {
             </span>
           </div>
 
-          {/* REVELA solda + 3 step (TARA/ARA/ANALİZ ET) sağda alt alta staggered */}
+          {/* REVELA solda + 3 step (TARA/ARA/ANALİZ ET) sağda alt alta — orantılı boyut, loop animasyon */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 lg:gap-12">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tighter text-primary leading-[0.9]">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-primary leading-[0.9]">
               REVELA
             </h1>
 
-            {/* 3 step — REVELA height'a hizalı, alt alta staggered fade-in */}
-            <div className="flex flex-col items-start justify-center gap-1.5 sm:gap-2 lg:gap-3">
-              {SCAN_STEPS.map((step, idx) => (
-                <motion.div
-                  key={step.key}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: 0.3 + idx * 0.35,
-                    type: 'spring',
-                    stiffness: 60,
-                    damping: 14,
-                  }}
-                  className="flex items-center gap-2 sm:gap-2.5 lg:gap-3"
-                >
-                  <span
-                    className={`material-icon ${step.color}`}
-                    style={{ fontSize: 'clamp(20px, 3vw, 32px)' }}
-                    aria-hidden="true"
+            {/* 3 step — REVELA wordmark yüksekliğine yakın, loop staggered fade in/out */}
+            <div className="flex flex-col items-start justify-center gap-2 sm:gap-2.5 lg:gap-3">
+              {SCAN_STEPS.map((step, idx) => {
+                const isVisible = cycle > idx && cycle < 4;
+                return (
+                  <motion.div
+                    key={step.key}
+                    initial={false}
+                    animate={
+                      isVisible
+                        ? { opacity: 1, x: 0 }
+                        : { opacity: 0, x: -24 }
+                    }
+                    transition={{
+                      type: 'spring',
+                      stiffness: 80,
+                      damping: 14,
+                    }}
+                    className="flex items-center gap-2 sm:gap-3 lg:gap-4"
                   >
-                    {step.icon}
-                  </span>
-                  <span className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold uppercase tracking-tight text-on-surface">
-                    {step.title}
-                  </span>
-                </motion.div>
-              ))}
+                    <span
+                      className={`material-icon ${step.color}`}
+                      style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}
+                      aria-hidden="true"
+                    >
+                      {step.icon}
+                    </span>
+                    <span className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold uppercase tracking-tight text-on-surface leading-none">
+                      {step.title}
+                    </span>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 

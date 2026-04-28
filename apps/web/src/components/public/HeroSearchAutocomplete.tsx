@@ -138,7 +138,7 @@ export default function HeroSearchAutocomplete() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-3xl mx-auto lg:mx-0">
+    <div ref={containerRef} className="relative w-full max-w-3xl mx-auto">
       <form
         onSubmit={(e) => {
           e.preventDefault();

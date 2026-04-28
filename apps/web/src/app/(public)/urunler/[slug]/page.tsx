@@ -62,6 +62,11 @@ interface ProductIngredient {
     ingredient_slug: string;
     allergen_flag: boolean;
     fragrance_flag: boolean;
+    endocrine_flag?: boolean;
+    eu_banned?: boolean;
+    cmr_class?: string | null;
+    safety_class?: string | null;
+    common_name?: string | null;
     function_summary?: string;
   };
 }
@@ -713,26 +718,29 @@ export default async function ProductDetailPage({
           if (allergenCount === 0) highlights.push('Alerjen içermiyor');
           if (fragranceCount === 0) highlights.push('Parfümsüz');
 
-          // Allergen/parfüm bileşen isimlerini topla — pill açılınca kullanıcı "hangisi" görsün.
+          // Pill açılınca gösterilecek bileşen isimleri — productIngredients'tan ID-based türet.
+          // Backend flags array'i Türkçe trivial isim ('Oktinoksat') dönüyor; INCI listesindeki
+          // 'Ethylhexyl Methoxycinnamate'yi karşılaştıramıyoruz, isim eşleşmesi başarısız.
+          // ProductIngredients ingredient_id ile bağlı → flag alanlarından doğrudan türet.
           const ingNameOf = (pi: typeof sortedIngredients[number]) =>
             pi.ingredient_display_name || pi.ingredient?.inci_name || pi.ingredient?.ingredient_slug || '';
-          const allergenNames = sortedIngredients
-            .filter((pi) => pi.ingredient?.allergen_flag)
-            .map(ingNameOf)
-            .filter(Boolean);
-          const fragranceNames = sortedIngredients
-            .filter((pi) => pi.ingredient?.fragrance_flag)
-            .map(ingNameOf)
-            .filter(Boolean);
+          const allergenNames = sortedIngredients.filter((pi) => pi.ingredient?.allergen_flag).map(ingNameOf).filter(Boolean);
+          const fragranceNames = sortedIngredients.filter((pi) => pi.ingredient?.fragrance_flag).map(ingNameOf).filter(Boolean);
+          const endocrineNames = sortedIngredients.filter((pi) => pi.ingredient?.endocrine_flag).map(ingNameOf).filter(Boolean);
+          const euBannedNames = sortedIngredients.filter((pi) => pi.ingredient?.eu_banned).map(ingNameOf).filter(Boolean);
+          const cmrNames = sortedIngredients.filter((pi) => pi.ingredient?.cmr_class).map(ingNameOf).filter(Boolean);
+          const harmfulNames = sortedIngredients.filter((pi) => pi.ingredient?.safety_class === 'harmful').map(ingNameOf).filter(Boolean);
 
           type WarningPill = { label: string; names?: string[] };
           const warnings: WarningPill[] = [];
-          if ((score.flags?.eu_banned?.length ?? 0) > 0)
-            warnings.push({ label: `⚠ AB'de yasaklı`, names: score.flags.eu_banned });
-          if ((score.flags?.cmr?.length ?? 0) > 0)
-            warnings.push({ label: `CMR içerik`, names: score.flags.cmr });
-          if ((score.flags?.endocrine?.length ?? 0) > 0)
-            warnings.push({ label: `Endokrin bozucu`, names: score.flags.endocrine });
+          if (euBannedNames.length > 0)
+            warnings.push({ label: `⚠ AB'de yasaklı`, names: euBannedNames });
+          if (cmrNames.length > 0)
+            warnings.push({ label: `CMR içerik`, names: cmrNames });
+          if (endocrineNames.length > 0)
+            warnings.push({ label: `Endokrin bozucu`, names: endocrineNames });
+          if (harmfulNames.length > 0)
+            warnings.push({ label: `Zararlı sınıf`, names: harmfulNames });
           if (allergenCount > 0)
             warnings.push({ label: `${allergenCount} alerjen içerik`, names: allergenNames });
           if (fragranceCount > 0)
@@ -974,26 +982,22 @@ export default async function ProductDetailPage({
             // Üstteki güvenlik uyarılarındaki ingredient'lar (endokrin/CMR/EU yasaklı) burada
             // KIRMIZI BORDER + ⚠ ünlem ikonu ile flag'leniyor → görsel bağlantı.
             (() => {
-              // Üstteki güvenlik uyarılarındaki TÜM bileşenler (CMR/endokrin/EU yasaklı + alerjen + parfüm)
-              // INCI listesinde kırmızı border + UYARI rozetiyle bağlanır.
-              const flaggedNames = new Set<string>([
-                ...(cosmeticScore?.flags?.eu_banned ?? []),
-                ...(cosmeticScore?.flags?.cmr ?? []),
-                ...(cosmeticScore?.flags?.endocrine ?? []),
-                ...(cosmeticScore?.flags?.harmful ?? []),
-                ...(cosmeticScore?.flags?.allergens ?? []),
-                ...(cosmeticScore?.flags?.fragrances ?? []),
-              ].map((s: string) => s.toLowerCase()));
-
+              // ID-based flag eşleştirme — backend'in flags array'i Türkçe trivial isim ('Oktinoksat')
+              // dönerken INCI 'Ethylhexyl Methoxycinnamate'tir; name-match güvenilmez.
+              // Ingredient flag'leri (endocrine_flag, eu_banned, cmr_class, safety_class)
+              // doğrudan productIngredients'tan derive edilir → birebir tutarlı.
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                   {sortedIngredients.map((pi, idx) => {
-                    const isAllergen = pi.ingredient?.allergen_flag;
-                    const isFragrance = pi.ingredient?.fragrance_flag;
+                    const ing = pi.ingredient;
+                    const isAllergen = !!ing?.allergen_flag;
+                    const isFragrance = !!ing?.fragrance_flag;
                     const displayName = pi.ingredient_display_name || '';
                     const isCritical =
-                      flaggedNames.has(displayName.toLowerCase()) ||
-                      (pi.ingredient?.inci_name && flaggedNames.has(pi.ingredient.inci_name.toLowerCase()));
+                      !!ing?.endocrine_flag ||
+                      !!ing?.eu_banned ||
+                      !!(ing?.cmr_class && ing.cmr_class.length > 0) ||
+                      ing?.safety_class === 'harmful';
 
                     // 3 seviye uyarı görseli (üstteki skor uyarılarıyla bağlantı):
                     // - isCritical (CMR/endokrin/eu-banned/harmful)         → tam kırmızı border + warning ikonu + UYARI rozet
