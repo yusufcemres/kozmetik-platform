@@ -143,12 +143,12 @@ export default function HeroFeatureShowcase({ stats }: Props) {
                   >
                     <span
                       className={`material-icon ${step.color}`}
-                      style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}
+                      style={{ fontSize: 'clamp(20px, 2.6vw, 30px)' }}
                       aria-hidden="true"
                     >
                       {step.icon}
                     </span>
-                    <span className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold uppercase tracking-tight text-on-surface leading-none">
+                    <span className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold uppercase tracking-tight text-on-surface leading-none">
                       {step.title}
                     </span>
                   </motion.div>
