@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif madde dozajı belirtilmemiş. 'Patentli yumurta kabuğu zarı ekstresi' geçiyor ancak mg cinsinden miktar verilmemiş ve bu ingredient DB'de mevcut değil. Dozaj bilgisi olmadan ingredient oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif madde dozajı belirtilmemiş. 'Patentli yumurta kabuğu zarı ekstresi' geçiyor ancak mg cinsinden miktar verilmemiş ve bu ingredient DB'de mevcut değil. Dozaj bilgisi olmadan ingredient oluşturulamaz."
+  }
+}

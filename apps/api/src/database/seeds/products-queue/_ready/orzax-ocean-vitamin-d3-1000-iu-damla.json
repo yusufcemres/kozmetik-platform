@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin D3 1000 IU Damla",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin D3 1000 IU Damla, her damlada Quali-D patentli 1000 IU (25 µg) D3 vitamini sunar. Taşıyıcı olarak zeytinyağı kullanılır; koruyucu, katkı, tatlandırıcı ve şeker içermez. 11 yaş ve üzeri için günde 1 damla.",
+    "net_content_value": 10,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "drop",
+      "serving_size": 1,
+      "serving_unit": "drop",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 1000,
+        "unit": "IU",
+        "daily_value_percentage": 500
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-d3-1000-iu-damla/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Web_Ocean_D3_1000IU_Damla_Yenilendi_1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

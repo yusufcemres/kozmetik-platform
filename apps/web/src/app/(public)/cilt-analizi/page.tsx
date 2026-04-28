@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { tracker } from '@/lib/analytics';
+import { saveSkinProfile } from '@/lib/profile-sync';
 
 // === Types ===
 
@@ -538,14 +539,11 @@ export default function SkinAnalysisPage() {
       total_time_ms: Date.now() - quizStartTime.current,
     });
 
-    const profile = {
-      anonymous_id: crypto.randomUUID(),
+    // Profile persistence: localStorage + cookie + backend tek seferde
+    saveSkinProfile({
       ...quiz,
-      updated_at: new Date().toISOString(),
-    };
-    localStorage.setItem('skin_profile', JSON.stringify(profile));
-    document.cookie = 'has_skin_profile=1; path=/; max-age=31536000; SameSite=Lax';
-    window.dispatchEvent(new Event('skin-profile-changed'));
+      anonymous_id: crypto.randomUUID(),
+    });
 
     const sensitivityKeys = Object.entries(quiz.sensitivities)
       .filter(([, v]) => v)

@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Çinko Bisglisinat 10 mg Likit 150 ml",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Çinko Bisglisinat, her 5 ml porsiyonda 10 mg şelatlı çinko (bisglisinat formu) sağlayan likit takviyedir. Muz aromalı, glüten, laktoz, tatlandırıcı ve renklendirici içermez. 11 yaş ve üzeri bireyler için uygundur.",
+    "net_content_value": 150,
+    "net_content_unit": "mL",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "mL",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-cinko-bisglisinat-10-mg/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Cinko_Bisglisinat.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

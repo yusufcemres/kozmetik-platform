@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Microfer 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Microfer saşe, mikroenkapsülasyon teknolojisi ile üretilmiş saşe başına 8.5 mg demir içeren takviye edici gıdadır. Aç veya tok tüketilebilir; yoğurt, süt veya meyve püresine karıştırılarak alınır. 30 saşelik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "iron",
+        "amount_per_serving": 8.5,
+        "unit": "mg",
+        "daily_value_percentage": 61
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-microfer-30-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Microfer_Sase-1.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

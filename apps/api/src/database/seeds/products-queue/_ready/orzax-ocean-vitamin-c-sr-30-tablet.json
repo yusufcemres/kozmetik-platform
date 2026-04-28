@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin C-SR 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin C SR, uzun salınımlı C vitamini tabletidir. Mide asidinden etkilenmez, ince bağırsakta yavaş salınarak gün boyu C vitamini seviyesini optimum düzeyde tutar. 30 tabletlik kutu, 11 yaş ve üzeri için günde 1-2 tablet.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 625
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-c-sr-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Vitamin_C_SR.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

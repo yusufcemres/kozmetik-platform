@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean D-Riboz 5000 mg 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean D-Riboz, her saşede 5000 mg D-Riboz içeren gıda takviyesidir. Saşe formu kullanım kolaylığı sağlar. 30 saşelik kutu, günde 1 saşe olarak tüketilir.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "d-ribose",
+        "amount_per_serving": 5000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-d-riboz-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_DRiboz.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "d-ribose",
+      "inci_name": "D-Ribose",
+      "common_name": "D-Riboz",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "D-Riboz, hücresel enerji üretiminde ATP sentezinin temel yapı taşı olan bir pentoz şekerdir. Kas enerji metabolizmasını destekler, yoğun egzersiz sonrası ATP rezervlerinin yenilenmesine katkı sağlar ve kronik yorgunluk sendromu araştırmalarında incelenmiştir.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14649969/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 3000,
+      "effective_dose_max": 10000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

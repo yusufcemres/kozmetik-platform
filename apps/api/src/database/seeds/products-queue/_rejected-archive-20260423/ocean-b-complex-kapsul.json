@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada B grubu vitaminleri, Kolin ve İnositol listelenmiş ancak porsiyon başı sayısal dozaj (mg/mcg) bilgisi yok. Ingredient amount_per_serving ve DV% hesaplanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada B grubu vitaminleri, Kolin ve İnositol listelenmiş ancak porsiyon başı sayısal dozaj (mg/mcg) bilgisi yok. Ingredient amount_per_serving ve DV% hesaplanamıyor."
+  }
+}

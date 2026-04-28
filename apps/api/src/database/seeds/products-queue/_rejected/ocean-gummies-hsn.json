@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada 9 vitamin, 3 mineral ve hidrolize keratin içerdiği belirtilmiş ancak her bir aktif maddenin sayısal dozajı (mg/mcg) verilmemiş. Ingredient parse için gerekli kantitatif veri eksik.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada 9 vitamin, 3 mineral ve hidrolize keratin içerdiği belirtilmiş ancak her bir aktif maddenin sayısal dozajı (mg/mcg) verilmemiş. Ingredient parse için gerekli kantitatif veri eksik."
+  }
+}

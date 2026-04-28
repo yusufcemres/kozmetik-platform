@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Çörek otu yağı (Nigella sativa oil) REVELA DB'sinde hazır ingredient slug'ı olarak bulunmuyor ve tek aktif bileşen bu. Yeni ingredient oluşturmak için yeterli evidence-grade dokümantasyon mevcut değil.",
+  "doc": {
+    "skip": true,
+    "reason": "Çörek otu yağı (Nigella sativa oil) REVELA DB'sinde hazır ingredient slug'ı olarak bulunmuyor ve tek aktif bileşen bu. Yeni ingredient oluşturmak için yeterli evidence-grade dokümantasyon mevcut değil."
+  }
+}

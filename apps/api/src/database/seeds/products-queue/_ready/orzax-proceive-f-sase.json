@@ -1,0 +1,124 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Proceive F Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Proceive F her saşede 2000 mg miyo-inositol, 100 mg CoQ10, 50 mg glutatyon, aktif B12 (MecobalActive) ve aktif folat (Quatrefolic) ile vitamin-mineral kombinasyonu sunar. Şeker ve glüten içermez, 30 saşelik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "sase",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sase",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 180,
+        "unit": "mg",
+        "daily_value_percentage": 225
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 27
+      },
+      {
+        "ingredient_slug": "coenzyme-q10",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "l-glutathione",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 15,
+        "unit": "mg",
+        "daily_value_percentage": 150
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 12,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 357
+      },
+      {
+        "ingredient_slug": "astaxanthin",
+        "amount_per_serving": 1,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 91
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 15,
+        "unit": "mcg",
+        "daily_value_percentage": 300
+      },
+      {
+        "ingredient_slug": "myo-inositol",
+        "amount_per_serving": 2000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/proceive-f-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Proceive_F-1.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "myo-inositol",
+      "inci_name": "Myo-Inositol",
+      "common_name": "Miyo-İnositol",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Miyo-inositol, hücre sinyal iletiminde rol oynayan B vitamini benzeri bir bileşiktir. İnsülin duyarlılığını destekler, PCOS (polikistik over sendromu) yönetiminde yumurtlama ve menstrüel düzeni iyileştirmeye yardımcı olur ve kadın üreme sağlığında yaygın kullanılır.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29042448/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 2000,
+      "effective_dose_max": 4000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "beneficial",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

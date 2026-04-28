@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında sindirim enzimleri karışımı (pankreatin, amilaz, lipaz, proteaz vb.) için bireysel dozaj bilgisi verilmemiş; yalnızca toplam 955,3 mg karışım belirtilmiş. Ayrıca DB'de hazır enzim ingredient slug'ları yok ve evidence-based dozaj aralıkları açıklamadan parse edilemiyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında sindirim enzimleri karışımı (pankreatin, amilaz, lipaz, proteaz vb.) için bireysel dozaj bilgisi verilmemiş; yalnızca toplam 955,3 mg karışım belirtilmiş. Ayrıca DB'de hazır enzim ingredient slug'ları yok ve evidence-based dozaj aralıkları açıklamadan parse edilemiyor."
+  }
+}

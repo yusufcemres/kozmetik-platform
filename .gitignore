@@ -35,3 +35,11 @@ coverage/
 
 .vercel
 .env.local.bak
+
+# Runtime / temp
+night-shift/logs/
+night-shift-reports/
+apps/web/test-results/
+
+# Sprint reports (sprint-spesifik geçici dökümanlar — AGENTS/ workspace'inde tut)
+MORNING_REPORT_SUPPLEMENT_INGEST_*.md

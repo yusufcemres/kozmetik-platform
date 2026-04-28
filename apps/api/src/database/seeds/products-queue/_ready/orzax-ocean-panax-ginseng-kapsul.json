@@ -1,0 +1,98 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Panax Ginseng 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Panax Ginseng her kapsülünde 500 mg Panax ginseng kök ekstresi ve 25 mg ginsenozit içerir. Vcaps bitkisel kapsül teknolojisiyle üretilmiş, 60 kapsüllük gıda takviyesidir.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "panax-ginseng-root-extract",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "ginsenosides",
+        "amount_per_serving": 25,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-panax-ginseng-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Panax_Ginseng.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "panax-ginseng-root-extract",
+      "inci_name": "Panax ginseng root extract",
+      "common_name": "Panax Ginseng Kök Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Panax ginseng (Kore ginsengi) kök ekstresi, adaptojen olarak kullanılan geleneksel bir bitkidir; bilişsel performans, yorgunluk azaltma, bağışıklık desteği ve genel enerji metabolizması üzerine etkileri araştırılmaktadır. Aktif bileşenleri ginsenozitlerdir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29624410/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 200,
+      "effective_dose_max": 1000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "ginsenosides",
+      "inci_name": "Ginsenosides",
+      "common_name": "Ginsenozitler",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Ginsenozitler, Panax ginseng kökünde bulunan triterpen saponin yapısındaki aktif biyolojik bileşiklerdir. Antioksidan, antiinflamatuar ve nöroprotektif etkileri çalışılmakta; bilişsel fonksiyon ve yorgunluk desteği ile ilişkilendirilmektedir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28396012/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 10,
+      "effective_dose_max": 80,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

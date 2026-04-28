@@ -1,0 +1,1 @@
+claude error: Expected ',' or ']' after array element in JSON at position 9773 (line 222 column 10)

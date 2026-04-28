@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Karışık Meyve Aromalı Balık Yağı 150 mL Likit",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Karışık Meyve Aromalı Balık Yağı her 5 mL porsiyonda 4506 mg balık yağı, 1480 mg toplam omega-3 (740 mg EPA + 470 mg DHA) sağlar. IFOS 5 yıldız onaylı, 150 mL likit form.",
+    "net_content_value": 150,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "mL",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "fish-oil",
+        "amount_per_serving": 4506,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 740,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 470,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-karisik-meyve-aromali-balik-yagi-150-ml-likit/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_BalikYagi_Karisik_Meyve.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

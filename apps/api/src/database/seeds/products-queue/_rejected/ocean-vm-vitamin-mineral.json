@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında 2 vitamin ve 5 mineralin hangi maddeler olduğu ve dozajları belirtilmemiş. Aktif madde listesi ve sayısal dozaj bilgisi olmadan ingredient parse edilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında 2 vitamin ve 5 mineralin hangi maddeler olduğu ve dozajları belirtilmemiş. Aktif madde listesi ve sayısal dozaj bilgisi olmadan ingredient parse edilemez."
+  }
+}

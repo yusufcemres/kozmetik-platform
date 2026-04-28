@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean ExtraMag Fibra 60 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean ExtraMag Fibra, her 2 tablette magnezyum malat ve sitrat kaynaklı 240 mg elementel magnezyum, L-triptofan, PQQ ve aktif form B6 (P5P) ile B12 (Metilkobalamin) içerir. Glüten, şeker ve tatlandırıcı içermez.",
+    "net_content_value": 60,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 240,
+        "unit": "mg",
+        "daily_value_percentage": 64
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-extramag-fibra/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_ExtraMag_Fibra.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (glukozamin sülfat, kondroitin, MSM, Tip 2 kolajen, magnezyum) porsiyon başı sayısal dozaj bilgileri verilmemiş. Dozaj olmadan ingredient amount_per_serving ve DV% hesaplanamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (glukozamin sülfat, kondroitin, MSM, Tip 2 kolajen, magnezyum) porsiyon başı sayısal dozaj bilgileri verilmemiş. Dozaj olmadan ingredient amount_per_serving ve DV% hesaplanamaz."
+  }
+}

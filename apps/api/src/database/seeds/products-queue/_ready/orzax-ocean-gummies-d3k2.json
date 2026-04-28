@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies D3K2 30 Çiğnenebilir Jel",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Gummies D3K2, her çiğnenebilir jelde 25 µg (1000 IU) D3 vitamini ve 12.5 µg K2 vitamini sunar. Portakal aromalı, jelatin ve yapay renklendirici içermez. 30 adet çiğnenebilir jel, 11 yaş ve üzeri için uygundur.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 1,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 25,
+        "unit": "mcg",
+        "daily_value_percentage": 500
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 12.5,
+        "unit": "mcg",
+        "daily_value_percentage": 17
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-d3k2/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Gummies_D3K2-1.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

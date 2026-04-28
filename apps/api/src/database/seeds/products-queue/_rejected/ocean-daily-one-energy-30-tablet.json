@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında her bir vitamin ve mineral için spesifik dozaj bilgisi bulunmuyor. '13 vitamin ve 10 mineral içeren' ifadesi genel olup, ingredient parse etmek için gerekli sayısal mg/mcg/IU değerleri verilmemiş. Panax ginseng ve Koenzim Q10 dozajları da belirtilmemiş. Güvenilir ingredient listesi oluşturulamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında her bir vitamin ve mineral için spesifik dozaj bilgisi bulunmuyor. '13 vitamin ve 10 mineral içeren' ifadesi genel olup, ingredient parse etmek için gerekli sayısal mg/mcg/IU değerleri verilmemiş. Panax ginseng ve Koenzim Q10 dozajları da belirtilmemiş. Güvenilir ingredient listesi oluşturulamıyor."
+  }
+}

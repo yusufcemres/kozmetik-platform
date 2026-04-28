@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin D3 400 IU Sprey 20 ml",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Vitamin D3 400 IU Sprey, her puf başına 400 IU (10 µg) Quali-D patentli D3 vitamini sağlar. Zeytinyağı bazlı, koruyucu ve şeker içermez. 20 ml sprey/damlalık formunda, 2 yaş ve üzeri çocuklar ile yetişkinler için uygundur.",
+    "net_content_value": 20,
+    "net_content_unit": "ml",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "spray",
+      "serving_size": 1,
+      "serving_unit": "puff",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 400,
+        "unit": "IU",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-d3-400-iu/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Web_Ocean_D3_400IU_Yenilendi_1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

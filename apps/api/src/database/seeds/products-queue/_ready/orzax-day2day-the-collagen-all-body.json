@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Day2Day The Collagen All Body 300 g Toz",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Day2Day The Collagen All Body, her 10 g'lık ölçekte 9366,6 mg Tip 1, 2 ve 3 hidrolize kolajen peptit, glutatyon, hyaluronik asit ile vitamin-mineral kompleksi sunan toz formda gıda takviyesidir. Şeker, glüten ve laktoz içermez.",
+    "net_content_value": 300,
+    "net_content_unit": "g",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "powder",
+      "serving_size": 10,
+      "serving_unit": "g",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "hydrolyzed-collagen",
+        "amount_per_serving": 9366.6,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/day2day-the-collagen-all-body/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/All_Body.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

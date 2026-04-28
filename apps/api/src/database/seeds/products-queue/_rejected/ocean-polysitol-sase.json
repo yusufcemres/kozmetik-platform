@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada L-Arginin, L-Karnitin, E vitamini, folat ve inositol listelenmiş ancak hiçbirinin porsiyon başı sayısal dozajı verilmemiş. Ingredient amount_per_serving alanları doldurulamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada L-Arginin, L-Karnitin, E vitamini, folat ve inositol listelenmiş ancak hiçbirinin porsiyon başı sayısal dozajı verilmemiş. Ingredient amount_per_serving alanları doldurulamıyor."
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Hepalex Softjel Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Hepalex, karaciğer sağlığını desteklemek amacıyla formüle edilmiş bitkisel bir gıda takviyesidir. Her 2 softjel kapsülde 165 mg kolin, 130 mg karahindiba ekstresi, 130 mg enginar ekstresi, 100 mg silibin, 50 mg E vitamini, 40 mg alfa lipoik asit ve 40 mg glutatyon sağlar.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 2,
+      "serving_unit": "softgel",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "choline",
+        "amount_per_serving": 165,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dandelion-extract",
+        "amount_per_serving": 130,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "artichoke-extract",
+        "amount_per_serving": 130,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "silybin",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 417
+      },
+      {
+        "ingredient_slug": "alpha-lipoic-acid",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "l-glutathione",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-hepalex-softjel-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Hepalex.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "choline",
+      "inci_name": "Choline",
+      "common_name": "Kolin",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Kolin, karaciğer fonksiyonu, lipid metabolizması, hücre zarı bütünlüğü ve nörotransmitter (asetilkolin) sentezi için gerekli esansiyel bir besindir. Karaciğerde yağ birikimini azaltmaya yardımcı olur.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 425,
+      "effective_dose_max": 550,
+      "effective_dose_unit": "mg",
+      "ul_dose": 3500,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "dandelion-extract",
+      "inci_name": "Taraxacum officinale Extract",
+      "common_name": "Karahindiba Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Karahindiba (Taraxacum officinale) ekstresi geleneksel olarak karaciğer ve safra fonksiyonlarını desteklemek, hafif diüretik etki sağlamak ve sindirimi kolaylaştırmak amacıyla kullanılan bitkisel bir takviyedir.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22946853/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "artichoke-extract",
+      "inci_name": "Cynara scolymus Extract",
+      "common_name": "Enginar Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Enginar (Cynara scolymus) ekstresi, sinarin ve klorojenik asit içerir; safra üretimini uyararak sindirime yardımcı olur, karaciğer sağlığını destekler ve lipid profili üzerinde olumlu etkiler göstermiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29520889/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 1500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "silybin",
+      "inci_name": "Silybin",
+      "common_name": "Silibin",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Silibin, deve dikeni (Silybum marianum) ekstresindeki silimarin kompleksinin en aktif bileşenidir. Güçlü antioksidan etkisi ile hepatositleri oksidatif hasara karşı korur ve karaciğer rejenerasyonunu destekler.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20564545/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

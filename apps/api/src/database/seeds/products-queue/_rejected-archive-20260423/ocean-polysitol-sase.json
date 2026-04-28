@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif maddelerin (L-Arginin, L-Karnitin, E vitamini, folik asit, inositol) porsiyon başına miktarları (dozajları) ürün açıklamasında belirtilmemiş. Sayısal dozaj bilgisi olmadan ingredients listesi oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif maddelerin (L-Arginin, L-Karnitin, E vitamini, folik asit, inositol) porsiyon başına miktarları (dozajları) ürün açıklamasında belirtilmemiş. Sayısal dozaj bilgisi olmadan ingredients listesi oluşturulamaz."
+  }
+}

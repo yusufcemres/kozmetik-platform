@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif maddelerin (magnezyum, çinko, D vitamini, kalsiyum, K2) porsiyon başına sayısal dozajları ham veride belirtilmemiş; dozaj bilgisi olmadan ingredient amount_per_serving ve DV% hesaplanamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif maddelerin (magnezyum, çinko, D vitamini, kalsiyum, K2) porsiyon başına sayısal dozajları ham veride belirtilmemiş; dozaj bilgisi olmadan ingredient amount_per_serving ve DV% hesaplanamaz."
+  }
+}

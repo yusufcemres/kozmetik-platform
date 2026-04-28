@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında glukozamin sülfat, kondroitin sülfat ve MSM içerdiği belirtiliyor ancak bu aktif maddelerin hiçbiri için sayısal dozaj (mg miktarı) verilmemiş. Ayrıca bu üç madde (glucosamine-sulfate, chondroitin-sulfate, msm) hazır ingredient listesinde bulunmuyor; yeni ingredient oluşturmak için dahi porsiyon başı dozaj bilgisi gerekli. Dozaj verisi olmadan ingredients alanı doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında glukozamin sülfat, kondroitin sülfat ve MSM içerdiği belirtiliyor ancak bu aktif maddelerin hiçbiri için sayısal dozaj (mg miktarı) verilmemiş. Ayrıca bu üç madde (glucosamine-sulfate, chondroitin-sulfate, msm) hazır ingredient listesinde bulunmuyor; yeni ingredient oluşturmak için dahi porsiyon başı dozaj bilgisi gerekli. Dozaj verisi olmadan ingredients alanı doldurulamaz."
+  }
+}

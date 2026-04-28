@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Aktif madde listesi ve dozajları verilmemiş. Açıklamada yalnızca 'Kalsiyum, Magnezyum, mineral ve vitamin içerir' ifadesi var; porsiyon başına mg/mcg miktarları belirtilmediği için ingredient parse edilemiyor ve DV% hesaplanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Aktif madde listesi ve dozajları verilmemiş. Açıklamada yalnızca 'Kalsiyum, Magnezyum, mineral ve vitamin içerir' ifadesi var; porsiyon başına mg/mcg miktarları belirtilmediği için ingredient parse edilemiyor ve DV% hesaplanamıyor."
+  }
+}

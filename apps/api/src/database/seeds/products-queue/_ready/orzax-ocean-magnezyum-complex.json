@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Magnezyum Complex 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Magnezyum Complex her tablette magnezyum bisglisinat, malat, sitrat ve tauratın birleşiminden 125 mg magnezyum ve 5 mg B6 vitamini sağlar. 11 yaş ve üzeri için günde 1-2 tablet.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 125,
+        "unit": "mg",
+        "daily_value_percentage": 33
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 357
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-magnezyum-complex/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/04/Ocean_Magnezyum_Complex.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

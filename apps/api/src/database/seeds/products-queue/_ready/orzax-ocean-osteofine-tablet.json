@@ -1,0 +1,105 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Osteofine Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Osteofine, her tablette 400 mg kalsiyum, 125 mg magnezyum, 7.5 mg çinko, bor, bakır, selenyum ve 10 µg D3 vitamini içerir. Normal kemiklerin korunmasına katkı sağlayan takviye edici gıdadır.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "calcium",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 125,
+        "unit": "mg",
+        "daily_value_percentage": 33
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 7.5,
+        "unit": "mg",
+        "daily_value_percentage": 75
+      },
+      {
+        "ingredient_slug": "boron",
+        "amount_per_serving": 0.3,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "copper",
+        "amount_per_serving": 500,
+        "unit": "mcg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 25,
+        "unit": "mcg",
+        "daily_value_percentage": 45
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 10,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-osteofine-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Osteofine.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "boron",
+      "inci_name": "Boron",
+      "common_name": "Bor",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Bor, kemik sağlığı ve kalsiyum metabolizması üzerinde rol oynayan eser bir mineraldir. Östrojen ve D vitamini metabolizmasını destekleyerek kemik yoğunluğunun korunmasına katkı sağlar ve eklem sağlığında yardımcı rol üstlenir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1,
+      "effective_dose_max": 10,
+      "effective_dose_unit": "mg",
+      "ul_dose": 20,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Kabuklu yemişler",
+          "amount_per_100g": 2,
+          "unit": "mg"
+        },
+        {
+          "food_name": "Baklagiller",
+          "amount_per_100g": 1.5,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

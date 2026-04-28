@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında spesifik EPA/DHA veya toplam omega-3 dozajı belirtilmemiş. 5 mL porsiyonda kaç mg EPA/DHA olduğu bilinmeden ingredients parse edilemez.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında spesifik EPA/DHA veya toplam omega-3 dozajı belirtilmemiş. 5 mL porsiyonda kaç mg EPA/DHA olduğu bilinmeden ingredients parse edilemez."
+  }
+}

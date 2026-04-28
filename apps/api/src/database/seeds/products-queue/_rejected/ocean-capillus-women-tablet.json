@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada içerik maddeleri ve dozajları belirtilmemiş; sadece 'vitamin, mineral ve bitkisel ekstreler' şeklinde genel ifade var. Parse edilebilir ingredient bilgisi yok.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada içerik maddeleri ve dozajları belirtilmemiş; sadece 'vitamin, mineral ve bitkisel ekstreler' şeklinde genel ifade var. Parse edilebilir ingredient bilgisi yok."
+  }
+}

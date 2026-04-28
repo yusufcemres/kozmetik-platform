@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (folat, B12, D3 dışındakiler) dozajları belirtilmemiş. Omega 3 miktarı (EPA/DHA), multivitamin ve multimineral içerikleri ile dozları bilinmediğinden ingredients listesi eksik kalacaktır. Sadece D3 1000 IU belirtilmiş, diğer aktif maddeler için sayısal dozaj verisi yok.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (folat, B12, D3 dışındakiler) dozajları belirtilmemiş. Omega 3 miktarı (EPA/DHA), multivitamin ve multimineral içerikleri ile dozları bilinmediğinden ingredients listesi eksik kalacaktır. Sadece D3 1000 IU belirtilmiş, diğer aktif maddeler için sayısal dozaj verisi yok."
+  }
+}

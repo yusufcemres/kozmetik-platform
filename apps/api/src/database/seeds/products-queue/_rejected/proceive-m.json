@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında L-karnitin, L-arjinin, CoQ10, glutatyon, B12, folik asit ve bitkisel ekstreler listeleniyor ancak hiçbir madde için sayısal dozaj (mg/mcg) belirtilmemiş. Ingredient amount_per_serving değerleri parse edilemiyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında L-karnitin, L-arjinin, CoQ10, glutatyon, B12, folik asit ve bitkisel ekstreler listeleniyor ancak hiçbir madde için sayısal dozaj (mg/mcg) belirtilmemiş. Ingredient amount_per_serving değerleri parse edilemiyor."
+  }
+}

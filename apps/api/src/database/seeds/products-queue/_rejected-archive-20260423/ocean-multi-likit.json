@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (11 vitamin, 5 mineral, omega 3) sayısal dozaj bilgisi verilmemiş. Her bir vitamin/mineral için amount_per_serving ve DV% hesaplanamıyor. Ingredient listesi eksik.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (11 vitamin, 5 mineral, omega 3) sayısal dozaj bilgisi verilmemiş. Her bir vitamin/mineral için amount_per_serving ve DV% hesaplanamıyor. Ingredient listesi eksik."
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Tribulus Terrestris 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Tribulus Terrestris her kapsülde 500 mg Tribulus Terrestris ekstresi (%90 saponin, 450 mg) içerir. 60 adet vegan ve vejetaryen kullanıma uygun kapsül. 11 yaş ve üzeri için günlük 2 kapsül önerilir.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 2,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "tribulus-terrestris-extract",
+        "amount_per_serving": 1000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-tribulus-terrestris-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Tribulus_Terre.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "tribulus-terrestris-extract",
+      "function_summary": "Tribulus terrestris (demir dikeni) saponin (özellikle protodioscin) içeren geleneksel bir bitkidir; libido, sporcu performansı ve androjenik destek iddialarıyla kullanılır ancak klinik kanıtlar sınırlıdır.",
+      "effective_dose_min": 500,
+      "effective_dose_max": 1500,
+      "ul_dose": null,
+      "evidence_grade": "C",
+      "inci_name": "Tribulus Terrestris Ekstresi",
+      "common_name": "Tribulus Terrestris Ekstresi",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27401787/",
+          "title": "Tribulus terrestris for treatment of sexual dysfunction in women: randomized double-blind placebo-controlled study"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24559105/",
+          "title": "The aphrodisiac herb Tribulus terrestris does not influence the androgen production in young men"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

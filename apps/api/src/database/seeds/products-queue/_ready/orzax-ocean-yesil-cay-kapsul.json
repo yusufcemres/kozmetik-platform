@@ -1,0 +1,104 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Yeşil Çay 500 mg 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Yeşil Çay her kapsülde 500 mg yeşil çay ekstresi (%90 polifenol) içerir. Kapsülün %45'i EGCG (225 mg) olarak standardize edilmiştir. Vcaps® bitkisel kapsül teknolojisi ile üretilmiştir.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 2,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "green-tea-extract",
+        "amount_per_serving": 1000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "egcg",
+        "amount_per_serving": 450,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-yesil-cay-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Yesil_Cay.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "green-tea-extract",
+      "effective_dose_min": 250,
+      "effective_dose_max": 1200,
+      "ul_dose": 1600,
+      "evidence_grade": "B",
+      "function_summary": "Yeşil çay ekstresi (Camellia sinensis) yüksek oranda polifenol ve kateşin içerir; antioksidan etkisi ile oksidatif stresi azaltmaya, termojenez üzerinden kilo yönetimine ve kardiyovasküler sağlığa katkı sağladığı araştırılmaktadır.",
+      "inci_name": "Yeşil Çay Ekstresi",
+      "common_name": "Yeşil Çay Ekstresi",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31126808/",
+          "title": "Green tea catechins and cardiovascular health: an update"
+        },
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/GreenTea-HealthProfessional/",
+          "title": "Green Tea Fact Sheet for Health Professionals"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "egcg",
+      "effective_dose_min": 100,
+      "effective_dose_max": 600,
+      "ul_dose": 800,
+      "evidence_grade": "B",
+      "function_summary": "EGCG yeşil çayın en aktif kateşin bileşenidir; güçlü antioksidan aktivitesi, anti-enflamatuar etkileri ve metabolik sağlık üzerine potansiyel faydaları nedeniyle en çok araştırılan polifenollerden biridir.",
+      "inci_name": "Epigallokateşin Gallat (EGCG)",
+      "common_name": "Epigallokateşin Gallat (EGCG)",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29777566/",
+          "title": "Epigallocatechin-3-gallate (EGCG): Mechanisms and clinical applications"
+        },
+        {
+          "source": "EFSA",
+          "url": "https://www.efsa.europa.eu/en/efsajournal/pub/5239",
+          "title": "Scientific opinion on the safety of green tea catechins"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif maddelerin (inositol, CoQ10, glutatyon, B12, folat, vitamin ve mineraller) spesifik dozajları belirtilmemiş. Sayısal miktarlar olmadan ingredient listesi oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif maddelerin (inositol, CoQ10, glutatyon, B12, folat, vitamin ve mineraller) spesifik dozajları belirtilmemiş. Sayısal miktarlar olmadan ingredient listesi oluşturulamaz."
+  }
+}

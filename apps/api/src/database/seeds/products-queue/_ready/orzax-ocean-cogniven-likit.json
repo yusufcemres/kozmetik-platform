@@ -1,0 +1,144 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Cogniven Likit 150 ml",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Cogniven Likit her 5 ml porsiyonda 150 mg patentli Cognizin sitikolin, üridin monofosfat, fosfatidilserin ile B1, B2, B6 ve aktif formda metilkobalamin (B12) içerir. Şeker, glüten ve koruyucu içermez.",
+    "net_content_value": 150,
+    "net_content_unit": "mL",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "mL",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "citicoline",
+        "amount_per_serving": 150,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "uridine-monophosphate",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "phosphatidylserine",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-cogniven-likit/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Cogniven_Surup.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "citicoline",
+      "inci_name": "Citicoline (CDP-Choline)",
+      "common_name": "Sitikolin",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Sitikolin (CDP-kolin), beyinde fosfatidilkolin sentezinde öncül görevi gören bir nöronutriyenttir. Bellek, dikkat ve bilişsel fonksiyonların desteklenmesinde rol oynar ve asetilkolin sentezine katkıda bulunur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26179181/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 250,
+      "effective_dose_max": 500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "uridine-monophosphate",
+      "inci_name": "Uridine 5'-Monophosphate",
+      "common_name": "Üridin Monofosfat",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Üridin monofosfat, sinaptik membran fosfolipidlerinin sentezinde rol oynayan bir nükleotittir. Beyin plastisitesi, nöronal iletim ve bilişsel fonksiyonların desteklenmesinde önemli görev üstlenir.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18606862/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 500,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "phosphatidylserine",
+      "inci_name": "Phosphatidylserine",
+      "common_name": "Fosfatidilserin",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Fosfatidilserin, hücre zarlarının önemli bir fosfolipid bileşenidir. Bilişsel fonksiyon, bellek ve öğrenme süreçlerinin desteklenmesi amacıyla kullanılır ve yaşa bağlı bilişsel gerilemede araştırılmaktadır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24024547/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 100,
+      "effective_dose_max": 300,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

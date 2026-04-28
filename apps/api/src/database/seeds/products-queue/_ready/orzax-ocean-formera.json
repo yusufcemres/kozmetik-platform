@@ -1,0 +1,120 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Formera 2'li Shot + Kapsül Set",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Formera, shot ve kapsül formlarını tek kutuda sunar. Kapsül formu 850 mg glukomannan, 350 mg kitosan, 1240 mg CLA ve 100 mg yeşil çay ekstresi içerir. Glüten ve şeker içermez.",
+    "net_content_value": 2,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 2,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "green-tea-extract",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-formera/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/Ocean_Formera.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "glucomannan",
+      "inci_name": "Amorphophallus konjac",
+      "common_name": "Glukomannan",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Konjac kökünden elde edilen suda çözünür diyet lifidir. Midede su tutarak viskoz jel oluşturur, tokluk hissini artırır ve kilo yönetimine destek olur. EFSA onaylı sağlık beyanına sahiptir.",
+      "evidence_grade": "A",
+      "evidence_citations": [
+        {
+          "source": "EFSA",
+          "url": "https://www.efsa.europa.eu/en/efsajournal/pub/1798",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1000,
+      "effective_dose_max": 3000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "chitosan",
+      "inci_name": "Chitosan",
+      "common_name": "Kitosan",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Kabuklu deniz ürünlerinin kitinlerinden elde edilen katyonik bir polisakkarittir. Sindirim sisteminde yağları bağlayarak emilimini azaltmaya yardımcı olur ve kilo yönetimi takviyelerinde kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29893587/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 3000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "conjugated-linoleic-acid",
+      "inci_name": "Conjugated Linoleic Acid",
+      "common_name": "Konjuge Linoleik Asit (CLA)",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Başlıca ruminant süt ürünlerinde bulunan bir trans yağ asididir. Vücut kompozisyonu, yağ kütlesi azalımı ve metabolik destek amacıyla takviye olarak kullanılır. İzomer karışımı içerir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17490954/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1000,
+      "effective_dose_max": 6000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

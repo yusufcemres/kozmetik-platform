@@ -1,0 +1,136 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies HSN 30 Çiğnenebilir Jel",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Gummies HSN; 9 vitamin, 3 mineral ve 20 mg hidrolize keratin içeren çiğnenebilir jel formunda takviye. 2 jel porsiyonda 5000 µg biotin, 400 µg folik asit, 30 mg C vitamini sunar. Çilek aromalı, 30'lu kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 30,
+        "unit": "mg",
+        "daily_value_percentage": 37
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-e",
+        "amount_per_serving": 6,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 3,
+        "unit": "mg",
+        "daily_value_percentage": 214
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 2,
+        "unit": "mg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 5000,
+        "unit": "mcg",
+        "daily_value_percentage": 10000
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      },
+      {
+        "ingredient_slug": "retinol",
+        "amount_per_serving": 200,
+        "unit": "mcg",
+        "daily_value_percentage": 25
+      },
+      {
+        "ingredient_slug": "vitamin-b12",
+        "amount_per_serving": 54,
+        "unit": "mcg",
+        "daily_value_percentage": 2160
+      },
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 30,
+        "unit": "mcg",
+        "daily_value_percentage": 20
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 25,
+        "unit": "mcg",
+        "daily_value_percentage": 500
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 20,
+        "unit": "mcg",
+        "daily_value_percentage": 36
+      },
+      {
+        "ingredient_slug": "hydrolyzed-keratin",
+        "amount_per_serving": 20,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-hsn/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Gummies_HSN.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "hydrolyzed-keratin",
+      "inci_name": "Hydrolyzed Keratin",
+      "common_name": "Hidrolize Keratin",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "Hidrolize keratin, saç ve tırnakların yapısal proteini olan keratinin enzimatik olarak parçalanmış küçük peptid formudur; saç tellerinin güçlenmesi, tırnak sağlığı ve cilt elastikiyeti için oral ve topikal takviye olarak kullanılır.",
+      "evidence_grade": "C",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29377797/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 20,
+      "effective_dose_max": 500,
+      "ul_dose": null,
+      "effective_dose_unit": "mg",
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

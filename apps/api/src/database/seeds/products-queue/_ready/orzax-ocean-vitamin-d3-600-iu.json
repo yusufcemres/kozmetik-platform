@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin D3 600 IU Sprey 20 ml",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin D3 600 IU Sprey, her pufta Quali-D patentli 600 IU (15 mcg) D3 vitamini sunar. Taşıyıcı olarak saf zeytinyağı kullanılır; koruyucu, tatlandırıcı, renklendirici ve ilave şeker içermez. 20 ml sprey form.",
+    "net_content_value": 20,
+    "net_content_unit": "mL",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "spray",
+      "serving_size": 1,
+      "serving_unit": "spray",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 600,
+        "unit": "IU",
+        "daily_value_percentage": 300
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-d3-600-iu/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/Web_Ocean_D3_600IU_Yenilendi_1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

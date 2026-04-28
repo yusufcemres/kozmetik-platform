@@ -1,0 +1,79 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean L-Arjinin Saşe 1000 mg",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean L-Arjinin, her saşesinde 1000 mg L-Arjinin içeren gıda takviyesidir. Saşe formu sayesinde pratik kullanım ve saklama kolaylığı sunar. 11 yaş ve üzeri bireyler için günlük 1-3 saşe önerilir.",
+    "net_content_value": 20,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-arginine",
+        "amount_per_serving": 1000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-l-arjinin-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_L_Arjinin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-arginine",
+      "inci_name": "L-Arginine",
+      "common_name": "L-Arjinin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino-acid",
+      "function_summary": "L-Arjinin, nitrik oksit (NO) üretiminde öncü rol oynayan yarı-esansiyel bir amino asittir. Vasküler endotel fonksiyonunu, kan akışını ve damar genişlemesini destekler; protein sentezi, üre döngüsü ve bağışıklık fonksiyonlarında görev alır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Arginine-HealthProfessional/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27749691/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 3000,
+      "effective_dose_max": 6000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Hindi göğsü",
+          "amount_per_100g": 2.3,
+          "unit": "g"
+        },
+        {
+          "food_name": "Yer fıstığı",
+          "amount_per_100g": 3.1,
+          "unit": "g"
+        },
+        {
+          "food_name": "Kabak çekirdeği",
+          "amount_per_100g": 5.4,
+          "unit": "g"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

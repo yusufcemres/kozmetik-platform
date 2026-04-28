@@ -1,0 +1,122 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Glucosamine Complex 60 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Glucosamine Complex, her 2 tablette 1500 mg glukozamin sülfat, 400 mg kondroitin sülfat, 250 mg MSM, 100 mg Harpagophytum ekstresi, 60 mg magnezyum ve 30 mg Tip II kolajen peptidi sağlar. 60 tabletlik kutu.",
+    "net_content_value": 60,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "glucosamine-sulfate",
+        "amount_per_serving": 1500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "chondroitin-sulfate",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "msm",
+        "amount_per_serving": 250,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "harpagophytum-procumbens-extract",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 60,
+        "unit": "mg",
+        "daily_value_percentage": 16
+      },
+      {
+        "ingredient_slug": "uc-ii-collagen",
+        "amount_per_serving": 30,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-glucosamine-complex/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Glucosamine_Complex.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "msm",
+      "inci_name": "Methylsulfonylmethane",
+      "common_name": "MSM (Metilsülfonilmetan)",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "MSM (Metilsülfonilmetan), organik kükürt kaynağı olan bir bileşiktir. Eklem sağlığını destekler, kıkırdak yapısının korunmasına ve egzersiz sonrası kas ağrılarının azalmasına katkıda bulunur; antioksidan ve anti-inflamatuar özellikler gösterir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28701904/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1500,
+      "effective_dose_max": 3000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "harpagophytum-procumbens-extract",
+      "inci_name": "Harpagophytum procumbens Extract",
+      "common_name": "Şeytan Pençesi Ekstresi (Harpagophytum)",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Harpagophytum procumbens (Şeytan Pençesi) ekstresi, harpagozit içeren geleneksel bir bitkisel takviyedir. Eklem konforu ve hareket kabiliyetinin desteklenmesine, kas-iskelet sistemindeki rahatsızlıkların hafifletilmesine katkıda bulunur.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17464966/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 50,
+      "effective_dose_max": 400,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

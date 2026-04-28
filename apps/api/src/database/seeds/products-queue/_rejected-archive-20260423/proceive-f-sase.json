@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: İçerik maddelerinin (inositol, CoQ10, glutatyon, vitamin/mineraller) sayısal dozajları ham veride belirtilmemiş; amount_per_serving alanları doldurulamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "İçerik maddelerinin (inositol, CoQ10, glutatyon, vitamin/mineraller) sayısal dozajları ham veride belirtilmemiş; amount_per_serving alanları doldurulamıyor."
+  }
+}

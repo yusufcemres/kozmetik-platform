@@ -1,0 +1,76 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Orzax Cosakondrin Plus 60 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Orzax Cosakondrin Plus; glukozamin sülfat, kondroitin sülfat, MSM ve Tip II kolajen kombinasyonu içeren eklem destek takviyesidir. Vitamin ve minerallerle zenginleştirilmiş 60 tabletlik kutu, günde 2 tablet kullanım için formüle edilmiştir.",
+    "net_content_value": 60,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 2,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "glucosamine-sulfate",
+        "amount_per_serving": 1500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "chondroitin-sulfate",
+        "amount_per_serving": 1200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "uc-ii-collagen",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/cosakondrin-plus/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Cosakondrin_Plus.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "msm",
+      "inci_name": "Methylsulfonylmethane",
+      "common_name": "MSM (Metilsülfonilmetan)",
+      "domain_type": "supplement",
+      "ingredient_group": "other",
+      "function_summary": "MSM (metilsülfonilmetan), vücutta doğal olarak bulunan organik kükürt bileşiğidir. Eklem konforu, kıkırdak sağlığı ve antiinflamatuar destek amacıyla glukozamin ve kondroitin ile kombine olarak kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28516967/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1500,
+      "effective_dose_max": 6000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

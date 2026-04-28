@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında 12 vitamin ve 5 mineral içerdiği belirtilmiş ancak her bir vitamin/mineralin spesifik dozajı (mg/mcg/IU değerleri) verilmemiş. Ingredients parse etmek için sayısal dozaj bilgisi zorunlu, bu bilgi olmadan DV% ve UL kontrolü yapılamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında 12 vitamin ve 5 mineral içerdiği belirtilmiş ancak her bir vitamin/mineralin spesifik dozajı (mg/mcg/IU değerleri) verilmemiş. Ingredients parse etmek için sayısal dozaj bilgisi zorunlu, bu bilgi olmadan DV% ve UL kontrolü yapılamaz."
+  }
+}

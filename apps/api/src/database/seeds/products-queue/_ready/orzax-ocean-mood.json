@@ -1,0 +1,116 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Mood 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Mood her kapsülde 150 mg passiflora, 100 mg valerian, 50 mg 5-HTP, 40 mg melisa ekstresi ve 5 mg B6 vitamini sağlar. Vcaps bitkisel kapsül teknolojisi ile üretilmiş, glüten ve laktoz içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "kapsül",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "passiflora-incarnata-extract",
+        "amount_per_serving": 150,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "valerian-extract",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "5-htp",
+        "amount_per_serving": 50,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "melissa-officinalis-extract",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 357
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-mood/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Mood.webp"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "valerian-extract",
+      "inci_name": "Valeriana officinalis",
+      "common_name": "Valerian (Kediotu) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Valerian (kediotu) kökü ekstresi geleneksel olarak uyku kalitesini desteklemek ve hafif anksiyete semptomlarını azaltmak için kullanılır; GABA reseptörleri üzerinden sedatif etki gösterdiği düşünülmektedir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Valerian-HealthProfessional/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 600,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "caution",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "melissa-officinalis-extract",
+      "inci_name": "Melissa officinalis",
+      "common_name": "Melisa (Oğul Otu) Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Melisa (Melissa officinalis) ekstresi geleneksel tıpta sakinleştirici ve sindirim destekleyici olarak kullanılır; rosmarinik asit içeriği sayesinde hafif anksiyolitik ve uyku kalitesi iyileştirici etkileri olduğu gösterilmiştir.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21480801/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 300,
+      "effective_dose_max": 600,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

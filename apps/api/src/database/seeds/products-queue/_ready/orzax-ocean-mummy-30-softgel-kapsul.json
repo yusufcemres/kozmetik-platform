@@ -1,0 +1,119 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Mummy 30 Softgel Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "hamile-takviyeleri",
+    "short_description": "Ocean Mummy, hamile ve emziren kadınlar için her softgel kapsülde 400 mg balık yağı (200 mg DHA, 40 mg EPA), 1000 IU D3, aktif metilfolat, metil B12, demir ve multivitamin-mineral kompleksi içerir. 30 softgel kapsüllük kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "pregnant",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "fish-oil",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "iron",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 114
+      },
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 40,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-b3",
+        "amount_per_serving": 16,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 10,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "copper",
+        "amount_per_serving": 1000,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "vitamin-b6",
+        "amount_per_serving": 1.4,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 25,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylfolate",
+        "amount_per_serving": 400,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "iodine",
+        "amount_per_serving": 150,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 55,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "biotin",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "methylcobalamin",
+        "amount_per_serving": 2.5,
+        "unit": "mcg",
+        "daily_value_percentage": 100
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-mummy-30-softgel-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Mummy.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

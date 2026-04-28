@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün 12 vitamin ve 5 mineral içerdiği belirtilmiş ancak her bir aktif maddenin sayısal dozajı (mg/mcg/IU) ham veride verilmemiş. Ingredient listesi sayısal dozaj olmadan oluşturulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün 12 vitamin ve 5 mineral içerdiği belirtilmiş ancak her bir aktif maddenin sayısal dozajı (mg/mcg/IU) ham veride verilmemiş. Ingredient listesi sayısal dozaj olmadan oluşturulamaz."
+  }
+}

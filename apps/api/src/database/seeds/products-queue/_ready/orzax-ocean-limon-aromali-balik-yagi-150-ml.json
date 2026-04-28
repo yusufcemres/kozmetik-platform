@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Limon Aromalı Balık Yağı 150 mL",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Limon Aromalı Balık Yağı, temiz sularda yaşayan küçük balıkların gövde yağlarından elde edilen Omega-3 içerir. 5 mL porsiyonda EPA ve DHA sağlar. IFOS 5 yıldız onaylı, 150 mL şişe.",
+    "net_content_value": 150,
+    "net_content_unit": "mL",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "liquid",
+      "serving_size": 5,
+      "serving_unit": "mL",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "fish-oil",
+        "amount_per_serving": 4600,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 760,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-limon-aromali-balik-yagi-150-ml/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/03/Ocean_BalikYagi_Limon.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

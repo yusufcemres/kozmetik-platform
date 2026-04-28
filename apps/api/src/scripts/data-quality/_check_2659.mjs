@@ -1,0 +1,11 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT product_id, product_name, status, short_description, (SELECT COUNT(*) FROM product_ingredients WHERE product_id=p.product_id) as inci, (SELECT image_url FROM product_images WHERE product_id=p.product_id ORDER BY sort_order LIMIT 1) as img FROM products p WHERE product_id = 2659`);
+console.log(JSON.stringify(r.rows[0], null, 2));
+await c.end();

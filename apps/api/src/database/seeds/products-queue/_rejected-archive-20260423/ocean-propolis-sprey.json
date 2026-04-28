@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında aktif madde dozajları (propolis ekstresi mg, Artepillin-C, bal ekstresi, meyan kökü ekstresi miktarları) belirtilmemiş. Sayısal ingredient verisi olmadan REVELA ingredient şeması doldurulamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında aktif madde dozajları (propolis ekstresi mg, Artepillin-C, bal ekstresi, meyan kökü ekstresi miktarları) belirtilmemiş. Sayısal ingredient verisi olmadan REVELA ingredient şeması doldurulamaz."
+  }
+}

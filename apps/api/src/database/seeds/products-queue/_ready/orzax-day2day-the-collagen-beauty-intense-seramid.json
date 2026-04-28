@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Day2Day The Collagen Beauty Intense Seramid 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Day2Day The Collagen Beauty Intense Seramid her saşede 10.000 mg Tip 1 ve 3 hidrolize kolajen, resveratrol, glutatyon, seramid, vitamin ve mineral içerir. Çilek aromalı, şeker, glüten ve laktoz içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "hydrolyzed-collagen",
+        "amount_per_serving": 10000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/day2day-the-collagen-beauty-intense-seramid/",
+    "affiliate_platform": "direct",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/D2D_Beauty_Intense_Seramid_Resveratrol.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Omega 3 & QH 30 Softjel",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean Omega 3 & QH, IFOS 5 yıldız kalite onaylı balık yağı ile EPA, DHA omega-3 yağ asitleri ve Koenzim Q10 (Ubikinol) içeren gıda takviyesidir. 30 softjel kapsüllük kutu, 11 yaş ve üzeri bireyler için günlük 1 kapsül kullanım önerilir.",
+    "net_content_value": 30,
+    "net_content_unit": "softgel",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "epa",
+        "amount_per_serving": 330,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "dha",
+        "amount_per_serving": 220,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "coenzyme-q10",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-omega-3-qh-30-softjel-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Omega3_QH.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

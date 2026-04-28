@@ -1,0 +1,80 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Krom Pikolinat 200 mcg 90 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Krom Pikolinat, her bitkisel kapsülde 200 mcg krom pikolinat içeren gıda takviyesidir. 90 kapsüllük kutu, 11 yaş ve üzeri için günlük 1 kapsül kullanım sağlar.",
+    "net_content_value": 90,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "chromium-picolinate",
+        "amount_per_serving": 200,
+        "unit": "mcg",
+        "daily_value_percentage": 500
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-krom-pikolinat/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Krom_Pikolinat_Kapsul.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "chromium-picolinate",
+      "inci_name": "Chromium Picolinate",
+      "common_name": "Krom Pikolinat",
+      "domain_type": "supplement",
+      "ingredient_group": "mineral",
+      "function_summary": "Krom pikolinat, krom mineralinin biyoyararlanımı yüksek şelat formudur. Normal makrobesin metabolizmasına ve kan şekeri seviyelerinin korunmasına katkıda bulunur; insülin duyarlılığını destekleyerek karbonhidrat ve lipid metabolizmasında rol oynar.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/",
+          "accessed": "2026-04-23"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24635480/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 25,
+      "effective_dose_max": 200,
+      "effective_dose_unit": "mcg",
+      "ul_dose": 1000,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Brokoli",
+          "amount_per_100g": 11,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Üzüm suyu",
+          "amount_per_100g": 7.5,
+          "unit": "mcg"
+        },
+        {
+          "food_name": "Tam tahıllı ekmek",
+          "amount_per_100g": 4,
+          "unit": "mcg"
+        }
+      ],
+      "elemental_ratio": 0.125
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

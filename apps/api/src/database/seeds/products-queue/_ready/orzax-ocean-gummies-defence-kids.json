@@ -1,0 +1,47 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Gummies Defence Kids 30 Çiğnenebilir Jel",
+    "brand_slug": "orzax",
+    "category_slug": "cocuk-vitaminleri",
+    "short_description": "Ocean Gummies Defence Kids, 4-10 yaş çocuklar için çiğnenebilir jel formda takviyedir. Her 2 jelde 80 mg C vitamini, 7.5 mg çinko ve 10 µg D3 vitamini içerir. Portakal ve şeftali aromalı, 30 jellik kutu.",
+    "net_content_value": 30,
+    "net_content_unit": "gummy",
+    "target_audience": "child_4_12y",
+    "supplement_detail": {
+      "form": "gummy",
+      "serving_size": 2,
+      "serving_unit": "gummy",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-c",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 100
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 7.5,
+        "unit": "mg",
+        "daily_value_percentage": 75
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 10,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-gummies-defence-kids/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/02/Ocean_Gummies_Kids_Defence.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

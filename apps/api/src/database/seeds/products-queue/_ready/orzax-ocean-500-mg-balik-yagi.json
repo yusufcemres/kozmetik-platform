@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean 500 mg Balık Yağı Softjel Kapsül 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "omega-yag-asitleri",
+    "short_description": "Ocean 500 mg Balık Yağı, temiz sularda yaşayan küçük balıklardan trigliserid formda elde edilen omega-3 kaynağıdır. Her softjel kapsülde 500 mg balık yağı bulunur. Limon aromalı, IFOS 5 yıldız onaylı, 60 kapsüllük kutu.",
+    "net_content_value": 60,
+    "net_content_unit": "kapsul",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "softgel",
+      "serving_size": 1,
+      "serving_unit": "softgel",
+      "certification": "IFOS"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "fish-oil",
+        "amount_per_serving": 500,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-500-mg-balik-yagi/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_500_BalikYagi.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

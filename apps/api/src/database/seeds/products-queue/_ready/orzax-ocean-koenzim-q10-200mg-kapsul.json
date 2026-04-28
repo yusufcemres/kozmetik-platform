@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Koenzim Q10 200 mg 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Koenzim Q10, her kapsülde 200 mg koenzim Q10 ve 5 mg karabiber ekstraktı (piperin) içeren gıda takviyesidir. 11 yaş ve üzeri yetişkinler için günde 1 kapsül olarak formüle edilmiştir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "coenzyme-q10",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "piperine",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-koenzim-q10-200mg-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Koenzim_Q10.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

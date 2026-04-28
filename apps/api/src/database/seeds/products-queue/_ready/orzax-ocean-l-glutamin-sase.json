@@ -1,0 +1,74 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean L-Glutamin Saşe 5000 mg",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean L-Glutamin, her saşesinde 5000 mg saf L-Glutamin içeren tek bileşenli gıda takviyesidir. Glüten, şeker, laktoz, koruyucu ve renklendirici içermez. Saşe formunda kullanım kolaylığı sunar.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "l-glutamine",
+        "amount_per_serving": 5000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-l-glutamin-sase/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_L_Glutamin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "l-glutamine",
+      "inci_name": "L-Glutamine",
+      "common_name": "L-Glutamin",
+      "domain_type": "supplement",
+      "ingredient_group": "amino-acid",
+      "function_summary": "L-Glutamin, vücutta en bol bulunan serbest amino asittir; bağırsak epitel hücrelerinin temel enerji kaynağıdır, bağışıklık fonksiyonlarını destekler ve yoğun egzersiz sonrası kas toparlanmasına katkı sağlar.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/30023994/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 5000,
+      "effective_dose_max": 10000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Dana eti",
+          "amount_per_100g": 1.2,
+          "unit": "g"
+        },
+        {
+          "food_name": "Yumurta",
+          "amount_per_100g": 0.8,
+          "unit": "g"
+        },
+        {
+          "food_name": "Süt",
+          "amount_per_100g": 0.3,
+          "unit": "g"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

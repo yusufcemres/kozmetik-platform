@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında C vitamini, çinko ve D3 vitamini içerdiği belirtilmiş ancak her bir aktif maddenin porsiyon başına spesifik dozaj bilgisi (mg/mcg/IU) verilmemiş. Dozaj olmadan ingredient miktarları ve DV% hesaplanamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında C vitamini, çinko ve D3 vitamini içerdiği belirtilmiş ancak her bir aktif maddenin porsiyon başına spesifik dozaj bilgisi (mg/mcg/IU) verilmemiş. Dozaj olmadan ingredient miktarları ve DV% hesaplanamaz."
+  }
+}

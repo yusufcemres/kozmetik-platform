@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Açıklamada Vitex Agnus Castus, Vitis Vinifera, Ginseng, Kalsiyum, Magnezyum ve B6 Vitamini listelenmiş ancak hiçbiri için porsiyon başı sayısal dozaj bilgisi verilmemiş. Ingredient amount_per_serving alanları doldurulamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Açıklamada Vitex Agnus Castus, Vitis Vinifera, Ginseng, Kalsiyum, Magnezyum ve B6 Vitamini listelenmiş ancak hiçbiri için porsiyon başı sayısal dozaj bilgisi verilmemiş. Ingredient amount_per_serving alanları doldurulamıyor."
+  }
+}

@@ -70,11 +70,11 @@ export default function PersonalScoreInline({
   if (!profile || (!profile.concerns?.length && !profile.skin_type)) {
     return (
       <div className="bg-surface-container-low border border-outline-variant/20 rounded-md p-6">
-        <p className="label-caps text-on-surface-variant">Senin Cildine Uyumu</p>
+        <p className="label-caps text-on-surface-variant">Senin İhtiyaçlarına Uyumu</p>
         <p className="text-lg font-bold text-primary mt-1">Kişisel skorunu gör</p>
         <p className="text-xs text-outline mt-2">
           <Link href="/profilim" className="text-primary hover:underline underline-offset-4">
-            Cilt profili oluştur
+            Profilini oluştur
           </Link>{' '}
           &rarr; sana özel uyumluluk skoru
         </p>
@@ -143,7 +143,7 @@ export default function PersonalScoreInline({
         <div className="flex-1 min-w-0">
           <p className="label-caps text-on-surface-variant flex items-center gap-1">
             <span className="material-icon text-[12px]" aria-hidden="true">person</span>
-            Senin Cildine Uyumu
+            Senin İhtiyaçlarına Uyumu
           </p>
           {finalScore !== null ? (
             <>

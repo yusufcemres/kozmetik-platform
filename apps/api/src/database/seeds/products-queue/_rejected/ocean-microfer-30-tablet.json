@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Demir miktarı (mg) ürün açıklamasında belirtilmemiş; dozaj bilgisi eksik olduğundan ingredient amount_per_serving hesaplanamıyor.",
+  "doc": {
+    "skip": true,
+    "reason": "Demir miktarı (mg) ürün açıklamasında belirtilmemiş; dozaj bilgisi eksik olduğundan ingredient amount_per_serving hesaplanamıyor."
+  }
+}

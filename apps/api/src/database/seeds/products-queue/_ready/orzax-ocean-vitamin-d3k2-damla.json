@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Vitamin D3K2 Damla 400 Damla",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Vitamin D3K2 Damla, her damlada 1000 IU D3 vitamini (Quali-D patentli) ve 11,25 mcg K2 vitamini sağlar. Zeytinyağı bazlı, koruyucu ve şeker içermez. 400 damla ile uzun süreli kullanım.",
+    "net_content_value": 400,
+    "net_content_unit": "drop",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "drop",
+      "serving_size": 1,
+      "serving_unit": "drop",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 1000,
+        "unit": "IU",
+        "daily_value_percentage": 500
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 11.25,
+        "unit": "mcg",
+        "daily_value_percentage": 15
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-vitamin-d3k2-damla/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/D3K2.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

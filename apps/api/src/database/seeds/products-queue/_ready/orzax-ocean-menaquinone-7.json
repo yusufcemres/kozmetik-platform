@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Menaquinone-7 K2 Vitamini 100 mcg 30 Bitkisel Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Menaquinone-7, her bitkisel kapsülünde patentli MenaQ7 formunda 100 µg K2 vitamini (menakinon-7) sağlar. Kemik ve damar sağlığını destekler. 30 kapsüllük kutu, günde 1 kapsül kullanım için uygundur.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 100,
+        "unit": "mcg",
+        "daily_value_percentage": 133
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-menaquinone-7/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Menaquinone.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

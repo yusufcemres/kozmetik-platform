@@ -1,0 +1,64 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Astaksantin 4 mg 30 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Astaksantin, Haematococcus pluvialis mikroalginden elde edilen, her kapsülde 4 mg astaksantin sağlayan gıda takviyesidir. 30 kapsüllük kutu, günde 1 kapsül kullanım içindir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "astaxanthin",
+        "amount_per_serving": 4,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-astaksantin/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Astaksantin-1.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "astaxanthin",
+      "category": "antioxidant",
+      "function_summary": "Astaksantin, Haematococcus pluvialis mikroalginden elde edilen ksantofil sınıfı karotenoid bir antioksidandır; hücre zarlarında lipid peroksidasyonunu azaltır, oksidatif stres ve göz/cilt sağlığı üzerinde çalışılmıştır.",
+      "effective_dose_min": 4,
+      "effective_dose_max": 12,
+      "ul_dose": null,
+      "evidence_grade": "B",
+      "inci_name": "Astaksantin",
+      "common_name": "Astaksantin",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29642770/",
+          "title": "Astaxanthin: Sources, Extraction, Stability, Biological Activities and Its Commercial Applications—A Review"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "ingredient_group": "antioxidant",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

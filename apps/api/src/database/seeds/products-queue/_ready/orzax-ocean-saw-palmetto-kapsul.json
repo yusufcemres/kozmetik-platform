@@ -1,0 +1,68 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Saw Palmetto 350 mg 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Saw Palmetto, her kapsülde 350 mg cüce palmiye (Serenoa repens) ekstresi içerir. Vegan uyumlu Vcaps bitkisel kapsül formunda, 60 kapsüllük ambalajıyla 2 aylık kullanım sağlar.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "saw-palmetto-extract",
+        "amount_per_serving": 350,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-saw-palmetto-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Saw_Palmetto.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "saw-palmetto-extract",
+      "function_summary": "Saw palmetto (Serenoa repens) meyvesinden elde edilen standardize bitkisel ekstre; geleneksel olarak erkeklerde alt üriner sistem sağlığı ve prostat konforu desteği amacıyla kullanılır.",
+      "effective_dose_min": 160,
+      "effective_dose_max": 320,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "ul_dose_unit": "mg",
+      "evidence_grade": "B",
+      "inci_name": "Saw Palmetto Ekstresi (Serenoa repens)",
+      "common_name": "Saw Palmetto Ekstresi (Serenoa repens)",
+      "evidence_citations": [
+        {
+          "source": "NIH_ODS",
+          "url": "https://www.nccih.nih.gov/health/saw-palmetto",
+          "title": "Saw Palmetto - NCCIH"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23235581/",
+          "title": "Serenoa repens for benign prostatic hyperplasia - Cochrane Review"
+        }
+      ],
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

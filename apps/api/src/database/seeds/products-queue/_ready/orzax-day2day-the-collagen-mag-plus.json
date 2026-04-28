@@ -1,0 +1,41 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Day2Day The Collagen Mag Plus 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Day2Day The Collagen Mag Plus her saşede 9.700 mg Tip 1 ve 3 hidrolize kolajen peptidi ile 200 mg magnezyum sağlar. Çilek-karpuz aromalı saşe formu suda çözülür; şeker, glüten, laktoz ve koruyucu içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "hydrolyzed-collagen",
+        "amount_per_serving": 9700,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 53
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/day2day-the-collagen-mag-plus/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Web_D2D_Magplus_1.webp"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

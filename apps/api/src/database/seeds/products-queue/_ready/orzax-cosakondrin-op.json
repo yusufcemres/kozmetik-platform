@@ -1,0 +1,59 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Cosakondrin OP 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Cosakondrin OP, yumurta kabuğu kaynaklı 400 mg kalsiyum, 80 mg magnezyum, 5 mg çinko, 50 µg K2 vitamini (MK-7) ve 10 µg D3 vitamini içeren gıda takviyesidir. 30 tablet.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "calcium",
+        "amount_per_serving": 400,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "magnesium",
+        "amount_per_serving": 80,
+        "unit": "mg",
+        "daily_value_percentage": 21
+      },
+      {
+        "ingredient_slug": "zinc",
+        "amount_per_serving": 5,
+        "unit": "mg",
+        "daily_value_percentage": 50
+      },
+      {
+        "ingredient_slug": "vitamin-k2",
+        "amount_per_serving": 50,
+        "unit": "mcg",
+        "daily_value_percentage": 67
+      },
+      {
+        "ingredient_slug": "cholecalciferol",
+        "amount_per_serving": 10,
+        "unit": "mcg",
+        "daily_value_percentage": 200
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/cosakondrin-op/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Cosakondrin_Op.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

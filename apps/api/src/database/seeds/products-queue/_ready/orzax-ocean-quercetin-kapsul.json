@@ -1,0 +1,69 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Quercetin 100 mg Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Quercetin, her kapsülde patentli Quercefit® Phytosome® teknolojisiyle hazırlanmış 250 mg Quercefit®'ten gelen 100 mg kuersetin içerir. Sophora japonica çiçek tomurcuklarından elde edilen flavonoid içerikli bitkisel gıda takviyesidir.",
+    "net_content_value": 30,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 1,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "quercetin-phytosome",
+        "amount_per_serving": 100,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-quercetin-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Quercetin.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "quercetin-phytosome",
+      "category": "flavonoid",
+      "function_summary": "Kuersetin, Sophora japonica gibi bitkilerde bulunan doğal bir flavonoiddir; antioksidan özellikleri, histamin salınımını modüle etme ve kardiyovasküler destek üzerine araştırılmaktadır. Phytosome teknolojisi biyoyararlanımı artırır.",
+      "effective_dose_min": 100,
+      "effective_dose_max": 500,
+      "ul_dose": null,
+      "evidence_grade": "B",
+      "inci_name": "Kuersetin (Quercefit® Phytosome)",
+      "common_name": "Kuersetin (Quercefit® Phytosome)",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31454500/",
+          "title": "A food supplement containing lecithin-based delivery form of quercetin (Quercefit) improves skin microcirculation"
+        },
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27187333/",
+          "title": "Therapeutic Potential of Quercetin: New Insights and Perspectives for Human Health"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "ingredient_group": "other",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

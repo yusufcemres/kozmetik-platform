@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün açıklamasında DHA, EPA, D vitamini ve C vitamini içerdiği belirtilmiş ancak aktif madde başına dozaj (mg/µg/IU) bilgisi verilmemiş. Dozaj olmadan ingredients listesi ve DV% hesaplanamaz.",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün açıklamasında DHA, EPA, D vitamini ve C vitamini içerdiği belirtilmiş ancak aktif madde başına dozaj (mg/µg/IU) bilgisi verilmemiş. Dozaj olmadan ingredients listesi ve DV% hesaplanamaz."
+  }
+}

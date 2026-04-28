@@ -1,0 +1,138 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Day2Day The Collagen Mushroom Glow 30 Saşe",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Day2Day The Collagen Mushroom Glow her saşede 10.000 mg Tip 1, 2 ve 3 hidrolize kolajen peptidi, Reishi ve Shiitake mantar özütleri ile şizandra ekstresi sunar. Elma-çilek aromalı, şeker/glüten/laktoz içermez.",
+    "net_content_value": 30,
+    "net_content_unit": "sachet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "sachet",
+      "serving_size": 1,
+      "serving_unit": "sachet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "hydrolyzed-collagen",
+        "amount_per_serving": 10000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "reishi-extract",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "shiitake-extract",
+        "amount_per_serving": 200,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      },
+      {
+        "ingredient_slug": "schisandra-extract",
+        "amount_per_serving": 150,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/day2day-the-collagen-mushroom-glow/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/D2D_Collagen_Mushroom_Glow.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "reishi-extract",
+      "inci_name": "Ganoderma lucidum",
+      "common_name": "Reishi Mantarı Özütü",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Reishi (Ganoderma lucidum) mantarı beta-glukanlar ve triterpenler içerir; bağışıklık modülasyonu, adaptojenik etki ve antioksidan destek amacıyla geleneksel ve modern takviyelerde kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27045827/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 1500,
+      "effective_dose_max": 9000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "shiitake-extract",
+      "inci_name": "Lentinula edodes",
+      "common_name": "Shiitake Mantarı Özütü",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Shiitake (Lentinula edodes) mantarı lentinan ve beta-glukanlar açısından zengindir; bağışıklık desteği, antioksidan ve lipid metabolizması için fonksiyonel takviye olarak kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25866155/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    },
+    {
+      "ingredient_slug": "schisandra-extract",
+      "inci_name": "Schisandra chinensis",
+      "common_name": "Şizandra Ekstresi",
+      "domain_type": "supplement",
+      "ingredient_group": "herbal",
+      "function_summary": "Schisandra chinensis (şizandra) lignan içeren adaptojenik bir bitkidir; karaciğer fonksiyonu desteği, stres dayanıklılığı ve antioksidan etki için geleneksel ve modern takviyelerde kullanılır.",
+      "evidence_grade": "B",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18515024/",
+          "accessed": "2026-04-23"
+        }
+      ],
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "effective_dose_unit": "mg",
+      "ul_dose": null,
+      "safety_class": "neutral",
+      "food_sources": [
+        {
+          "food_name": "Bitkisel kaynak (ham materyal)",
+          "amount_per_100g": 100,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

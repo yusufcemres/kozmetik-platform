@@ -1,0 +1,35 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Selenyum 100 mcg 30 Tablet",
+    "brand_slug": "orzax",
+    "category_slug": "vitamin-mineral",
+    "short_description": "Ocean Selenyum, her tablette 100 mcg organik bağlı L-Selenometiyonin formunda selenyum sağlayan bir gıda takviyesidir. 30 tabletlik kutu, 11 yaş ve üzeri bireyler için günde 1 tablet kullanıma uygundur.",
+    "net_content_value": 30,
+    "net_content_unit": "tablet",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "tablet",
+      "serving_size": 1,
+      "serving_unit": "tablet",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "selenium",
+        "amount_per_serving": 100,
+        "unit": "mcg",
+        "daily_value_percentage": 182
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-selenyum-100-mcg-30-tablet/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Selenyum_30.png"
+  },
+  "ingredients_to_create": [],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

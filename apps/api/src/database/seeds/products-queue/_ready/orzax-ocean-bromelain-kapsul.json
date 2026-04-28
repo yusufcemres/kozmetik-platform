@@ -1,0 +1,63 @@
+{
+  "skip": false,
+  "product": {
+    "product_name": "Ocean Bromelain 1000 mg 60 Kapsül",
+    "brand_slug": "orzax",
+    "category_slug": "bitkisel-takviye",
+    "short_description": "Ocean Bromelain, her 2 kapsülde 1000 mg bromelain (2400 GDU/g aktivite) sağlar. Ananastan elde edilen proteolitik enzim karışımı içerir. Vcaps bitkisel kapsül teknolojisi ile üretilmiştir, glüten ve koruyucu içermez.",
+    "net_content_value": 60,
+    "net_content_unit": "capsule",
+    "target_audience": "adult",
+    "supplement_detail": {
+      "form": "capsule",
+      "serving_size": 2,
+      "serving_unit": "capsule",
+      "certification": "GMP"
+    },
+    "ingredients": [
+      {
+        "ingredient_slug": "bromelain",
+        "amount_per_serving": 1000,
+        "unit": "mg",
+        "daily_value_percentage": 0
+      }
+    ],
+    "affiliate_url": "https://www.orzax.com.tr/ocean-bromelain-kapsul/",
+    "affiliate_platform": "orzax",
+    "image_url": "https://www.orzax.com.tr/wp-content/uploads/2026/01/Ocean_Bromelain.png"
+  },
+  "ingredients_to_create": [
+    {
+      "ingredient_slug": "bromelain",
+      "ingredient_name_tr": "Bromelain",
+      "effective_dose_min": 500,
+      "effective_dose_max": 2000,
+      "ul_dose": null,
+      "evidence_grade": "B",
+      "function_summary": "Bromelain, ananas sapından elde edilen proteolitik enzim karışımıdır. Protein sindirimine yardımcı olur, ameliyat sonrası ödem ve inflamasyonun azaltılmasında ve sinüzit semptomlarının hafifletilmesinde kullanılır.",
+      "inci_name": "Bromelain",
+      "common_name": "Bromelain",
+      "evidence_citations": [
+        {
+          "source": "PubMed",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27621606/",
+          "title": "Properties and therapeutic application of bromelain: a review"
+        }
+      ],
+      "effective_dose_unit": "mg",
+      "domain_type": "supplement",
+      "food_sources": [
+        {
+          "food_name": "Takviye formu (diyet genelinde düşük)",
+          "amount_per_100g": 0,
+          "unit": "mg"
+        }
+      ]
+    }
+  ],
+  "brand_to_create": {
+    "brand_slug": "orzax",
+    "brand_name": "Orzax",
+    "country": "TR"
+  }
+}

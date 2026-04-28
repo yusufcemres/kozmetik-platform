@@ -1,0 +1,7 @@
+{
+  "reason": "claude-skip: Ürün etiketinde L-Glutatyon miktarı (mg cinsinden dozaj) belirtilmemiş. Ayrıca L-Glutatyon DB'deki hazır ingredient listesinde yok ve ingredients_to_create için gerekli sayısal dozaj bilgisi ham veride mevcut değil (effective_dose_min/max belirlenemiyor).",
+  "doc": {
+    "skip": true,
+    "reason": "Ürün etiketinde L-Glutatyon miktarı (mg cinsinden dozaj) belirtilmemiş. Ayrıca L-Glutatyon DB'deki hazır ingredient listesinde yok ve ingredients_to_create için gerekli sayısal dozaj bilgisi ham veride mevcut değil (effective_dose_min/max belirlenemiyor)."
+  }
+}
