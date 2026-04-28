@@ -1,0 +1,82 @@
+{
+  "_source_note": "The Ordinary Wave 3 — 2 yeni urun (theordinary.com 2026-04-27)",
+  "_source_url": "https://theordinary.com",
+  "products": [
+    {
+      "product_name": "The Ordinary Multi-Antioxidant Radiance Serum 30 ml",
+      "product_slug": "the-ordinary-multi-antioxidant-radiance-serum",
+      "brand_slug": "the-ordinary",
+      "domain_type": "cosmetic",
+      "category_slug": "serum-ampul",
+      "short_description": "8 antioksidan teknolojisini birleştiren günlük serum. Donukluğu hedefler, çevresel hasara karşı koruma sağlar, parlaklığı artırır.",
+      "net_content_value": 30,
+      "net_content_unit": "ml",
+      "target_area": "face",
+      "product_type_label": "Multi-Antioksidan Aydınlatıcı Serum",
+      "inci": [
+        {"display_name": "Aqua/Water/Eau", "slug": "water"},
+        {"display_name": "Propanediol", "slug": "propanediol"},
+        {"display_name": "Ascorbyl Glucoside", "slug": null, "highlighted": true},
+        {"display_name": "Ergothioneine", "slug": null, "highlighted": true},
+        {"display_name": "Epigallocatechin Gallatyl Glucoside (EGCG)", "slug": null, "highlighted": true},
+        {"display_name": "Acetyl Tetrapeptide-2", "slug": null},
+        {"display_name": "Heptapeptide-6", "slug": null},
+        {"display_name": "Tocotrienols", "slug": null, "highlighted": true},
+        {"display_name": "Tremella Fuciformis Sporocarp Extract", "slug": null},
+        {"display_name": "Sphingomonas Ferment Extract", "slug": null},
+        {"display_name": "Panax Ginseng Root Extract", "slug": null},
+        {"display_name": "Bixa Orellana Seed Extract", "slug": null},
+        {"display_name": "Glycerin", "slug": "glycerin"},
+        {"display_name": "Isoceteth-20", "slug": null},
+        {"display_name": "Citric Acid", "slug": null},
+        {"display_name": "Sodium Citrate", "slug": null},
+        {"display_name": "Sodium Hydroxide", "slug": null},
+        {"display_name": "Caprylyl Glycol", "slug": null},
+        {"display_name": "Ethylhexylglycerin", "slug": null},
+        {"display_name": "Phenoxyethanol", "slug": "phenoxyethanol"},
+        {"display_name": "Chlorphenesin", "slug": null}
+      ],
+      "usage": "Sabah ve akşam yüze pamuk veya parmaklarınızla uygulayın. Göz çevresinden ve göz temasından kaçının. Göze değerse hemen suyla yıkayın.",
+      "warning": "Göz çevresinden uzak tutun. Çocukların ulaşamayacağı yerde saklayın.",
+      "claims": [
+        "Donukluğu hedefler — antioksidan destek",
+        "Çevresel hasarla mücadele",
+        "Donuk cildi belirgin biçimde aydınlatır",
+        "Parlaklığı arttırır",
+        "Görünür koyu lekeleri açar",
+        "Cilt dokusunu pürüzsüzleştirir",
+        "Bariyer güçlendirir",
+        "Uzun süreli nem"
+      ],
+      "image_url": "https://theordinary.com/dw/image/v2/BFKJ_PRD/on/demandware.static/-/Sites-deciem-master/default/dwade40aeb/Images/products/The%20Ordinary/ORD-Product-MARS-Packshot.png",
+      "source_url": "https://theordinary.com/en-ca/multi-antioxidant-radiance-serum-100716.html",
+      "external_source_name": "The Ordinary (Resmi)"
+    },
+    {
+      "product_name": "The Ordinary 100% L-Ascorbic Acid Powder 20 g",
+      "product_slug": "the-ordinary-100-l-ascorbic-acid-powder",
+      "brand_slug": "the-ordinary",
+      "domain_type": "cosmetic",
+      "category_slug": "serum-ampul",
+      "short_description": "Saf toz formda direkt C vitamini. Mevcut bakım ürünlerine eklenerek aydınlatma ve antioksidan etki sağlar. Cilt tonu eşitsizliği ve yaşlanma belirtilerine yönelik.",
+      "net_content_value": 20,
+      "net_content_unit": "g",
+      "target_area": "face",
+      "product_type_label": "Saf C Vitamini Tozu",
+      "inci": [
+        {"display_name": "Ascorbic Acid", "slug": "ascorbic-acid", "highlighted": true}
+      ],
+      "usage": "Avucunuzda diğer bakım ürünleriyle az miktarda karıştırın. Günde 1 kez, tercihen akşam, yüze uygulayın. Göz çevresinden kaçının. Gündüz mutlaka güneş kremi kullanın. Yanma hissi normaldir; çok güçlü gelirse miktarı azaltın.",
+      "warning": "Tahriş olursa durulayın ve kullanımı bırakın. Yalnızca sağlam cilde uygulayın. Patch testi önerilir. Bakır Peptidler, Direkt Asitler, Direkt C Vitamini, EUK, Niasinamid, Peptidler, Retinoidler veya GF 15% Solution ile birlikte kullanmayın.",
+      "claims": [
+        "Cildi aydınlatır",
+        "Cilt tonu eşitsizliğini düzeltir",
+        "Yaşlanma belirtilerini hedefler",
+        "Çevresel stresörlere karşı korur"
+      ],
+      "image_url": "https://theordinary.com/dw/image/v2/BFKJ_PRD/on/demandware.static/-/Sites-deciem-master/default/dwc9528190/Images/products/The%20Ordinary/rdn-100pct-l-ascorbic-acid-powder-20g.png?sw=800&sh=800&sm=fit",
+      "source_url": "https://theordinary.com/en-ca/100-l-ascorbic-acid-powder-vitamin-c-100390.html",
+      "external_source_name": "The Ordinary (Resmi)"
+    }
+  ]
+}

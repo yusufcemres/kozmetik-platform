@@ -5,14 +5,14 @@
 /* ========== REVELA THEME — CSS Variables ========== */
 
 :root {
-  /* Primary */
-  --color-primary: #1a1a1a;
-  --color-primary-dim: #111111;
-  --color-primary-container: #e5e2e1;
-  --color-primary-fixed: #e5e2e1;
-  --color-primary-fixed-dim: #d7d4d3;
+  /* Primary — Deep Botanical Green (REVELA signature: bitkisel + klinik kimlik) */
+  --color-primary: #1F4E3D;
+  --color-primary-dim: #163A2D;
+  --color-primary-container: #d5e6dc;
+  --color-primary-fixed: #d5e6dc;
+  --color-primary-fixed-dim: #b8d3c4;
   --color-on-primary: #faf7f6;
-  --color-on-primary-container: #525151;
+  --color-on-primary-container: #2a4a3a;
 
   /* Secondary */
   --color-secondary: #605f5e;
@@ -78,14 +78,14 @@
 /* ========== DARK THEME ========== */
 
 .dark {
-  /* Primary — inverted: light on dark */
-  --color-primary: #e8e4e3;
-  --color-primary-dim: #d4d0cf;
-  --color-primary-container: #3a3838;
-  --color-primary-fixed: #e5e2e1;
-  --color-primary-fixed-dim: #d7d4d3;
-  --color-on-primary: #1a1a1a;
-  --color-on-primary-container: #c8c5c4;
+  /* Primary — Deep Botanical Green inverted (light sage on dark) */
+  --color-primary: #9DC4AF;
+  --color-primary-dim: #82AB97;
+  --color-primary-container: #2a4a3a;
+  --color-primary-fixed: #d5e6dc;
+  --color-primary-fixed-dim: #b8d3c4;
+  --color-on-primary: #0F2418;
+  --color-on-primary-container: #c8d8cf;
 
   /* Secondary */
   --color-secondary: #c8c6c5;
