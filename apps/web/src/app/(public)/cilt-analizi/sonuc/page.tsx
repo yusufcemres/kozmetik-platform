@@ -977,31 +977,35 @@ function ResultsContent() {
           const ageNum = ageRange ? parseInt(ageRange.split('-')[0]) || 0 : 0;
           const isMature = ageNum >= 35;
 
-          type DayRow = { day: string; icon: string; morning: string; evening: string; tag: string; tagColor: string };
+          type DayRow = { day: string; icon: string; morning: string; evening: string; tag: string; tagColor: string; keywords: string[] };
           const week: DayRow[] = [
             {
               day: 'Pazartesi', icon: 'bolt',
               morning: 'Temel rutin + SPF',
               evening: isSensitive ? 'Bakuchiol serum' : (isMature ? 'Retinol serum' : 'AHA/BHA serum'),
               tag: 'Aktif', tagColor: 'bg-primary text-on-primary',
+              keywords: isSensitive ? ['bakuchiol'] : (isMature ? ['retinol', 'retinal'] : ['aha', 'bha', 'salisil', 'glikolik', 'laktik', 'mandelik']),
             },
             {
               day: 'Salı', icon: 'spa',
               morning: 'Temel rutin + SPF',
               evening: 'Sadece nemlendirici',
               tag: 'Dinlenme', tagColor: 'bg-surface-container text-on-surface-variant',
+              keywords: ['nemlendirici', 'moisturizer', 'cream', 'krem', 'cera', 'panthenol'],
             },
             {
               day: 'Çarşamba', icon: 'balance',
               morning: 'Temel rutin + SPF',
               evening: isOily ? 'Niacinamide (yağ kontrolü)' : 'Niacinamide serum',
               tag: 'Orta', tagColor: 'bg-score-medium/15 text-score-medium',
+              keywords: ['niacinamide', 'niasinamid'],
             },
             {
               day: 'Perşembe', icon: 'water_drop',
               morning: 'Temel rutin + SPF',
               evening: 'Hyaluronik asit + nemlendirici',
               tag: 'Dinlenme', tagColor: 'bg-surface-container text-on-surface-variant',
+              keywords: ['hyaluronic', 'hyalurronik', 'hyaluronik', 'ha serum', 'hidrat'],
             },
             {
               day: 'Cuma', icon: 'auto_awesome',
@@ -1009,20 +1013,37 @@ function ResultsContent() {
               evening: isSensitive ? 'Sadece nemlendirici' : (isMature ? 'Retinol serum' : 'AHA/BHA serum'),
               tag: isSensitive ? 'Dinlenme' : 'Aktif',
               tagColor: isSensitive ? 'bg-surface-container text-on-surface-variant' : 'bg-primary text-on-primary',
+              keywords: isSensitive ? ['nemlendirici', 'cream', 'krem', 'cera'] : (isMature ? ['retinol', 'retinal'] : ['aha', 'bha', 'salisil', 'glikolik']),
             },
             {
               day: 'Cumartesi', icon: 'self_improvement',
               morning: 'Temel rutin + SPF',
               evening: isSensitive ? 'Enzim maske + nemlendirici' : (isOily ? 'BHA peeling + kil maskesi' : 'AHA peeling + nem maskesi'),
               tag: 'Derin Bakım', tagColor: 'bg-score-high/15 text-score-high',
+              keywords: isSensitive ? ['enzim', 'enzyme', 'maske', 'mask'] : (isOily ? ['bha', 'salisil', 'kil', 'clay', 'peeling'] : ['aha', 'glikolik', 'laktik', 'peeling', 'mask']),
             },
             {
               day: 'Pazar', icon: 'hotel',
               morning: 'Temel rutin + SPF',
               evening: isDry ? 'Bakım yağı + sleeping mask' : 'Peptit serum + yoğun nemlendirici',
               tag: 'Onarım', tagColor: 'bg-score-high/15 text-score-high',
+              keywords: isDry ? ['oil', 'yağ', 'sleeping', 'mask', 'maske', 'gece'] : ['peptit', 'peptide', 'matrixyl', 'argireline'],
             },
           ];
+
+          // Keyword-based ürün match — daily plan'daki category match'le aynı products[] array'i kullanır.
+          const findProductForKeywords = (keywords: string[]) => {
+            return products.find((ps) => {
+              const haystack = [
+                ps.product?.product_name,
+                ps.product?.brand?.brand_name,
+                ps.product?.category?.category_name,
+                ps.product?.product_type_label,
+                ps.product?.short_description,
+              ].filter(Boolean).join(' ').toLowerCase();
+              return keywords.some((kw) => haystack.includes(kw.toLowerCase()));
+            });
+          };
 
           return (
             <>
@@ -1031,21 +1052,53 @@ function ResultsContent() {
               </p>
 
               <div className="space-y-2">
-                {week.map((d) => (
-                  <div key={d.day} className="curator-card p-4 flex items-center gap-3">
-                    <span className="material-icon text-primary text-lg" aria-hidden="true">{d.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-sm font-bold text-on-surface">{d.day}</span>
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.tagColor}`}>{d.tag}</span>
+                {week.map((d) => {
+                  const matched = findProductForKeywords(d.keywords);
+                  return (
+                    <div key={d.day} className="curator-card p-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 md:gap-4 items-center">
+                      {/* Sol: Rutin + uygulanışı */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="material-icon text-primary text-lg shrink-0" aria-hidden="true">{d.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="text-sm font-bold text-on-surface">{d.day}</span>
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${d.tagColor}`}>{d.tag}</span>
+                          </div>
+                          <p className="text-xs text-on-surface-variant flex items-center gap-1">
+                            <span className="material-icon text-[12px]" aria-hidden="true">dark_mode</span>
+                            {d.evening}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-xs text-on-surface-variant flex items-center gap-1">
-                        <span className="material-icon text-[12px]" aria-hidden="true">dark_mode</span>
-                        {d.evening}
-                      </p>
+
+                      {/* Sağ: Eşleşen ürün */}
+                      {matched?.product ? (
+                        <Link
+                          href={`/urunler/${matched.product.product_slug}`}
+                          className="group flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-sm px-3 py-2 transition-colors min-w-0 md:max-w-[280px]"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] uppercase tracking-wider text-outline font-semibold mb-0.5">Önerilen ürün</p>
+                            <p className="text-xs text-primary font-medium truncate group-hover:underline">
+                              {matched.product.brand?.brand_name} {matched.product.product_name}
+                            </p>
+                          </div>
+                          <span
+                            className="material-icon text-outline-variant group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0"
+                            style={{ fontSize: '16px' }}
+                            aria-hidden="true"
+                          >
+                            arrow_forward
+                          </span>
+                        </Link>
+                      ) : (
+                        <span className="text-[10px] text-outline italic px-3 py-2 hidden md:inline">
+                          Eşleşen ürün yok
+                        </span>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="mt-4 bg-primary/5 border border-primary/10 rounded-sm p-3">
