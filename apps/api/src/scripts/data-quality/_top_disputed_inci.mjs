@@ -1,0 +1,12 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT i.inci_name, i.ingredient_slug, i.endocrine_flag, i.eu_banned, i.cmr_class, i.safety_class FROM ingredients i WHERE (i.endocrine_flag=true OR i.eu_banned=true OR i.cmr_class IS NOT NULL OR i.safety_class='harmful') AND (i.safety_narrative IS NULL OR length(i.safety_narrative) < 50) ORDER BY i.ingredient_slug LIMIT 50`);
+console.log(`Disputed without narrative: ${r.rowCount}`);
+for (const x of r.rows) console.log(`  ${x.ingredient_slug.padEnd(40)} | endo=${x.endocrine_flag} | eu_ban=${x.eu_banned} | cmr=${x.cmr_class} | safety=${x.safety_class}`);
+await c.end();
