@@ -125,8 +125,8 @@ cef2769  feat(content): Faz 1.5b — top 10 INCI detailed_description
 | Need interaction_warnings | 0/24 | **24/24 (%100)** | +24 |
 | Need confused_with | 0/24 | **24/24 (%100)** | +24 |
 | Articles published | 39 | **45** | +6 |
-| Ingredient common_name | 193/5100 (%4) | **277/5100 (%5.4)** | +84 |
-| Ingredient detailed_description | 0/5100 (%0) | **10/5100 (%0.2)** | +10 (top 10 popüler) |
+| Ingredient common_name | 193/5100 (%4) | **308/5100 (%6)** | +115 |
+| Ingredient detailed_description | 0/5100 (%0) | **20/5100 (%0.4)** | +20 (top 20 popüler) |
 | Platform desteği | 6 logo (n11 broken) | **8 logo (n11 + pttavm)** | +2 |
 
 ---
