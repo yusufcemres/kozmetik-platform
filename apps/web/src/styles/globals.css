@@ -5,14 +5,14 @@
 /* ========== REVELA THEME — CSS Variables ========== */
 
 :root {
-  /* Primary — Deep Botanical Green (REVELA signature: bitkisel + klinik kimlik) */
-  --color-primary: #1F4E3D;
-  --color-primary-dim: #163A2D;
-  --color-primary-container: #d5e6dc;
-  --color-primary-fixed: #d5e6dc;
-  --color-primary-fixed-dim: #b8d3c4;
-  --color-on-primary: #faf7f6;
-  --color-on-primary-container: #2a4a3a;
+  /* Primary — Wasabi Yellow (REVELA signature: bold + natural + distinctive) */
+  --color-primary: #A4B824;
+  --color-primary-dim: #889B1B;
+  --color-primary-container: #ecf2c8;
+  --color-primary-fixed: #ecf2c8;
+  --color-primary-fixed-dim: #d4dfa3;
+  --color-on-primary: #1a1a0a;
+  --color-on-primary-container: #4a5510;
 
   /* Secondary */
   --color-secondary: #605f5e;
@@ -78,14 +78,14 @@
 /* ========== DARK THEME ========== */
 
 .dark {
-  /* Primary — Deep Botanical Green inverted (light sage on dark) */
-  --color-primary: #9DC4AF;
-  --color-primary-dim: #82AB97;
-  --color-primary-container: #2a4a3a;
-  --color-primary-fixed: #d5e6dc;
-  --color-primary-fixed-dim: #b8d3c4;
-  --color-on-primary: #0F2418;
-  --color-on-primary-container: #c8d8cf;
+  /* Primary — Wasabi Yellow inverted (warmer wasabi on dark) */
+  --color-primary: #C4D44A;
+  --color-primary-dim: #B0C232;
+  --color-primary-container: #4a5510;
+  --color-primary-fixed: #ecf2c8;
+  --color-primary-fixed-dim: #d4dfa3;
+  --color-on-primary: #1a1a0a;
+  --color-on-primary-container: #d4dfa3;
 
   /* Secondary */
   --color-secondary: #c8c6c5;
