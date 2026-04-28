@@ -119,7 +119,7 @@ export default function HeroFeatureShowcase({ stats }: Props) {
 
           {/* Slogan: TARA → ARA → ANALİZ ET — animated word-morph */}
           <div className="flex items-center justify-center mt-5 sm:mt-7">
-            <span className="text-base sm:text-lg lg:text-xl font-medium text-on-surface-variant tracking-tight">
+            <span className="text-base sm:text-lg lg:text-xl font-extrabold tracking-tight uppercase text-on-surface">
               Bilim destekli
             </span>
             <span className="relative flex justify-start overflow-hidden h-9 sm:h-10 lg:h-12 w-[180px] sm:w-[230px] lg:w-[280px] ml-2 sm:ml-3">
