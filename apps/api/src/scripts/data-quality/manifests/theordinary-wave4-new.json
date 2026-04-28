@@ -1,0 +1,33 @@
+{
+  "_source_note": "The Ordinary Wave 4 — EUK 134 antioxidant serum (theordinary.com 2026-04-27)",
+  "_source_url": "https://theordinary.com",
+  "products": [
+    {
+      "product_name": "The Ordinary EUK 134 0.1% Antioxidant Serum 30 ml",
+      "product_slug": "the-ordinary-euk-134-0-1",
+      "brand_slug": "the-ordinary",
+      "domain_type": "cosmetic",
+      "category_slug": "serum-ampul",
+      "short_description": "Yağ benzeri antioksidan serum. Cildin doğal olarak ürettiği güçlü antioksidanları taklit eden öz-yenilenen molekül (EUK 134) ile çalışır. Cilt tonu eşitliği ve parlaklığı destekler.",
+      "net_content_value": 30,
+      "net_content_unit": "ml",
+      "target_area": "face",
+      "product_type_label": "Antioksidan Serum",
+      "inci": [
+        {"display_name": "Propanediol", "slug": "propanediol"},
+        {"display_name": "Ethylbisiminomethylguaiacol Manganese Chloride (EUK 134)", "slug": null, "highlighted": true}
+      ],
+      "usage": "Sabah ve akşam yüze birkaç damla uygulayın. Antioksidan kapasitesini arttırmak için diğer ürünlerle karıştırılabilir. Yalnızca sağlam cilde uygulayın. Patch testi önerilir.",
+      "warning": "Tahriş olursa durulayın ve kullanımı bırakın. Çocukların ulaşamayacağı yerde saklayın.",
+      "claims": [
+        "Donukluğu hedefler",
+        "Antioksidan destek",
+        "Hassas dahil tüm cilt tipleri için uygun",
+        "Çevresel hasara karşı cilt savunmasını destekler"
+      ],
+      "image_url": "https://theordinary.com/dw/image/v2/BFKJ_PRD/on/demandware.static/-/Sites-deciem-master/default/dw140fcd8e/Images/products/The%20Ordinary/rdn-euk-134-0-1pct-30ml.png",
+      "source_url": "https://theordinary.com/en-ca/euk-134-0-1pct-100442.html",
+      "external_source_name": "The Ordinary (Resmi)"
+    }
+  ]
+}

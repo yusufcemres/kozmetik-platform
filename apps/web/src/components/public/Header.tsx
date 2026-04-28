@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import ThemeToggle from '@/components/public/ThemeToggle';
@@ -133,8 +134,15 @@ export default function Header() {
     <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="flex justify-between items-center w-full px-3 sm:px-6 lg:px-12 py-3 sm:py-4 max-w-full">
         {/* Logo */}
-        <Link href="/" className="text-3xl md:text-4xl font-extrabold tracking-tighter text-on-surface leading-none">
-          REVELA
+        <Link href="/" className="flex items-center leading-none dark:invert" aria-label="REVELA">
+          <Image
+            src="/revela-logo.png"
+            alt="REVELA"
+            width={156}
+            height={48}
+            priority
+            className="h-9 sm:h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop nav */}

@@ -5,14 +5,14 @@
 /* ========== REVELA THEME — CSS Variables ========== */
 
 :root {
-  /* Primary — Wasabi Yellow (REVELA signature: bold + natural + distinctive) */
-  --color-primary: #A4B824;
-  --color-primary-dim: #889B1B;
-  --color-primary-container: #ecf2c8;
-  --color-primary-fixed: #ecf2c8;
-  --color-primary-fixed-dim: #d4dfa3;
-  --color-on-primary: #1a1a0a;
-  --color-on-primary-container: #4a5510;
+  /* Primary — Ink Blue (REVELA logo ile senkron: scientific + medical + trustworthy) */
+  --color-primary: #1B2D45;
+  --color-primary-dim: #142036;
+  --color-primary-container: #d6dde9;
+  --color-primary-fixed: #d6dde9;
+  --color-primary-fixed-dim: #b8c4d6;
+  --color-on-primary: #faf7f6;
+  --color-on-primary-container: #2a3d55;
 
   /* Secondary */
   --color-secondary: #605f5e;
@@ -78,14 +78,14 @@
 /* ========== DARK THEME ========== */
 
 .dark {
-  /* Primary — Wasabi Yellow inverted (warmer wasabi on dark) */
-  --color-primary: #C4D44A;
-  --color-primary-dim: #B0C232;
-  --color-primary-container: #4a5510;
-  --color-primary-fixed: #ecf2c8;
-  --color-primary-fixed-dim: #d4dfa3;
-  --color-on-primary: #1a1a0a;
-  --color-on-primary-container: #d4dfa3;
+  /* Primary — Ink Blue inverted (light blue on dark) */
+  --color-primary: #A5B8D0;
+  --color-primary-dim: #8AA0BB;
+  --color-primary-container: #2a3d55;
+  --color-primary-fixed: #d6dde9;
+  --color-primary-fixed-dim: #b8c4d6;
+  --color-on-primary: #0E1722;
+  --color-on-primary-container: #c8d4e2;
 
   /* Secondary */
   --color-secondary: #c8c6c5;
