@@ -25,16 +25,26 @@ const platformLabels: Record<string, string> = {
   trendyol: 'Trendyol',
   hepsiburada: 'Hepsiburada',
   amazon_tr: 'Amazon TR',
+  n11: 'n11',
+  pttavm: 'PttAVM',
   gratis: 'Gratis',
   dermoeczanem: 'Dermoeczanem',
+  rossmann: 'Rossmann',
+  watsons: 'Watsons',
+  sekate: 'Sekate',
 };
 
 const platformColors: Record<string, string> = {
   trendyol: 'bg-orange-100 text-orange-700',
   hepsiburada: 'bg-blue-100 text-blue-700',
   amazon_tr: 'bg-yellow-100 text-yellow-700',
+  n11: 'bg-purple-100 text-purple-700',
+  pttavm: 'bg-blue-100 text-blue-800',
   gratis: 'bg-pink-100 text-pink-700',
   dermoeczanem: 'bg-green-100 text-green-700',
+  rossmann: 'bg-red-100 text-red-700',
+  watsons: 'bg-teal-100 text-teal-700',
+  sekate: 'bg-slate-100 text-slate-700',
 };
 
 const columns = [

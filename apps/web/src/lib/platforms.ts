@@ -37,11 +37,18 @@ export const PLATFORM_INFO: Record<string, PlatformInfo> = {
     textColor: '#FF9900',
   },
   n11: {
-    label: 'N11',
+    label: 'n11',
     logo: '/logos/n11.svg',
-    color: '#F5A623',
-    colorHover: '#D8921C',
-    textColor: '#FFFFFF',
+    color: '#5C2D91',
+    colorHover: '#4A2475',
+    textColor: '#FBC706',
+  },
+  pttavm: {
+    label: 'PttAVM',
+    logo: '/logos/pttavm.svg',
+    color: '#003F88',
+    colorHover: '#002F66',
+    textColor: '#FFC000',
   },
   dermoeczanem: {
     label: 'Dermoeczanem',
