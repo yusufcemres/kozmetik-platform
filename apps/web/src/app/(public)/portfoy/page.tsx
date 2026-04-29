@@ -31,7 +31,7 @@ const PRODUCTS = [
       'ARA: 1795 ürün arası autocomplete (%100 görselli)',
       'ANALİZ ET: 7-boyut REVELA Skoru (CIR/SCCS uyumlu)',
       'Profil: cilt tipi + ihtiyaç + hassasiyet → kişisel uyumluluk',
-      '65 rehber makale, 24 ihtiyaç FAQ + skin type matrisi',
+      '85 rehber makale, 24 ihtiyaç FAQ + skin type matrisi',
     ],
     differentiator: [
       'Bağımsız + şeffaf (marka iş ortaklığı yok)',

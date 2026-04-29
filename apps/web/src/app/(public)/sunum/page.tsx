@@ -487,7 +487,7 @@ export default function SunumLandingPage() {
             REVELA ile içerik artık şifre değil
           </h2>
           <p className="text-base text-on-surface-variant leading-relaxed mb-8">
-            1568 kozmetik · 227 takviye · 5.1K bileşen · 24 ihtiyaç matrisi — hepsi canlı, hepsi referanslı.
+            1568 kozmetik · 227 takviye · 5.1K bileşen · 85 rehber makale · 24 ihtiyaç matrisi — hepsi canlı, hepsi referanslı.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
