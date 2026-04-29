@@ -1,8 +1,33 @@
 # 🌅 REVELA Gece Vardiyası — 2026-04-29 Sabah Raporu
 
 **Vardiya başlangıç:** 2026-04-28 23:00
-**Vardiya bitiş:** ~10:00 (devam ediyor)
-**Branch:** master (13+ commit push edildi)
+**Vardiya bitiş:** 2026-04-29 sabah (toplam ~12 saat)
+**Branch:** master (**19 commit** push edildi)
+
+## 🆕 Sabah ek fazlar (uyandıktan sonra)
+
+### Faz 6 — 46 yeni takviye eklendi (Sekate kataloğu)
+- Sekate sitemap'inde DB'de olmayan **46 yeni aday** tespit edildi
+- Her biri için title + summary + image scrape + brand/category resolve
+- DB takviye sayısı: **283 → 329 (+46)**
+
+### Faz 6b — 45 Sekate affiliate link
+- Her yeni ürüne `affiliate_links` (platform='sekate') + price snapshot eklendi
+- Form/Miktar attribute table parse edildi → `products.form_type`
+
+### Faz 6c — 45 ürün published
+- Filter: image=sekate + affiliate=sekate olan ürünler
+- DB published takviye: **233 → 278 (+45)**
+- INCI list eksik (sonradan eklenir, score recalc otomatik tetiklenir)
+
+### Faz 7 — CeraVe 9 eksik görsel
+- ❌ CeraVe TR sitesinde Baby/Eczema/BP ürünleri yok (lokal envanter farklı)
+- Manuel ekleme TODO
+
+### Engelli kaynaklar
+- ❌ Sonkullan, Trendyol, Hepsiburada, N11 → tümü Cloudflare-blocked
+- ✅ Sekate, Voonka, Nutraxin, CeraVe TR → çalışıyor (sınırlı)
+
 
 ---
 
