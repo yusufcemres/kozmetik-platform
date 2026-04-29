@@ -178,6 +178,10 @@ export default function SunumLandingPage() {
               <span className="material-icon text-score-high text-[16px]" aria-hidden="true">verified</span>
               Kullanılan <span className="font-semibold text-on-surface">437 INCI bileşeninin tamamında</span> Türkçe karşılık — <span className="font-semibold text-score-high">%100 kapsama</span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="material-icon text-score-high text-[16px]" aria-hidden="true">science</span>
+              <span className="font-semibold text-on-surface">313 INCI bileşeninde</span> bilimsel kanıt derecelendirmesi (A-E) + literatür atıfı — <span className="font-semibold text-score-high">%72 kapsama</span>
+            </div>
           </div>
         </div>
       </section>
