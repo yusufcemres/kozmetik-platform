@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useToast } from './Toast';
 
 const STORAGE_KEY = 'revela_consent';
 
@@ -26,6 +27,7 @@ function updateConsent(granted: boolean) {
 
 export default function CookieConsent() {
   const [show, setShow] = useState(false);
+  const { success, info } = useToast();
 
   useEffect(() => {
     try {
@@ -40,11 +42,13 @@ export default function CookieConsent() {
   const accept = () => {
     updateConsent(true);
     setShow(false);
+    success('Çerez tercihi kaydedildi — analitik aktif.');
   };
 
   const reject = () => {
     updateConsent(false);
     setShow(false);
+    info('Çerez tercihi kaydedildi — analitik kapalı.');
   };
 
   if (!show) return null;
