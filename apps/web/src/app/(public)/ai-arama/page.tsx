@@ -48,27 +48,84 @@ export default function AiSearchPage() {
   return (
     <article className="curator-section max-w-[1400px] mx-auto">
       <header className="mb-6">
-        <h1 className="text-2xl md:text-3xl headline-tight text-on-surface mb-1">AI Arama</h1>
-        <p className="text-sm text-on-surface-variant">
-          Doğal dilde sor: "rozam var ne iyi gelir", "hamilelikte güvenli içerikler", "akne için başlangıç".
+        <div className="flex items-center gap-2 mb-2">
+          <span className="material-icon text-primary text-[26px]" aria-hidden="true">auto_awesome</span>
+          <h1 className="text-2xl md:text-3xl headline-tight text-on-surface">AI Arama</h1>
+        </div>
+        <p className="text-sm text-on-surface-variant max-w-2xl">
+          Doğal dilde sor — REVELA seni doğru ürün, içerik veya rehbere yönlendirir.
         </p>
       </header>
 
-      <form onSubmit={submit} className="flex gap-2 mb-6">
+      <form onSubmit={submit} className="flex flex-col sm:flex-row gap-2 mb-3">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ne arıyorsun?"
+          placeholder="Örn: rozam var ne iyi gelir?"
           className="flex-1 rounded-sm border border-outline-variant/30 bg-surface-container-low px-4 py-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all"
         />
         <button
           type="submit"
           disabled={loading || !query.trim()}
-          className="curator-btn-primary text-[10px] px-6 py-3 disabled:opacity-50"
+          className="curator-btn-primary text-[10px] px-6 py-3 disabled:opacity-50 inline-flex items-center justify-center gap-2"
         >
-          {loading ? '...' : 'Ara'}
+          {loading ? (
+            <>
+              <span className="material-icon text-[14px] animate-spin" aria-hidden="true">progress_activity</span>
+              Aranıyor
+            </>
+          ) : (
+            <>
+              <span className="material-icon text-[14px]" aria-hidden="true">search</span>
+              Ara
+            </>
+          )}
         </button>
       </form>
+
+      {/* Quick examples — boş input için ilham */}
+      {!result && !loading && !err && (
+        <div className="mb-6">
+          <p className="label-caps text-outline mb-2 text-[10px]">Örnek sorular</p>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              'rozam var ne iyi gelir',
+              'hamilelikte güvenli içerikler',
+              'akne için başlangıç rutini',
+              'kuru cilt için nemlendirici',
+              'göz altı morluğu için',
+              'C vitamini en iyi marka',
+              'hassas cilt güneş kremi',
+              '40+ yaş için takviye',
+            ].map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => { setQuery(q); }}
+                className="text-xs bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-full px-3 py-1.5 text-on-surface transition-colors"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="space-y-3 animate-pulse">
+          <div className="curator-card p-4">
+            <div className="h-4 bg-surface-container rounded w-1/3 mb-2" />
+            <div className="h-3 bg-surface-container rounded w-2/3 mb-1" />
+            <div className="h-3 bg-surface-container rounded w-1/2" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="curator-card p-2 h-12" />
+            ))}
+          </div>
+        </div>
+      )}
 
       {err && (
         <div className="mb-4 bg-error/5 border border-error/20 rounded-sm p-3 flex items-start gap-2">
