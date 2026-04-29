@@ -4,6 +4,64 @@
 **Vardiya bitiş:** 2026-04-29 sabah (toplam ~12 saat)
 **Branch:** master (**19 commit** push edildi)
 
+## 🌃 GECE VARDİYASI 2 (29 Nisan akşam → 30 Nisan sabah)
+
+**~7 fazlı plan, ~7 saat sürdü.**
+
+### 🆕 Yeni Sayfalar
+- **`/portfoy`** — SoloLabs 4 ürün pitch sayfası (REVELA + ChemDoc AI + ChefMate + Redi)
+  - Hero + 4 ürün kartı (metrics + features + differentiator + business model)
+  - Roadmap 3 çeyrek (Q2/Q3/Q4)
+  - Kurucu hakkında + iletişim
+  - Organization JSON-LD schema.org
+  - **noindex** — gizli, sadece direkt URL
+  - **ARDVENTURE TEKMER 4 Mayıs sunumu için**
+
+### 🎨 UI İyileştirme
+- **AI Arama** (`/ai-arama`) — empty state + skeleton + 8 örnek sorgu chip
+  - "rozam var ne iyi gelir" gibi natural language örnekleri tek tık ile
+  - Loading state spinner + skeleton card animasyonu
+  - Mobile responsive (flex-col sm:flex-row)
+
+### 🧹 Veri Temizliği (kritik!)
+- **80 hayalet takviye arşivlendi** (AI tarafından uydurulmuş, gerçek üretici kataloğunda yok)
+  - 30 Orzax + 24 Naturals Garden + 17 Voonka + 9 Nutraxin
+- **36 broken kozmetik arşivlendi** (URL boş veya 403/404)
+  - 9 CeraVe baby/eczema/BP + 27 diğer marka
+- **Toplam temizlik: 116 ürün** (reversible — `status='archived'`)
+- Yayında published: **1732 → 1697** (gerçek)
+- MISSING_IMAGES_2026-04-29.md güncel (V2 audit, 15s timeout)
+
+### 📊 Content Final Durumu
+| Metrik | Değer |
+|--------|-------|
+| **Brand description** | **181/181 (%100 KAPSAMA!)** ✨ |
+| Need full enrichment | 24/24 (%100) |
+| INCI Türkçe common_name | 415/5100 |
+| INCI detailed_description | 56/5100 |
+| Yayında makale | 65 |
+
+### 🔄 Faz 6 Yeni Takviye Ürünleri (sabah turnu)
+- **44 yeni takviye** (Sekate kataloğundan, status=published)
+- **45 Sekate affiliate link** + price snapshot
+- **38 doğru görsel** (og:image scrape sonrası)
+- **21 ürün × 83 supplement_ingredients satır**
+- **15 ürün product_scores** (REVELA Skoru hesaplandı)
+- **23 ürün product_need_scores** (Uyumluluk skorları)
+
+### 🚧 TODO (kullanıcı tarafı)
+1. **3 Orzax INCI** — `ORZAX_INCI_TEMPLATE.csv` doldur (15 dk)
+2. **36 kozmetik görsel** — markaya göre klasör + ZIP (1 saat)
+3. Kalan görsel/INCI gelince ben otomatik insert + recalc
+
+### 🛠️ Yardımcı dosyalar
+- `MISSING_IMAGES_2026-04-29.md` — 36 eksik kozmetik (V2 audit)
+- `ORZAX_INCI_TEMPLATE.csv` — 3 Orzax için CSV
+- `USER_INSTRUCTIONS_2026-04-29.md` — sen ne yapacaksın
+- `journal/*.md` — tüm gece script raporları
+
+---
+
 ## 🌟 ÖĞLE SONRASI SÜREKLİ İYİLEŞTİRME (kullanıcı yokken)
 
 **Plan A + B + C** çalıştırıldı (10:30-15:00 arası, 23 commit toplam). 
