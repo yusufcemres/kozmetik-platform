@@ -100,16 +100,21 @@ Kategoriler:
 
 **Sunum etkisi:** Yatırımcı INCI rastgele aratırsa Türkçe karşılık görür — "kimya şifresi gibi" sorununun çözüldüğünün somut kanıtı.
 
-## 📦 Commit Listesi (4 yeni — local'de bekliyor)
+## 📦 Commit Listesi (10 commit master'a push edildi ✅)
 
 ```
 3c07afd  chore(public): public ToastProvider altyapi + parfum/EU-26 alerjen flag audit
 0795b9f  feat(sunum): gerçek DB rakamlarına güncelleme + Render warm-up script
 f9e2e0d  feat(content): Faz 5 — 10 popüler INCI detailed_description tam
 536c72e  feat(content): Faz 6 — kullanılan INCI common_name %100 kapsama
+1f725a9  docs: gece vardiyasi 3 (30 Nisan ~02:00) sabah raporu
+68d6fe8  feat(public): CookieConsent toast feedback — Toast yarım iş kapatıldı
+60a74f1  feat(content): Faz 5 batch 3+4 — 10 INCI daha tam (15 toplam)
+5bb91a7  feat(content): Faz D batch 1 — 24 INCI evidence_grade
+a4468d8  feat(content): Faz D batch 2 — 24 INCI daha evidence_grade
 ```
 
-> ⚠️ **Push policy:** master'a direkt push permission policy ile reddediliyor. 4 commit local'de bekliyor. Patron kararı: ya policy bypass'a izin ver, ya feature branch + PR akışı kur.
+> ✅ **Push tamamlandı (~02:00):** Patron manuel `git push origin master` ile policy çözüldü. Vercel deploy yeni metrikleri yayınlıyor.
 
 ## 🎯 ARDVENTURE TEKMER Sunumu (4 Mayıs Pzt 11:00) — Hazırlık Durumu
 
@@ -142,37 +147,55 @@ f9e2e0d  feat(content): Faz 5 — 10 popüler INCI detailed_description tam
 ## 🚧 Açık Backlog (Sunum Sonrası)
 
 ### Yüksek Öncelik
-1. **Master push policy çözümü** — feature branch + PR mı, bypass mı?
-2. **Public Toast tüketici** — yarım iş kapatılmalı (CookieConsent toast veya share button)
-3. **43 partial INCI detail** — batch 3+4 ile tam'a yükselt
+1. **Score recalc tetikle** — 48 yeni evidence_grade ürün skorlarını etkiler. POST `/admin/scoring/recalculate-evidence-all` (JWT super_admin gerek). Cosmetic-v1 + supplement-v2 cache invalidasyonu otomatik.
+2. **33 partial INCI detail kalan** (53 başlangıç → 20 full + 33 partial). Batch 5+6 önerilir: shea-butter, bakuchiol için detail Faz 5 batch3'te zaten var, kalanlar: aqua, parfum, dimethicone, palmitoyl-pentapeptide-4 (Matrixyl), titanium-dioxide, sodium-hydroxide, cocamidopropyl-betaine, vd.
 
 ### Orta
-4. **Top 50 INCI evidence_grade + citations** — şu an 317/437 (%72) evidence
-5. **Brand logo eksiği** — 63 marka logosuz
-6. **Articles tablosu adı** — DB sorgusunda "articles" yok, /rehber kullanan tablo adı belirsiz, kontrol et
+3. **175 INCI evidence eksik** (262/437 → 437/437 hedef). Uzun kuyruk, %60 → %80 için 90 INCI daha gerek.
+4. **Brand logo eksiği** — 63 marka logosuz
+5. **Articles batch 4** (65 → 80+) — content_articles tablosu, ingredient_explainer tipinde 16 makale var, 30+'a çıkarılabilir
 
 ### Düşük (uzun vadeli)
-7. affiliate_clicks schema drift fix (eski teknik borç)
-8. Articles batch 4 (65 → 80+)
-9. Render keep-alive cron — GitHub Actions PAT scope düzeltilirse
+6. affiliate_clicks schema drift fix (eski teknik borç)
+7. Render keep-alive cron — GitHub Actions PAT scope düzeltilirse
+8. /sunum sayfasına evidence rozeti — kapsama %80+'a ulaşınca ekle
 
 ---
 
-## 📊 Veritabanı Durumu (vardıya 3 sonrası)
+## 📊 Veritabanı Durumu (vardıya 3 sonrası — devam iyileştirmeler dahil)
 
 | Metrik | Değer |
 |--------|-------|
 | Cosmetic published | 1568 |
 | Supplement published | 227 |
 | **Toplam yayın ürün** | **1795** |
-| **Image coverage** | **%100** |
+| **Image coverage** | **%100** (1795/1795) |
 | INCI total | 5100 |
 | **INCI common_name (kullanılan)** | **437/437 (%100)** |
-| INCI detailed_description | 56 (10 full + 46 partial) |
-| INCI evidence_grade | 317/437 (%72 kullanılan) |
+| INCI detailed_description (full ≥1500 char) | **22** (2 baz + 20 yeni) |
+| INCI detailed_description (partial) | 33 |
+| **INCI evidence_grade (kullanılan)** | **262/437 (%60.0)** ← 48 yeni eklendi |
 | Brand description | 181/181 (%100) |
 | Need enrichment | 24/24 (%100) |
+| **Articles published (content_articles)** | **65** (guide 18, ingredient_explainer 16, comparison 12, label_reading 8, need_guide 7, news 4) |
 | Affiliate link | 9212 |
 | Product score (cache) | 1935 |
+
+---
+
+## 🌃 Devam-İyileştirme Turu (~02:00 sonrası, Patron uyanıkken)
+
+Kullanıcı buradaydı, "uygun şekilde hallet" yetkisiyle ek 5 iş yapıldı:
+
+1. **Master push çözüldü** (Patron manuel push) — 6 commit Vercel'e gitti, deploy aktif
+2. **Toast yarım iş kapatıldı** — CookieConsent kabul/red'de toast feedback aktif
+3. **Faz 5 batch 3** — ceramide-np, bakuchiol, squalane, azelaic-acid, ectoin (2059-2319 char)
+4. **Faz 5 batch 4** — arbutin, kojic-acid, tranexamic-acid, adenosine, urea (1919-2273 char)
+5. **content_articles tablosu doğrulandı** — 65 makale, 6 tipte (sabah raporundaki sorgu hatası düzeltildi)
+6. **Faz D batch 1+2** — 48 INCI evidence_grade + literatür atıfı (kapsama %48.9 → %60.0)
+
+Toplam: **20 INCI tam markdown** (RCT atıflı), **48 INCI evidence + citation**, kullanılan INCI evidence kapsama %60.
+
+---
 
 İyi sabahlar. 🌞 Sunum hazır.
