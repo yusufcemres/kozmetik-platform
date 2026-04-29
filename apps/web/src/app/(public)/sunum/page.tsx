@@ -169,9 +169,15 @@ export default function SunumLandingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-on-surface-variant">
-            <span className="material-icon text-score-high text-[16px]" aria-hidden="true">verified</span>
-            Yayındaki <span className="font-semibold text-on-surface">1795 ürünün tamamında</span> gerçek görsel — <span className="font-semibold text-score-high">%100 kapsama</span>
+          <div className="mt-6 flex flex-col items-center gap-2 text-xs text-on-surface-variant">
+            <div className="flex items-center gap-2">
+              <span className="material-icon text-score-high text-[16px]" aria-hidden="true">verified</span>
+              Yayındaki <span className="font-semibold text-on-surface">1795 ürünün tamamında</span> gerçek görsel — <span className="font-semibold text-score-high">%100 kapsama</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="material-icon text-score-high text-[16px]" aria-hidden="true">verified</span>
+              Kullanılan <span className="font-semibold text-on-surface">437 INCI bileşeninin tamamında</span> Türkçe karşılık — <span className="font-semibold text-score-high">%100 kapsama</span>
+            </div>
           </div>
         </div>
       </section>
