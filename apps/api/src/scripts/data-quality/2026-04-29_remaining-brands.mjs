@@ -1,0 +1,12 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT brand_slug, brand_name, country_of_origin FROM brands WHERE is_active=true AND (brand_description IS NULL OR length(brand_description) < 50) ORDER BY brand_name`);
+console.log(`Kalan: ${r.rowCount}`);
+for (const x of r.rows) console.log(`  ${x.brand_slug.padEnd(30)} | ${(x.country_of_origin||'?').padEnd(3)} | ${x.brand_name}`);
+await c.end();
