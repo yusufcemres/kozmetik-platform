@@ -5,6 +5,7 @@ import AnalyticsProvider from '@/components/providers/AnalyticsProvider';
 import OnboardingModal from '@/components/public/OnboardingModal';
 import InstallPWAButton from '@/components/public/InstallPWAButton';
 import CookieConsent from '@/components/public/CookieConsent';
+import { ToastProvider } from '@/components/public/Toast';
 
 export default function PublicLayout({
   children,
@@ -13,14 +14,16 @@ export default function PublicLayout({
 }) {
   return (
     <AnalyticsProvider>
-      <a href="#main-content" className="skip-to-content">İçeriğe atla</a>
-      <Header />
-      <main id="main-content" className="min-h-screen pt-[57px] sm:pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
-      <Footer />
-      <BottomNav />
-      <OnboardingModal />
-      <InstallPWAButton />
-      <CookieConsent />
+      <ToastProvider>
+        <a href="#main-content" className="skip-to-content">İçeriğe atla</a>
+        <Header />
+        <main id="main-content" className="min-h-screen pt-[57px] sm:pt-[65px] pb-20 md:pb-0 bg-surface">{children}</main>
+        <Footer />
+        <BottomNav />
+        <OnboardingModal />
+        <InstallPWAButton />
+        <CookieConsent />
+      </ToastProvider>
     </AnalyticsProvider>
   );
 }
