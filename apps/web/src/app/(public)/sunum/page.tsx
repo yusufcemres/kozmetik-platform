@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 const STATS = [
-  { value: '1.9K+', label: 'Kozmetik ürün', icon: 'palette' },
-  { value: '283+', label: 'Gıda takviyesi', icon: 'medication' },
-  { value: '5.1K+', label: 'INCI bileşeni', icon: 'science' },
+  { value: '1568', label: 'Kozmetik ürün', icon: 'palette' },
+  { value: '227', label: 'Gıda takviyesi', icon: 'medication' },
+  { value: '5.1K', label: 'INCI bileşeni', icon: 'science' },
   { value: '181', label: 'Marka', icon: 'storefront' },
 ];
 
@@ -43,7 +43,7 @@ const SOLUTIONS = [
   {
     icon: 'search',
     title: 'ARA',
-    desc: 'Ürün adı, marka veya bileşen yaz — autocomplete\'le 1.9K kozmetik + 283 takviye arasında anında bul.',
+    desc: 'Ürün adı, marka veya bileşen yaz — autocomplete\'le 1568 kozmetik + 227 takviye arasında anında bul.',
   },
   {
     icon: 'science',
@@ -168,6 +168,10 @@ export default function SunumLandingPage() {
                 <p className="label-caps text-on-surface-variant mt-1 text-[10px]">{s.label}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-on-surface-variant">
+            <span className="material-icon text-score-high text-[16px]" aria-hidden="true">verified</span>
+            Yayındaki <span className="font-semibold text-on-surface">1795 ürünün tamamında</span> gerçek görsel — <span className="font-semibold text-score-high">%100 kapsama</span>
           </div>
         </div>
       </section>
@@ -473,7 +477,7 @@ export default function SunumLandingPage() {
             REVELA ile içerik artık şifre değil
           </h2>
           <p className="text-base text-on-surface-variant leading-relaxed mb-8">
-            1.9K kozmetik · 283 takviye · 5.1K bileşen · 25 ihtiyaç matrisi — hepsi canlı, hepsi referanslı.
+            1568 kozmetik · 227 takviye · 5.1K bileşen · 24 ihtiyaç matrisi — hepsi canlı, hepsi referanslı.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link

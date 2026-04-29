@@ -21,14 +21,14 @@ const PRODUCTS = [
     description:
       'Kozmetik ve gıda takviyelerinin gerçek formülünü SCCS/CIR regülasyon takipli, peer-reviewed kaynaklarla analiz eden bağımsız platform. Markaların değil, formüllerin konuştuğu yer.',
     metrics: [
-      { value: '1.5K+', label: 'Kozmetik' },
-      { value: '197+', label: 'Takviye' },
+      { value: '1568', label: 'Kozmetik' },
+      { value: '227', label: 'Takviye' },
       { value: '5.1K', label: 'INCI bileşen' },
-      { value: '163', label: 'Marka' },
+      { value: '181', label: 'Marka' },
     ],
     features: [
       'TARA: Mobil barkod tarama → anında analiz',
-      'ARA: 1.7K ürün arası autocomplete',
+      'ARA: 1795 ürün arası autocomplete (%100 görselli)',
       'ANALİZ ET: 7-boyut REVELA Skoru (CIR/SCCS uyumlu)',
       'Profil: cilt tipi + ihtiyaç + hassasiyet → kişisel uyumluluk',
       '65 rehber makale, 24 ihtiyaç FAQ + skin type matrisi',
@@ -151,7 +151,7 @@ const ROADMAP = [
   {
     period: '2026 Q2 — Şu an',
     items: [
-      '✅ REVELA lansmana hazır (1735 ürün published)',
+      '✅ REVELA lansmana hazır (1795 ürün published, %100 görsel)',
       '✅ ChefMate production canlı (995 tarif)',
       '🟡 ChemDoc AI BİGG 1812 başvurusu süreci',
       '🟡 Redi hosting day (5 commit push bekliyor)',
