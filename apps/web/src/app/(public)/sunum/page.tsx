@@ -180,7 +180,7 @@ export default function SunumLandingPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="material-icon text-score-high text-[16px]" aria-hidden="true">science</span>
-              <span className="font-semibold text-on-surface">339 INCI bileşeninde</span> bilimsel kanıt derecelendirmesi (A-E) + literatür atıfı — <span className="font-semibold text-score-high">%78 kapsama</span>
+              <span className="font-semibold text-on-surface">355 INCI bileşeninde</span> bilimsel kanıt derecelendirmesi (A-E) + literatür atıfı — <span className="font-semibold text-score-high">%81 kapsama</span>
             </div>
           </div>
         </div>
