@@ -1,0 +1,22 @@
+product_id,product_name,ingredient_name_tr,amount,unit,sort_order
+# Bu CSV'yi her ürünün besin değerleri ile doldur. Boş bırak satırlarını sil.
+# Örnek format:
+# 2734,Nutraxin Iron Max,Demir,17,mg,1
+# 2734,Nutraxin Iron Max,Vitamin C,80,mg,2
+# unit: mg / mcg / IU / g / ml
+
+# 2743 - Ocean Bromelain %50 Daha Fazla 45 Kapsül
+2743,"Ocean Bromelain %50 Daha Fazla 45 Kapsül",,,,1
+2743,"Ocean Bromelain %50 Daha Fazla 45 Kapsül",,,,2
+2743,"Ocean Bromelain %50 Daha Fazla 45 Kapsül",,,,3
+
+# 2725 - Orzax Ocean 500mg 60 Kapsül
+2725,"Orzax Ocean 500mg 60 Kapsül",,,,1
+2725,"Orzax Ocean 500mg 60 Kapsül",,,,2
+2725,"Orzax Ocean 500mg 60 Kapsül",,,,3
+
+# 2759 - Orzax Ocean Plus Saf Balık Yağı 1200 mg 50 Kapsül - Omega 3 Balık Yağı Takviyesi - ORZAX
+2759,"Orzax Ocean Plus Saf Balık Yağı 1200 mg 50 Kapsül - Omega 3 Balık Yağı Takviyesi - ORZAX",,,,1
+2759,"Orzax Ocean Plus Saf Balık Yağı 1200 mg 50 Kapsül - Omega 3 Balık Yağı Takviyesi - ORZAX",,,,2
+2759,"Orzax Ocean Plus Saf Balık Yağı 1200 mg 50 Kapsül - Omega 3 Balık Yağı Takviyesi - ORZAX",,,,3
+
