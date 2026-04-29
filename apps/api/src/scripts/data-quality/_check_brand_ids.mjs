@@ -1,0 +1,14 @@
+import { Client } from 'pg';
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../../../.env') });
+const c = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+await c.connect();
+const r = await c.query(`SELECT brand_id, brand_slug, brand_name FROM brands WHERE brand_slug IN ('nutraxin','orzax','ocean','voonka','solgar','dynavit','redoxon','abdiibrahim','newlife','solpure','mineralis','tab1','imunol') ORDER BY brand_slug`);
+for (const x of r.rows) console.log(`${x.brand_id} | ${x.brand_slug} | ${x.brand_name}`);
+console.log('---categories---');
+const cats = await c.query(`SELECT category_id, category_slug, category_name FROM categories WHERE domain_type='supplement' OR domain_type='both' ORDER BY category_slug LIMIT 20`);
+for (const x of cats.rows) console.log(`${x.category_id} | ${x.category_slug} | ${x.category_name}`);
+await c.end();
