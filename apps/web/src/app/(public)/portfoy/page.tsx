@@ -189,9 +189,37 @@ const ABOUT = {
   contact: 'yusufcemresan@gmail.com',
 };
 
+const ORG_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'SoloLabs',
+  description: 'Tek kuruculu yazılım stüdyosu — REVELA, ChemDoc AI, ChefMate, Redi. Sağlık & güzellik, kimya regülasyonu, tarif AI ve restoran SaaS.',
+  founder: {
+    '@type': 'Person',
+    name: 'Yusuf Cemre Şan',
+    jobTitle: 'Kurucu',
+    email: 'yusufcemresan@gmail.com',
+  },
+  foundingDate: '2026',
+  email: 'sololabstr@gmail.com',
+  sameAs: [
+    'https://kozmetik-platform.vercel.app',
+  ],
+  makesOffer: PRODUCTS.map((p) => ({
+    '@type': 'Offer',
+    name: p.name,
+    description: p.tagline,
+    category: p.domain,
+  })),
+};
+
 export default function PortfolioPage() {
   return (
     <main className="bg-surface text-on-surface">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+      />
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-outline-variant/20 -mt-[57px] sm:-mt-[65px] pt-[57px] sm:pt-[65px]">
         <div className="absolute inset-0 z-0 opacity-[0.04] pointer-events-none" style={{
