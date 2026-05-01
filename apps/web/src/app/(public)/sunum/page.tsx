@@ -309,9 +309,18 @@ export default function SunumLandingPage() {
       <section className="border-b border-outline-variant/20 py-14 sm:py-20 bg-surface-container-low/40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="label-caps text-on-surface-variant text-center mb-2 text-[10px]">Ürünü gör</p>
-          <h2 className="text-3xl sm:text-4xl headline-tight text-on-surface text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl headline-tight text-on-surface text-center mb-3">
             Canlı tarama akışı
           </h2>
+          <div className="text-center mb-12">
+            <Link
+              href="/urunler/cerave-acne-foaming-cream-wash"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-semibold"
+            >
+              <span className="material-icon text-[16px]" aria-hidden="true">launch</span>
+              Canlı bir ürün analizi gör — CeraVe Acne Foaming
+            </Link>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Mockup 1: INCI listesi */}
             <div className="curator-card p-5">
