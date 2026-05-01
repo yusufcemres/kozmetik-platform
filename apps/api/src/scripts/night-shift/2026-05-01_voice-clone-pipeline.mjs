@@ -6,9 +6,15 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Memory'den
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || 'sk_c12e839a9b924da6b8dd96d2b591df19867643e4d5ca55c3';
-const VOICE_ID = process.env.VOICE_ID; // Patron kendi voice ID'sini set eder
+// Güvenlik: API key + voice ID ortam değişkeninden zorunlu (asla hardcoded değil)
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const VOICE_ID = process.env.VOICE_ID;
+
+if (!ELEVENLABS_API_KEY) {
+  console.error('HATA: ELEVENLABS_API_KEY ortam değişkeni gerekli.');
+  console.error('Kullanım: ELEVENLABS_API_KEY=sk_xxx VOICE_ID=yyy node script.mjs file.md');
+  process.exit(1);
+}
 
 if (!VOICE_ID) {
   console.error('HATA: VOICE_ID ortam değişkeni gerekli.');
@@ -63,8 +69,9 @@ const body = {
   text: speakable,
   model_id: 'eleven_multilingual_v2',
   voice_settings: {
-    stability: 0.45,
-    similarity_boost: 0.75,
+    // AGENTS/voice-config.json default_settings (Patron'un mevcut altyapısı)
+    stability: 0.30,
+    similarity_boost: 0.85,
     style: 0.30,
     use_speaker_boost: true,
   },
