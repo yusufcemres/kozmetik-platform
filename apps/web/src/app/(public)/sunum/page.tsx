@@ -87,7 +87,7 @@ const DIFFERENTIATORS = [
 
 const ROADMAP = [
   { period: '2026 Q2', status: 'active', items: ['Lansman canlı', 'Mobil PWA', 'Affiliate ağı (8 platform)', 'Cilt analizi quizi'] },
-  { period: '2026 Q3', status: 'planned', items: ['IOS + Android native', 'Brand portal (B2B)', 'AI etiket okuma (foto)', 'Topluluk yorumları'] },
+  { period: '2026 Q3', status: 'planned', items: ['IOS + Android native', 'Brand portal (B2B)', 'AI etiket okuma (foto)', 'REVELA Podcast (75+ bölüm pipeline)', 'Topluluk yorumları'] },
   { period: '2026 Q4', status: 'planned', items: ['Dermatolog onayı', 'Avrupa pazarı', 'Karşılaştırmalı klinik veri', 'Doctor referral programı'] },
 ];
 
