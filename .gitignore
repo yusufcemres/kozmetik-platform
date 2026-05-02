@@ -43,3 +43,10 @@ apps/web/test-results/
 
 # Sprint reports (sprint-spesifik geçici dökümanlar — AGENTS/ workspace'inde tut)
 MORNING_REPORT_SUPPLEMENT_INGEST_*.md
+
+# Internal audit dumps
+apps/api/src/scripts/night-shift/_*.json
+
+# Podcast audio binaries (büyük dosyalar — Spotify'a manuel upload)
+podcast-pilot/**/audio/
+*.mp3

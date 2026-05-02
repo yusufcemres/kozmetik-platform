@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>MORNING_REPORT_REVELA_GECE_VARDIYASI_3_20260430</title><style>
+  @page { size: A4; margin: 20mm; }
+  body {
+    font-family: 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+    line-height: 1.6;
+    color: #1a1a1a;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  h1 { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 8px; page-break-after: avoid; }
+  h2 { color: #34495e; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-top: 24px; page-break-after: avoid; }
+  h3 { color: #34495e; margin-top: 20px; page-break-after: avoid; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background-color: #f5f5f5; font-weight: 600; }
+  code { background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  pre { background-color: #2d3748; color: #f7fafc; padding: 12px; border-radius: 6px; overflow-x: auto; page-break-inside: avoid; }
+  pre code { background: transparent; color: inherit; padding: 0; }
+  blockquote { border-left: 4px solid #4299e1; padding-left: 16px; color: #4a5568; margin: 16px 0; page-break-inside: avoid; }
+  ul, ol { padding-left: 24px; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+  @media print {
+    body { padding: 0; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style></head><body><h1>🌅 REVELA Gece Vardiyası 3 — 2026-04-30 Sabah Raporu</h1>
+<p><strong>Vardiya başlangıç:</strong> 2026-04-30 00:16 (Türkiye)
+<strong>Vardiya bitiş:</strong> 2026-04-30 ~02:00 (~1.5 saat)
+<strong>Branch:</strong> master (4 yeni commit local — push policy nedeniyle bekleyenler)</p>
+<blockquote>
+<p>Sunum-merkezli vardiya — <strong>4 Mayıs Pzt 11:00 ARDVENTURE TEKMER yüz yüze görüşmesine</strong> son hazırlık. Önceki gece vardiyası 2&#39;nin (29-30 Nisan) zaten %100 brand description, %100 need enrichment ve %100 görsel kapsama getirdiği keşfedildi → Faz 3-4 (CF Worker + 49 görsel scrape) iptal, plan yeniden 7 faz halinde organize edildi.</p>
+</blockquote>
+<hr>
+<h2>✅ 7 Faz Özeti</h2>
+<table>
+<thead>
+<tr>
+<th>Faz</th>
+<th>Konu</th>
+<th>Sonuç</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Pending temizlik (Toast + audit script + layout)</td>
+<td>✅ commit <code>3c07afd</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Vercel deploy verify</td>
+<td>✅ 9/9 URL 200, içerik render OK</td>
+</tr>
+<tr>
+<td>3</td>
+<td>/sunum + /portfoy gerçek metrik güncelleme</td>
+<td>✅ commit <code>0795b9f</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Render warm-up script (sunum cold start fix)</td>
+<td>✅ scripts/sunum-warmup.sh</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Top 10 popüler INCI detailed_description tam</td>
+<td>✅ commit <code>f9e2e0d</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Kullanılan INCI common_name %100 kapsama</td>
+<td>✅ commit <code>536c72e</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Sabah raporu + TG ping</td>
+<td>(bu rapor)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>🆕 Faz 1 — Pending Temizlik</h2>
+<p>3 uncommitted dosya commit&#39;lendi:</p>
+<ul>
+<li><code>apps/web/src/components/public/Toast.tsx</code> (99 satır) — public ToastProvider altyapı</li>
+<li><code>apps/web/src/app/(public)/layout.tsx</code> — ToastProvider wrap</li>
+<li><code>apps/api/src/scripts/data-quality/_check_flag_state.mjs</code> — parfum/EU-26 alerjen flag audit</li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>Sunum sonrası TODO:</strong> Public ToastProvider kullanan tüketici yok (no-op fallback aktif). CookieConsent veya OnboardingModal&#39;da <code>useToast()</code> ile entegre edilmeli — yarım iş tamamlanmalı.</p>
+</blockquote>
+<h2>🌐 Faz 2 — Vercel + Render Deploy Verify</h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Status</th>
+<th>Süre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/sunum, /portfoy, /rehber, /markalar/cerave, /markalar/round-lab, /markalar/skinceuticals, /ihtiyaclar/sivilce-akne, /icerikler/niacinamide, /ai-arama</td>
+<td><strong>9/9 → 200</strong></td>
+<td>&lt;500ms</td>
+</tr>
+<tr>
+<td>API /health</td>
+<td><strong>200</strong></td>
+<td>DB+Redis connected, build sha 8ad1b4a</td>
+</tr>
+<tr>
+<td>API /products/top-by-concern/sivilce-akne</td>
+<td><strong>200</strong></td>
+<td>295ms</td>
+</tr>
+</tbody></table>
+<p><strong>İçerik spot-check:</strong></p>
+<ul>
+<li>/sunum hero başlık + metadata title doğru</li>
+<li>/portfoy 4 ürün (REVELA + ChemDoc + ChefMate + Redi) render</li>
+<li>/markalar/cerave description rendered</li>
+<li>/ihtiyaclar/sivilce-akne 3 yeni section (Cilt Tipi + Sıkça Sorulan + Karıştırılan)</li>
+<li>/icerikler/niacinamide &quot;Niasinamid&quot; başlık + (yeni) tam markdown</li>
+</ul>
+<h2>📊 Faz 3 — Gerçek DB Rakamlarına Güncelleme</h2>
+<p>Sabah raporu ve memory&#39;deki rakamlar gerçek DB&#39;den sapıyordu (gece vardiyası 2&#39;de 80 hayalet ürün arşivlemesi sonrası). Düzeltmeler:</p>
+<table>
+<thead>
+<tr>
+<th>Yer</th>
+<th>Eski</th>
+<th>Yeni</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/sunum STATS Kozmetik</td>
+<td>1.9K+</td>
+<td><strong>1568</strong></td>
+</tr>
+<tr>
+<td>/sunum STATS Takviye</td>
+<td>283+</td>
+<td><strong>227</strong></td>
+</tr>
+<tr>
+<td>/sunum CTA &quot;25 ihtiyaç&quot;</td>
+<td>25</td>
+<td><strong>24</strong> (gerçek)</td>
+</tr>
+<tr>
+<td>/sunum SOLUTIONS &quot;1.9K+283&quot;</td>
+<td>eski</td>
+<td><strong>1568+227</strong></td>
+</tr>
+<tr>
+<td>/portfoy REVELA Kozmetik</td>
+<td>1.5K+</td>
+<td><strong>1568</strong></td>
+</tr>
+<tr>
+<td>/portfoy REVELA Takviye</td>
+<td>197+</td>
+<td><strong>227</strong></td>
+</tr>
+<tr>
+<td>/portfoy REVELA Marka</td>
+<td>163</td>
+<td><strong>181</strong></td>
+</tr>
+<tr>
+<td>/portfoy ROADMAP &quot;1735 ürün&quot;</td>
+<td>1735</td>
+<td><strong>1795</strong></td>
+</tr>
+<tr>
+<td>/sunum yeni rozet</td>
+<td>—</td>
+<td><strong>%100 görsel kapsama (1795/1795)</strong></td>
+</tr>
+<tr>
+<td>/sunum yeni rozet (Faz 6 sonrası)</td>
+<td>—</td>
+<td><strong>%100 INCI Türkçe (437/437)</strong></td>
+</tr>
+</tbody></table>
+<h2>⏱️ Faz 4 — Render Warm-up Script</h2>
+<p><code>scripts/sunum-warmup.sh</code> oluşturuldu — 4 Mayıs Pzt sabahı 10:30 civarı çalıştırılacak. API + 5 frontend hot path ısıtması. Sunum sırasında 30 sn cold start yaşanmasın.</p>
+<blockquote>
+<p>⚠️ <strong>GitHub Actions cron</strong> ile otomasyon yapılmadı (PAT workflow scope eksik — daha önce tespit edilmiş teknik borç). Manuel kullanım sürdürülecek.</p>
+</blockquote>
+<h2>📚 Faz 5 — 10 Popüler INCI detailed_description Tam Yazıldı</h2>
+<p>Audit sonucu: 56 ingredient&#39;ın <code>detailed_description</code> dolu ama <strong>53&#39;ü partial</strong> (başlıklar var, içerik kısa/yarım), sadece 2 full (ascorbic-acid + retinol). 1 stub. Sunumda kullanıcı /icerikler/[slug] tıkladığında &quot;## Etkili Konsantrasyon&quot; altı boş görüyordu.</p>
+<p><strong>10 popüler INCI partial → full</strong> (1700-2260 char, RCT atıflı):</p>
+<p>Batch 1 (5):</p>
+<ul>
+<li>niacinamide (1973 char) · salicylic-acid (1953) · hyaluronic-acid (1868) · glycerin (1712) · phenoxyethanol (1926)</li>
+</ul>
+<p>Batch 2 (5):</p>
+<ul>
+<li>tocopherol (2166) · glycolic-acid (2260) · centella-asiatica-leaf-extract (2116) · panthenol (1975) · caffeine (1671)</li>
+</ul>
+<p>Her INCI için: <strong>Mekanizma · Etkili Konsantrasyon · Kanıt (RCT atıflı: Lin 2003, Bissett 2005, Pavicic 2011, Bonté 1994 vb.) · Kullanım Tüyoları · Hassasiyet · Kaynaklar</strong>.</p>
+<blockquote>
+<p>⚠️ <strong>Geriye 43 partial INCI</strong> kaldı (700-1500 char). Sunum sonrası batch 3+4&#39;te tamamlanacak. Listede: ceramide-np, bakuchiol, squalane, azelaic-acid, ectoin, retinyl-palmitate, kojic-acid, arbutin, tranexamic-acid, adenosine, allantoin, panthenol, urea, vd.</p>
+</blockquote>
+<h2>🇹🇷 Faz 6 — Kullanılan INCI common_name %100 Kapsama</h2>
+<p>86 NULL <code>common_name</code> uzun-kuyruk INCI Türkçe karşılığı eklendi. <strong>Sonuç: 437/437 (%100) — yayında ürünlerde geçen INCI&#39;lerin tamamı</strong>.</p>
+<p>Kategoriler:</p>
+<ul>
+<li>Aminoasitler (8): glutamik asit, aspartik asit, histidin, izolösin, valin, fenilalanin, l-serin, l-teanin</li>
+<li>Vitaminler/Aktifler (5): beta karoten, riboflavin 5-fosfat, inositol, ergotioneine, PCA</li>
+<li>Peptitler (5): asetil tetrapeptit-2, palmitoil tripeptit-38, pentapeptit-18, syn-ake, anti-aging peptit</li>
+<li>Bariyer/Seramid (4): sfingosin, sfinganin, seramid NS, HA crosspolymer</li>
+<li>Bitki Özleri (15): çam kabuğu, hayıt, annatto, japon kamelyası, pirinç kepeği, tribulus, tremella, vd.</li>
+<li>Yüzey Aktif/Emolyent (11), PEG/Polyglyceryl (12), Humektant/Solvent (5)</li>
+<li>Mineral (5), pH/Tampon (2), Polimer/Mikroplastik (7), Antiseptik/Şelat (2), Diğer (2)</li>
+</ul>
+<p><strong>Sunum etkisi:</strong> Yatırımcı INCI rastgele aratırsa Türkçe karşılık görür — &quot;kimya şifresi gibi&quot; sorununun çözüldüğünün somut kanıtı.</p>
+<h2>📦 Commit Listesi (10 commit master&#39;a push edildi ✅)</h2>
+<pre><code>3c07afd  chore(public): public ToastProvider altyapi + parfum/EU-26 alerjen flag audit
+0795b9f  feat(sunum): gerçek DB rakamlarına güncelleme + Render warm-up script
+f9e2e0d  feat(content): Faz 5 — 10 popüler INCI detailed_description tam
+536c72e  feat(content): Faz 6 — kullanılan INCI common_name %100 kapsama
+1f725a9  docs: gece vardiyasi 3 (30 Nisan ~02:00) sabah raporu
+68d6fe8  feat(public): CookieConsent toast feedback — Toast yarım iş kapatıldı
+60a74f1  feat(content): Faz 5 batch 3+4 — 10 INCI daha tam (15 toplam)
+5bb91a7  feat(content): Faz D batch 1 — 24 INCI evidence_grade
+a4468d8  feat(content): Faz D batch 2 — 24 INCI daha evidence_grade
+</code></pre>
+<blockquote>
+<p>✅ <strong>Push tamamlandı (~02:00):</strong> Patron manuel <code>git push origin master</code> ile policy çözüldü. Vercel deploy yeni metrikleri yayınlıyor.</p>
+</blockquote>
+<h2>🎯 ARDVENTURE TEKMER Sunumu (4 Mayıs Pzt 11:00) — Hazırlık Durumu</h2>
+<h3>Sunum-Hazır Metrikler (gurur için)</h3>
+<ul>
+<li><strong>1795 yayın ürünü</strong> (1568 kozmetik + 227 takviye)</li>
+<li><strong>%100 görsel kapsama</strong> — 1795/1795 gerçek görsel</li>
+<li><strong>%100 INCI Türkçe</strong> — 437/437 kullanılan INCI</li>
+<li><strong>%100 brand description</strong> — 181/181 marka</li>
+<li><strong>%100 need enrichment</strong> — 24/24 ihtiyaç (FAQ + skin type + interaction + confused_with)</li>
+<li><strong>65 yayın makale</strong> (rehber + label_reading + need_guide + news + comparison)</li>
+<li><strong>9212 affiliate link</strong> (Trendyol/HB/N11/PttAVM/Sekate)</li>
+<li><strong>1935 product_score</strong> (supplement-v2 + cosmetic-v1 cache, Redis sıcak)</li>
+</ul>
+<h3>Sunum Akışı (5-6 dk önerisi)</h3>
+<ol>
+<li>/portfoy → 4 ürün özeti (30 sn)</li>
+<li>/sunum → metodoloji + %100 metrik vurgusu (1 dk)</li>
+<li>/ai-arama → &quot;rozam var ne iyi gelir&quot; demo (1 dk)</li>
+<li>Bir ürün skor sayfası (örnek) → 7 boyut breakdown (1 dk)</li>
+<li>/karsilastir → 2 ürün diff (45 sn)</li>
+<li>/rehber → 65 makale + bir niacinamide makalesi (45 sn)</li>
+</ol>
+<h3>Hazırlık Yapılacaklar</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Patron sabah uyanınca: <code>git push origin master</code> (4 commit) — policy bypass kararı</li>
+<li><input disabled="" type="checkbox"> 4 May 10:30: <code>bash scripts/sunum-warmup.sh</code> çalıştır</li>
+<li><input disabled="" type="checkbox"> D:\chemdoc-ai PDF klasöründe 6 dosya hazır mı kontrol (ChefMate dahil 4 ürün)</li>
+<li><input disabled="" type="checkbox"> Hangi 1 ürün demo örneği seçilecek? (Niasinamid serumu öner — Faz 5&#39;te tam markdown var)</li>
+</ul>
+<hr>
+<h2>🚧 Açık Backlog (Sunum Sonrası)</h2>
+<h3>Yüksek Öncelik</h3>
+<ol>
+<li><strong>Score recalc tetikle</strong> — 48 yeni evidence_grade ürün skorlarını etkiler. POST <code>/admin/scoring/recalculate-evidence-all</code> (JWT super_admin gerek). Cosmetic-v1 + supplement-v2 cache invalidasyonu otomatik.</li>
+<li><strong>33 partial INCI detail kalan</strong> (53 başlangıç → 20 full + 33 partial). Batch 5+6 önerilir: shea-butter, bakuchiol için detail Faz 5 batch3&#39;te zaten var, kalanlar: aqua, parfum, dimethicone, palmitoyl-pentapeptide-4 (Matrixyl), titanium-dioxide, sodium-hydroxide, cocamidopropyl-betaine, vd.</li>
+</ol>
+<h3>Orta</h3>
+<ol start="3">
+<li><strong>175 INCI evidence eksik</strong> (262/437 → 437/437 hedef). Uzun kuyruk, %60 → %80 için 90 INCI daha gerek.</li>
+<li><strong>Brand logo eksiği</strong> — 63 marka logosuz</li>
+<li><strong>Articles batch 4</strong> (65 → 80+) — content_articles tablosu, ingredient_explainer tipinde 16 makale var, 30+&#39;a çıkarılabilir</li>
+</ol>
+<h3>Düşük (uzun vadeli)</h3>
+<ol start="6">
+<li>affiliate_clicks schema drift fix (eski teknik borç)</li>
+<li>Render keep-alive cron — GitHub Actions PAT scope düzeltilirse</li>
+<li>/sunum sayfasına evidence rozeti — kapsama %80+&#39;a ulaşınca ekle</li>
+</ol>
+<hr>
+<h2>📊 Veritabanı Durumu (vardıya 3 sonrası — devam iyileştirmeler dahil)</h2>
+<table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cosmetic published</td>
+<td>1568</td>
+</tr>
+<tr>
+<td>Supplement published</td>
+<td>227</td>
+</tr>
+<tr>
+<td><strong>Toplam yayın ürün</strong></td>
+<td><strong>1795</strong></td>
+</tr>
+<tr>
+<td><strong>Image coverage</strong></td>
+<td><strong>%100</strong> (1795/1795)</td>
+</tr>
+<tr>
+<td>INCI total</td>
+<td>5100</td>
+</tr>
+<tr>
+<td><strong>INCI common_name (kullanılan)</strong></td>
+<td><strong>437/437 (%100)</strong></td>
+</tr>
+<tr>
+<td>INCI detailed_description (full ≥1500 char)</td>
+<td><strong>22</strong> (2 baz + 20 yeni)</td>
+</tr>
+<tr>
+<td>INCI detailed_description (partial)</td>
+<td>33</td>
+</tr>
+<tr>
+<td><strong>INCI evidence_grade (kullanılan)</strong></td>
+<td><strong>262/437 (%60.0)</strong> ← 48 yeni eklendi</td>
+</tr>
+<tr>
+<td>Brand description</td>
+<td>181/181 (%100)</td>
+</tr>
+<tr>
+<td>Need enrichment</td>
+<td>24/24 (%100)</td>
+</tr>
+<tr>
+<td><strong>Articles published (content_articles)</strong></td>
+<td><strong>65</strong> (guide 18, ingredient_explainer 16, comparison 12, label_reading 8, need_guide 7, news 4)</td>
+</tr>
+<tr>
+<td>Affiliate link</td>
+<td>9212</td>
+</tr>
+<tr>
+<td>Product score (cache)</td>
+<td>1935</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>🌃 Devam-İyileştirme Turu (~02:00 sonrası, Patron uyanıkken)</h2>
+<p>Kullanıcı buradaydı, &quot;uygun şekilde hallet&quot; yetkisiyle ek 5 iş yapıldı:</p>
+<ol>
+<li><strong>Master push çözüldü</strong> (Patron manuel push) — 6 commit Vercel&#39;e gitti, deploy aktif</li>
+<li><strong>Toast yarım iş kapatıldı</strong> — CookieConsent kabul/red&#39;de toast feedback aktif</li>
+<li><strong>Faz 5 batch 3</strong> — ceramide-np, bakuchiol, squalane, azelaic-acid, ectoin (2059-2319 char)</li>
+<li><strong>Faz 5 batch 4</strong> — arbutin, kojic-acid, tranexamic-acid, adenosine, urea (1919-2273 char)</li>
+<li><strong>content_articles tablosu doğrulandı</strong> — 65 makale, 6 tipte (sabah raporundaki sorgu hatası düzeltildi)</li>
+<li><strong>Faz D batch 1+2</strong> — 48 INCI evidence_grade + literatür atıfı (kapsama %48.9 → %60.0)</li>
+</ol>
+<p>Toplam: <strong>20 INCI tam markdown</strong> (RCT atıflı), <strong>48 INCI evidence + citation</strong>, kullanılan INCI evidence kapsama %60.</p>
+<hr>
+<p>İyi sabahlar. 🌞 Sunum hazır.</p>
+</body></html>
