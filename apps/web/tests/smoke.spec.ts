@@ -35,7 +35,7 @@ test.describe('REVELA smoke', () => {
 
   test('/ai-arama form renders', async ({ page }) => {
     await page.goto('/ai-arama');
-    await expect(page.locator('input[placeholder*="arıyorsun" i]')).toBeVisible();
+    await expect(page.locator('input[placeholder*="rozam" i]')).toBeVisible();
   });
 
   test('/uzmanlar directory renders', async ({ page }) => {
