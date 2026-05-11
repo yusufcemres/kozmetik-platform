@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
@@ -63,6 +63,14 @@ function gradeColor(g?: string | null) {
 }
 
 export default function InciAnalysisPage() {
+  return (
+    <Suspense fallback={<div className="curator-section max-w-[1200px] mx-auto py-8"><div className="animate-pulse h-32 bg-surface-container-low rounded" /></div>}>
+      <InciAnalysisInner />
+    </Suspense>
+  );
+}
+
+function InciAnalysisInner() {
   const searchParams = useSearchParams();
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
