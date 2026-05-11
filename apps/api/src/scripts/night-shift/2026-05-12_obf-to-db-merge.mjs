@@ -186,21 +186,34 @@ for (const f of files) {
       stats.new_products++;
       if (!DRY && brandId) {
         const qty = parseQuantity(p.net_content);
-        const slug = turkishSlug(`${p.brand_name} ${p.product_name}`).slice(0, 80) + '-' + bc.slice(-4);
-        const ins = await client.query(
-          `INSERT INTO products (brand_id, category_id, product_name, product_slug, short_description, barcode, net_content_value, net_content_unit, domain_type, status, target_audience, created_at, updated_at)
-           VALUES ($1, 1, $2, $3, $4, $5, $6, $7, 'cosmetic', 'draft', 'adult', NOW(), NOW())
-           RETURNING product_id`,
-          [
-            brandId,
-            p.product_name,
-            slug,
-            `${p.brand_name || ''} ${p.product_name || ''} — OpenBeautyFacts'ten eklendi (kaynak: ${data.brand_slug}).`,
-            bc,
-            qty.value,
-            qty.unit,
-          ],
-        );
+        let slug = turkishSlug(`${p.brand_name} ${p.product_name}`).slice(0, 70) + '-' + bc.slice(-4);
+        // Duplicate slug check + suffix
+        const slugCheck = await client.query(`SELECT product_id FROM products WHERE product_slug = $1 LIMIT 1`, [slug]);
+        if (slugCheck.rows.length > 0) {
+          // Already exists with this slug — skip (probably same product)
+          stats.skipped++;
+          continue;
+        }
+        let ins;
+        try {
+          ins = await client.query(
+            `INSERT INTO products (brand_id, category_id, product_name, product_slug, short_description, barcode, net_content_value, net_content_unit, domain_type, status, target_audience, created_at, updated_at)
+             VALUES ($1, 1, $2, $3, $4, $5, $6, $7, 'cosmetic', 'draft', 'adult', NOW(), NOW())
+             RETURNING product_id`,
+            [brandId, p.product_name, slug, `${p.brand_name || ''} ${p.product_name || ''} — OpenBeautyFacts'ten eklendi (kaynak: ${data.brand_slug}).`, bc, qty.value, qty.unit],
+          );
+        } catch (e) {
+          if (e.code === '23505') {
+            // Last resort: timestamp suffix
+            slug = slug.slice(0, 65) + '-' + Date.now().toString().slice(-7);
+            ins = await client.query(
+              `INSERT INTO products (brand_id, category_id, product_name, product_slug, short_description, barcode, net_content_value, net_content_unit, domain_type, status, target_audience, created_at, updated_at)
+               VALUES ($1, 1, $2, $3, $4, $5, $6, $7, 'cosmetic', 'draft', 'adult', NOW(), NOW())
+               RETURNING product_id`,
+              [brandId, p.product_name, slug, `${p.brand_name || ''} ${p.product_name || ''} — OpenBeautyFacts'ten eklendi.`, bc, qty.value, qty.unit],
+            );
+          } else throw e;
+        }
         productId = ins.rows[0].product_id;
         // INCI eslesti -> direkt matched (yeni urun, baska veri yok, OBF'den geliyor)
         if (p.ingredients_list?.length > 0) {
