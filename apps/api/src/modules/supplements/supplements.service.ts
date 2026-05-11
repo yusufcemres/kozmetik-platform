@@ -57,19 +57,40 @@ export class SupplementsService {
   }
 
   async findByProductId(productId: number) {
-    const detail = await this.detailRepo.findOne({
-      where: { product_id: productId },
-      relations: ['product'],
-    });
-    if (!detail) throw new NotFoundException('Supplement detayı bulunamadı');
+    // 44 üründe supplement_details yok ama supplement_ingredients (nutrition_facts) var.
+    // Eskiden 404 dönüyorduk → frontend "Besin bilgileri henüz eklenmemiş" gösteriyordu.
+    // Şimdi her iki kaynaktan da ne varsa döner; ikisi de yoksa NotFound.
+    const [detail, ingredients] = await Promise.all([
+      this.detailRepo.findOne({
+        where: { product_id: productId },
+        relations: ['product'],
+      }),
+      this.ingredientRepo.find({
+        where: { product_id: productId },
+        relations: ['ingredient'],
+        order: { sort_order: 'ASC' },
+      }),
+    ]);
 
-    const ingredients = await this.ingredientRepo.find({
-      where: { product_id: productId },
-      relations: ['ingredient'],
-      order: { sort_order: 'ASC' },
-    });
+    if (!detail && (!ingredients || ingredients.length === 0)) {
+      throw new NotFoundException('Supplement detayı bulunamadı');
+    }
 
-    return { ...detail, nutrition_facts: ingredients };
+    // detail yoksa boş kabuk dön — frontend nutrition_facts'ı yine de render eder
+    const base = detail ?? ({
+      product_id: productId,
+      form: null,
+      serving_size: null,
+      servings_per_container: null,
+      recommended_use: null,
+      warnings: null,
+      requires_prescription: false,
+      manufacturer_country: null,
+      certification: null,
+      product: null,
+    } as any);
+
+    return { ...base, nutrition_facts: ingredients };
   }
 
   async update(productId: number, dto: UpdateSupplementDetailDto) {
