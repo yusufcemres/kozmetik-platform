@@ -7,6 +7,9 @@ import {
 } from '@database/entities';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { InteractionsModule } from '../interactions/interactions.module';
+import { ReviewsModule } from '../reviews/reviews.module';
+import { ScoringModule } from '../scoring/scoring.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { ProductsService } from './products.service';
       AffiliateLink, AffiliateClick, FormulaRevision, PriceHistory,
       Category, ProductScore,
     ]),
+    InteractionsModule,
+    ReviewsModule,
+    ScoringModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

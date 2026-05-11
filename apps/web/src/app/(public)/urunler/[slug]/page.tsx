@@ -138,38 +138,34 @@ type ReviewsAggregate = {
   rating_distribution: Record<'1' | '2' | '3' | '4' | '5', number>;
 };
 
-async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate | null> {
+type SupplementCrossRef = {
+  product_id: number;
+  product_name: string;
+  product_slug: string;
+  brand?: { brand_name: string };
+  images?: { image_url: string }[];
+};
+
+interface ProductFullResponse {
+  product: Product;
+  similar: SimilarProductResult[];
+  interactions: IngredientInteraction[];
+  cosmetic_score: any | null;
+  supplement_cross_refs: SupplementCrossRef[];
+  reviews_aggregate: ReviewsAggregate | null;
+}
+
+/**
+ * Composite fetch — backend tek atışta tüm sayfa verisini döner.
+ * Eski paralel 6+ ayrı fetch yerine. Redis 10dk + Next.js 5dk cache.
+ */
+async function getProductFull(slug: string): Promise<ProductFullResponse | null> {
   try {
-    return await apiFetch<ReviewsAggregate>(`/products/${productId}/reviews/aggregate`, {
-      next: { revalidate: 120 },
+    return await apiFetch<ProductFullResponse>(`/products/slug/${slug}/full`, {
+      next: { revalidate: 300 },
     } as any);
   } catch {
     return null;
-  }
-}
-
-async function getIngredientInteractions(ingredientIds: number[]): Promise<IngredientInteraction[]> {
-  if (ingredientIds.length === 0) return [];
-  try {
-    const results: IngredientInteraction[] = [];
-    // Fetch interactions for each key ingredient (max 5 to avoid too many requests)
-    const idsToCheck = ingredientIds.slice(0, 5);
-    for (const id of idsToCheck) {
-      const data = await apiFetch<IngredientInteraction[]>(
-        `/interactions/by-ingredient/${id}`,
-        { next: { revalidate: 300 } } as any,
-      );
-      if (data?.length) results.push(...data);
-    }
-    // Deduplicate by interaction_id
-    const seen = new Set<number>();
-    return results.filter((r) => {
-      if (seen.has(r.interaction_id)) return false;
-      seen.add(r.interaction_id);
-      return true;
-    });
-  } catch {
-    return [];
   }
 }
 
@@ -417,50 +413,27 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const product = await getProduct(params.slug);
-  if (!product) notFound();
+  // Composite endpoint — product + similar + interactions + cosmetic_score + supplement cross-refs + reviews
+  // tek roundtrip'te, Redis 10dk cache. Skin profile bağımsız (cookie tabanlı).
+  const [full, serverSkinProfile] = await Promise.all([
+    getProductFull(params.slug),
+    getServerSkinProfile(),
+  ]);
+  if (!full) notFound();
+
+  const {
+    product,
+    similar: similarProducts,
+    interactions,
+    cosmetic_score: cosmeticScore,
+    supplement_cross_refs: supplementProducts,
+    reviews_aggregate: reviewsAgg,
+  } = full;
 
   // Domain guard: supplement products must render at /takviyeler/<slug>, not /urunler
-  // Aksi halde kozmetik şablonu (INCI, cilt safety skoru) takviye ürününde görünür
   if (product.domain_type === 'supplement') {
     redirect(`/takviyeler/${product.product_slug}`);
   }
-
-  const keyIngredientIds = (product.ingredients || [])
-    .filter((pi: any) => pi.is_key_ingredient || pi.inci_order_rank <= 5)
-    .map((pi: any) => pi.ingredient_id)
-    .filter(Boolean);
-
-  // Fetch supplement cross-references for highlighted/top ingredients
-  const topIngredientIds = (product.ingredients || [])
-    .filter((pi) => pi.ingredient_id && (pi.inci_order_rank <= 3))
-    .map((pi) => pi.ingredient_id!)
-    .slice(0, 5);
-
-  const [similarProducts, interactions, cosmeticScore, supplementCrossRefs, reviewsAgg, serverSkinProfile] = await Promise.all([
-    getSimilarProducts(product.product_id),
-    getIngredientInteractions(keyIngredientIds),
-    apiFetch<any>(`/products/${product.product_id}/cosmetic-score`, { next: { revalidate: 300 } } as any).catch(() => null),
-    Promise.all(
-      topIngredientIds.map(async (id) => {
-        try {
-          return await apiFetch<Array<{ product_id: number; product_name: string; product_slug: string; brand?: { brand_name: string }; images?: { image_url: string }[] }>>(
-            `/products/by-ingredient/${id}?domain_type=supplement&limit=3`,
-            { next: { revalidate: 300 } } as any,
-          );
-        } catch { return []; }
-      }),
-    ),
-    getReviewsAggregate(product.product_id),
-    getServerSkinProfile(),
-  ]);
-
-  // Deduplicate supplement products
-  const supplementMap = new Map<number, { product_id: number; product_name: string; product_slug: string; brand?: { brand_name: string }; images?: { image_url: string }[] }>();
-  supplementCrossRefs.flat().forEach((p) => {
-    if (!supplementMap.has(p.product_id)) supplementMap.set(p.product_id, p);
-  });
-  const supplementProducts = Array.from(supplementMap.values()).slice(0, 6);
 
   // Filter interactions to only those where BOTH ingredients are in this product
   const productIngredientIds = new Set(
@@ -469,7 +442,6 @@ export default async function ProductDetailPage({
   const relevantInteractions = interactions.filter(
     (inter) =>
       inter.severity !== 'none' &&
-      // At least one ingredient is in this product — show as educational info
       (productIngredientIds.has((inter.ingredient_a as any)?.ingredient_id) ||
        productIngredientIds.has((inter.ingredient_b as any)?.ingredient_id)),
   );

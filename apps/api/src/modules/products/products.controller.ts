@@ -154,6 +154,13 @@ export class ProductsController {
     return this.service.findBySlug(slug);
   }
 
+  @Get('slug/:slug/full')
+  @Header('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=3600')
+  @ApiOperation({ summary: 'Ürün detay (composite) — product + similar + interactions + score + reviews + supplement cross-refs tek atışta' })
+  findBySlugFull(@Param('slug') slug: string) {
+    return this.service.findBySlugFull(slug);
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'content_editor')

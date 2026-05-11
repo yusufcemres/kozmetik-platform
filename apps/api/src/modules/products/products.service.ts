@@ -12,6 +12,10 @@ import { CreateAffiliateLinkDto } from './dto/create-affiliate-link.dto';
 import { UpdateAffiliateLinkDto } from './dto/update-affiliate-link.dto';
 import { PaginationDto } from '@common/dto/pagination.dto';
 import { turkishSlug } from '@common/utils/turkish-slug';
+import { CacheService } from '@common/cache/cache.service';
+import { InteractionsService } from '../interactions/interactions.service';
+import { ReviewsService } from '../reviews/reviews.service';
+import { CosmeticScoringService } from '../scoring/cosmetic-scoring.service';
 
 @Injectable()
 export class ProductsService {
@@ -38,6 +42,10 @@ export class ProductsService {
     private readonly clickRepo: Repository<AffiliateClick>,
     @InjectRepository(ProductScore)
     private readonly scoreRepo: Repository<ProductScore>,
+    private readonly cache: CacheService,
+    private readonly interactionsService: InteractionsService,
+    private readonly reviewsService: ReviewsService,
+    private readonly cosmeticScoring: CosmeticScoringService,
   ) {}
 
   async create(dto: CreateProductDto) {
@@ -714,6 +722,10 @@ export class ProductsService {
   }
 
   async findBySlug(slug: string) {
+    const cacheKey = `product:slug:${slug}`;
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return cached;
+
     const entity = await this.repo.findOne({
       where: { product_slug: slug },
       relations: [
@@ -729,11 +741,87 @@ export class ProductsService {
         (l: any) => l.verification_status !== 'needs_review' && l.verification_status !== 'dead',
       );
     }
+    await this.cache.set(cacheKey, entity, 600);
     return entity;
+  }
+
+  /**
+   * Composite endpoint — frontend ürün detay sayfasının tüm ihtiyacını tek roundtrip'te döner.
+   * findBySlug + similar + interactions + cosmetic_score + supplement cross-refs + reviews_aggregate.
+   * 10dk Redis cache; admin update'inde slug bazlı invalidate edilir.
+   */
+  async findBySlugFull(slug: string) {
+    const cacheKey = `product:slug:${slug}:full`;
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return cached;
+
+    const product: any = await this.findBySlug(slug);
+
+    const keyIngredientIds: number[] = (product.ingredients || [])
+      .filter((pi: any) => (pi.is_key_ingredient || pi.inci_order_rank <= 5) && pi.ingredient_id)
+      .map((pi: any) => pi.ingredient_id)
+      .slice(0, 5);
+
+    const topIngredientIds: number[] = (product.ingredients || [])
+      .filter((pi: any) => pi.ingredient_id && pi.inci_order_rank <= 3)
+      .map((pi: any) => pi.ingredient_id)
+      .slice(0, 5);
+
+    const [similar, interactionBatches, cosmeticScore, supplementBatches, reviewsAggregate] = await Promise.all([
+      this.findSimilar(product.product_id, 4).catch(() => []),
+      Promise.all(
+        keyIngredientIds.map((id) =>
+          this.interactionsService.findByIngredient(id).catch(() => []),
+        ),
+      ),
+      this.cosmeticScoring.calculateScore(product.product_id).catch(() => null),
+      Promise.all(
+        topIngredientIds.map((id) =>
+          this.findByIngredient(id, 3, 'supplement').catch(() => []),
+        ),
+      ),
+      this.reviewsService.aggregateForProduct(product.product_id).catch(() => null),
+    ]);
+
+    // Interactions dedup
+    const seen = new Set<number>();
+    const interactions = interactionBatches.flat().filter((r: any) => {
+      if (seen.has(r.interaction_id)) return false;
+      seen.add(r.interaction_id);
+      return true;
+    });
+
+    // Supplement cross-refs dedup
+    const supplementMap = new Map<number, any>();
+    supplementBatches.flat().forEach((p: any) => {
+      if (!supplementMap.has(p.product_id)) supplementMap.set(p.product_id, p);
+    });
+    const supplement_cross_refs = Array.from(supplementMap.values()).slice(0, 6);
+
+    const result = {
+      product,
+      similar,
+      interactions,
+      cosmetic_score: cosmeticScore,
+      supplement_cross_refs,
+      reviews_aggregate: reviewsAggregate,
+    };
+
+    await this.cache.set(cacheKey, result, 600);
+    return result;
+  }
+
+  /** Slug bazlı tüm cache key'lerini temizle — admin update sonrası */
+  async invalidateSlugCache(slug: string): Promise<void> {
+    await Promise.all([
+      this.cache.del(`product:slug:${slug}`),
+      this.cache.del(`product:slug:${slug}:full`),
+    ]);
   }
 
   async update(id: number, dto: UpdateProductDto) {
     const entity = await this.findOne(id);
+    const oldSlug = entity.product_slug;
     const { label, images, ...productData } = dto;
 
     if (productData.product_name) {
@@ -763,6 +851,12 @@ export class ProductsService {
         );
         await this.imageRepo.save(imageEntities);
       }
+    }
+
+    // Cache invalidate: hem eski slug hem yeni slug (rename durumunda)
+    await this.invalidateSlugCache(oldSlug);
+    if (entity.product_slug !== oldSlug) {
+      await this.invalidateSlugCache(entity.product_slug);
     }
 
     return this.findOne(id);

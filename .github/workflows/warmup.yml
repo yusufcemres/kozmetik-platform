@@ -1,0 +1,37 @@
+name: Render API Warmup
+
+# Render Starter tier 15 dk idle sonrası uyur — soğuk başlangıçta 10-30 sn ek gecikme olur.
+# Bu workflow her 10 dakikada API /health endpoint'ini hit'leyerek instance'ı uyanık tutar.
+# Ek bonus: ürün sayfasını da pre-warm eder, Redis cache hot kalır.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  warmup:
+    name: Ping API + warm cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping API health
+        run: |
+          curl -sf --max-time 30 \
+            -H "User-Agent: github-actions-warmup" \
+            https://kozmetik-api.onrender.com/api/v1/health \
+            || echo "API health check failed (may be cold-starting)"
+
+      - name: Warm hot endpoints
+        run: |
+          # Hot path'lerini ping'le — Redis cache'i sıcak tut.
+          # Hata olsa bile fail etme (best-effort warmup).
+          for path in \
+            "/products/top-scored?limit=6" \
+            "/needs" \
+            "/brands?limit=10"; do
+            curl -sf --max-time 30 \
+              -H "User-Agent: github-actions-warmup" \
+              "https://kozmetik-api.onrender.com/api/v1${path}" \
+              > /dev/null || true
+          done
