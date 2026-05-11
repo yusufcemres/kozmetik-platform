@@ -161,6 +161,15 @@ export class ProductsController {
     return this.service.findBySlugFull(slug);
   }
 
+  @Post('admin/cache/flush-products')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Tum product slug Redis cache temizle (ops araci)' })
+  flushProductCache() {
+    return this.service.flushAllProductCache();
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'content_editor')

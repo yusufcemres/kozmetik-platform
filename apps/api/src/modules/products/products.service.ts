@@ -825,6 +825,12 @@ export class ProductsService {
     ]);
   }
 
+  /** Tüm product:slug:* cache key'lerini sil — toplu veri güncellemesi sonrası ops aracı */
+  async flushAllProductCache(): Promise<{ flushed: number }> {
+    await this.cache.delPattern('product:slug:*');
+    return { flushed: -1 };
+  }
+
   async update(id: number, dto: UpdateProductDto) {
     const entity = await this.findOne(id);
     const oldSlug = entity.product_slug;
