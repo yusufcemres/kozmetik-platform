@@ -82,28 +82,27 @@ JSON çıktısı (sadece JSON, başka metin yok):
 
 Görmediklerin için null veya boş array bırak. Okumakta tereddütlü değer için confidence sayma — sadece net okuduğunu yaz. Sadece JSON döndür, başka açıklama ekleme.`;
 
-// 5MB Anthropic limit — büyük fotolar için zarif fallback
+// 5MB Anthropic limit — büyük fotolar için Jimp ile resize
 const MAX_IMAGE_BYTES = 4_900_000;
 
 async function readImageBase64(imagePath) {
   let buf = await readFile(imagePath);
   if (buf.length > MAX_IMAGE_BYTES) {
-    // sharp varsa kullan; yoksa node:zlib bazlı küçültme yapamayız, hata fırlat
     try {
-      const sharp = (await import('sharp')).default;
+      const { Jimp } = await import('jimp');
+      const img = await Jimp.read(buf);
+      // 1600px max width + kademeli kalite düşür
+      const targetWidth = Math.min(img.width, 1600);
+      img.resize({ w: targetWidth });
       let quality = 80;
-      let resized = buf;
-      // Aşamalı sıkıştır: önce kalite düş, hala büyükse 1600px'e küçült
-      while (resized.length > MAX_IMAGE_BYTES && quality >= 40) {
-        resized = await sharp(buf).jpeg({ quality }).toBuffer();
+      let out = await img.getBuffer('image/jpeg', { quality });
+      while (out.length > MAX_IMAGE_BYTES && quality >= 40) {
         quality -= 15;
+        out = await img.getBuffer('image/jpeg', { quality });
       }
-      if (resized.length > MAX_IMAGE_BYTES) {
-        resized = await sharp(buf).resize({ width: 1600 }).jpeg({ quality: 70 }).toBuffer();
-      }
-      buf = resized;
+      buf = out;
     } catch (e) {
-      throw new Error(`Image >5MB and sharp unavailable: ${e.message}`);
+      throw new Error(`Image >5MB resize failed: ${e.message}`);
     }
   }
   return buf.toString('base64');
