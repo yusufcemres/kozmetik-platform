@@ -8,6 +8,8 @@ export interface VisionResult {
   detected_text: string | null;
   confidence: number; // 0-1
   raw?: string;
+  /** Etiketten okunan INCI listesi (var ise). Smart-scan'de mevcut uruni enrich eder. */
+  ingredients_list?: string[];
 }
 
 /**
@@ -57,10 +59,11 @@ Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
   "product_name": "ürün adı veya null",
   "product_type": "serum|krem|tonik|temizleyici|maske|vitamin|takviye|diğer veya null",
   "detected_text": "ambalajda gördüğün metinlerin özeti",
-  "confidence": 0.0-1.0 arası güven skoru
+  "confidence": 0.0-1.0 arası güven skoru,
+  "ingredients_list": ["INCI1", "INCI2", ...]  // İçindekiler / Ingredients bölümünde gördüğün tüm bileşenler (sıralı), parantez içlerini at, %x gibi yüzde belirtileri at, sadece INCI isimleri. Eğer bu panel INCI listesi içermiyorsa boş array.
 }
 
-Emin değilsen null döndür. Türkçe marka/ürün adı olabilir, olduğu gibi yaz.`;
+Emin değilsen null veya boş array döndür. Türkçe karakterleri (ş ç ğ ı ö ü) doğru yaz.`;
   }
 
   private async gemini(image: string, mime: string, apiKey: string): Promise<VisionResult> {
@@ -96,8 +99,8 @@ Emin değilsen null döndür. Türkçe marka/ürün adı olabilir, olduğu gibi 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
+        model: 'claude-sonnet-4-5',
+        max_tokens: 2048,
         messages: [{
           role: 'user',
           content: [
@@ -115,9 +118,16 @@ Emin değilsen null döndür. Türkçe marka/ürün adı olabilir, olduğu gibi 
 
   private parseResult(text: string): VisionResult {
     try {
-      // Strip markdown fences if model adds them
       const clean = text.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
       const parsed = JSON.parse(clean);
+      // ingredients_list parse + temizle
+      let ings: string[] = [];
+      if (Array.isArray(parsed.ingredients_list)) {
+        ings = parsed.ingredients_list
+          .map((s: any) => String(s || '').trim().replace(/^["'`]+|["'`]+$/g, '').replace(/\([^)]*\)/g, '').replace(/\s*%?\s*\d+[.,]?\d*\s*%?\s*/g, ' ').trim())
+          .filter((s: string) => s.length > 1 && s.length < 100)
+          .slice(0, 100);
+      }
       return {
         brand: parsed.brand ?? null,
         product_name: parsed.product_name ?? null,
@@ -125,6 +135,7 @@ Emin değilsen null döndür. Türkçe marka/ürün adı olabilir, olduğu gibi 
         detected_text: parsed.detected_text ?? null,
         confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
         raw: clean,
+        ingredients_list: ings,
       };
     } catch {
       return {
@@ -134,6 +145,7 @@ Emin değilsen null döndür. Türkçe marka/ürün adı olabilir, olduğu gibi 
         detected_text: text.slice(0, 200),
         confidence: 0,
         raw: text,
+        ingredients_list: [],
       };
     }
   }

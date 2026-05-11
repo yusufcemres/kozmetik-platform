@@ -473,12 +473,96 @@ export default function TaraPage() {
                   <div className="text-xs text-on-surface-variant">{result.product.brand_name}</div>
                   <h2 className="text-lg font-bold text-on-surface mt-1">{result.product.product_name}</h2>
                 </div>
+
+                {/* Enrichment: yeni INCI eklendi */}
+                {result.enriched_inci_count != null && result.enriched_inci_count > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm text-green-800">
+                    <span className="material-icon align-middle text-[18px] mr-1" aria-hidden="true">add_circle</span>
+                    Tebrikler! Bu fotoğraftan <strong>{result.enriched_inci_count} yeni INCI</strong> eklendi — Pionér katkı 🏆
+                  </div>
+                )}
+                {result.enriched_inci_count === 0 && result.inci_analysis && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-xs text-blue-700">
+                    Fotoğraftan {result.inci_analysis.summary.matched} INCI okundu — hepsi zaten kayıtlıydı.
+                  </div>
+                )}
+
                 <Link
                   href={`/urunler/${result.product.product_slug}?scan=1`}
                   className="curator-btn-primary text-sm px-6 py-3 inline-flex items-center"
                 >
                   Tam Bilgiyi Gör
                   <span className="material-icon material-icon-sm ml-2" aria-hidden="true">arrow_forward</span>
+                </Link>
+              </div>
+            )}
+
+            {/* INCI-only mode: urun tanınamadı ama INCI listesi okundu */}
+            {result.status === 'inci_only' && result.inci_analysis && (
+              <div className="curator-card p-5 space-y-4">
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 mb-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs">
+                    <span className="material-icon text-[14px]">science</span>
+                    INCI Analizi
+                  </div>
+                  <h2 className="text-lg font-bold text-on-surface mb-1">
+                    Ürün tanınamadı ama içeriği okuduk
+                  </h2>
+                  <p className="text-xs text-on-surface-variant">
+                    {result.inci_analysis.summary.matched} / {result.inci_analysis.summary.total} bileşen REVELA veritabanında eşleşti
+                  </p>
+                  <div className="flex items-baseline justify-center gap-2 mt-3">
+                    <span className="text-3xl font-bold text-on-surface">{result.inci_analysis.summary.score}</span>
+                    <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded ${
+                      result.inci_analysis.summary.verdict === 'çok iyi' ? 'bg-green-600 text-white' :
+                      result.inci_analysis.summary.verdict === 'iyi' ? 'bg-lime-600 text-white' :
+                      result.inci_analysis.summary.verdict === 'orta' ? 'bg-amber-500 text-white' :
+                      result.inci_analysis.summary.verdict === 'riskli' ? 'bg-orange-600 text-white' : 'bg-red-600 text-white'
+                    }`}>{result.inci_analysis.summary.verdict}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto">
+                  {result.inci_analysis.tokens.map((t) => (
+                    <div key={t.rank} className={`border border-outline-variant/20 rounded p-2 text-xs ${!t.matched ? 'opacity-60 bg-surface-container-low' : ''}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[9px] text-outline">#{t.rank}</div>
+                          {t.matched && t.ingredient ? (
+                            <Link href={`/icerikler/${t.ingredient.ingredient_slug}`} className="font-semibold text-on-surface hover:text-primary truncate block">
+                              {t.ingredient.common_name || t.ingredient.inci_name}
+                            </Link>
+                          ) : (
+                            <div className="text-on-surface-variant">"{t.raw}" — eşleşmedi</div>
+                          )}
+                          {t.matched && t.ingredient?.function_summary && (
+                            <div className="text-[10px] text-on-surface-variant line-clamp-1">{t.ingredient.function_summary}</div>
+                          )}
+                        </div>
+                        {t.matched && t.ingredient?.evidence_grade && (
+                          <span className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded ${
+                            t.ingredient.evidence_grade === 'A' ? 'bg-green-100 text-green-700' :
+                            t.ingredient.evidence_grade === 'B' ? 'bg-lime-100 text-lime-700' :
+                            t.ingredient.evidence_grade === 'C' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>{t.ingredient.evidence_grade}</span>
+                        )}
+                      </div>
+                      {t.matched && t.ingredient && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {t.ingredient.allergen_flag && <span className="text-[9px] text-amber-700 bg-amber-50 px-1 rounded">Alerjen</span>}
+                          {t.ingredient.fragrance_flag && <span className="text-[9px] text-orange-700 bg-orange-50 px-1 rounded">Parfüm</span>}
+                          {t.ingredient.cmr_class && <span className="text-[9px] text-red-700 bg-red-50 px-1 rounded">CMR</span>}
+                          {t.ingredient.eu_banned && <span className="text-[9px] text-red-700 bg-red-100 px-1 rounded">AB Yasak</span>}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href={`/inci-analiz?prefill=${encodeURIComponent((result.vision_result?.ingredients_list || []).join(', '))}`}
+                  className="block text-center text-xs text-primary hover:underline"
+                >
+                  Tam INCI Analiz Sayfasında Aç →
                 </Link>
               </div>
             )}

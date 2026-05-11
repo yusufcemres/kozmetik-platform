@@ -2,9 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
-import { UnknownScan, ScanHistory } from '@database/entities';
+import { UnknownScan, ScanHistory, ProductIngredient } from '@database/entities';
 import { VisionService } from './vision.service';
 import { MatchService, MatchCandidate } from './match.service';
+import { IngredientsService } from '../ingredients/ingredients.service';
 
 export interface SmartScanRequest {
   barcode?: string;
@@ -15,8 +16,8 @@ export interface SmartScanRequest {
 }
 
 export interface SmartScanResponse {
-  status: 'matched' | 'candidates' | 'unknown';
-  method: 'barcode' | 'vision' | 'vision_fuzzy' | null;
+  status: 'matched' | 'candidates' | 'unknown' | 'inci_only';
+  method: 'barcode' | 'vision' | 'vision_fuzzy' | 'inci_only' | null;
   confidence: number;
   product?: {
     product_id: number;
@@ -27,6 +28,10 @@ export interface SmartScanResponse {
   candidates?: MatchCandidate[];
   vision_result?: any;
   scan_id?: number;
+  /** Yeni fotodan eklenen INCI sayisi (matched product enrichment). */
+  enriched_inci_count?: number;
+  /** Vision'in fotodan okuduğu tüm INCI'lerin analiz sonucu (inci-only mode + enrichment için). */
+  inci_analysis?: any;
 }
 
 @Injectable()
@@ -38,9 +43,55 @@ export class SmartScanService {
   constructor(
     @InjectRepository(UnknownScan) private readonly unknowns: Repository<UnknownScan>,
     @InjectRepository(ScanHistory) private readonly history: Repository<ScanHistory>,
+    @InjectRepository(ProductIngredient) private readonly pi: Repository<ProductIngredient>,
     private readonly vision: VisionService,
     private readonly match: MatchService,
+    private readonly ingredientsService: IngredientsService,
   ) {}
+
+  /**
+   * Fotodan okunan INCI listesini mevcut urune ekle. Sadece master'da olmayan
+   * INCI'ler eklenir. Kullaniciya kac yeni INCI eklendigi bildirilir.
+   */
+  private async enrichProductWithInci(
+    productId: number,
+    inciList: string[],
+  ): Promise<{ added: number; analysis: any }> {
+    if (!inciList || inciList.length === 0) return { added: 0, analysis: null };
+    // ingredients.analyzeInciList ile fuzzy match
+    const analysis = await this.ingredientsService.analyzeInciList(inciList.join(', '));
+    const matched = (analysis.tokens || []).filter((t: any) => t.matched && t.ingredient);
+    if (matched.length === 0) return { added: 0, analysis };
+    // Mevcut INCI'leri al
+    const existing = await this.pi
+      .createQueryBuilder('pi')
+      .where('pi.product_id = :pid AND pi.ingredient_id IS NOT NULL', { pid: productId })
+      .getMany();
+    const existingIds = new Set(existing.map((e) => e.ingredient_id));
+    const maxRank = existing.reduce((m, e) => Math.max(m, e.inci_order_rank || 0), 0);
+    let rank = maxRank;
+    let added = 0;
+    for (const t of matched) {
+      if (!t.ingredient) continue;
+      const ingId = t.ingredient.ingredient_id;
+      if (existingIds.has(ingId)) continue;
+      rank++;
+      await this.pi.save(
+        this.pi.create({
+          product_id: productId,
+          ingredient_id: ingId,
+          ingredient_display_name: t.ingredient.inci_name || t.raw,
+          inci_order_rank: rank,
+          concentration_band: 'unknown',
+          is_below_one_percent_estimate: false,
+          is_highlighted_in_claims: false,
+          match_status: 'auto_matched',
+        } as any),
+      );
+      added++;
+    }
+    return { added, analysis };
+  }
 
   async scan(req: SmartScanRequest): Promise<SmartScanResponse> {
     // === Pipeline A: Barcode (REVELA DB) ===
@@ -91,15 +142,11 @@ export class SmartScanService {
     if (req.image_base64) {
       const imageHash = createHash('md5').update(req.image_base64.slice(0, 1000)).digest('hex');
 
-      // Cache check
-      const cached = this.cache.get(imageHash);
-      if (cached && Date.now() - cached.ts < this.CACHE_TTL) {
-        this.logger.log(`Cache hit: ${imageHash.slice(0, 8)}`);
-        return cached.res;
-      }
-
+      // Cache check — enrichment varsa cache atla (DB'ye yeni veri yazılır)
       const visionResult = await this.vision.recognizeProduct(req.image_base64, req.image_mime);
-      this.logger.log(`Vision: brand=${visionResult.brand} product=${visionResult.product_name} conf=${visionResult.confidence}`);
+      this.logger.log(`Vision: brand=${visionResult.brand} product=${visionResult.product_name} inci_count=${(visionResult.ingredients_list || []).length} conf=${visionResult.confidence}`);
+
+      const hasIncis = (visionResult.ingredients_list || []).length >= 3;
 
       if (visionResult.brand || visionResult.product_name) {
         const candidates = await this.match.findByVisionText(visionResult.brand, visionResult.product_name);
@@ -107,8 +154,17 @@ export class SmartScanService {
         if (candidates.length > 0) {
           const best = candidates[0];
 
-          // Auto-match if very confident
           if (best.similarity >= 0.6) {
+            // === Matched → enrich INCIs from new photo ===
+            let enrichResult = { added: 0, analysis: null as any };
+            if (hasIncis) {
+              try {
+                enrichResult = await this.enrichProductWithInci(best.product_id, visionResult.ingredients_list!);
+                this.logger.log(`Enrich: product #${best.product_id} added ${enrichResult.added} new INCIs`);
+              } catch (err: any) {
+                this.logger.warn(`Enrich failed: ${err.message}`);
+              }
+            }
             await this.recordHistory(
               req.user_id,
               best.product_id,
@@ -117,7 +173,7 @@ export class SmartScanService {
               null,
               `${visionResult.brand} ${visionResult.product_name}`,
             );
-            const response: SmartScanResponse = {
+            return {
               status: 'matched',
               method: 'vision',
               confidence: best.similarity,
@@ -128,9 +184,9 @@ export class SmartScanService {
                 brand_name: best.brand_name,
               },
               vision_result: visionResult,
+              enriched_inci_count: enrichResult.added,
+              inci_analysis: enrichResult.analysis,
             };
-            this.cache.set(imageHash, { res: response, ts: Date.now() });
-            return response;
           }
 
           // Multiple candidates — let user pick
@@ -141,6 +197,23 @@ export class SmartScanService {
             candidates,
             vision_result: visionResult,
           };
+        }
+      }
+
+      // === INCI-only mode: ürün tanınamadı ama bileşen listesi okundu ===
+      if (hasIncis) {
+        try {
+          const analysis = await this.ingredientsService.analyzeInciList(visionResult.ingredients_list!.join(', '));
+          await this.recordHistory(req.user_id, null, 'vision', visionResult.confidence, null, `INCI-only: ${visionResult.ingredients_list!.length} items`);
+          return {
+            status: 'inci_only',
+            method: 'inci_only',
+            confidence: visionResult.confidence,
+            vision_result: visionResult,
+            inci_analysis: analysis,
+          };
+        } catch (err: any) {
+          this.logger.warn(`INCI-only analysis failed: ${err.message}`);
         }
       }
 

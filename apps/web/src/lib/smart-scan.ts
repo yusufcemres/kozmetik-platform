@@ -11,8 +11,8 @@ export type ScanCandidate = {
 };
 
 export type ScanResponse = {
-  status: 'matched' | 'candidates' | 'unknown';
-  method: 'barcode' | 'vision' | 'vision_fuzzy' | null;
+  status: 'matched' | 'candidates' | 'unknown' | 'inci_only';
+  method: 'barcode' | 'vision' | 'vision_fuzzy' | 'inci_only' | null;
   confidence: number;
   product?: {
     product_id: number;
@@ -35,6 +35,41 @@ export type ScanResponse = {
     obf_url?: string;
   };
   scan_id?: number;
+  /** Mevcut urune eklenmis yeni INCI sayisi (enrichment). */
+  enriched_inci_count?: number;
+  /** Fotodan tum INCI'lerin tek tek analizi (inci_only mode + enrichment). */
+  inci_analysis?: {
+    tokens: Array<{
+      rank: number;
+      raw: string;
+      matched: boolean;
+      confidence?: number;
+      ingredient?: {
+        ingredient_id: number;
+        inci_name: string;
+        common_name?: string | null;
+        ingredient_slug?: string;
+        function_summary?: string;
+        evidence_grade?: 'A' | 'B' | 'C' | 'D' | 'F' | null;
+        allergen_flag?: boolean;
+        fragrance_flag?: boolean;
+        eu_banned?: boolean;
+        cmr_class?: string | null;
+      };
+    }>;
+    summary: {
+      total: number;
+      matched: number;
+      unmatched: number;
+      allergens: number;
+      fragrances: number;
+      cmr: number;
+      eu_banned: number;
+      kathon: number;
+      score: number;
+      verdict: 'çok iyi' | 'iyi' | 'orta' | 'riskli' | 'tehlikeli';
+    };
+  };
 };
 
 export async function smartScan(body: {
