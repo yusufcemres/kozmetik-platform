@@ -55,16 +55,70 @@ function inciFingerprint(inciList) {
   return createHash('sha256').update(normalized).digest('hex').slice(0, 24);
 }
 
-// Cluster: barkoda gore grupla (yoksa brand+product_name)
+// Filename -> Unix timestamp: IMG_20260511_162740.jpg -> 2026-05-11 16:27:40
+function fileTimestamp(filename) {
+  const m = filename.match(/IMG_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
+  if (!m) return 0;
+  const [, y, mo, d, h, mi, s] = m;
+  return new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}`).getTime();
+}
+
+function normName(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9ığşçöü]/g, '');
+}
+
+// Cluster: oncellikle barkoda, sonra zamansal+brand benzerligine gore
 function clusterByProduct(records) {
-  const clusters = new Map();
+  // 1. Barkod kume - en guvenilir
+  const byBarcode = new Map();
+  const noBarcode = [];
   for (const rec of records) {
-    const key = rec.barcode
-      ? `barcode:${rec.barcode}`
-      : `bp:${(rec.brand_name || '?').toLowerCase()}|${(rec.product_name || '?').toLowerCase()}`;
-    if (!clusters.has(key)) clusters.set(key, []);
-    clusters.get(key).push(rec);
+    const bc = rec.barcode ? String(rec.barcode).replace(/\D/g, '') : null;
+    if (bc && bc.length >= 8) {
+      if (!byBarcode.has(bc)) byBarcode.set(bc, []);
+      byBarcode.get(bc).push(rec);
+    } else {
+      noBarcode.push(rec);
+    }
   }
+
+  // 2. Barkodu olmayanlar: zamansal + brand benzerligi ile grupla
+  noBarcode.sort((a, b) => fileTimestamp(a.source_file) - fileTimestamp(b.source_file));
+  const tempGroups = [];
+  for (const rec of noBarcode) {
+    const ts = fileTimestamp(rec.source_file);
+    const bn = normName(rec.brand_name);
+    const pn = normName(rec.product_name);
+    let placed = false;
+    for (const g of tempGroups) {
+      const last = g[g.length - 1];
+      const dt = ts - fileTimestamp(last.source_file);
+      if (dt > 120_000) continue; // >2 dk = farkli urun
+      // Marka veya urun adi yakinsa ayni urun
+      const lbn = normName(last.brand_name);
+      const lpn = normName(last.product_name);
+      const brandMatch = bn && lbn && (bn === lbn || bn.includes(lbn) || lbn.includes(bn));
+      const nameMatch = pn && lpn && (pn === lpn || pn.includes(lpn) || lpn.includes(pn));
+      if (dt < 60_000 || brandMatch || nameMatch) {
+        g.push(rec);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) tempGroups.push([rec]);
+  }
+
+  // 3. Barkodu olmayan gruplara da unique key ver
+  const clusters = new Map();
+  for (const [bc, group] of byBarcode) {
+    clusters.set(`barcode:${bc}`, group);
+  }
+  tempGroups.forEach((g, idx) => {
+    const sample = g[0];
+    const key = `temporal:${normName(sample.brand_name) || 'unk'}-${normName(sample.product_name) || idx}-${idx}`;
+    clusters.set(key, g);
+  });
+
   // Her cluster'i tek bir "merged" nesneye birlestir
   const merged = [];
   for (const [key, group] of clusters) {
@@ -261,16 +315,31 @@ async function main() {
       if (!DRY && brandId && brandId !== -1) {
         const slug = turkishSlug(`${m.brand_name} ${m.product_name}`).slice(0, 80) +
           '-' + (m.barcode ? m.barcode.slice(-4) : Date.now().toString().slice(-6));
+        // product_type -> category mapping
+        const ptype = (m.product_type || '').toLowerCase();
+        let categoryId = 1; // yuz-bakim default
+        if (ptype.includes('serum') || ptype.includes('ampul')) categoryId = 105;
+        else if (ptype.includes('krem') && (ptype.includes('nem') || ptype.includes('moisturiz'))) categoryId = 104;
+        else if (ptype.includes('şampuan') || ptype.includes('sampuan') || ptype.includes('shampoo')) categoryId = 139;
+        else if (ptype.includes('saç') || ptype.includes('sac') || ptype.includes('hair')) categoryId = 7;
+        else if (ptype.includes('sabun') || ptype.includes('soap')) categoryId = 2;
+        else if (ptype.includes('dudak') || ptype.includes('lip')) categoryId = 5;
+        else if (ptype.includes('vücut') || ptype.includes('vucut') || ptype.includes('body')) categoryId = 6;
+        else if (ptype.includes('makyaj') || ptype.includes('makeup') || ptype.includes('fondöten')) categoryId = 8;
+        else if (ptype.includes('güneş') || ptype.includes('sun')) categoryId = 122;
+        // dis macunu/agiz icin spesifik kategori yok, vucut-bakim altina al
+        else if (ptype.includes('diş') || ptype.includes('dis macunu')) categoryId = 6;
         const ins = await client.query(
           `INSERT INTO products (
-            brand_id, product_name, product_slug, short_description, barcode,
+            brand_id, category_id, product_name, product_slug, short_description, barcode,
             net_content_value, net_content_unit,
             domain_type, status, target_audience,
             created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'cosmetic', 'draft', 'adult', NOW(), NOW())
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'cosmetic', 'draft', 'adult', NOW(), NOW())
           RETURNING product_id`,
           [
             brandId,
+            categoryId,
             m.product_name || 'Bilinmiyor',
             slug,
             `${m.brand_name || ''} ${m.product_name || ''} — OCR ile eklendi (${m.source_files.length} foto).`,
