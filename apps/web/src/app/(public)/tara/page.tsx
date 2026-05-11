@@ -3,10 +3,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { detectBarcodeFromVideo, captureVideoFrame, blobToBase64 } from '@/lib/barcode';
+import { detectBarcodeFromVideo, captureVideoFrame, blobToBase64, fileToResizedBase64, detectBarcodeFromBlob } from '@/lib/barcode';
 import { smartScan, ScanResponse } from '@/lib/smart-scan';
 
-type Phase = 'idle' | 'permission' | 'scanning' | 'processing' | 'result' | 'error';
+type Phase = 'idle' | 'permission' | 'scanning' | 'processing' | 'result' | 'error' | 'batch';
+
+interface BatchProgress {
+  total: number;
+  current: number;
+  results: Array<{ filename: string; status: 'ok' | 'fail'; product_slug?: string; product_name?: string; brand_name?: string; barcode?: string; error?: string }>;
+}
 
 export default function TaraPage() {
   const router = useRouter();
@@ -185,6 +191,76 @@ export default function TaraPage() {
     setResult(null);
     setError('');
     setPhase('idle');
+    setBatchProgress(null);
+  };
+
+  // === Foto upload (galeri tek dosya) ===
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = ''; // reset
+    setPhase('processing');
+    setHint('Foto islenıyor...');
+    setError('');
+    try {
+      // Once barkod tara (yerel, ucuz)
+      const barcode = await detectBarcodeFromBlob(file);
+      if (barcode?.rawValue) {
+        await handleDetected({ barcode: barcode.rawValue });
+        return;
+      }
+      // Barkod yoksa vision'a gonder (resize)
+      const { base64, mime } = await fileToResizedBase64(file, 1600, 0.82);
+      await handleDetected({ image_base64: base64, image_mime: mime });
+    } catch (err: any) {
+      setPhase('error');
+      setError(err.message || 'Foto islenemedi');
+    }
+  };
+
+  // === Batch upload (coklu dosya) ===
+  const [batchProgress, setBatchProgress] = useState<BatchProgress | null>(null);
+
+  const handleBatchUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    e.target.value = ''; // reset
+    setPhase('batch');
+    setError('');
+    setBatchProgress({ total: files.length, current: 0, results: [] });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        // Barkod tara
+        const barcode = await detectBarcodeFromBlob(file);
+        let res: ScanResponse;
+        if (barcode?.rawValue) {
+          res = await smartScan({ barcode: barcode.rawValue });
+        } else {
+          const { base64, mime } = await fileToResizedBase64(file, 1600, 0.82);
+          res = await smartScan({ image_base64: base64, image_mime: mime });
+        }
+        const status: 'ok' | 'fail' = res.status === 'matched' || res.status === 'candidates' ? 'ok' : 'fail';
+        setBatchProgress((prev) => prev ? {
+          ...prev,
+          current: i + 1,
+          results: [...prev.results, {
+            filename: file.name,
+            status,
+            product_slug: res.product?.product_slug,
+            product_name: res.product?.product_name || res.vision_result?.product_name || undefined,
+            brand_name: res.product?.brand_name || res.vision_result?.brand || undefined,
+            barcode: barcode?.rawValue,
+          }],
+        } : prev);
+      } catch (err: any) {
+        setBatchProgress((prev) => prev ? {
+          ...prev,
+          current: i + 1,
+          results: [...prev.results, { filename: file.name, status: 'fail', error: err.message }],
+        } : prev);
+      }
+    }
   };
 
   // Video container görünür mü? scanning + processing + (transition için) permission de dahil
@@ -240,17 +316,98 @@ export default function TaraPage() {
               </div>
             </div>
 
-            <button
-              onClick={startCamera}
-              className="curator-btn-primary text-sm px-8 py-3"
-              type="button"
-            >
-              <span className="material-icon material-icon-sm mr-2" aria-hidden="true">photo_camera</span>
-              Kamerayı Aç
-            </button>
-            <p className="text-[10px] text-outline mt-2">
-              İlk açılışta tarayıcı kamera izni soracak — &quot;İzin ver&quot; demen yeterli.
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch justify-center max-w-md mx-auto pt-2">
+              <button
+                onClick={startCamera}
+                className="curator-btn-primary text-sm px-6 py-3 flex-1"
+                type="button"
+              >
+                <span className="material-icon material-icon-sm mr-2" aria-hidden="true">photo_camera</span>
+                Kamerayı Aç
+              </button>
+              <label className="cursor-pointer flex-1 inline-flex items-center justify-center text-sm px-6 py-3 border border-outline-variant/40 rounded-sm bg-surface hover:bg-surface-container-low transition-colors">
+                <span className="material-icon material-icon-sm mr-2" aria-hidden="true">photo_library</span>
+                Galeriden Sec
+                <input type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+              </label>
+            </div>
+            <label className="block cursor-pointer text-xs text-primary hover:underline pt-1">
+              <span className="material-icon align-middle text-[14px] mr-1" aria-hidden="true">cloud_upload</span>
+              Toplu yukle (cok foto, batch tarama)
+              <input type="file" accept="image/*" multiple onChange={handleBatchUpload} className="hidden" />
+            </label>
+            <p className="text-[10px] text-outline">
+              Kamera izni isteyeceğiz veya galeriden seç. Toplu yüklemede her foto otomatik taranır.
             </p>
+          </div>
+        )}
+
+        {/* Processing — tek foto OCR scan efekti */}
+        {phase === 'processing' && !showVideo && (
+          <div className="curator-card p-8 text-center space-y-4">
+            <div className="relative w-32 h-32 mx-auto rounded-lg bg-gradient-to-br from-primary/5 to-primary/15 overflow-hidden">
+              <span className="material-icon absolute inset-0 flex items-center justify-center text-primary text-[56px] opacity-60" aria-hidden="true">document_scanner</span>
+              <div className="scan-line" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-on-surface">Etiket analiz ediliyor</p>
+              <p className="text-xs text-on-surface-variant mt-1">Barkod · marka · INCI okunuyor…</p>
+            </div>
+          </div>
+        )}
+
+        {/* Batch upload progress */}
+        {phase === 'batch' && batchProgress && (
+          <div className="curator-card p-5 space-y-4">
+            <div className="text-center">
+              {batchProgress.current < batchProgress.total && (
+                <div className="relative w-24 h-24 mx-auto rounded-lg bg-gradient-to-br from-primary/5 to-primary/15 overflow-hidden mb-3">
+                  <span className="material-icon absolute inset-0 flex items-center justify-center text-primary text-[40px] opacity-60" aria-hidden="true">photo_library</span>
+                  <div className="scan-line" />
+                </div>
+              )}
+              <h2 className="text-lg font-bold text-on-surface mb-1">Toplu Tarama</h2>
+              <p className="text-xs text-on-surface-variant">{batchProgress.current} / {batchProgress.total} foto işlendi</p>
+              <div className="w-full bg-surface-container-low rounded-full h-2 mt-3 overflow-hidden">
+                <div
+                  className="bg-primary h-full transition-all duration-300"
+                  style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+            <div className="max-h-[400px] overflow-y-auto space-y-1">
+              {batchProgress.results.map((r, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs border-b border-outline-variant/10 pb-1">
+                  <span className="material-icon text-[14px]" style={{ color: r.status === 'ok' ? '#10b981' : '#ef4444' }} aria-hidden="true">
+                    {r.status === 'ok' ? 'check_circle' : 'error'}
+                  </span>
+                  <span className="text-outline text-[10px] flex-shrink-0">{r.filename.slice(-25)}</span>
+                  <span className="text-on-surface truncate flex-1">
+                    {r.product_slug ? (
+                      <Link href={`/urunler/${r.product_slug}`} className="hover:underline text-primary">
+                        {r.brand_name} / {r.product_name}
+                      </Link>
+                    ) : (
+                      <span className="text-on-surface-variant">{r.product_name || r.brand_name || r.error || 'eşleşmedi'}</span>
+                    )}
+                  </span>
+                  {r.barcode && <span className="text-[9px] text-outline font-mono">{r.barcode}</span>}
+                </div>
+              ))}
+            </div>
+            {batchProgress.current === batchProgress.total && (
+              <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20">
+                <span className="text-xs text-on-surface-variant">
+                  ✓ {batchProgress.results.filter(r => r.status === 'ok').length} eşleşti · {batchProgress.results.filter(r => r.status === 'fail').length} bulunamadı
+                </span>
+                <button
+                  onClick={reset}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Yeni Tarama
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -455,6 +612,29 @@ export default function TaraPage() {
           </div>
         )}
       </div>
+
+      {/* OCR scanning effect — profesyonel taramayor cizgisi */}
+      <style jsx>{`
+        .scan-line {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(var(--color-primary-rgb, 79, 124, 241), 0.95), transparent);
+          box-shadow: 0 0 14px 4px rgba(var(--color-primary-rgb, 79, 124, 241), 0.4);
+          animation: scan-sweep 1.6s ease-in-out infinite;
+        }
+        @keyframes scan-sweep {
+          0%   { top: 0%; opacity: 0; }
+          10%  { opacity: 1; }
+          50%  { top: 96%; opacity: 1; }
+          60%  { opacity: 0; top: 96%; }
+          61%  { top: 0%; opacity: 0; }
+          70%  { opacity: 1; }
+          100% { top: 0%; opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }

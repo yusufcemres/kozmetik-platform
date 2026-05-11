@@ -73,6 +73,41 @@ export function captureVideoFrame(video: HTMLVideoElement, mime = 'image/jpeg', 
   });
 }
 
+/**
+ * File (galeri/disk) -> resize + JPEG'e cevir + base64.
+ * Backend body limit 15MB; 1600px max width yeterli (Anthropic Vision'a uyum).
+ */
+export async function fileToResizedBase64(
+  file: File,
+  maxWidth = 1600,
+  quality = 0.82,
+): Promise<{ base64: string; mime: string; width: number; height: number; size: number }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = url;
+    });
+    const scale = Math.min(1, maxWidth / img.naturalWidth);
+    const w = Math.floor(img.naturalWidth * scale);
+    const h = Math.floor(img.naturalHeight * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Canvas blob failed'))), 'image/jpeg', quality);
+    });
+    const base64 = await blobToBase64(blob);
+    return { base64, mime: 'image/jpeg', width: w, height: h, size: blob.size };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
