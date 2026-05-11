@@ -52,7 +52,8 @@ export class VisionService {
 
   private buildPrompt(): string {
     return `Bu fotoğrafta bir kozmetik ürünü, gıda takviyesi veya cilt bakım ürünü olup olmadığına bak.
-Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
+
+SADECE aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
 
 {
   "brand": "marka adı veya null",
@@ -60,10 +61,19 @@ Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
   "product_type": "serum|krem|tonik|temizleyici|maske|vitamin|takviye|diğer veya null",
   "detected_text": "ambalajda gördüğün metinlerin özeti",
   "confidence": 0.0-1.0 arası güven skoru,
-  "ingredients_list": ["INCI1", "INCI2", ...]  // İçindekiler / Ingredients bölümünde gördüğün tüm bileşenler (sıralı), parantez içlerini at, %x gibi yüzde belirtileri at, sadece INCI isimleri. Eğer bu panel INCI listesi içermiyorsa boş array.
+  "ingredients_list": ["INCI1", "INCI2", ...]
 }
 
-Emin değilsen null veya boş array döndür. Türkçe karakterleri (ş ç ğ ı ö ü) doğru yaz.`;
+KRİTİK INGREDIENT KURALLARI:
+1) SADECE FOTOĞRAFTA NET OKUYABİLDİĞİN INCI'leri yaz. Tahmin etme, hayal etme.
+2) Bir INCI bulanık/silik/yarısı kesilmişse onu YAZMA.
+3) Bir INCI 'İçindekiler' veya 'Ingredients' başlığı altında geçiyorsa yaz; başka yerde (reklam, claim, slogan) geçiyorsa YAZMA.
+4) Aynı INCI'yi 2 kez yazma. Aynı kökten farklı versiyon (örn. PEG-40 ve PEG-60) sadece her ikisi de NET görünüyorsa yaz; tek görünüyorsa diğerini ekleme.
+5) Yüzde işaretlerini, parantez içlerini ve dilbilgisi bağlaçlarını (ve, and) at.
+6) Türkçe karakterleri (ş ç ğ ı ö ü) doğru yaz.
+7) Eğer fotoğrafta INCI listesi yoksa veya net okuyamıyorsan, boş array [] döndür.
+
+Emin değilsen null veya boş array döndür. Hallucinate etme.`;
   }
 
   private async gemini(image: string, mime: string, apiKey: string): Promise<VisionResult> {

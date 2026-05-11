@@ -835,6 +835,12 @@ export class ProductsService {
         (l: any) => l.verification_status !== 'needs_review' && l.verification_status !== 'dead',
       );
     }
+    // pending_review INCI'leri publike gosterme (admin onay bekliyor)
+    if (entity.ingredients) {
+      entity.ingredients = entity.ingredients.filter(
+        (pi: any) => pi.match_status !== 'pending_review',
+      );
+    }
     await this.cache.set(cacheKey, entity, 600);
     return entity;
   }
@@ -917,6 +923,50 @@ export class ProductsService {
   async flushAllProductCache(): Promise<{ flushed: number }> {
     await this.cache.delPattern('product:slug:*');
     return { flushed: -1 };
+  }
+
+  /**
+   * Tarama ile gelen pending INCI onerileri.
+   * Public sayfada gosterilmeyen, admin onayi bekleyen INCI'ler.
+   */
+  async getInciProposals(): Promise<any[]> {
+    return this.repo.manager.query(
+      `SELECT
+        pi.product_ingredient_id, pi.product_id, pi.ingredient_id,
+        pi.ingredient_display_name, pi.inci_order_rank, pi.created_at,
+        p.product_name, p.product_slug, p.status AS product_status,
+        b.brand_name,
+        i.inci_name, i.common_name, i.ingredient_slug, i.evidence_grade,
+        i.allergen_flag, i.fragrance_flag
+      FROM product_ingredients pi
+      JOIN products p ON p.product_id = pi.product_id
+      LEFT JOIN brands b ON b.brand_id = p.brand_id
+      LEFT JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
+      WHERE pi.match_status = 'pending_review'
+      ORDER BY pi.created_at DESC, pi.product_id, pi.inci_order_rank`,
+    );
+  }
+
+  async approveInciProposal(productIngredientId: number): Promise<{ approved: boolean }> {
+    const r = await this.repo.manager.query(
+      `UPDATE product_ingredients SET match_status = 'auto_matched', updated_at = NOW()
+       WHERE product_ingredient_id = $1 AND match_status = 'pending_review'
+       RETURNING product_ingredient_id, product_id`,
+      [productIngredientId],
+    );
+    if (r.length > 0) {
+      // cache flush — slug bilinmiyor, basit yol: tum product:slug:* (composite cache)
+      await this.cache.delPattern(`product:slug:*`);
+    }
+    return { approved: r.length > 0 };
+  }
+
+  async rejectInciProposal(productIngredientId: number): Promise<{ rejected: boolean }> {
+    const r = await this.repo.manager.query(
+      `DELETE FROM product_ingredients WHERE product_ingredient_id = $1 AND match_status = 'pending_review' RETURNING product_ingredient_id`,
+      [productIngredientId],
+    );
+    return { rejected: r.length > 0 };
   }
 
   /**

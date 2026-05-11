@@ -186,6 +186,33 @@ export class ProductsController {
     return this.service.getOcrDrafts();
   }
 
+  @Get('admin/inci-proposals')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Tarama ile eklenen pending INCI onerileri (admin onay)' })
+  inciProposals() {
+    return this.service.getInciProposals();
+  }
+
+  @Post('admin/inci-proposals/:piId/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'INCI onerisi onayla (pending_review -> auto_matched)' })
+  approveInciProposal(@Param('piId', ParseIntPipe) piId: number) {
+    return this.service.approveInciProposal(piId);
+  }
+
+  @Delete('admin/inci-proposals/:piId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'INCI onerisi reddet (sil)' })
+  rejectInciProposal(@Param('piId', ParseIntPipe) piId: number) {
+    return this.service.rejectInciProposal(piId);
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'content_editor')

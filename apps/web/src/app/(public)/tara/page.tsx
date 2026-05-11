@@ -14,6 +14,62 @@ interface BatchProgress {
   results: Array<{ filename: string; status: 'ok' | 'fail'; product_slug?: string; product_name?: string; brand_name?: string; barcode?: string; error?: string }>;
 }
 
+// Tek INCI kartı — varsayılan kapalı, tıklayınca detay açılır
+function InciCard({ token: t }: { token: any }) {
+  const [open, setOpen] = useState(false);
+  const gradeColor = !t.ingredient?.evidence_grade ? 'bg-surface-container text-outline' :
+    t.ingredient.evidence_grade === 'A' ? 'bg-green-100 text-green-700' :
+    t.ingredient.evidence_grade === 'B' ? 'bg-lime-100 text-lime-700' :
+    t.ingredient.evidence_grade === 'C' ? 'bg-amber-100 text-amber-700' :
+    'bg-red-100 text-red-700';
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen((v) => !v)}
+      className={`text-left border border-outline-variant/20 rounded p-2 text-xs hover:border-primary/40 transition-colors ${!t.matched ? 'opacity-60 bg-surface-container-low' : 'bg-surface'} ${open ? 'border-primary/60 shadow-sm' : ''}`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-[9px] text-outline w-5 flex-shrink-0">#{t.rank}</span>
+        <span className="flex-1 min-w-0 truncate">
+          {t.matched && t.ingredient ? (
+            <span className="font-semibold text-on-surface">{t.ingredient.common_name || t.ingredient.inci_name}</span>
+          ) : (
+            <span className="text-on-surface-variant">"{t.raw}" — eşleşmedi</span>
+          )}
+        </span>
+        {t.matched && t.ingredient?.evidence_grade && (
+          <span className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded ${gradeColor}`}>{t.ingredient.evidence_grade}</span>
+        )}
+        <span className="material-icon text-outline text-[16px] flex-shrink-0" aria-hidden="true">
+          {open ? 'expand_less' : 'expand_more'}
+        </span>
+      </div>
+      {open && t.matched && t.ingredient && (
+        <div className="mt-2 pt-2 border-t border-outline-variant/20 space-y-1.5">
+          {t.ingredient.function_summary && (
+            <p className="text-[11px] text-on-surface-variant leading-snug">{t.ingredient.function_summary}</p>
+          )}
+          <div className="flex flex-wrap gap-1">
+            {t.ingredient.allergen_flag && <span className="text-[9px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Alerjen</span>}
+            {t.ingredient.fragrance_flag && <span className="text-[9px] text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded">Parfüm</span>}
+            {t.ingredient.cmr_class && <span className="text-[9px] text-red-700 bg-red-50 px-1.5 py-0.5 rounded">CMR</span>}
+            {t.ingredient.eu_banned && <span className="text-[9px] text-red-700 bg-red-100 px-1.5 py-0.5 rounded">AB Yasak</span>}
+          </div>
+          {t.ingredient.ingredient_slug && (
+            <Link
+              href={`/icerikler/${t.ingredient.ingredient_slug}`}
+              className="block text-[11px] text-primary hover:underline mt-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Tam bilim makalesi →
+            </Link>
+          )}
+        </div>
+      )}
+    </button>
+  );
+}
+
 export default function TaraPage() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -494,11 +550,12 @@ export default function TaraPage() {
                   <h2 className="text-lg font-bold text-on-surface mt-1">{result.product.product_name}</h2>
                 </div>
 
-                {/* Enrichment: yeni INCI eklendi */}
+                {/* Enrichment: yeni INCI onerildi (pending_review) */}
                 {result.enriched_inci_count != null && result.enriched_inci_count > 0 && (
-                  <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm text-green-800">
-                    <span className="material-icon align-middle text-[18px] mr-1" aria-hidden="true">add_circle</span>
-                    Tebrikler! Bu fotoğraftan <strong>{result.enriched_inci_count} yeni INCI</strong> eklendi — Pionér katkı 🏆
+                  <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
+                    <span className="material-icon align-middle text-[18px] mr-1" aria-hidden="true">pending</span>
+                    Tebrikler! <strong>{result.enriched_inci_count} INCI önerin</strong> admin onayına gönderildi — Pionér katkı 🏆
+                    <p className="text-[11px] mt-1 opacity-80">Onaylandığında ürün sayfasında görünecek.</p>
                   </div>
                 )}
                 {result.enriched_inci_count === 0 && result.inci_analysis && (
@@ -541,41 +598,10 @@ export default function TaraPage() {
                     }`}>{result.inci_analysis.summary.verdict}</span>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto">
+                <div className="text-[10px] text-outline text-center">Detay görmek için kartlara tıkla</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto">
                   {result.inci_analysis.tokens.map((t) => (
-                    <div key={t.rank} className={`border border-outline-variant/20 rounded p-2 text-xs ${!t.matched ? 'opacity-60 bg-surface-container-low' : ''}`}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[9px] text-outline">#{t.rank}</div>
-                          {t.matched && t.ingredient ? (
-                            <Link href={`/icerikler/${t.ingredient.ingredient_slug}`} className="font-semibold text-on-surface hover:text-primary truncate block">
-                              {t.ingredient.common_name || t.ingredient.inci_name}
-                            </Link>
-                          ) : (
-                            <div className="text-on-surface-variant">"{t.raw}" — eşleşmedi</div>
-                          )}
-                          {t.matched && t.ingredient?.function_summary && (
-                            <div className="text-[10px] text-on-surface-variant line-clamp-1">{t.ingredient.function_summary}</div>
-                          )}
-                        </div>
-                        {t.matched && t.ingredient?.evidence_grade && (
-                          <span className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded ${
-                            t.ingredient.evidence_grade === 'A' ? 'bg-green-100 text-green-700' :
-                            t.ingredient.evidence_grade === 'B' ? 'bg-lime-100 text-lime-700' :
-                            t.ingredient.evidence_grade === 'C' ? 'bg-amber-100 text-amber-700' :
-                            'bg-red-100 text-red-700'
-                          }`}>{t.ingredient.evidence_grade}</span>
-                        )}
-                      </div>
-                      {t.matched && t.ingredient && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {t.ingredient.allergen_flag && <span className="text-[9px] text-amber-700 bg-amber-50 px-1 rounded">Alerjen</span>}
-                          {t.ingredient.fragrance_flag && <span className="text-[9px] text-orange-700 bg-orange-50 px-1 rounded">Parfüm</span>}
-                          {t.ingredient.cmr_class && <span className="text-[9px] text-red-700 bg-red-50 px-1 rounded">CMR</span>}
-                          {t.ingredient.eu_banned && <span className="text-[9px] text-red-700 bg-red-100 px-1 rounded">AB Yasak</span>}
-                        </div>
-                      )}
-                    </div>
+                    <InciCard key={t.rank} token={t} />
                   ))}
                 </div>
                 <Link

@@ -75,6 +75,8 @@ export class SmartScanService {
       if (!t.ingredient) continue;
       const ingId = t.ingredient.ingredient_id;
       if (existingIds.has(ingId)) continue;
+      // ONEMLI: pending_review status — admin onayina kadar publike gosterilmez
+      // (false-positive INCI eklenmesini önler, örn. PEG-60 hatasi)
       rank++;
       await this.pi.save(
         this.pi.create({
@@ -85,7 +87,7 @@ export class SmartScanService {
           concentration_band: 'unknown',
           is_below_one_percent_estimate: false,
           is_highlighted_in_claims: false,
-          match_status: 'auto_matched',
+          match_status: 'pending_review',
         } as any),
       );
       added++;

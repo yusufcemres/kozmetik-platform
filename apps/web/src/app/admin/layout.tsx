@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/articles', label: 'Makaleler', icon: '📝' },
   { href: '/admin/review-queue', label: 'Review Queue', icon: '👁️' },
   { href: '/admin/ocr-drafts', label: 'OCR Drafts', icon: '📸' },
+  { href: '/admin/inci-proposals', label: 'INCI Önerileri', icon: '🧪' },
   { href: '/admin/scoring-config', label: 'Scoring', icon: '⚙️' },
   { href: '/admin/qc', label: 'Kalite Kontrol', icon: '🔍' },
   { href: '/admin/supplements', label: 'Supplement', icon: '💊' },
