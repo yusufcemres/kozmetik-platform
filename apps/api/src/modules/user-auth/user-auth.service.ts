@@ -173,6 +173,87 @@ export class UserAuthService {
     return this.users.findOne({ where: { user_id: userId, is_active: true } });
   }
 
+  /**
+   * Kullanıcının tarama geçmişi — product JOIN ile ürün bilgisi dahil.
+   * Tek kart bir ürün gösterirse listede son tarama gözükür.
+   */
+  async getScanHistory(userId: number, limit = 50): Promise<Array<{
+    history_id: number;
+    method: string;
+    confidence: number | null;
+    raw_barcode: string | null;
+    raw_query: string | null;
+    created_at: Date;
+    product: {
+      product_id: number;
+      product_name: string;
+      product_slug: string;
+      brand_name: string | null;
+      image_url: string | null;
+      top_need_name: string | null;
+    } | null;
+  }>> {
+    const rows = await this.scanHistory.manager.query(
+      `SELECT
+        sh.history_id, sh.method, sh.confidence, sh.raw_barcode, sh.raw_query, sh.created_at,
+        p.product_id, p.product_name, p.product_slug, p.top_need_name,
+        b.brand_name,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.product_id ORDER BY pi.sort_order ASC LIMIT 1) AS image_url
+      FROM scan_history sh
+      LEFT JOIN products p ON p.product_id = sh.product_id
+      LEFT JOIN brands b ON b.brand_id = p.brand_id
+      WHERE sh.user_id = $1
+      ORDER BY sh.created_at DESC
+      LIMIT $2`,
+      [userId, limit],
+    );
+    return rows.map((r: any) => ({
+      history_id: r.history_id,
+      method: r.method,
+      confidence: r.confidence != null ? Number(r.confidence) : null,
+      raw_barcode: r.raw_barcode,
+      raw_query: r.raw_query,
+      created_at: r.created_at,
+      product: r.product_id ? {
+        product_id: r.product_id,
+        product_name: r.product_name,
+        product_slug: r.product_slug,
+        brand_name: r.brand_name,
+        image_url: r.image_url,
+        top_need_name: r.top_need_name,
+      } : null,
+    }));
+  }
+
+  /** Kullanıcının tarama özeti — toplam, bu ay, eşsiz ürün, eşsiz marka, Pionér count */
+  async getScanStats(userId: number): Promise<{
+    total: number;
+    this_month: number;
+    unique_products: number;
+    unique_brands: number;
+    pionér_count: number;
+  }> {
+    const rows = await this.scanHistory.manager.query(
+      `SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE sh.created_at > date_trunc('month', NOW()))::int AS this_month,
+        COUNT(DISTINCT sh.product_id) FILTER (WHERE sh.product_id IS NOT NULL)::int AS unique_products,
+        COUNT(DISTINCT p.brand_id) FILTER (WHERE p.brand_id IS NOT NULL)::int AS unique_brands,
+        COUNT(*) FILTER (WHERE sh.method IN ('vision','vision_fuzzy') AND sh.product_id IS NULL)::int AS pionér_count
+       FROM scan_history sh
+       LEFT JOIN products p ON p.product_id = sh.product_id
+       WHERE sh.user_id = $1`,
+      [userId],
+    );
+    return rows[0] || { total: 0, this_month: 0, unique_products: 0, unique_brands: 0, pionér_count: 0 };
+  }
+
+  /** Tek scan geçmişini sil (kullanıcı kendi taramasını gizlemek isterse) */
+  async deleteScan(userId: number, historyId: number): Promise<{ deleted: boolean }> {
+    const r = await this.scanHistory.delete({ user_id: userId, history_id: historyId });
+    return { deleted: (r.affected ?? 0) > 0 };
+  }
+
   async exportUserData(userId: number): Promise<Record<string, unknown>> {
     const user = await this.users.findOne({ where: { user_id: userId } });
     if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');

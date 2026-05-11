@@ -36,13 +36,14 @@ interface Brand {
 // === Data Fetching (ISR) ===
 
 async function getHomeData() {
-  const [topProducts, latestRes, categories, brands, ingredientCountRes, supplementsRes] = await Promise.allSettled([
+  const [topProducts, latestRes, categories, brands, ingredientCountRes, supplementsRes, scanStatsRes] = await Promise.allSettled([
     apiFetch<Product[]>('/products/top-scored?limit=8&domain_type=cosmetic', { next: { revalidate: 300 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=cosmetic', { next: { revalidate: 1800 } } as any),
     apiFetch<Category[]>('/categories/tree', { next: { revalidate: 86400 } } as any),
     apiFetch<Brand[]>('/products/popular-brands?limit=12', { next: { revalidate: 300 } } as any),
     apiFetch<{ data: unknown[]; meta: { total: number } }>('/ingredients?limit=1&page=1', { next: { revalidate: 86400 } } as any),
     apiFetch<{ data: Product[]; meta: { total: number } }>('/products?limit=6&page=1&domain_type=supplement', { next: { revalidate: 300 } } as any),
+    apiFetch<{ total_scans: number; total_scanners: number; unique_products: number; scans_this_month: number }>('/smart-scan/stats', { next: { revalidate: 600 } } as any),
   ]);
 
   const FALLBACK_PRODUCT_COUNT = 1903;
@@ -53,6 +54,7 @@ async function getHomeData() {
   const brandsData = brands.status === 'fulfilled' ? brands.value : [];
   const ingredientData = ingredientCountRes.status === 'fulfilled' ? ingredientCountRes.value.meta?.total || 0 : 0;
   const supplementData = supplementsRes.status === 'fulfilled' ? supplementsRes.value : { data: [], meta: { total: 0 } };
+  const scanStats = scanStatsRes.status === 'fulfilled' ? scanStatsRes.value : null;
 
   return {
     topProducts: topProducts.status === 'fulfilled' ? topProducts.value : [],
@@ -65,6 +67,7 @@ async function getHomeData() {
     brands: brandsData,
     brandCount: brandsData.length > 12 ? brandsData.length : FALLBACK_BRAND_COUNT,
     ingredientCount: ingredientData || FALLBACK_INGREDIENT_COUNT,
+    scanStats,
   };
 }
 
@@ -153,7 +156,7 @@ function ProductCard({ product }: { product: Product }) {
 // === Page ===
 
 export default async function HomePage() {
-  const { topProducts, latest, supplementCount, brands, brandCount, ingredientCount } = await getHomeData();
+  const { topProducts, latest, supplementCount, brands, brandCount, ingredientCount, scanStats } = await getHomeData();
   const featuredProducts = topProducts.length > 0 ? topProducts : (latest.data || []);
 
   const jsonLd = {
@@ -186,6 +189,7 @@ export default async function HomePage() {
           takviye: supplementCount || 0,
           icerik: ingredientCount || 0,
           marka: brandCount || 0,
+          tarama: scanStats?.total_scans || 0,
         }}
       />
 

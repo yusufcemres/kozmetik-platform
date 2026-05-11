@@ -16,13 +16,23 @@ export class TitckService {
   constructor(private readonly dataSource: DataSource) {}
 
   /**
-   * Haftalık cron. Tüm draft ürünleri TİTCK ile çapraz kontrol eder.
-   * MVP: scraper henüz yok → tüm ürünler 'not_checked' kalır.
-   * Faz F'te browserless worker ile TİTCK sorgu sistemine bağlanır.
+   * Tüm published/active ürünleri TİTCK yasaklı INCI listesi ile çapraz kontrol eder.
+   * Banned bulunanları 'banned' statüye düşürür ve titck_banned_reason yazar.
+   * Yasaklı bulunmayanlarda 'not_checked' korunur (web scraper hazır olunca dolar).
    */
   async rescanAll(): Promise<{ checked: number; verified: number; banned: number }> {
-    this.logger.log('TİTCK rescan placeholder — scraper yazılana kadar no-op');
-    return { checked: 0, verified: 0, banned: 0 };
+    const products = await this.dataSource.query(
+      `SELECT product_id FROM products WHERE status IN ('published','active') AND domain_type = 'cosmetic'`,
+    );
+    let checked = 0;
+    let banned = 0;
+    for (const row of products) {
+      const result = await this.checkProduct(row.product_id);
+      checked++;
+      if (result.status === 'banned') banned++;
+    }
+    this.logger.log(`TİTCK rescan: ${checked} checked, ${banned} banned flagged`);
+    return { checked, verified: 0, banned };
   }
 
   async checkProduct(productId: number): Promise<TitckCheckResult> {
@@ -35,6 +45,19 @@ export class TitckService {
       return { status: 'banned', notificationNo: null, bannedReason: banned };
     }
     return { status: 'not_checked', notificationNo: null };
+  }
+
+  /**
+   * Admin manuel olarak ürünün TİTCK bildirim numarasını ekler.
+   * Kullanıcı kozmetikbildirim.titck.gov.tr'den çekip buraya yazar (yarı-otomatik).
+   * Web scraper hazır olunca otomatize edilir.
+   */
+  async setNotification(productId: number, notificationNo: string, status: TitckStatus = 'verified'): Promise<TitckCheckResult> {
+    await this.dataSource.query(
+      `UPDATE products SET titck_status = $2, titck_notification_no = $3, titck_verified_at = NOW() WHERE product_id = $1`,
+      [productId, status, notificationNo],
+    );
+    return { status, notificationNo };
   }
 
   /**

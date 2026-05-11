@@ -191,11 +191,43 @@ export class SmartScanService {
     }
   }
 
-  async getUserHistory(userId: number, limit = 50): Promise<ScanHistory[]> {
-    return this.history.find({
-      where: { user_id: userId },
-      order: { created_at: 'DESC' },
-      take: limit,
-    });
+  /**
+   * Public topluluk istatistigi — homepage sosyal kanit sayaci.
+   * 1 saat Redis cache verilebilir ama oturumda 1 sorgu yeterli.
+   */
+  async getPublicStats(): Promise<{
+    total_scans: number;
+    total_scanners: number;
+    unique_products: number;
+    scans_this_month: number;
+  }> {
+    const rows = await this.history.manager.query(
+      `SELECT
+        COUNT(*)::int AS total_scans,
+        COUNT(DISTINCT user_id) FILTER (WHERE user_id IS NOT NULL)::int AS total_scanners,
+        COUNT(DISTINCT product_id) FILTER (WHERE product_id IS NOT NULL)::int AS unique_products,
+        COUNT(*) FILTER (WHERE created_at > date_trunc('month', NOW()))::int AS scans_this_month
+       FROM scan_history`,
+    );
+    return rows[0] || { total_scans: 0, total_scanners: 0, unique_products: 0, scans_this_month: 0 };
+  }
+
+  async getUserHistory(userId: number, limit = 50): Promise<any[]> {
+    // Enriched: product + brand + image JOIN
+    return this.history.manager.query(
+      `SELECT
+        sh.history_id, sh.user_id, sh.product_id, sh.method, sh.confidence,
+        sh.raw_barcode, sh.raw_query, sh.created_at,
+        p.product_name, p.product_slug, p.top_need_name,
+        b.brand_name,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.product_id ORDER BY pi.sort_order ASC LIMIT 1) AS image_url
+      FROM scan_history sh
+      LEFT JOIN products p ON p.product_id = sh.product_id
+      LEFT JOIN brands b ON b.brand_id = p.brand_id
+      WHERE sh.user_id = $1
+      ORDER BY sh.created_at DESC
+      LIMIT $2`,
+      [userId, limit],
+    );
   }
 }

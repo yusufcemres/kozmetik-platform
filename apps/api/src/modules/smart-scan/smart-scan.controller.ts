@@ -24,4 +24,10 @@ export class SmartScanController {
   async history(@Req() req: any) {
     return this.service.getUserHistory(req.user.user_id);
   }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Topluluk tarama istatistigi (public sosyal kanit)' })
+  async stats() {
+    return this.service.getPublicStats();
+  }
 }

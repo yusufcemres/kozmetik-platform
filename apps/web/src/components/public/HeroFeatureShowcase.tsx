@@ -18,7 +18,13 @@ import HeroSearchAutocomplete from './HeroSearchAutocomplete';
  */
 
 interface Props {
-  stats: { kozmetik: number; takviye: number; icerik: number; marka: number };
+  stats: {
+    kozmetik: number;
+    takviye: number;
+    icerik: number;
+    marka: number;
+    tarama?: number;
+  };
 }
 
 const SCAN_STEPS = [
@@ -324,6 +330,7 @@ export default function HeroFeatureShowcase({ stats }: Props) {
             { label: 'Takviye', value: stats.takviye },
             { label: 'İçerik', value: stats.icerik },
             { label: 'Marka', value: stats.marka },
+            ...(stats.tarama && stats.tarama > 0 ? [{ label: 'Tarama', value: stats.tarama }] : []),
           ].map((s) => (
             <div key={s.label} className="flex items-baseline gap-1.5">
               <span className="text-base sm:text-lg font-extrabold tracking-tight text-on-surface">

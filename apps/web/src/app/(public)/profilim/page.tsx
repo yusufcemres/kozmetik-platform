@@ -66,6 +66,11 @@ interface ScanHistoryItem {
   raw_barcode: string | null;
   raw_query: string | null;
   created_at: string;
+  product_name?: string | null;
+  product_slug?: string | null;
+  brand_name?: string | null;
+  image_url?: string | null;
+  top_need_name?: string | null;
 }
 
 // === Constants ===
@@ -981,19 +986,31 @@ function ProfilePageInner() {
                   confidence >= 80 ? 'text-primary bg-primary/10' :
                   confidence >= 50 ? 'text-tertiary bg-tertiary/10' :
                   'text-error bg-error/10';
-                const label = scan.raw_barcode || scan.raw_query || `Tarama #${scan.history_id}`;
-                return (
-                  <div key={scan.history_id} className="curator-card p-4 flex items-center gap-4">
-                    <span className="material-icon text-outline-variant" aria-hidden="true">
-                      {scan.product_id ? 'check_circle' : 'help_outline'}
-                    </span>
+                const hasProduct = scan.product_id && scan.product_slug;
+                const title = scan.product_name || scan.raw_barcode || scan.raw_query || `Tarama #${scan.history_id}`;
+                const subline = scan.brand_name ? scan.brand_name : (scan.method === 'barcode' ? scan.raw_barcode : null);
+                const card = (
+                  <div key={scan.history_id} className="curator-card p-3 flex items-center gap-3 hover:bg-surface-container-low transition-colors">
+                    {scan.image_url ? (
+                      <img src={scan.image_url} alt={title} className="w-12 h-12 rounded object-contain bg-surface-container-low flex-shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 rounded bg-surface-container-low flex items-center justify-center flex-shrink-0">
+                        <span className="material-icon text-outline-variant" aria-hidden="true">
+                          {hasProduct ? 'check_circle' : 'help_outline'}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-on-surface truncate">{label}</p>
-                      <div className="flex items-center gap-2 mt-1">
+                      {subline && <p className="text-[10px] text-outline uppercase tracking-wider truncate">{subline}</p>}
+                      <p className="text-sm font-medium text-on-surface truncate">{title}</p>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         <span className="text-[10px] text-outline">
                           {new Date(scan.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </span>
                         <span className="label-caps text-outline text-[9px]">· {scan.method}</span>
+                        {scan.top_need_name && (
+                          <span className="text-[9px] text-primary bg-primary/5 px-1.5 py-0.5 rounded-sm">{scan.top_need_name}</span>
+                        )}
                         {confidence !== null && confBadge && (
                           <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-sm ${confBadge}`}>
                             {confidence}%
@@ -1001,8 +1018,16 @@ function ProfilePageInner() {
                         )}
                       </div>
                     </div>
+                    {hasProduct && (
+                      <span className="material-icon text-outline-variant text-[18px]" aria-hidden="true">chevron_right</span>
+                    )}
                   </div>
                 );
+                return hasProduct ? (
+                  <Link key={scan.history_id} href={`/urunler/${scan.product_slug}`}>
+                    {card}
+                  </Link>
+                ) : card;
               })}
             </div>
           )}
