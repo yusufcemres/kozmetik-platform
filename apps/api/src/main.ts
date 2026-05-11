@@ -2,9 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import compression from 'compression';
-import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { initSentry } from './sentry';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
@@ -13,9 +13,9 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 initSentry();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'log'],
-    bodyParser: false, // Manuel olarak 15MB limitle yukleyecegiz (smart-scan foto)
+    bodyParser: false, // Asagida 15MB limitle manuel ekliyoruz
   });
   const configService = app.get(ConfigService);
   const isProduction = configService.get('NODE_ENV') === 'production';
@@ -28,8 +28,9 @@ async function bootstrap() {
 
   // Body limit yükseltildi (smart-scan foto base64 + batch upload icin)
   // Default 100kb → 15MB (5 foto x ~3MB = 15MB margin)
-  app.use(json({ limit: '15mb' }));
-  app.use(urlencoded({ limit: '15mb', extended: true }));
+  // NestJS native API — express modulunu direkt import etmiyoruz (build sorunu)
+  app.useBodyParser('json', { limit: '15mb' });
+  app.useBodyParser('urlencoded', { limit: '15mb', extended: true });
 
   // Global prefix
   app.setGlobalPrefix('api/v1');
