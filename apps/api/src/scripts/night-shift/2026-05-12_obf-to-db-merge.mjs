@@ -123,9 +123,19 @@ let stats = {
 };
 
 for (const f of files) {
-  const data = JSON.parse(await readFile(join(INPUT, f), 'utf-8'));
+  let data;
+  try {
+    data = JSON.parse(await readFile(join(INPUT, f), 'utf-8'));
+  } catch (e) {
+    console.log(`SKIP ${f}: invalid JSON`);
+    continue;
+  }
+  if (!data || !Array.isArray(data.products)) {
+    console.log(`SKIP ${f}: no products array`);
+    continue;
+  }
   stats.files_processed++;
-  console.log(`\n=== ${data.brand_slug} — ${data.products.length} urun ===`);
+  console.log(`\n=== ${data.brand_slug || f} — ${data.products.length} urun ===`);
 
   for (const p of data.products) {
     if (!p.barcode || !p.product_name) {

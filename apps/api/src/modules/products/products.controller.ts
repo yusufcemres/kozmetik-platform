@@ -195,6 +195,31 @@ export class ProductsController {
     return this.service.getInciProposals();
   }
 
+  @Get('admin/inci-mapping-proposals')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'AI ile uretilmis INCI->need mapping onerileri (admin onay)' })
+  inciMappingProposals() {
+    return this.service.getInciMappingProposals();
+  }
+
+  @Post('admin/inci-mapping-proposals/:proposalId/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  approveMappingProposal(@Param('proposalId', ParseIntPipe) proposalId: number) {
+    return this.service.approveMappingProposal(proposalId);
+  }
+
+  @Delete('admin/inci-mapping-proposals/:proposalId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  rejectMappingProposal(@Param('proposalId', ParseIntPipe) proposalId: number) {
+    return this.service.rejectMappingProposal(proposalId);
+  }
+
   @Post('admin/inci-proposals/:piId/approve')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'reviewer', 'content_editor')

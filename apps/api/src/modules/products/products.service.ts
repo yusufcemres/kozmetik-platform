@@ -969,6 +969,50 @@ export class ProductsService {
     return { rejected: r.length > 0 };
   }
 
+  /** INCI -> need mapping AI onerileri (admin onay bekler) */
+  async getInciMappingProposals(): Promise<any[]> {
+    return this.repo.manager.query(
+      `SELECT p.proposal_id, p.ingredient_id, p.need_id, p.relevance_score, p.effect_type,
+        p.evidence_level, p.ai_reasoning, p.status, p.created_at,
+        i.inci_name, i.common_name, i.ingredient_slug, i.evidence_grade AS ing_grade,
+        n.need_name, n.need_slug
+      FROM ingredient_need_mapping_proposals p
+      JOIN ingredients i ON i.ingredient_id = p.ingredient_id
+      JOIN needs n ON n.need_id = p.need_id
+      WHERE p.status = 'pending'
+      ORDER BY p.relevance_score DESC, p.created_at DESC
+      LIMIT 500`,
+    );
+  }
+
+  async approveMappingProposal(proposalId: number): Promise<{ approved: boolean }> {
+    const proposal = await this.repo.manager.query(
+      `SELECT * FROM ingredient_need_mapping_proposals WHERE proposal_id = $1 AND status = 'pending'`,
+      [proposalId],
+    );
+    if (proposal.length === 0) return { approved: false };
+    const p = proposal[0];
+    await this.repo.manager.query(
+      `INSERT INTO ingredient_need_mappings (ingredient_id, need_id, relevance_score, effect_type, evidence_level, usage_context_note, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+       ON CONFLICT DO NOTHING`,
+      [p.ingredient_id, p.need_id, p.relevance_score, p.effect_type, p.evidence_level, p.ai_reasoning],
+    );
+    await this.repo.manager.query(
+      `UPDATE ingredient_need_mapping_proposals SET status='approved', reviewed_at=NOW() WHERE proposal_id = $1`,
+      [proposalId],
+    );
+    return { approved: true };
+  }
+
+  async rejectMappingProposal(proposalId: number): Promise<{ rejected: boolean }> {
+    const r = await this.repo.manager.query(
+      `UPDATE ingredient_need_mapping_proposals SET status='rejected', reviewed_at=NOW() WHERE proposal_id = $1 AND status='pending' RETURNING proposal_id`,
+      [proposalId],
+    );
+    return { rejected: r.length > 0 };
+  }
+
   /**
    * OCR ile eklenen draft urunler — admin review queue.
    * Son 7 gunde olusturulmus + status='draft' + OCR ile eklenmis (short_description'da
