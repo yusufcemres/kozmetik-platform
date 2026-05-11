@@ -15,6 +15,7 @@ const navItems = [
   { href: '/admin/ingredient-need-mappings', label: 'Eşleşmeler', icon: '🔗' },
   { href: '/admin/articles', label: 'Makaleler', icon: '📝' },
   { href: '/admin/review-queue', label: 'Review Queue', icon: '👁️' },
+  { href: '/admin/ocr-drafts', label: 'OCR Drafts', icon: '📸' },
   { href: '/admin/scoring-config', label: 'Scoring', icon: '⚙️' },
   { href: '/admin/qc', label: 'Kalite Kontrol', icon: '🔍' },
   { href: '/admin/supplements', label: 'Supplement', icon: '💊' },

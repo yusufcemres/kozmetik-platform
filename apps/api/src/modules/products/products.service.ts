@@ -919,6 +919,33 @@ export class ProductsService {
     return { flushed: -1 };
   }
 
+  /**
+   * OCR ile eklenen draft urunler — admin review queue.
+   * Son 7 gunde olusturulmus + status='draft' + OCR ile eklenmis (short_description'da
+   * 'OCR ile eklendi' geciyor) kayitlari brand+ing_count+image_count ile listeler.
+   */
+  async getOcrDrafts(): Promise<any[]> {
+    return this.repo.manager.query(
+      `SELECT
+        p.product_id, p.product_name, p.product_slug, p.barcode, p.status,
+        p.short_description, p.net_content_value, p.net_content_unit,
+        p.created_at,
+        b.brand_id, b.brand_name,
+        c.category_name, c.category_slug,
+        (SELECT COUNT(*) FROM product_ingredients pi WHERE pi.product_id = p.product_id) AS ing_count,
+        (SELECT COUNT(*) FROM product_ingredients pi WHERE pi.product_id = p.product_id AND pi.ingredient_id IS NOT NULL) AS ing_matched,
+        (SELECT COUNT(*) FROM product_images im WHERE im.product_id = p.product_id) AS image_count,
+        (SELECT COUNT(*) FROM affiliate_links al WHERE al.product_id = p.product_id AND al.is_active = true) AS affiliate_count
+      FROM products p
+      LEFT JOIN brands b ON b.brand_id = p.brand_id
+      LEFT JOIN categories c ON c.category_id = p.category_id
+      WHERE p.status = 'draft'
+        AND p.created_at > NOW() - INTERVAL '7 days'
+        AND (p.short_description ILIKE '%OCR ile eklendi%' OR p.short_description ILIKE '%OCR%')
+      ORDER BY ing_count DESC, p.created_at DESC`,
+    );
+  }
+
   async update(id: number, dto: UpdateProductDto) {
     const entity = await this.findOne(id);
     const oldSlug = entity.product_slug;

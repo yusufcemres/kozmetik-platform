@@ -177,6 +177,15 @@ export class ProductsController {
     return this.service.flushAllProductCache();
   }
 
+  @Get('admin/ocr-drafts')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('super_admin', 'reviewer', 'content_editor')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'OCR ile eklenen draft urun review queue' })
+  ocrDrafts() {
+    return this.service.getOcrDrafts();
+  }
+
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('super_admin', 'content_editor')
