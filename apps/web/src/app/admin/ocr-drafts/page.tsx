@@ -54,12 +54,14 @@ export default function OcrDraftsPage() {
   useEffect(() => {
     if (!token) return;
     load();
-    // brand + category yukle (modal icin)
+    // brand + category yukle (modal icin) — limit cap 200
     Promise.all([
-      api.get<{ data: Brand[] }>('/brands?limit=500', { token }).catch(() => ({ data: [] })),
+      api.get<{ data: Brand[] }>('/brands?limit=200', { token }).catch(() => ({ data: [] })),
       api.get<Category[]>('/categories/tree', { token }).catch(() => []),
     ]).then(([b, c]) => {
-      setBrands((b as any).data || (b as any));
+      const brandRows = ((b as any).data || (b as any) || []) as Brand[];
+      brandRows.sort((a, b) => (a.brand_name || '').localeCompare(b.brand_name || '', 'tr'));
+      setBrands(brandRows);
       // Flatten category tree
       const flat: Category[] = [];
       const walk = (n: any) => {

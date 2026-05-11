@@ -123,18 +123,21 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (!token) return;
-    // Brand listesi
+    // Brand listesi (limit cap 200, sort'u JS'te yap)
     api
-      .get<{ data: { brand_id: number; brand_name: string }[] }>('/brands?limit=500&sort=name', { token })
+      .get<{ data: { brand_id: number; brand_name: string }[] }>('/brands?limit=200', { token })
       .then((res) => {
-        const rows = (res as any).data || (res as any);
+        const rows = (res as any).data || (res as any) || [];
         setBrands(
           rows
             .map((b: any) => ({ value: String(b.brand_id), label: b.brand_name }))
             .sort((a: any, b: any) => a.label.localeCompare(b.label, 'tr')),
         );
       })
-      .catch(() => setBrands([]));
+      .catch((err) => {
+        console.error('Brand load failed:', err);
+        setBrands([]);
+      });
     // Kategori tree -> flat
     api
       .get<any[]>('/categories/tree', { token })
