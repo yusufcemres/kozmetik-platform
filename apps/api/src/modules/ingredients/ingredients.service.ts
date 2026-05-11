@@ -183,4 +183,130 @@ export class IngredientsService {
       (a, b) => (orderMap.get(a.ingredient_id) ?? 0) - (orderMap.get(b.ingredient_id) ?? 0),
     );
   }
+
+  /**
+   * INCI listesi yapıştır → bileşen bileşen analiz et.
+   * Kullanıcı ürün etiketinden kopyala-yapıştır metni atar, biz parse + fuzzy match + skor döner.
+   *
+   * Skor heuristik (0-100):
+   *   100 - 6 × (alerjen sayısı) - 12 × (CMR / EU banned / Kathon) - 4 × (eşleşmeyen)
+   *   + bonus: aktif (evidence A/B), zararlı yoksa
+   */
+  async analyzeInciList(rawText: string) {
+    const cleaned = (rawText || '').trim();
+    if (!cleaned) return { tokens: [], summary: { total: 0 } };
+
+    // Parse: virgül, nokta, satır sonu ile böl
+    const tokens = cleaned
+      .replace(/[\(\[].*?[\)\]]/g, '')
+      .split(/[,;.\n]+/)
+      .map((t) => t.trim().replace(/^["'`]+|["'`]+$/g, ''))
+      .filter((t) => t.length > 1 && t.length < 120)
+      .slice(0, 80);
+
+    if (tokens.length === 0) return { tokens: [], summary: { total: 0 } };
+
+    // Her token için tek SQL'de en iyi eşleşmeyi bul (pg_trgm)
+    const placeholders = tokens.map((_, i) => `$${i + 1}`).join(', ');
+    const rows: Array<{ token: string; ingredient_id: number; score: number }> = await this.repo.query(
+      `
+      WITH input_tokens AS (
+        SELECT unnest(ARRAY[${placeholders}]::text[]) AS token
+      ),
+      best_matches AS (
+        SELECT it.token, i.ingredient_id,
+               GREATEST(
+                 similarity(LOWER(i.inci_name), LOWER(it.token)),
+                 similarity(LOWER(COALESCE(i.common_name, '')), LOWER(it.token))
+               ) AS score,
+               ROW_NUMBER() OVER (
+                 PARTITION BY it.token
+                 ORDER BY GREATEST(
+                   similarity(LOWER(i.inci_name), LOWER(it.token)),
+                   similarity(LOWER(COALESCE(i.common_name, '')), LOWER(it.token))
+                 ) DESC
+               ) AS rn
+        FROM input_tokens it
+        JOIN ingredients i ON i.is_active = true
+        WHERE GREATEST(
+          similarity(LOWER(i.inci_name), LOWER(it.token)),
+          similarity(LOWER(COALESCE(i.common_name, '')), LOWER(it.token))
+        ) > 0.35
+      )
+      SELECT token, ingredient_id, score FROM best_matches WHERE rn = 1
+      `,
+      tokens,
+    );
+
+    const matchMap = new Map(rows.map((r) => [r.token, { ingredient_id: r.ingredient_id, score: Number(r.score) }]));
+    const ids = rows.map((r) => r.ingredient_id);
+    const ingredients = ids.length > 0
+      ? await this.repo
+          .createQueryBuilder('i')
+          .where('i.ingredient_id IN (:...ids)', { ids })
+          .getMany()
+      : [];
+    const ingMap = new Map(ingredients.map((i) => [i.ingredient_id, i]));
+
+    // Per-token sonuç
+    let allergens = 0, fragrances = 0, cmr = 0, banned = 0, kathon = 0, matched = 0;
+    const goodActives = new Set(['niacinamide', 'hyaluronic-acid', 'sodium-hyaluronate', 'panthenol', 'tocopherol', 'centella-asiatica', 'glycerin', 'retinol', 'ascorbic-acid', 'salicylic-acid']);
+    let activeBonus = 0;
+
+    const results = tokens.map((token, idx) => {
+      const match = matchMap.get(token);
+      const ing = match ? ingMap.get(match.ingredient_id) : null;
+      if (!ing) {
+        return { rank: idx + 1, raw: token, matched: false };
+      }
+      matched++;
+      if (ing.allergen_flag) allergens++;
+      if (ing.fragrance_flag) fragrances++;
+      if (ing.cmr_class) cmr++;
+      if (ing.eu_banned) banned++;
+      const lowerInci = (ing.inci_name || '').toLowerCase();
+      if (lowerInci.includes('methylisothiazolinone') || lowerInci.includes('methylchloroisothiazolinone')) kathon++;
+      if (ing.ingredient_slug && goodActives.has(ing.ingredient_slug)) activeBonus += 4;
+      return {
+        rank: idx + 1,
+        raw: token,
+        matched: true,
+        confidence: Math.round((match!.score) * 100) / 100,
+        ingredient: {
+          ingredient_id: ing.ingredient_id,
+          inci_name: ing.inci_name,
+          common_name: ing.common_name,
+          ingredient_slug: ing.ingredient_slug,
+          function_summary: ing.function_summary,
+          evidence_grade: ing.evidence_grade,
+          safety_class: ing.safety_class,
+          allergen_flag: ing.allergen_flag,
+          fragrance_flag: ing.fragrance_flag,
+          eu_banned: ing.eu_banned,
+          cmr_class: ing.cmr_class,
+        },
+      };
+    });
+
+    // Skor hesabı
+    const unmatched = tokens.length - matched;
+    let score = 100 - allergens * 6 - cmr * 18 - banned * 25 - kathon * 12 - unmatched * 3 + Math.min(activeBonus, 12);
+    score = Math.max(0, Math.min(100, score));
+
+    return {
+      tokens: results,
+      summary: {
+        total: tokens.length,
+        matched,
+        unmatched,
+        allergens,
+        fragrances,
+        cmr,
+        eu_banned: banned,
+        kathon,
+        score,
+        verdict: score >= 80 ? 'çok iyi' : score >= 60 ? 'iyi' : score >= 40 ? 'orta' : score >= 20 ? 'riskli' : 'tehlikeli',
+      },
+    };
+  }
 }

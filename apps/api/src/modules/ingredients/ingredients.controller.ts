@@ -42,6 +42,13 @@ export class IngredientsController {
     return this.service.suggest(q, lim);
   }
 
+  @Post('analyze-list')
+  @Throttle({ public: { ttl: 60_000, limit: 20 } })
+  @ApiOperation({ summary: 'INCI listesi yapistir -> bilesen bilesen analiz + skor' })
+  analyzeList(@Body() body: { text: string }) {
+    return this.service.analyzeInciList(body?.text || '');
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'İçerik maddesi detay (ID)' })
   findOne(@Param('id', ParseIntPipe) id: number) {

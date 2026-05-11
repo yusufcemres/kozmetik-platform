@@ -15,9 +15,10 @@ interface DropdownItem {
 }
 
 const TESTS_DROPDOWN: DropdownItem[] = [
+  { href: '/inci-analiz', label: 'INCI Analiz', icon: 'science', badge: 'YEN\u0130' },
   { href: '/cilt-analizi', label: 'Cilt Analizi', icon: 'water_drop', badge: 'AI' },
-  { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', badge: 'YEN\u0130' },
-  { href: '/sac-analizi', label: 'Sa\u00e7 Analizi', icon: 'face_retouching_natural', badge: 'YEN\u0130' },
+  { href: '/beslenme-analizi', label: 'Beslenme Analizi', icon: 'nutrition', badge: null },
+  { href: '/sac-analizi', label: 'Sa\u00e7 Analizi', icon: 'face_retouching_natural', badge: null },
   { href: '/cilt-yasi-testi', label: 'Cilt Ya\u015f\u0131 Testi', icon: 'timer', badge: 'V\u0130RAL' },
   { href: '/icerik-testi', label: '\u0130\u00e7erik Testi', icon: 'quiz', badge: null },
 ];
