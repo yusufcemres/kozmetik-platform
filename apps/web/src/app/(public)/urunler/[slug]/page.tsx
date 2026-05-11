@@ -1478,11 +1478,17 @@ export default async function ProductDetailPage({
           <section className="mb-16">
             <h2 className="text-xl font-bold tracking-tight mb-2 text-on-surface flex items-center gap-2">
               <span className="material-icon text-primary" aria-hidden="true">swap_horiz</span>
-              Benzer Ürünler
+              Bu ürüne uyumlu alternatifler
             </h2>
-            <p className="text-sm text-on-surface-variant mb-6">
-              Kategori, aktif içerikler, ihtiyaç uyumu ve fiyat aralığı bazında hesaplanan benzerlik.
+            <p className="text-sm text-on-surface-variant mb-2">
+              Aktif içerikler, ihtiyaç uyumu, kategori ve fiyat aralığına göre hesaplanan eşleşme oranı.
             </p>
+            <div className="flex flex-wrap items-center gap-3 mb-6 text-[10px] uppercase tracking-wider">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500" /> %80+ Yüksek eşleşme</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-lime-500" /> %60-79 İyi</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500" /> %40-59 Orta</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-surface-container border border-outline-variant" /> %40 altı</span>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {similarProducts.map((sp) => {
                 const spImg = sp.product.image_url?.includes('placehold.co') || sp.product.image_url?.includes('dicebear')
@@ -1512,10 +1518,23 @@ export default async function ProductDetailPage({
                       ) : (
                         <span className="material-icon text-outline-variant flex items-center justify-center h-full" style={{ fontSize: '48px' }} aria-hidden="true">inventory_2</span>
                       )}
-                      {/* Similarity badge */}
-                      <div className="absolute top-2 right-2 bg-surface/90 backdrop-blur-sm rounded-sm px-2 py-1">
-                        <span className="text-xs font-bold text-primary">%{sp.similarity_score}</span>
-                      </div>
+                      {/* Similarity badge — büyük, renkli, açıklayıcı */}
+                      {(() => {
+                        const s = sp.similarity_score;
+                        const cls = s >= 80
+                          ? 'bg-green-500 text-white'
+                          : s >= 60
+                          ? 'bg-lime-500 text-white'
+                          : s >= 40
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-surface/90 text-on-surface-variant';
+                        return (
+                          <div className={`absolute top-2 right-2 ${cls} backdrop-blur-sm rounded-md px-2.5 py-1.5 shadow-md flex flex-col items-center leading-none`}>
+                            <span className="text-[8px] uppercase tracking-wider font-bold opacity-90">Eşleşme</span>
+                            <span className="text-base font-extrabold mt-0.5">%{s}</span>
+                          </div>
+                        );
+                      })()}
                       {/* Price comparison badge */}
                       {priceLabel && (
                         <div className={`absolute bottom-2 left-2 rounded-sm px-2 py-0.5 ${priceColor}`}>
