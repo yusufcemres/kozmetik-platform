@@ -27,6 +27,12 @@ export type ScanResponse = {
     product_type: string | null;
     detected_text: string | null;
     confidence: number;
+    /** OpenBeautyFacts katmanindan gelen alanlar (smart-scan A2) */
+    source?: 'vision' | 'openbeautyfacts';
+    barcode?: string;
+    image_url?: string | null;
+    ingredients_list?: string[];
+    obf_url?: string;
   };
   scan_id?: number;
 };

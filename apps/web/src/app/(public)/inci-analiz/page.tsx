@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 
 interface AnalysisToken {
@@ -62,10 +63,19 @@ function gradeColor(g?: string | null) {
 }
 
 export default function InciAnalysisPage() {
+  const searchParams = useSearchParams();
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Prefill from query string (/tara -> Pionér rozet akışı)
+  useEffect(() => {
+    const prefill = searchParams.get('prefill');
+    if (prefill && !text) {
+      setText(prefill);
+    }
+  }, [searchParams]);
 
   const handleAnalyze = async () => {
     setError(null);

@@ -326,7 +326,52 @@ export default function TaraPage() {
               </div>
             )}
 
-            {result.status === 'candidates' && result.candidates && (
+            {result.status === 'candidates' && result.vision_result?.source === 'openbeautyfacts' && (
+              <div className="curator-card p-6 space-y-4">
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 mb-2 bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-xs">
+                    <span className="material-icon text-[14px]">explore</span>
+                    Yeni keşif — Pionér rozeti
+                  </div>
+                  <h2 className="text-lg font-bold text-on-surface mb-1">
+                    {result.vision_result.brand || '—'} · {result.vision_result.product_name || 'Ürün'}
+                  </h2>
+                  <p className="text-xs text-on-surface-variant max-w-md mx-auto">
+                    REVELA katalogunda henüz yoktu. OpenBeautyFacts kaynağından bilgileri çektik.
+                    İncelemeden geçirip kataloğa ekleyeceğiz.
+                  </p>
+                </div>
+                {result.vision_result.image_url && (
+                  <div className="flex justify-center">
+                    <img
+                      src={result.vision_result.image_url}
+                      alt={result.vision_result.product_name || ''}
+                      className="max-w-[180px] max-h-[180px] object-contain rounded"
+                    />
+                  </div>
+                )}
+                {result.vision_result.ingredients_list && result.vision_result.ingredients_list.length > 0 && (
+                  <div className="bg-surface-container-low rounded-sm p-3">
+                    <div className="text-[10px] uppercase tracking-wider text-outline mb-1">INCI (OpenBeautyFacts)</div>
+                    <p className="text-xs text-on-surface leading-relaxed">
+                      {result.vision_result.ingredients_list.slice(0, 15).join(', ')}
+                      {result.vision_result.ingredients_list.length > 15 && ` … +${result.vision_result.ingredients_list.length - 15}`}
+                    </p>
+                  </div>
+                )}
+                <Link
+                  href={`/inci-analiz?prefill=${encodeURIComponent((result.vision_result.ingredients_list || []).join(', '))}`}
+                  className="curator-btn-primary block text-center text-sm py-3"
+                >
+                  REVELA Skoru Hesapla →
+                </Link>
+                <p className="text-[10px] text-outline text-center">
+                  Kaynak: OpenBeautyFacts (CC-BY-SA) · Barkod: {result.vision_result.barcode}
+                </p>
+              </div>
+            )}
+
+            {result.status === 'candidates' && result.candidates && result.candidates.length > 0 && (
               <div className="curator-card p-6 space-y-4">
                 <div className="text-center">
                   <h2 className="text-lg font-bold text-on-surface mb-1">Birkaç seçenek buldum</h2>
