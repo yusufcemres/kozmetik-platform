@@ -263,8 +263,9 @@ export default function TaraPage() {
     }
   };
 
-  // Video container görünür mü? scanning + processing + (transition için) permission de dahil
-  const showVideo = phase === 'scanning' || phase === 'processing';
+  // Video container sadece scanning'de görünür. Processing'de kamera durdugu icin
+  // siyah ekran yerine 'veri isleniyor' efekti gosteririz.
+  const showVideo = phase === 'scanning';
 
   return (
     <div className="min-h-screen bg-surface">
@@ -343,15 +344,35 @@ export default function TaraPage() {
         )}
 
         {/* Processing — tek foto OCR scan efekti */}
-        {phase === 'processing' && !showVideo && (
-          <div className="curator-card p-8 text-center space-y-4">
-            <div className="relative w-32 h-32 mx-auto rounded-lg bg-gradient-to-br from-primary/5 to-primary/15 overflow-hidden">
-              <span className="material-icon absolute inset-0 flex items-center justify-center text-primary text-[56px] opacity-60" aria-hidden="true">document_scanner</span>
+        {phase === 'processing' && (
+          <div className="curator-card p-8 text-center space-y-5">
+            <div className="relative w-40 h-40 mx-auto rounded-lg bg-gradient-to-br from-primary/5 via-primary/10 to-primary/15 overflow-hidden">
+              {/* Pulsing icon */}
+              <span className="material-icon absolute inset-0 flex items-center justify-center text-primary text-[72px] opacity-70 process-pulse" aria-hidden="true">document_scanner</span>
+              {/* Scan sweep line */}
               <div className="scan-line" />
+              {/* Corner brackets */}
+              <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-primary/60" />
+              <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-primary/60" />
+              <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-primary/60" />
+              <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-primary/60" />
             </div>
-            <div>
-              <p className="text-sm font-semibold text-on-surface">Etiket analiz ediliyor</p>
-              <p className="text-xs text-on-surface-variant mt-1">Barkod · marka · INCI okunuyor…</p>
+            <div className="space-y-2">
+              <p className="text-base font-semibold text-on-surface">Veriler işleniyor</p>
+              <div className="flex items-center justify-center gap-1 text-xs text-on-surface-variant">
+                <span className="dot-anim" style={{ animationDelay: '0ms' }}>•</span>
+                <span>Barkod</span>
+                <span className="text-outline">·</span>
+                <span className="dot-anim" style={{ animationDelay: '200ms' }}>•</span>
+                <span>Marka</span>
+                <span className="text-outline">·</span>
+                <span className="dot-anim" style={{ animationDelay: '400ms' }}>•</span>
+                <span>INCI listesi</span>
+                <span className="text-outline">·</span>
+                <span className="dot-anim" style={{ animationDelay: '600ms' }}>•</span>
+                <span>Skor</span>
+              </div>
+              <p className="text-[10px] text-outline">REVELA AI etiketi analiz ediyor…</p>
             </div>
           </div>
         )}
@@ -433,7 +454,7 @@ export default function TaraPage() {
               </div>
               {/* Bottom hint */}
               <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur text-white text-xs rounded-sm px-4 py-2 text-center">
-                {phase === 'processing' ? 'Eşleştiriliyor…' : hint}
+                {hint}
               </div>
             </div>
 
@@ -447,7 +468,6 @@ export default function TaraPage() {
               </button>
               <button
                 onClick={capturePhoto}
-                disabled={phase === 'processing'}
                 className="curator-btn-primary text-sm px-6 py-3 disabled:opacity-50"
                 type="button"
               >
@@ -564,6 +584,29 @@ export default function TaraPage() {
                 >
                   Tam INCI Analiz Sayfasında Aç →
                 </Link>
+
+                {/* Kullaniciyi sistemi gelistirmeye davet */}
+                <div className="border-t border-outline-variant/20 pt-4 mt-4">
+                  <div className="text-center">
+                    <span className="material-icon text-primary text-[20px] mb-1 block" aria-hidden="true">help_outline</span>
+                    <p className="text-sm font-semibold text-on-surface mb-1">Bu hangi ürün?</p>
+                    <p className="text-xs text-on-surface-variant mb-3">
+                      Şimdi ürünün <strong>ön yüzünü</strong> veya kutu marka kısmını da çekersen, REVELA kataloğa ekler ve diğer kullanıcılar da bu üründen yararlanır.
+                    </p>
+                    <label className="cursor-pointer inline-flex items-center gap-2 text-sm bg-primary/10 text-primary px-4 py-2 rounded-md hover:bg-primary/15 transition">
+                      <span className="material-icon text-[18px]" aria-hidden="true">photo_camera</span>
+                      Ürün Fotoğrafı Ekle
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-[10px] text-outline mt-2">+ Pionér katkı rozeti</p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -717,6 +760,22 @@ export default function TaraPage() {
           61%  { top: 0%; opacity: 0; }
           70%  { opacity: 1; }
           100% { top: 0%; opacity: 0; }
+        }
+        .process-pulse {
+          animation: process-pulse 2s ease-in-out infinite;
+        }
+        @keyframes process-pulse {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50%      { opacity: 1;   transform: scale(1.05); }
+        }
+        .dot-anim {
+          animation: dot-blink 1.4s ease-in-out infinite;
+          color: rgb(var(--color-primary-rgb, 79, 124, 241));
+          font-weight: 900;
+        }
+        @keyframes dot-blink {
+          0%, 60%, 100% { opacity: 0.2; }
+          30%           { opacity: 1; }
         }
       `}</style>
     </div>
