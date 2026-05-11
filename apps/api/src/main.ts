@@ -15,6 +15,7 @@ initSentry();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
+    bodyParser: false, // Manuel olarak 15MB limitle yukleyecegiz (smart-scan foto)
   });
   const configService = app.get(ConfigService);
   const isProduction = configService.get('NODE_ENV') === 'production';
