@@ -16,6 +16,8 @@ config({ path: resolve(__dirname, '../../../../../.env') });
 const args = process.argv.slice(2);
 const limitArg = args.find(a => a.startsWith('--limit='));
 const LIMIT = limitArg ? parseInt(limitArg.split('=')[1], 10) : 60;
+const topArg = args.find(a => a.startsWith('--top='));
+const TOP_RANGE = topArg ? parseInt(topArg.split('=')[1], 10) : 100;
 const DRY = args.includes('--dry');
 const PARALLEL = 4;
 
@@ -97,11 +99,11 @@ const { rows: targets } = await client.query(`
     WHERE i.is_active = true
     GROUP BY i.ingredient_id
     ORDER BY usage DESC
-    LIMIT 100
+    LIMIT $2
   )
-  SELECT * FROM top_inci WHERE desc_len < 500
+  SELECT * FROM top_inci WHERE desc_len < 1500
   ORDER BY usage DESC LIMIT $1
-`, [LIMIT]);
+`, [LIMIT, TOP_RANGE]);
 
 console.log(`Target INCI count: ${targets.length}\n`);
 
