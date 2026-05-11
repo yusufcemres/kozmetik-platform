@@ -30,6 +30,56 @@ export class MatchService {
   }
 
   /**
+   * OpenBeautyFacts'ten ürün verisi çek — Yuka modeli, açık veri.
+   * Bulduğunda REVELA-uyumlu ham nesne döner; çağıran taraf isterse
+   * draft olarak DB'ye import eder. Hata olursa null.
+   */
+  async fetchFromOpenBeautyFacts(barcode: string): Promise<{
+    barcode: string;
+    product_name: string | null;
+    brand_name: string | null;
+    image_url: string | null;
+    ingredients_raw: string | null;
+    ingredients_list: string[];
+    net_content: string | null;
+    obf_url: string;
+    completeness: number;
+  } | null> {
+    if (!barcode || barcode.length < 8) return null;
+    try {
+      const url = `https://world.openbeautyfacts.org/api/v2/product/${barcode}.json`;
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'REVELA/1.0 (https://kozmetik-platform.vercel.app)' },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) return null;
+      const data: any = await res.json();
+      if (data.status !== 1 || !data.product) return null;
+      const p = data.product;
+      const inciRaw: string = p.ingredients_text_en || p.ingredients_text || p.ingredients_text_tr || '';
+      const inciTokens = inciRaw
+        .replace(/[\(\[].*?[\)\]]/g, '')
+        .split(/[,;\.\n]+/)
+        .map((s: string) => s.trim().replace(/^["'`]+|["'`]+$/g, ''))
+        .filter((s: string) => s.length > 1 && s.length < 100)
+        .slice(0, 80);
+      return {
+        barcode,
+        product_name: p.product_name || p.product_name_en || null,
+        brand_name: (p.brands || '').split(',')[0]?.trim() || null,
+        image_url: p.image_front_url || p.image_url || null,
+        ingredients_raw: inciRaw || null,
+        ingredients_list: inciTokens,
+        net_content: p.quantity || null,
+        obf_url: `https://world.openbeautyfacts.org/product/${barcode}`,
+        completeness: Number(p.completeness) || 0,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Fuzzy match using pg_trgm on brand name + product name.
    * Higher weight when both brand and product name match.
    */

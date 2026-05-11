@@ -154,6 +154,13 @@ export class ProductsController {
     return this.service.findBySlug(slug);
   }
 
+  @Get('barcode/:barcode')
+  @Header('Cache-Control', 'public, max-age=120, s-maxage=600')
+  @ApiOperation({ summary: 'Barkodla urun bul (REVELA -> OpenBeautyFacts -> not_found)' })
+  findByBarcode(@Param('barcode') barcode: string) {
+    return this.service.findByBarcode(barcode);
+  }
+
   @Get('slug/:slug/full')
   @Header('Cache-Control', 'public, max-age=120, s-maxage=600, stale-while-revalidate=3600')
   @ApiOperation({ summary: 'Ürün detay (composite) — product + similar + interactions + score + reviews + supplement cross-refs tek atışta' })

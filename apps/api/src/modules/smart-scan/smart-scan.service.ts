@@ -43,7 +43,7 @@ export class SmartScanService {
   ) {}
 
   async scan(req: SmartScanRequest): Promise<SmartScanResponse> {
-    // === Pipeline A: Barcode (fastest, most reliable) ===
+    // === Pipeline A: Barcode (REVELA DB) ===
     if (req.barcode) {
       const product = await this.match.findByBarcode(req.barcode);
       if (product) {
@@ -58,6 +58,31 @@ export class SmartScanService {
             product_name: product.product_name,
             brand_name: product.brand?.brand_name ?? '',
           },
+        };
+      }
+
+      // === Pipeline A2: OpenBeautyFacts (acik veri, Yuka modeli) ===
+      const obf = await this.match.fetchFromOpenBeautyFacts(req.barcode);
+      if (obf && (obf.product_name || obf.ingredients_list.length > 0)) {
+        // External match — kullaniciya goster ama draft urun olarak DB'ye yazma
+        // ileride admin onayi ile tam katmandan kayit edilebilir
+        return {
+          status: 'candidates',
+          method: 'vision_fuzzy',
+          confidence: 0.5,
+          candidates: [],
+          vision_result: {
+            brand: obf.brand_name,
+            product_name: obf.product_name,
+            product_type: null,
+            detected_text: obf.ingredients_raw,
+            confidence: obf.completeness || 0.5,
+            source: 'openbeautyfacts',
+            barcode: obf.barcode,
+            image_url: obf.image_url,
+            ingredients_list: obf.ingredients_list,
+            obf_url: obf.obf_url,
+          } as any,
         };
       }
     }

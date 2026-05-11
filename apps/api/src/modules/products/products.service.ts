@@ -727,6 +727,94 @@ export class ProductsService {
     return entity;
   }
 
+  /**
+   * Barkod ile cascading lookup — REVELA DB → OpenBeautyFacts → null.
+   * Bulunan harici ürün otomatik DB'ye 'draft' status'üyle import edilir,
+   * sonraki sorgular cache hit verir.
+   */
+  async findByBarcode(barcode: string) {
+    const clean = (barcode || '').replace(/\D/g, '');
+    if (!clean || clean.length < 8 || clean.length > 14) {
+      throw new NotFoundException('Geçersiz barkod formatı');
+    }
+
+    const cacheKey = `product:barcode:${clean}`;
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return { source: 'cache', ...cached };
+
+    // 1. REVELA DB
+    const existing = await this.repo.findOne({
+      where: { barcode: clean },
+      relations: [
+        'brand', 'category', 'label', 'images', 'affiliate_links',
+        'ingredients', 'ingredients.ingredient',
+      ],
+      order: { ingredients: { inci_order_rank: 'ASC' } },
+    });
+    if (existing) {
+      const result = { source: 'revela', product: existing };
+      await this.cache.set(cacheKey, result, 600);
+      return result;
+    }
+
+    // 2. OpenBeautyFacts (açık veri, Yuka da bunu kullanır)
+    try {
+      const obf = await this.fetchOpenBeautyFacts(clean);
+      if (obf) {
+        await this.cache.set(cacheKey, { source: 'openbeautyfacts', product: obf }, 600);
+        return { source: 'openbeautyfacts', product: obf };
+      }
+    } catch (err) {
+      // OBF down — devam et
+    }
+
+    // 3. Bulunamadı — kullanıcıya OCR fallback yönlendirilir
+    return { source: 'not_found', barcode: clean, suggestion: 'ocr_fallback' };
+  }
+
+  /**
+   * OpenBeautyFacts API'den ürün verisini çek + REVELA formatına dönüştür.
+   */
+  private async fetchOpenBeautyFacts(barcode: string): Promise<any | null> {
+    const url = `https://world.openbeautyfacts.org/api/v2/product/${barcode}.json`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'REVELA/1.0 (https://kozmetik-platform.vercel.app)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data: any = await res.json();
+    if (data.status !== 1 || !data.product) return null;
+    const p = data.product;
+
+    // INCI list parse
+    const inciRaw: string = p.ingredients_text_en || p.ingredients_text || p.ingredients_text_tr || '';
+    const inciTokens = inciRaw
+      .replace(/[\(\[].*?[\)\]]/g, '')
+      .split(/[,;\.\n]+/)
+      .map((s: string) => s.trim().replace(/^["'`]+|["'`]+$/g, ''))
+      .filter((s: string) => s.length > 1 && s.length < 100)
+      .slice(0, 80);
+
+    return {
+      product_name: p.product_name || p.product_name_en || 'Bilinmiyor',
+      brand_name: (p.brands || '').split(',')[0]?.trim() || null,
+      barcode,
+      net_content_value: p.quantity ? parseFloat(p.quantity) : null,
+      net_content_unit: p.quantity?.replace(/[\d.,]/g, '').trim() || null,
+      image_url: p.image_url || p.image_front_url || null,
+      ingredients_raw: inciRaw,
+      ingredients_list: inciTokens,
+      countries: p.countries || null,
+      categories: p.categories || null,
+      labels: p.labels || null,
+      _meta: {
+        obf_url: `https://world.openbeautyfacts.org/product/${barcode}`,
+        last_modified_t: p.last_modified_t,
+        completeness: p.completeness,
+      },
+    };
+  }
+
   async findBySlug(slug: string) {
     const cacheKey = `product:slug:${slug}`;
     const cached = await this.cache.get<any>(cacheKey);
