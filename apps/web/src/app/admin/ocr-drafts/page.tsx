@@ -25,12 +25,18 @@ interface OcrDraft {
   affiliate_count: string;
 }
 
+interface Brand { brand_id: number; brand_name: string; brand_slug: string; }
+interface Category { category_id: number; category_name: string; category_slug: string; }
+
 export default function OcrDraftsPage() {
   const { toast } = useToast();
   const [drafts, setDrafts] = useState<OcrDraft[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<OcrDraft | null>(null);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
 
   const load = useCallback(async () => {
@@ -48,7 +54,34 @@ export default function OcrDraftsPage() {
   useEffect(() => {
     if (!token) return;
     load();
+    // brand + category yukle (modal icin)
+    Promise.all([
+      api.get<{ data: Brand[] }>('/brands?limit=500', { token }).catch(() => ({ data: [] })),
+      api.get<Category[]>('/categories/tree', { token }).catch(() => []),
+    ]).then(([b, c]) => {
+      setBrands((b as any).data || (b as any));
+      // Flatten category tree
+      const flat: Category[] = [];
+      const walk = (n: any) => {
+        flat.push({ category_id: n.category_id, category_name: n.category_name, category_slug: n.category_slug });
+        (n.children || []).forEach(walk);
+      };
+      (c as any[]).forEach(walk);
+      setCategories(flat);
+    });
   }, [token, load]);
+
+  const saveEdit = async (patch: Partial<OcrDraft & { brand_id?: number; category_id?: number; product_name?: string; barcode?: string | null }>) => {
+    if (!editing) return;
+    try {
+      await api.put(`/products/${editing.product_id}`, patch, { token });
+      toast('Güncellendi', 'success');
+      setEditing(null);
+      load();
+    } catch (e: any) {
+      toast(e.message || 'Güncellenemedi', 'error');
+    }
+  };
 
   const toggleSelect = (id: number) => {
     setSelected((prev) => {
@@ -295,6 +328,13 @@ export default function OcrDraftsPage() {
                         </div>
                         <div className="flex items-center gap-1">
                           <button
+                            onClick={() => setEditing(d)}
+                            className="px-2 py-1 text-[11px] bg-blue-600 text-white rounded hover:bg-blue-700"
+                            title="Düzenle"
+                          >
+                            ✏️ Düzenle
+                          </button>
+                          <button
                             onClick={() => publishOne(d.product_id)}
                             className="px-2 py-1 text-[11px] bg-green-600 text-white rounded hover:bg-green-700 flex-1"
                             title="Yayınla — sadece doğruladıktan sonra"
@@ -316,6 +356,102 @@ export default function OcrDraftsPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editing && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setEditing(null)}>
+          <div className="bg-surface rounded-lg shadow-xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-on-surface">Ürünü Düzenle #{editing.product_id}</h2>
+              <button onClick={() => setEditing(null)} className="text-outline hover:text-on-surface text-xl">×</button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const fd = new FormData(e.currentTarget);
+                const patch: any = {
+                  product_name: String(fd.get('product_name') || '').trim() || undefined,
+                  brand_id: fd.get('brand_id') ? Number(fd.get('brand_id')) : undefined,
+                  category_id: fd.get('category_id') ? Number(fd.get('category_id')) : undefined,
+                  barcode: String(fd.get('barcode') || '').trim() || null,
+                  short_description: String(fd.get('short_description') || '').trim() || undefined,
+                };
+                saveEdit(patch);
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="text-xs uppercase tracking-wider text-outline block mb-1">Ürün Adı</label>
+                <input
+                  name="product_name"
+                  defaultValue={editing.product_name || ''}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-md bg-surface text-sm focus:border-primary focus:outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-outline block mb-1">Marka</label>
+                <select
+                  name="brand_id"
+                  defaultValue={editing.brand_id || ''}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-md bg-surface text-sm"
+                >
+                  <option value="">— seç —</option>
+                  {brands.map((b) => (
+                    <option key={b.brand_id} value={b.brand_id}>{b.brand_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-outline block mb-1">Kategori</label>
+                <select
+                  name="category_id"
+                  defaultValue={categories.find((c) => c.category_name === editing.category_name)?.category_id || ''}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-md bg-surface text-sm"
+                >
+                  <option value="">— seç —</option>
+                  {categories.map((c) => (
+                    <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-outline block mb-1">Barkod (boş bırak yoksa)</label>
+                <input
+                  name="barcode"
+                  defaultValue={editing.barcode || ''}
+                  placeholder="869..."
+                  className="w-full px-3 py-2 border border-outline-variant rounded-md bg-surface text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-outline block mb-1">Kısa Açıklama</label>
+                <textarea
+                  name="short_description"
+                  defaultValue={editing.short_description || ''}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-md bg-surface text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="submit"
+                  className="flex-1 bg-primary text-on-primary px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
+                >
+                  Kaydet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditing(null)}
+                  className="px-4 py-2 text-sm border border-outline-variant rounded-md hover:bg-surface-container-low"
+                >
+                  İptal
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
