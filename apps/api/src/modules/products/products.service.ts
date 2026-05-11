@@ -328,7 +328,8 @@ export class ProductsService {
 
     if (search) where.product_name = ILike(`%${search}%`);
     if (brand_id) where.brand_id = Number(brand_id);
-    if (status) where.status = status;
+    // Default: published/active. Status açıkça istenirse onu kullan (admin'in draft listelemesi gibi).
+    where.status = status ? status : In(['published', 'active']);
     if (target_area) where.target_area = target_area;
     if (usage_time) where.usage_time_hint = usage_time;
     if (product_type) where.product_type_label = ILike(`%${product_type}%`);
@@ -372,6 +373,8 @@ export class ProductsService {
       if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
       if (domain_type) qb.andWhere('p.domain_type = :dt', { dt: domain_type });
       if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
+      if (status) qb.andWhere('p.status = :st', { st: status });
+      else qb.andWhere('p.status IN (:...defaultStatuses)', { defaultStatuses: ['published', 'active'] });
 
       qb.orderBy('pi.inci_order_rank', 'ASC')
         .skip((page - 1) * limit)
@@ -395,6 +398,8 @@ export class ProductsService {
       if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
       if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
       if (product_type) qb.andWhere('p.product_type_label ILIKE :pt', { pt: `%${product_type}%` });
+      if (status) qb.andWhere('p.status = :st', { st: status });
+      else qb.andWhere('p.status IN (:...defaultStatuses)', { defaultStatuses: ['published', 'active'] });
 
       qb.orderBy('ns.compatibility_score', 'DESC')
         .skip((page - 1) * limit)
@@ -421,6 +426,7 @@ export class ProductsService {
       if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
       if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
       if (status) qb.andWhere('p.status = :st', { st: status });
+      else qb.andWhere('p.status IN (:...defaultStatuses)', { defaultStatuses: ['published', 'active'] });
       if (domain_type) qb.andWhere('p.domain_type = :dt', { dt: domain_type });
       if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
       if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
