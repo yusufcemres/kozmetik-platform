@@ -253,29 +253,62 @@ export default function OcrDraftsPage() {
                       <span className={`text-[10px] font-bold px-2 py-1 rounded ${q.color}`}>{q.label}</span>
                     </td>
                     <td className="px-3 py-2">
-                      <div className="flex items-center gap-1">
-                        <Link
-                          href={`/urunler/${d.product_slug}`}
-                          target="_blank"
-                          className="px-2 py-1 text-[11px] border border-outline-variant rounded hover:bg-surface-container-low"
-                          title="Önizle"
-                        >
-                          🔍
-                        </Link>
-                        <button
-                          onClick={() => publishOne(d.product_id)}
-                          className="px-2 py-1 text-[11px] bg-green-600 text-white rounded hover:bg-green-700"
-                          title="Yayınla"
-                        >
-                          ✓ Yayınla
-                        </button>
-                        <button
-                          onClick={() => deleteOne(d.product_id)}
-                          className="px-2 py-1 text-[11px] bg-red-600 text-white rounded hover:bg-red-700"
-                          title="Sil"
-                        >
-                          ✕
-                        </button>
+                      <div className="flex flex-col gap-1">
+                        {/* Doğrulama linkleri — yayınlamadan önce online kontrol */}
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={`https://www.trendyol.com/sr?q=${encodeURIComponent((d.brand_name || '') + ' ' + (d.product_name || ''))}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="px-1.5 py-0.5 text-[10px] bg-orange-100 text-orange-700 rounded hover:bg-orange-200"
+                            title="Trendyol'da ara"
+                          >TY</a>
+                          <a
+                            href={`https://www.hepsiburada.com/ara?q=${encodeURIComponent((d.brand_name || '') + ' ' + (d.product_name || ''))}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="px-1.5 py-0.5 text-[10px] bg-orange-50 text-orange-600 rounded hover:bg-orange-100"
+                            title="Hepsiburada'da ara"
+                          >HB</a>
+                          {d.barcode && (
+                            <a
+                              href={`https://world.openbeautyfacts.org/product/${d.barcode}`}
+                              target="_blank"
+                              rel="noopener"
+                              className="px-1.5 py-0.5 text-[10px] bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                              title="OpenBeautyFacts"
+                            >OBF</a>
+                          )}
+                          <a
+                            href={`https://www.google.com/search?q=${encodeURIComponent('"' + (d.brand_name || '') + '" ' + (d.product_name || '') + (d.barcode ? ' ' + d.barcode : ''))}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                            title="Google'da ara"
+                          >G</a>
+                          <Link
+                            href={`/urunler/${d.product_slug}`}
+                            target="_blank"
+                            className="px-1.5 py-0.5 text-[10px] border border-outline-variant rounded hover:bg-surface-container-low"
+                            title="REVELA'da önizle"
+                          >👁</Link>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => publishOne(d.product_id)}
+                            className="px-2 py-1 text-[11px] bg-green-600 text-white rounded hover:bg-green-700 flex-1"
+                            title="Yayınla — sadece doğruladıktan sonra"
+                          >
+                            ✓ Yayınla
+                          </button>
+                          <button
+                            onClick={() => deleteOne(d.product_id)}
+                            className="px-2 py-1 text-[11px] bg-red-600 text-white rounded hover:bg-red-700"
+                            title="Sil"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
