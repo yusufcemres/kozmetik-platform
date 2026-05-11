@@ -194,13 +194,15 @@ for (const f of files) {
           stats.skipped++;
           continue;
         }
+        const safeName = (p.product_name || '').slice(0, 200);
+        const safeDesc = `${p.brand_name || ''} ${safeName} — OpenBeautyFacts'ten eklendi.`.slice(0, 500);
         let ins;
         try {
           ins = await client.query(
             `INSERT INTO products (brand_id, category_id, product_name, product_slug, short_description, barcode, net_content_value, net_content_unit, domain_type, status, target_audience, created_at, updated_at)
              VALUES ($1, 1, $2, $3, $4, $5, $6, $7, 'cosmetic', 'draft', 'adult', NOW(), NOW())
              RETURNING product_id`,
-            [brandId, p.product_name, slug, `${p.brand_name || ''} ${p.product_name || ''} — OpenBeautyFacts'ten eklendi (kaynak: ${data.brand_slug}).`, bc, qty.value, qty.unit],
+            [brandId, safeName, slug, safeDesc, bc, qty.value, qty.unit],
           );
         } catch (e) {
           if (e.code === '23505') {
@@ -233,13 +235,18 @@ for (const f of files) {
             }
           }
         }
-        // Image
-        if (p.image_url) {
-          await client.query(
-            `INSERT INTO product_images (product_id, image_url, alt_text, sort_order, created_at)
-             VALUES ($1, $2, $3, 0, NOW())`,
-            [productId, p.image_url, p.product_name],
-          );
+        // Image (truncate to varchar limits)
+        if (p.image_url && p.image_url.length < 500) {
+          try {
+            await client.query(
+              `INSERT INTO product_images (product_id, image_url, alt_text, sort_order, created_at)
+               VALUES ($1, $2, $3, 0, NOW())`,
+              [productId, p.image_url.slice(0, 500), (p.product_name || '').slice(0, 200)],
+            );
+          } catch (e) {
+            // Image insert fail silently — urun zaten eklendi
+            if (e.code !== '22001') throw e;
+          }
         }
       }
     }
