@@ -119,6 +119,35 @@ function clusterByProduct(records) {
     clusters.set(key, g);
   });
 
+  // 4. POST-CLUSTER DEDUP: Ayni brand+product_name olan barkodlu + barkodsuz kumeler
+  // birlestir (KOREACO Brightening Ampoule bug fix — ayni urunun on/arka panelleri
+  // farkli kumeye dustugu icin 2 kayit olusturuyordu).
+  const clusterKeys = [...clusters.keys()];
+  const mergedKeys = new Set();
+  for (const k1 of clusterKeys) {
+    if (mergedKeys.has(k1)) continue;
+    const g1 = clusters.get(k1);
+    const s1 = g1[0];
+    const bn1 = normName(s1.brand_name);
+    const pn1 = normName(s1.product_name);
+    if (!bn1 && !pn1) continue;
+    for (const k2 of clusterKeys) {
+      if (k1 === k2 || mergedKeys.has(k2)) continue;
+      const g2 = clusters.get(k2);
+      const s2 = g2[0];
+      const bn2 = normName(s2.brand_name);
+      const pn2 = normName(s2.product_name);
+      if (!bn2 || !pn2) continue;
+      const brandSame = bn1 && bn2 && (bn1 === bn2 || bn1.includes(bn2) || bn2.includes(bn1));
+      const nameSame = pn1 && pn2 && (pn1 === pn2 || pn1.includes(pn2) || pn2.includes(pn1));
+      if (brandSame && nameSame) {
+        clusters.get(k1).push(...g2);
+        clusters.delete(k2);
+        mergedKeys.add(k2);
+      }
+    }
+  }
+
   // Her cluster'i tek bir "merged" nesneye birlestir
   const merged = [];
   for (const [key, group] of clusters) {
