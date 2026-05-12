@@ -74,18 +74,19 @@ await client.connect();
 const needs = (await client.query(`SELECT need_id, need_name, need_slug FROM needs WHERE is_active=true ORDER BY need_id`)).rows;
 console.log(`${needs.length} need available\n`);
 
+const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || '500');
 const { rows: targets } = await client.query(`
   WITH top_inci AS (
     SELECT i.ingredient_id, i.inci_name, i.common_name, i.function_summary, i.evidence_grade,
       (SELECT COUNT(*) FROM product_ingredients pi WHERE pi.ingredient_id=i.ingredient_id) AS usage
     FROM ingredients i WHERE i.is_active = true
-    ORDER BY usage DESC LIMIT 500
+    ORDER BY usage DESC LIMIT $1
   )
   SELECT * FROM top_inci ti
   WHERE NOT EXISTS (SELECT 1 FROM ingredient_need_mappings m WHERE m.ingredient_id=ti.ingredient_id)
     AND NOT EXISTS (SELECT 1 FROM ingredient_need_mapping_proposals p WHERE p.ingredient_id=ti.ingredient_id)
   ORDER BY usage DESC
-`);
+`, [LIMIT]);
 console.log(`Targets: ${targets.length}\n`);
 
 let success = 0, failed = 0, totalProposals = 0;
