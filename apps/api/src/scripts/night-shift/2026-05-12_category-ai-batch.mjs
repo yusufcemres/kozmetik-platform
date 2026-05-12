@@ -81,13 +81,14 @@ const cats = (await client.query(`SELECT category_id, category_slug, category_na
 const catMap = new Map(cats.map((c) => [c.category_slug, c.category_id]));
 const catList = cats.map((c) => ({ slug: c.category_slug, name: c.category_name }));
 
+const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || '600');
 const { rows: targets } = await client.query(`
   SELECT p.product_id, p.product_name, b.brand_name
   FROM products p LEFT JOIN brands b ON b.brand_id=p.brand_id
   WHERE p.status='draft' AND p.category_id = 1 AND p.product_name IS NOT NULL
   ORDER BY p.product_id DESC
-  LIMIT 600
-`);
+  LIMIT $1
+`, [LIMIT]);
 console.log(`Targets: ${targets.length}\n`);
 
 // Batch'le

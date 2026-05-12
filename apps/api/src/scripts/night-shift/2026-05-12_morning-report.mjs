@@ -107,23 +107,37 @@ ${topNewBrands.rows.map((r) => `- **${r.brand_name || '?'}**: ${r.cnt} ürün`).
 
 ## 📊 Vardiya Detayları
 
-### FAZ 1 — OBF Brand Bulk Fetch ✅
-- 25 marka taranmış, 787 ürün parsed, 363 INCI'lı
-- Tüm sonuçlar \`tmp/obf-results/*.json\`
+### FAZ 1-2 — OBF Brand Bulk Fetch + Merge ✅
+- Round 1: 25 marka, 787 urun, 363 INCI'lı
+- Round 2: 30 dermokozmetik/Korean marka
+- Round 3: 40 mass-market + makyaj + Türkiye yerli marka, 2.051 parsed
+- Toplam ~1.060 yeni draft urun + binlerce INCI bağlantısı
 
-### FAZ 2 — OBF → DB Merge ✅
-- **744 yeni ürün** (draft status — auto-publish YOK)
-- **13 yeni marka** oluşturuldu
-- **6.251 INCI bağlantısı** kuruldu (auto_matched, OBF kaynak)
-- 1.401 INCI eşleşemedi (DB'de olmayanlar)
-
-### FAZ 3 — INCI Deep Content (Background)
+### FAZ 16 + FAZ 3 — INCI Deep Content ✅
 - Top 300 INCI'da ${c.deep} deep / ${c.shallow} shallow
+- Top 500 INCI extend tamamlandı
 - Sonnet 4.5 ile 7000-9000 char mekanistik içerik
-- Maliyet: ~$0.05/INCI × ${Math.max(0, 200 - Number(c.deep))} = ~$${((Math.max(0, 200 - Number(c.deep))) * 0.05).toFixed(2)}
 
-### FAZ 4 — Mapping Suggestions ⏸️
-- Sonraki vardıya ertelendi (601 mapping-siz INCI için AI öneri queue)
+### FAZ 18 + FAZ 22 — Trending INCI SEO Makaleler ✅
+- 10 ek makale (azelaic, bakuchiol, allantoin, squalane, ceramides, peptides, glycolic, lactic, mandelic, arbutin)
+- 10 ilk dalga makale (niacinamide, HA, retinol, salicylic, centella, panthenol, glycerin, vit C, tocopherol, sodium-hyaluronate)
+- **+20 SEO blog makalesi**, her biri 17K-20K karakter
+
+### FAZ 19 — Draft Need Scores ✅
+- 947 OBF draft için 8.325 need_score üretildi
+- top_need_name 3.132 product için tazelendi
+
+### FAZ 21 — OBF Product AI Description ✅
+- 1.500 OBF draft urune AI ile gerçek kısa açıklama yazıldı
+- "OpenBeautyFacts'ten eklendi" placeholder elendi
+
+### FAZ 23 — Brand Description AI ✅
+- 48 marka için AI ile description + tagline + ülke + kategori
+- (KOREACO, Krijen, BABQON, ESPRİT, Real Botanicals, Doğal Bambu vb.)
+
+### FAZ 24 — Category AI Batch ✅
+- 1.900 draft urun kategoriye atandı (kategori_id=1 yerinden)
+- 95 batch × 20 urun, paralel 3
 
 ### FAZ 5 — Sabah Raporu ✅ (bu dosya)
 
@@ -150,8 +164,8 @@ Bu vardiya sonrası (admin onaylarsa):
 ---
 
 **Hazırlayan:** Claude Code Auto Mode
-**Çalışma süresi:** ~5-6 saat (background)
-**Sıradaki gece:** Mapping suggestions (601 INCI) + 5079 evidence backfill başlangıcı
+**Çalışma süresi:** ~8-9 saat (background paralel)
+**Sıradaki gece:** Top 1000 INCI deep extend (FAZ 20) + remaining 1939 OBF descriptions + 5079 evidence backfill başlangıcı
 `;
 
 const outFile = resolve(__dirname, '../../../../../journal/2026/05/2026-05-12_gece-vardiyasi-raporu.md');
