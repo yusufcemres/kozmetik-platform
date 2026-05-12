@@ -85,7 +85,7 @@ const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('
 const { rows: targets } = await client.query(`
   SELECT p.product_id, p.product_name, b.brand_name
   FROM products p LEFT JOIN brands b ON b.brand_id=p.brand_id
-  WHERE p.status='draft' AND p.category_id = 1 AND p.product_name IS NOT NULL
+  WHERE p.status='draft' AND (p.category_id = 1 OR p.category_id IS NULL) AND p.product_name IS NOT NULL
   ORDER BY p.product_id DESC
   LIMIT $1
 `, [LIMIT]);
