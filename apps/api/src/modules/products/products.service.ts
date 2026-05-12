@@ -19,6 +19,8 @@ import { CosmeticScoringService } from '../scoring/cosmetic-scoring.service';
 
 @Injectable()
 export class ProductsService {
+  private readonly _facetMemCache = new Map<string, { data: unknown; expiresAt: number }>();
+
   constructor(
     @InjectRepository(Product)
     private readonly repo: Repository<Product>,
@@ -469,94 +471,98 @@ export class ProductsService {
    * Hafif sorgu: sadece COUNT, JOIN minimal. 5dk Redis cache (controller).
    */
   async getFilterFacets(domainType: string) {
-    const baseWhere = `p.domain_type = $1 AND p.status IN ('published','active')`;
+    const cacheKey = `filter-facets:${domainType}`;
+    const TTL_S = 300; // 5 dakika
 
+    // 1. Redis cache
+    const cached = await this.cache.get<unknown>(cacheKey);
+    if (cached) return cached;
+
+    // 2. Process-level memory cache (Redis olmadığında)
+    const memEntry = this._facetMemCache.get(cacheKey);
+    if (memEntry && memEntry.expiresAt > Date.now()) return memEntry.data;
+
+    const baseWhere = `p.domain_type = $1 AND p.status IN ('published','active')`;
     type Row<T> = T & { count: string };
 
-    // Brand facet
-    const brands = await this.repo.query(
-      `SELECT b.brand_id, b.brand_name, b.brand_slug, COUNT(*)::text AS count
-       FROM products p
-       JOIN brands b ON b.brand_id = p.brand_id
-       WHERE ${baseWhere}
-       GROUP BY b.brand_id, b.brand_name, b.brand_slug
-       ORDER BY count DESC, b.brand_name
-       LIMIT 50`,
-      [domainType],
-    );
+    const supplementQueries = domainType === 'supplement'
+      ? Promise.all([
+          this.repo.query(
+            `SELECT LOWER(sd.form) AS form, COUNT(*)::text AS count
+             FROM products p
+             JOIN supplement_details sd ON sd.product_id = p.product_id
+             WHERE ${baseWhere} AND sd.form IS NOT NULL
+             GROUP BY LOWER(sd.form) ORDER BY count DESC`,
+            [domainType],
+          ),
+          this.repo.query(
+            `SELECT sd.manufacturer_country AS country, COUNT(*)::text AS count
+             FROM products p
+             JOIN supplement_details sd ON sd.product_id = p.product_id
+             WHERE ${baseWhere} AND sd.manufacturer_country IS NOT NULL
+             GROUP BY sd.manufacturer_country ORDER BY count DESC`,
+            [domainType],
+          ),
+        ])
+      : Promise.resolve([[], []]);
 
-    // Form facet (sadece supplement)
-    const forms = domainType === 'supplement'
-      ? await this.repo.query(
-          `SELECT LOWER(sd.form) AS form, COUNT(*)::text AS count
-           FROM products p
-           JOIN supplement_details sd ON sd.product_id = p.product_id
-           WHERE ${baseWhere} AND sd.form IS NOT NULL
-           GROUP BY LOWER(sd.form)
-           ORDER BY count DESC`,
-          [domainType],
-        )
-      : [];
+    // Tüm sorgular paralel
+    const [
+      brands,
+      grades,
+      needs,
+      ingredients,
+      totalRow,
+      [forms, countries],
+    ] = await Promise.all([
+      this.repo.query(
+        `SELECT b.brand_id, b.brand_name, b.brand_slug, COUNT(*)::text AS count
+         FROM products p
+         JOIN brands b ON b.brand_id = p.brand_id
+         WHERE ${baseWhere}
+         GROUP BY b.brand_id, b.brand_name, b.brand_slug
+         ORDER BY count DESC, b.brand_name
+         LIMIT 50`,
+        [domainType],
+      ),
+      this.repo.query(
+        `SELECT ps.grade, COUNT(*)::text AS count
+         FROM products p
+         JOIN product_scores ps ON ps.product_id = p.product_id
+           AND ps.algorithm_version IN ('supplement-v2','cosmetic-v1')
+         WHERE ${baseWhere} AND ps.grade IS NOT NULL
+         GROUP BY ps.grade ORDER BY ps.grade`,
+        [domainType],
+      ),
+      this.repo.query(
+        `SELECT n.need_id, n.need_name, n.need_slug, COUNT(DISTINCT p.product_id)::text AS count
+         FROM products p
+         JOIN product_need_scores ns ON ns.product_id = p.product_id AND ns.compatibility_score >= 40
+         JOIN needs n ON n.need_id = ns.need_id
+         WHERE ${baseWhere}
+         GROUP BY n.need_id, n.need_name, n.need_slug
+         ORDER BY count DESC LIMIT 20`,
+        [domainType],
+      ),
+      this.repo.query(
+        `SELECT ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug,
+                COUNT(DISTINCT p.product_id)::text AS count
+         FROM products p
+         JOIN product_ingredients pi ON pi.product_id = p.product_id
+         JOIN ingredients ing ON ing.ingredient_id = pi.ingredient_id
+         WHERE ${baseWhere}
+         GROUP BY ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug
+         ORDER BY count DESC LIMIT 30`,
+        [domainType],
+      ),
+      this.repo.query(
+        `SELECT COUNT(*)::text AS count FROM products p WHERE ${baseWhere}`,
+        [domainType],
+      ),
+      supplementQueries,
+    ]);
 
-    // Manufacturer country
-    const countries = domainType === 'supplement'
-      ? await this.repo.query(
-          `SELECT sd.manufacturer_country AS country, COUNT(*)::text AS count
-           FROM products p
-           JOIN supplement_details sd ON sd.product_id = p.product_id
-           WHERE ${baseWhere} AND sd.manufacturer_country IS NOT NULL
-           GROUP BY sd.manufacturer_country
-           ORDER BY count DESC`,
-          [domainType],
-        )
-      : [];
-
-    // Evidence grade dağılımı
-    const grades = await this.repo.query(
-      `SELECT ps.grade, COUNT(*)::text AS count
-       FROM products p
-       JOIN product_scores ps ON ps.product_id = p.product_id
-         AND ps.algorithm_version IN ('supplement-v2','cosmetic-v1')
-       WHERE ${baseWhere} AND ps.grade IS NOT NULL
-       GROUP BY ps.grade
-       ORDER BY ps.grade`,
-      [domainType],
-    );
-
-    // Top 20 needs
-    const needs = await this.repo.query(
-      `SELECT n.need_id, n.need_name, n.need_slug, COUNT(DISTINCT p.product_id)::text AS count
-       FROM products p
-       JOIN product_need_scores ns ON ns.product_id = p.product_id AND ns.compatibility_score >= 40
-       JOIN needs n ON n.need_id = ns.need_id
-       WHERE ${baseWhere}
-       GROUP BY n.need_id, n.need_name, n.need_slug
-       ORDER BY count DESC
-       LIMIT 20`,
-      [domainType],
-    );
-
-    // Top 30 ingredients (etken madde popüler)
-    const ingredients = await this.repo.query(
-      `SELECT ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug,
-              COUNT(DISTINCT p.product_id)::text AS count
-       FROM products p
-       JOIN product_ingredients pi ON pi.product_id = p.product_id
-       JOIN ingredients ing ON ing.ingredient_id = pi.ingredient_id
-       WHERE ${baseWhere}
-       GROUP BY ing.ingredient_id, ing.inci_name, ing.common_name, ing.ingredient_slug
-       ORDER BY count DESC
-       LIMIT 30`,
-      [domainType],
-    );
-
-    // Total
-    const totalRow = await this.repo.query(
-      `SELECT COUNT(*)::text AS count FROM products p WHERE ${baseWhere}`,
-      [domainType],
-    );
-
-    return {
+    const result = {
       domain_type: domainType,
       total: parseInt(totalRow[0]?.count || '0', 10),
       brands: brands.map((r: Row<{ brand_id: number; brand_name: string; brand_slug: string }>) => ({
@@ -590,6 +596,12 @@ export class ProductsService {
         }),
       ),
     };
+
+    // Cache yaz (Redis + process memory)
+    void this.cache.set(cacheKey, result, TTL_S);
+    this._facetMemCache.set(cacheKey, { data: result, expiresAt: Date.now() + TTL_S * 1000 });
+
+    return result;
   }
 
   /**
