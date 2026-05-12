@@ -57,6 +57,9 @@ const nextConfig = {
       { protocol: 'https', hostname: 'cdn.media.amplience.net' },
       // Brand logos (Google Favicon API)
       { protocol: 'https', hostname: 'www.google.com' },
+      // OpenBeautyFacts ürün görselleri
+      { protocol: 'https', hostname: 'images.openbeautyfacts.org' },
+      { protocol: 'https', hostname: 'static.openbeautyfacts.org' },
       // Other
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'api.dicebear.com' },

@@ -993,8 +993,8 @@ export default async function ProductDetailPage({
                       >
                         <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                           {/* Üst: sıra no + konsantrasyon badge + uyarı rozeti + chevron */}
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="label-caps text-outline text-[9px] shrink-0">
+                          <div className="flex items-start gap-1 mb-1 flex-wrap">
+                            <span className="label-caps text-outline text-[9px] shrink-0 mt-0.5">
                               {idx + 1}
                             </span>
                             <span
@@ -1003,16 +1003,21 @@ export default async function ProductDetailPage({
                             >
                               {conc.label}
                             </span>
-                            {/* Uyarı rozeti — kapalı kart üzerinde de görünür. Çoklu flag tek combined rozet ile (4-col grid'de yer dar). */}
+                            {/* Uyarı rozeti — 4-col grid'de yer dar, kısa metin kullan */}
                             {isCritical && (
                               <span className="label-caps text-[9px] bg-error text-on-error px-1 py-0.5 rounded-sm font-bold shrink-0">
                                 UYARI
                               </span>
                             )}
                             {!isCritical && isAllergen && isFragrance && (
-                              <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30" title="Hem allerjen hem parfüm/koku bileşeni">
-                                PARFÜM·ALERJEN
-                              </span>
+                              <>
+                                <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
+                                  ALERJEN
+                                </span>
+                                <span className="label-caps text-[9px] bg-tertiary-container text-on-tertiary-container px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
+                                  PARFÜM
+                                </span>
+                              </>
                             )}
                             {!isCritical && isAllergen && !isFragrance && (
                               <span className="label-caps text-[9px] bg-error/10 text-error px-1 py-0.5 rounded-sm shrink-0 border border-error/30">
@@ -1026,7 +1031,7 @@ export default async function ProductDetailPage({
                             )}
                             <span className="flex-1" />
                             <span
-                              className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0"
+                              className="material-icon text-outline-variant group-open:rotate-180 transition-transform shrink-0 mt-0.5"
                               style={{ fontSize: '14px' }}
                               aria-hidden="true"
                             >
