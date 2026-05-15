@@ -64,6 +64,8 @@ export class MatchService {
           ingredients_text_tr?: string;
           image_url?: string;
           image_front_url?: string;
+          quantity?: string;
+          completeness?: number | string;
         };
       };
       if (data.status !== 1 || !data.product) return null;

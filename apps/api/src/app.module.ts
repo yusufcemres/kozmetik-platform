@@ -8,6 +8,7 @@ import { HealthController } from './health.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserAuthModule } from './modules/user-auth/user-auth.module';
 import { SmartScanModule } from './modules/smart-scan/smart-scan.module';
+import { SkinAnalysisModule } from './modules/skin-analysis/skin-analysis.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -79,7 +80,7 @@ const dbModule = skipDb
 const featureModules = skipDb
   ? []
   : [
-      AuthModule, UserAuthModule, SmartScanModule, NotificationsModule, FavoritesModule, CategoriesModule, BrandsModule, IngredientsModule, NeedsModule,
+      AuthModule, UserAuthModule, SmartScanModule, SkinAnalysisModule, NotificationsModule, FavoritesModule, CategoriesModule, BrandsModule, IngredientsModule, NeedsModule,
       ProductsModule, IngestionModule, MappingsModule, MethodologyModule,
       ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
       SupplementsModule, InteractionsModule, AffiliateModule, B2bModule, PriceAlertsModule,

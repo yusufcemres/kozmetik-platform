@@ -79,6 +79,102 @@ export class VisionService {
     return EMPTY_VISION_RESULT;
   }
 
+  /**
+   * Genel Vision API çağrısı — caller kendi prompt'ını ve parse mantığını yönetir.
+   *
+   * 2026-05-16 Foto Analiz Faz 1 Gün 2 ile eklendi: skin-analysis modülü
+   * kendi domain prompt'ıyla bu metodu çağırır (DRY — HTTP + timeout + MIME guard reuse).
+   *
+   * @returns Provider'ın döndüğü ham metin + kullanılan model versiyonu.
+   *          Caller JSON parse ve domain-specific validation yapar.
+   */
+  async callVisionWithPrompt(
+    imageBase64: string,
+    mimeType: string,
+    prompt: string,
+  ): Promise<{ raw: string; model: string } | null> {
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      this.logger.warn(`callVisionWithPrompt reddedilen MIME: ${mimeType}`);
+      return null;
+    }
+    const cleanBase64 = imageBase64.replace(/^data:image\/(jpeg|jpg|png|webp);base64,/, '');
+    if (!cleanBase64) return null;
+
+    const geminiKey = this.config.get<string>('GEMINI_API_KEY');
+    if (geminiKey) {
+      try {
+        const raw = await this.geminiRaw(cleanBase64, mimeType, geminiKey, prompt);
+        return { raw, model: 'gemini-2.0-flash' };
+      } catch (err: any) {
+        this.logger.warn(`Gemini failed (skin-prompt): ${err.message}, trying Claude…`);
+      }
+    }
+
+    const claudeKey = this.config.get<string>('ANTHROPIC_API_KEY');
+    if (claudeKey) {
+      try {
+        const raw = await this.claudeRaw(cleanBase64, mimeType, claudeKey, prompt);
+        return { raw, model: 'claude-sonnet-4-6' };
+      } catch (err: any) {
+        this.logger.error(`Claude failed (skin-prompt): ${err.message}`);
+      }
+    }
+    return null;
+  }
+
+  /** Gemini API — custom prompt versiyonu */
+  private async geminiRaw(image: string, mime: string, apiKey: string, prompt: string): Promise<string> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: mime, data: image } },
+          ],
+        }],
+        generationConfig: { temperature: 0.1, responseMimeType: 'application/json' },
+      }),
+    });
+    if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
+    const json = (await res.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+    return json?.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';
+  }
+
+  /** Claude API — custom prompt versiyonu */
+  private async claudeRaw(image: string, mime: string, apiKey: string, prompt: string): Promise<string> {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2048,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mime, data: image } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      }),
+    });
+    if (!res.ok) throw new Error(`Claude ${res.status}: ${await res.text()}`);
+    const json = (await res.json()) as {
+      content?: Array<{ text?: string }>;
+    };
+    return json?.content?.[0]?.text ?? '{}';
+  }
+
   private buildPrompt(): string {
     return `Bu fotoğrafta bir kozmetik ürünü, gıda takviyesi veya cilt bakım ürünü olup olmadığına bak.
 
