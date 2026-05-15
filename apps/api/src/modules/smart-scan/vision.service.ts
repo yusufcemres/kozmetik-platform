@@ -125,7 +125,9 @@ Emin değilsen null veya boş array döndür. Hallucinate etme.`;
       }),
     });
     if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
-    const json: any = await res.json();
+    const json = (await res.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
     const text = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';
     return this.parseResult(text);
   }
@@ -152,7 +154,9 @@ Emin değilsen null veya boş array döndür. Hallucinate etme.`;
       }),
     });
     if (!res.ok) throw new Error(`Claude ${res.status}: ${await res.text()}`);
-    const json: any = await res.json();
+    const json = (await res.json()) as {
+      content?: Array<{ text?: string }>;
+    };
     const text = json?.content?.[0]?.text ?? '{}';
     return this.parseResult(text);
   }
@@ -164,8 +168,8 @@ Emin değilsen null veya boş array döndür. Hallucinate etme.`;
       // ingredients_list parse + temizle
       let ings: string[] = [];
       if (Array.isArray(parsed.ingredients_list)) {
-        ings = parsed.ingredients_list
-          .map((s: any) => String(s || '').trim().replace(/^["'`]+|["'`]+$/g, '').replace(/\([^)]*\)/g, '').replace(/\s*%?\s*\d+[.,]?\d*\s*%?\s*/g, ' ').trim())
+        ings = (parsed.ingredients_list as unknown[])
+          .map((s) => String(s ?? '').trim().replace(/^["'`]+|["'`]+$/g, '').replace(/\([^)]*\)/g, '').replace(/\s*%?\s*\d+[.,]?\d*\s*%?\s*/g, ' ').trim())
           .filter((s: string) => s.length > 1 && s.length < 100)
           .slice(0, 100);
       }

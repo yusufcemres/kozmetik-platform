@@ -4,18 +4,28 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { requestMagicLink } from '@/lib/user-auth';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function GirisPage() {
   const [email, setEmail] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [devToken, setDevToken] = useState<string | null>(null);
 
+  const emailValid = EMAIL_REGEX.test(email.trim());
+  const emailError = emailTouched && email.length > 0 && !emailValid;
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!emailValid) {
+      setEmailTouched(true);
+      return;
+    }
     setStatus('loading');
     setMessage('');
     try {
-      const res = await requestMagicLink(email);
+      const res = await requestMagicLink(email.trim());
       setStatus('sent');
       if (res.devToken) {
         setDevToken(res.devToken);
@@ -53,10 +63,20 @@ export default function GirisPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
                 placeholder="sen@ornek.com"
                 disabled={status === 'loading'}
-                className="w-full px-4 py-3 bg-surface border border-outline-variant/30 rounded-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
+                aria-invalid={emailError}
+                aria-describedby={emailError ? 'email-error' : undefined}
+                className={`w-full px-4 py-3 bg-surface border rounded-sm text-on-surface placeholder:text-outline focus:outline-none transition-colors ${
+                  emailError ? 'border-error focus:border-error' : 'border-outline-variant/30 focus:border-primary'
+                }`}
               />
+              {emailError && (
+                <p id="email-error" className="text-xs text-error mt-2">
+                  Geçerli bir e-posta adresi gir (örn. sen@ornek.com)
+                </p>
+              )}
             </div>
 
             {status === 'error' && (
@@ -67,7 +87,7 @@ export default function GirisPage() {
 
             <button
               type="submit"
-              disabled={status === 'loading' || !email}
+              disabled={status === 'loading' || !emailValid}
               className="curator-btn-primary text-sm px-6 py-3 w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === 'loading' ? 'Gönderiliyor…' : 'Giriş Bağlantısı Gönder'}
@@ -81,7 +101,7 @@ export default function GirisPage() {
             <h2 className="text-xl font-bold text-on-surface">Bağlantı gönderildi</h2>
             <p className="text-sm text-on-surface-variant leading-relaxed">
               <strong>{email}</strong> adresine giriş bağlantısı gönderdik.
-              <br />E-postanı kontrol et. 20 dakika geçerli.
+              <br />E-postanı kontrol et. 10 dakika geçerli.
             </p>
 
             {devToken && (

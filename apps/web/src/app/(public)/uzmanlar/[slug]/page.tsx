@@ -54,8 +54,25 @@ export default async function ReviewerDetailPage({ params }: { params: { slug: s
   }
   const { reviewer, posts, ingredients } = data;
 
+  // JSON-LD Person schema (Madde 14): SEO + Google Knowledge Graph için bilim kurulu uzmanı.
+  const personJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: reviewer.name,
+    jobTitle: reviewer.title || undefined,
+    description: reviewer.bio || undefined,
+    image: reviewer.avatar_url || undefined,
+    knowsAbout: reviewer.specialty || undefined,
+    identifier: reviewer.license_no ? { '@type': 'PropertyValue', propertyID: 'Diploma No', value: reviewer.license_no } : undefined,
+    affiliation: { '@type': 'Organization', name: 'REVELA' },
+  };
+
   return (
     <main className="container mx-auto max-w-3xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       <section className="flex gap-6">
         {reviewer.avatar_url && (
           // eslint-disable-next-line @next/next/no-img-element

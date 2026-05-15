@@ -218,6 +218,37 @@ export class UserAuthService {
   }
 
   /**
+   * Profile update — display_name. KVKK Madde 11 (kullanıcı veri düzeltme hakkı).
+   * 2026-05-15 Madde 20 ile eklendi: audit trail PROFILE_UPDATE hook.
+   */
+  async updateProfile(
+    userId: number,
+    patch: { display_name?: string | null },
+    ip?: string,
+  ): Promise<{ user_id: number; email: string; display_name: string | null }> {
+    const user = await this.users.findOne({ where: { user_id: userId } });
+    if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');
+
+    const changes: Record<string, { from: unknown; to: unknown }> = {};
+    if (patch.display_name !== undefined && patch.display_name !== user.display_name) {
+      changes.display_name = { from: user.display_name, to: patch.display_name };
+      user.display_name = patch.display_name ? patch.display_name.trim().slice(0, 100) : null;
+    }
+
+    if (Object.keys(changes).length > 0) {
+      await this.users.save(user);
+      void this.audit('PROFILE_UPDATE', {
+        user_id: userId,
+        email: user.email,
+        ip,
+        details: { changes },
+      });
+    }
+
+    return { user_id: user.user_id, email: user.email, display_name: user.display_name };
+  }
+
+  /**
    * Kullanıcının tarama geçmişi — product JOIN ile ürün bilgisi dahil.
    * Tek kart bir ürün gösterirse listede son tarama gözükür.
    */

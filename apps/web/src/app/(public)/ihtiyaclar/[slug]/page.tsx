@@ -207,6 +207,29 @@ function needJsonLd(need: Need) {
   };
 }
 
+/**
+ * FAQPage schema (Madde 14): need.faq_json varsa Google rich result için ayrı script.
+ * Min 2 soru gerekli; daha azsa schema yayınlanmaz.
+ */
+function needFaqJsonLd(need: Need): Record<string, unknown> | null {
+  const faqs = (need.faq_json && Array.isArray(need.faq_json) ? need.faq_json : []).filter(
+    (f) => f && typeof f.q === 'string' && typeof f.a === 'string' && f.q.length > 0 && f.a.length > 0,
+  );
+  if (faqs.length < 2) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.a,
+      },
+    })),
+  };
+}
+
 // === Page ===
 
 export default async function NeedDetailPage({
@@ -280,6 +303,15 @@ export default async function NeedDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(needJsonLd(need)) }}
       />
+      {(() => {
+        const faqLd = needFaqJsonLd(need);
+        return faqLd ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          />
+        ) : null;
+      })()}
 
       <article className="curator-section max-w-[1400px] mx-auto">
         {/* Breadcrumb */}

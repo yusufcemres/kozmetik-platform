@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound, redirect } from 'next/navigation';
 import { apiFetch, SITE_URL } from '@/lib/api';
+import { formatPrice } from '@/lib/format';
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';
@@ -324,13 +325,7 @@ function concentrationLabel(band: string): { label: string; color: string; toolt
   return map[band] || { label: band, color: 'text-outline', tooltip: 'Konsantrasyon bilinmiyor' };
 }
 
-function formatPrice(price: number | null): string {
-  if (!price) return '';
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: 'TRY',
-  }).format(price);
-}
+// formatPrice → @/lib/format (Madde 23: DRY)
 
 // === JSON-LD ===
 

@@ -53,9 +53,11 @@ export class IngredientsService {
       where.inci_name = Like(`%${search}%`);
     }
 
+    // 2026-05-15 audit (Madde 18): list endpoint için aliases + evidence_links
+    // eager-load kaldırıldı. Detay endpoint (findOne / findBySlug) yine eager.
+    // 5K+ alias + evidence_link kayıt list response payload'unu ~3x büyütüyordu.
     const [data, total] = await this.repo.findAndCount({
       where,
-      relations: ['aliases', 'evidence_links'],
       order: { inci_name: 'ASC' },
       skip: (page - 1) * limit,
       take: limit,

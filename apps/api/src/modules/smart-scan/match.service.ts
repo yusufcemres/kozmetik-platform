@@ -53,7 +53,19 @@ export class MatchService {
         signal: AbortSignal.timeout(8000),
       });
       if (!res.ok) return null;
-      const data: any = await res.json();
+      const data = (await res.json()) as {
+        status?: number;
+        product?: {
+          product_name?: string;
+          product_name_en?: string;
+          brands?: string;
+          ingredients_text?: string;
+          ingredients_text_en?: string;
+          ingredients_text_tr?: string;
+          image_url?: string;
+          image_front_url?: string;
+        };
+      };
       if (data.status !== 1 || !data.product) return null;
       const p = data.product;
       const inciRaw: string = p.ingredients_text_en || p.ingredients_text || p.ingredients_text_tr || '';

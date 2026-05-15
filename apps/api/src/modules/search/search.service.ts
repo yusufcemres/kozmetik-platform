@@ -87,59 +87,68 @@ export class SearchService {
     type SuggestRow = { name: string; slug: string };
     type ProductSuggestRow = SuggestRow & { overall_score?: number; grade?: string };
     type SuggestItem = { type: 'product' | 'ingredient' | 'need' | 'brand'; name: string; slug: string; score?: number; grade?: string };
-    const suggestions: SuggestItem[] = [];
 
-    // Products (with precomputed score)
-    const products: ProductSuggestRow[] = await this.dataSource.query(
-      `SELECT p.product_name as name, p.product_slug as slug,
-              ps.overall_score, ps.grade
-       FROM products p
-       LEFT JOIN product_scores ps ON ps.product_id = p.product_id
-       WHERE p.status != 'archived'
-         AND p.product_name ILIKE $1
-       ORDER BY p.product_name ASC
-       LIMIT $2`,
-      [`%${term}%`, Math.ceil(limit / 3)],
-    );
-    suggestions.push(...products.map((p): SuggestItem => ({
-      type: 'product', name: p.name, slug: p.slug,
-      score: p.overall_score ?? undefined, grade: p.grade ?? undefined,
-    })));
+    // 2026-05-15 audit (Madde 16): 4 sequential query → Promise.all paralel.
+    // Önceki: ~300ms (4 × 75ms sequential). Sonrası: ~75-100ms (slowest query yönetir).
+    const wildcard = `%${term}%`;
+    const productLimit = Math.ceil(limit / 3);
+    const ingredientLimit = Math.ceil(limit / 3);
+    const needLimit = Math.ceil(limit / 4);
+    const brandLimit = Math.ceil(limit / 4);
 
-    // Ingredients
-    const ingredients: SuggestRow[] = await this.dataSource.query(
-      `SELECT DISTINCT i.inci_name as name, i.ingredient_slug as slug
-       FROM ingredients i
-       LEFT JOIN ingredient_aliases a ON a.ingredient_id = i.ingredient_id
-       WHERE i.is_active = true
-         AND (i.inci_name ILIKE $1 OR i.common_name ILIKE $1 OR a.alias_name ILIKE $1)
-       ORDER BY i.inci_name ASC
-       LIMIT $2`,
-      [`%${term}%`, Math.ceil(limit / 3)],
-    );
-    suggestions.push(...ingredients.map((i): SuggestItem => ({ type: 'ingredient', name: i.name, slug: i.slug })));
+    const [products, ingredients, needs, brands] = await Promise.all([
+      // Products (with precomputed score)
+      this.dataSource.query(
+        `SELECT p.product_name as name, p.product_slug as slug,
+                ps.overall_score, ps.grade
+         FROM products p
+         LEFT JOIN product_scores ps ON ps.product_id = p.product_id
+         WHERE p.status != 'archived'
+           AND p.product_name ILIKE $1
+         ORDER BY p.product_name ASC
+         LIMIT $2`,
+        [wildcard, productLimit],
+      ) as Promise<ProductSuggestRow[]>,
+      // Ingredients (with alias trgm lookup)
+      this.dataSource.query(
+        `SELECT DISTINCT i.inci_name as name, i.ingredient_slug as slug
+         FROM ingredients i
+         LEFT JOIN ingredient_aliases a ON a.ingredient_id = i.ingredient_id
+         WHERE i.is_active = true
+           AND (i.inci_name ILIKE $1 OR i.common_name ILIKE $1 OR a.alias_name ILIKE $1)
+         ORDER BY i.inci_name ASC
+         LIMIT $2`,
+        [wildcard, ingredientLimit],
+      ) as Promise<SuggestRow[]>,
+      // Needs
+      this.dataSource.query(
+        `SELECT need_name as name, need_slug as slug
+         FROM needs
+         WHERE is_active = true AND (need_name ILIKE $1 OR user_friendly_label ILIKE $1)
+         ORDER BY need_name ASC
+         LIMIT $2`,
+        [wildcard, needLimit],
+      ) as Promise<SuggestRow[]>,
+      // Brands
+      this.dataSource.query(
+        `SELECT brand_name as name, brand_slug as slug
+         FROM brands
+         WHERE brand_name ILIKE $1
+         ORDER BY brand_name ASC
+         LIMIT $2`,
+        [wildcard, brandLimit],
+      ) as Promise<SuggestRow[]>,
+    ]);
 
-    // Needs
-    const needs: SuggestRow[] = await this.dataSource.query(
-      `SELECT need_name as name, need_slug as slug
-       FROM needs
-       WHERE is_active = true AND (need_name ILIKE $1 OR user_friendly_label ILIKE $1)
-       ORDER BY need_name ASC
-       LIMIT $2`,
-      [`%${term}%`, Math.ceil(limit / 4)],
-    );
-    suggestions.push(...needs.map((n): SuggestItem => ({ type: 'need', name: n.name, slug: n.slug })));
-
-    // Brands
-    const brands: SuggestRow[] = await this.dataSource.query(
-      `SELECT brand_name as name, brand_slug as slug
-       FROM brands
-       WHERE brand_name ILIKE $1
-       ORDER BY brand_name ASC
-       LIMIT $2`,
-      [`%${term}%`, Math.ceil(limit / 4)],
-    );
-    suggestions.push(...brands.map((b): SuggestItem => ({ type: 'brand', name: b.name, slug: b.slug })));
+    const suggestions: SuggestItem[] = [
+      ...products.map((p): SuggestItem => ({
+        type: 'product', name: p.name, slug: p.slug,
+        score: p.overall_score ?? undefined, grade: p.grade ?? undefined,
+      })),
+      ...ingredients.map((i): SuggestItem => ({ type: 'ingredient', name: i.name, slug: i.slug })),
+      ...needs.map((n): SuggestItem => ({ type: 'need', name: n.name, slug: n.slug })),
+      ...brands.map((b): SuggestItem => ({ type: 'brand', name: b.name, slug: b.slug })),
+    ];
 
     const result = suggestions.slice(0, limit);
     await this.cache.set(cacheKey, result, SUGGEST_CACHE_TTL);

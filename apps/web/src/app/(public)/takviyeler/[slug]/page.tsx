@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
+import { formatPrice } from '@/lib/format';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import PriceChart from '@/components/public/PriceChart';
@@ -240,10 +241,7 @@ function platformLabel(p: string): string {
   return sharedPlatformLabel(p);
 }
 
-function formatPrice(price: number | null): string {
-  if (!price) return '';
-  return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(price);
-}
+// formatPrice → @/lib/format (Madde 23: DRY)
 
 // === JSON-LD ===
 

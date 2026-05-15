@@ -1,8 +1,17 @@
-import { Body, Controller, Delete, Get, Ip, Param, ParseIntPipe, Post, Query, UseGuards, Req } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Ip, Param, ParseIntPipe, Patch, Post, Query, UseGuards, Req } from '@nestjs/common';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { ApiOperation, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { UserAuthService } from './user-auth.service';
 import { AppJwtGuard } from './app-jwt.guard';
+
+class UpdateProfileDto {
+  @ApiPropertyOptional({ example: 'Ada Lovelace', description: 'Görünür isim (max 100)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  display_name?: string | null;
+}
 
 @ApiTags('User Auth')
 @Controller('user-auth')
@@ -28,6 +37,14 @@ export class UserAuthController {
   @ApiOperation({ summary: 'Mevcut kullanıcı bilgisi' })
   async me(@Req() req: any) {
     return req.user;
+  }
+
+  @Patch('me')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Profil bilgisini güncelle (display_name)' })
+  async updateMe(@Req() req: any, @Body() body: UpdateProfileDto, @Ip() ip: string) {
+    return this.service.updateProfile(req.user.user_id, body, ip);
   }
 
   @Get('me/export')
