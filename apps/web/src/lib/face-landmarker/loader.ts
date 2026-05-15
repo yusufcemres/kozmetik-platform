@@ -8,7 +8,7 @@
  * WASM gerekiyor — eski mobiller fallback (server-side Gemini Vision yalın).
  */
 
-import type { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+import type { FaceLandmarker } from '@mediapipe/tasks-vision';
 
 let landmarkerPromise: Promise<FaceLandmarker | null> | null = null;
 
@@ -22,10 +22,10 @@ export async function getFaceLandmarker(): Promise<FaceLandmarker | null> {
   landmarkerPromise = (async () => {
     try {
       const { FilesetResolver, FaceLandmarker } = await import('@mediapipe/tasks-vision');
-      const filesetResolver: FilesetResolver = await FilesetResolver.forVisionTasks(
+      const wasmFileset = await FilesetResolver.forVisionTasks(
         'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm',
       );
-      const landmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+      const landmarker = await FaceLandmarker.createFromOptions(wasmFileset, {
         baseOptions: {
           modelAssetPath:
             'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',

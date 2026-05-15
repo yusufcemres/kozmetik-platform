@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
+import { RadarChart } from '@/components/skin-analysis/RadarChart';
 import { apiFetch } from '@/lib/api';
 
 /**
@@ -153,27 +154,40 @@ export default function FotoTestPage() {
             </div>
           </div>
 
-          {/* 6-Boyut breakdown */}
+          {/* 6-Boyut radar chart + breakdown bar */}
           <div className="curator-card p-5 mb-8">
-            <h3 className="text-base font-semibold text-on-surface mb-4">Boyut Bazında Skor</h3>
-            <div className="space-y-3">
-              {Object.entries(result.scores).map(([dim, score]) => (
-                <div key={dim}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-on-surface">{DIMENSION_LABELS[dim] || dim}</span>
-                    <span className="font-semibold text-on-surface">{score}</span>
+            <h3 className="text-base font-semibold text-on-surface mb-4 text-center">6-Boyut Cilt Skoru</h3>
+
+            <RadarChart
+              dimensions={[
+                { key: 't_zone_oil', label: 'T-Bölge', value: Number(result.scores.t_zone_oil) || 0 },
+                { key: 'pore_visibility', label: 'Gözenek', value: Number(result.scores.pore_visibility) || 0 },
+                { key: 'wrinkles', label: 'Kırışıklık', value: Number(result.scores.wrinkles) || 0 },
+                { key: 'pigmentation', label: 'Leke', value: Number(result.scores.pigmentation) || 0 },
+                { key: 'redness', label: 'Kızarıklık', value: Number(result.scores.redness) || 0 },
+                { key: 'under_eye_darkness', label: 'Gözaltı', value: Number(result.scores.under_eye_darkness) || 0 },
+              ]}
+              size={320}
+            />
+
+            {/* Bonus: acne + fitzpatrick (radar dışı, ayrı bilgi kartı) */}
+            {(result.scores.acne_count != null || result.scores.fitzpatrick_type != null) && (
+              <div className="mt-6 pt-4 border-t border-outline-variant/20 grid grid-cols-2 gap-4 text-center text-sm">
+                {result.scores.acne_count != null && (
+                  <div>
+                    <p className="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Aktif Sivilce</p>
+                    <p className="text-2xl font-bold text-on-surface">{result.scores.acne_count}</p>
                   </div>
-                  <div className="h-2 bg-surface-container rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        score >= 70 ? 'bg-score-low' : score >= 40 ? 'bg-score-medium' : 'bg-score-high'
-                      }`}
-                      style={{ width: `${Math.min(100, Number(score) * (dim === 'fitzpatrick_type' ? 16.67 : dim === 'acne_count' ? 2 : 1))}%` }}
-                    />
+                )}
+                {result.scores.fitzpatrick_type != null && (
+                  <div>
+                    <p className="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Cilt Tonu</p>
+                    <p className="text-2xl font-bold text-on-surface">Tip {result.scores.fitzpatrick_type}</p>
+                    <p className="text-xs text-on-surface-variant mt-1">Fitzpatrick I-VI</p>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* INCI Recommendations */}

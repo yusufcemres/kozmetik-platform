@@ -665,22 +665,22 @@ export default function SkinAnalysisPage() {
 
           <MedicalDisclaimer detail="REVELA cilt analizi yapay zeka destekli bir öneri motorudur." />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Quick Test Card */}
             <button
               onClick={() => { setQuizMode('quick'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
-              className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group"
+              className="curator-card p-6 md:p-7 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group"
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 <span className="material-icon text-score-medium text-3xl" aria-hidden="true">bolt</span>
                 <div>
-                  <h2 className="text-xl font-bold text-on-surface">Hızlı Test</h2>
+                  <h2 className="text-lg font-bold text-on-surface">Hızlı Test</h2>
                   <span className="text-xs text-outline font-medium">~1 dk</span>
                 </div>
               </div>
-              <p className="text-sm text-on-surface-variant italic mb-4">&ldquo;Asansörde bile yetişir.&rdquo;</p>
-              <p className="text-xs text-on-surface-variant leading-relaxed mb-6">
-                6 soru — cilt tipini ve temel ihtiyaçlarını belirle, hızlıca öneri al.
+              <p className="text-xs text-on-surface-variant italic mb-3">&ldquo;Asansörde bile yetişir.&rdquo;</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed mb-5">
+                6 soru — cilt tipini ve temel ihtiyaçlarını belirle.
               </p>
               <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline">
                 Hızlı Başla
@@ -691,27 +691,52 @@ export default function SkinAnalysisPage() {
             {/* Detailed Test Card */}
             <button
               onClick={() => { setQuizMode('detailed'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
-              className="curator-card p-6 md:p-8 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative"
+              className="curator-card p-6 md:p-7 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative"
             >
               <div className="absolute top-3 right-3">
                 <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Önerilen</span>
               </div>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 <span className="material-icon text-primary text-3xl" aria-hidden="true">biotech</span>
                 <div>
-                  <h2 className="text-xl font-bold text-on-surface">Detaylı Test</h2>
+                  <h2 className="text-lg font-bold text-on-surface">Detaylı Test</h2>
                   <span className="text-xs text-outline font-medium">~4 dk</span>
                 </div>
               </div>
-              <p className="text-sm text-on-surface-variant italic mb-4">&ldquo;Bir kahve koy, cildini baştan sona tanıyalım.&rdquo;</p>
-              <p className="text-xs text-on-surface-variant leading-relaxed mb-6">
-                19 soru — hormon, rutin, yaşam tarzı, çevresel faktörler dahil eksiksiz analiz.
+              <p className="text-xs text-on-surface-variant italic mb-3">&ldquo;Bir kahve koy, cildini tanıyalım.&rdquo;</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed mb-5">
+                19 soru — hormon, rutin, yaşam tarzı, çevresel faktörler.
               </p>
               <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline">
                 Detaylı Başla
                 <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
               </span>
             </button>
+
+            {/* Foto Analiz Card (Yeni — Faz 1 Gün 5 ile eklendi) */}
+            <a
+              href="/cilt-analizi/foto-test"
+              className="curator-card p-6 md:p-7 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative no-underline"
+            >
+              <div className="absolute top-3 right-3">
+                <span className="bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Beta</span>
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="material-icon text-primary text-3xl" aria-hidden="true">photo_camera</span>
+                <div>
+                  <h2 className="text-lg font-bold text-on-surface">Foto Analizi</h2>
+                  <span className="text-xs text-outline font-medium">~30 sn</span>
+                </div>
+              </div>
+              <p className="text-xs text-on-surface-variant italic mb-3">&ldquo;Soru yok, sadece foto.&rdquo;</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed mb-5">
+                Yüz foto AI 6-boyut cilt skoru: T-bölge, gözenek, kırışık, leke, kızarıklık, gözaltı.
+              </p>
+              <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline">
+                Foto ile Başla
+                <span className="material-icon material-icon-sm ml-1" aria-hidden="true">arrow_forward</span>
+              </span>
+            </a>
           </div>
         </div>
       )}
