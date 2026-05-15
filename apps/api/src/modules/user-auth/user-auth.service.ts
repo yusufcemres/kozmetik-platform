@@ -10,11 +10,15 @@ import {
   UserFavorite,
   ScanHistory,
   PushSubscription,
+  UserAction,
+  UserActionType,
 } from '@database/entities';
 
-const TOKEN_TTL_MINUTES = 20;
+// Audit hardening 2026-05-15: token TTL 20→10 dk, IP rate 5→2/min
+// SHA256 hash + 32 byte random = 256-bit entropy. 2 deneme/dk × 10 dk = 20 brute force penceresi (yeterli).
+const TOKEN_TTL_MINUTES = 10;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 per minute per email
-const IP_RATE_LIMIT_MAX = 5; // 5 requests per minute per IP
+const IP_RATE_LIMIT_MAX = 2; // 2 requests per minute per IP
 const IP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 @Injectable()
@@ -29,16 +33,46 @@ export class UserAuthService {
     @InjectRepository(UserFavorite) private readonly favorites: Repository<UserFavorite>,
     @InjectRepository(ScanHistory) private readonly scanHistory: Repository<ScanHistory>,
     @InjectRepository(PushSubscription) private readonly pushSubs: Repository<PushSubscription>,
+    @InjectRepository(UserAction) private readonly userActions: Repository<UserAction>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
   ) {}
 
-  private checkIpRateLimit(ip: string | undefined): void {
+  /**
+   * KVKK + denetim audit log — Madde 8 (2026-05-15) ile eklendi.
+   * Tüm log yazımları best-effort: hata olursa silent (login/silme akışı kesilmesin).
+   */
+  private async audit(
+    action_type: UserActionType,
+    params: { user_id?: number | null; email?: string; ip?: string; user_agent?: string; details?: Record<string, unknown> } = {},
+  ): Promise<void> {
+    try {
+      const email_hash = params.email
+        ? createHash('sha256').update(this.normalizeEmail(params.email)).digest('hex')
+        : null;
+      await this.userActions.save(
+        this.userActions.create({
+          user_id: params.user_id ?? null,
+          action_type,
+          email_hash,
+          ip: params.ip ?? null,
+          user_agent: params.user_agent ? params.user_agent.slice(0, 255) : null,
+          details: params.details ?? null,
+        }),
+      );
+    } catch (err: any) {
+      this.logger.warn(`audit log failed: ${err.message}`);
+    }
+  }
+
+  private checkIpRateLimit(ip: string | undefined, email?: string): void {
     if (!ip) return;
     const now = Date.now();
     const windowStart = now - IP_RATE_LIMIT_WINDOW_MS;
     const recent = (this.ipRequests.get(ip) || []).filter((t) => t > windowStart);
     if (recent.length >= IP_RATE_LIMIT_MAX) {
+      // Audit log (best-effort, fire-and-forget)
+      void this.audit('LOGIN_RATE_LIMITED', { ip, email, details: { recent_count: recent.length } });
       throw new BadRequestException('Çok fazla istek. Lütfen biraz bekleyin.');
     }
     recent.push(now);
@@ -59,10 +93,11 @@ export class UserAuthService {
       throw new BadRequestException('Geçersiz e-posta adresi');
     }
 
-    this.checkIpRateLimit(ip);
+    this.checkIpRateLimit(ip, email);
 
     const last = this.recentRequests.get(email);
     if (last && Date.now() - last < RATE_LIMIT_WINDOW_MS) {
+      void this.audit('LOGIN_RATE_LIMITED', { ip, email, details: { source: 'email_throttle' } });
       throw new BadRequestException('Çok hızlı istek. Lütfen 1 dakika bekleyin.');
     }
     this.recentRequests.set(email, Date.now());
@@ -90,6 +125,9 @@ export class UserAuthService {
     } else {
       this.logger.warn(`[MAGIC LINK DEV MODE] ${email} → ${link}`);
     }
+
+    // Audit log: anonim, user_id yok (token doğrulanana kadar bilinmez)
+    void this.audit('LOGIN_REQUEST', { email, ip });
 
     // Dev convenience: return token when not in production
     const isProd = this.config.get<string>('NODE_ENV') === 'production';
@@ -132,19 +170,23 @@ export class UserAuthService {
     }
   }
 
-  async verifyMagicLink(rawToken: string): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
+  async verifyMagicLink(rawToken: string, ip?: string): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
     if (!rawToken || rawToken.length < 16) {
+      void this.audit('LOGIN_FAILED', { ip, details: { reason: 'invalid_token_format' } });
       throw new UnauthorizedException('Geçersiz bağlantı');
     }
     const tokenHash = this.hashToken(rawToken);
     const record = await this.tokens.findOne({ where: { token_hash: tokenHash } });
     if (!record) {
+      void this.audit('LOGIN_FAILED', { ip, details: { reason: 'token_not_found' } });
       throw new UnauthorizedException('Bağlantı bulunamadı veya kullanılmış');
     }
     if (record.used_at) {
+      void this.audit('LOGIN_FAILED', { ip, email: record.email, details: { reason: 'token_already_used' } });
       throw new UnauthorizedException('Bu bağlantı daha önce kullanılmış');
     }
     if (record.expires_at.getTime() < Date.now()) {
+      void this.audit('LOGIN_FAILED', { ip, email: record.email, details: { reason: 'token_expired' } });
       throw new UnauthorizedException('Bağlantının süresi dolmuş');
     }
 
@@ -162,6 +204,8 @@ export class UserAuthService {
       { sub: user.user_id, email: user.email, kind: 'app' },
       { expiresIn: '30d' },
     );
+
+    void this.audit('LOGIN_SUCCESS', { user_id: user.user_id, email: user.email, ip });
 
     return {
       token: jwtToken,
@@ -254,7 +298,7 @@ export class UserAuthService {
     return { deleted: (r.affected ?? 0) > 0 };
   }
 
-  async exportUserData(userId: number): Promise<Record<string, unknown>> {
+  async exportUserData(userId: number, ip?: string): Promise<Record<string, unknown>> {
     const user = await this.users.findOne({ where: { user_id: userId } });
     if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');
 
@@ -263,6 +307,13 @@ export class UserAuthService {
       this.scanHistory.find({ where: { user_id: userId } }),
       this.pushSubs.find({ where: { user_id: userId } }),
     ]);
+
+    void this.audit('DATA_EXPORT', {
+      user_id: userId,
+      email: user.email,
+      ip,
+      details: { favorites: favorites.length, scans: scans.length, pushes: pushes.length },
+    });
 
     return {
       exported_at: new Date().toISOString(),
@@ -287,9 +338,18 @@ export class UserAuthService {
     };
   }
 
-  async deleteAccount(userId: number): Promise<{ deleted: boolean }> {
+  async deleteAccount(userId: number, ip?: string): Promise<{ deleted: boolean }> {
     const user = await this.users.findOne({ where: { user_id: userId } });
     if (!user) throw new UnauthorizedException('Kullanıcı bulunamadı');
+
+    // Audit log ÖNCE — user_id silindikten sonra FK SET NULL devreye girer,
+    // ama bu kayıtta cascade öncesi bilgi saklanır (KVKK Madde 7 kanıtı).
+    await this.audit('ACCOUNT_DELETE', {
+      user_id: userId,
+      email: user.email,
+      ip,
+      details: { display_name: user.display_name, deleted_at: new Date().toISOString() },
+    });
 
     // Cascade delete user-owned records. ScanHistory uses user_id FK (nullable); null out or delete.
     await this.favorites.delete({ user_id: userId });

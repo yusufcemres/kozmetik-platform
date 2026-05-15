@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Ip, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Ip, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import { SmartScanService, SmartScanRequest } from './smart-scan.service';
+import { SmartScanService } from './smart-scan.service';
+import { SmartScanRequestDto } from './dto/scan.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
 
 @ApiTags('Smart Scan')
@@ -12,7 +13,10 @@ export class SmartScanController {
   @Post()
   @Throttle({ public: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Barkod/görsel tara' })
-  async scan(@Body() body: SmartScanRequest, @Req() req: any, @Ip() ip: string) {
+  async scan(@Body() body: SmartScanRequestDto, @Req() req: any, @Ip() ip: string) {
+    if (!body.barcode && !body.image_base64) {
+      throw new BadRequestException('barcode veya image_base64 alanlarından en az biri gerekli');
+    }
     // Optional auth: if token present, attach user_id
     const userId = req?.user?.user_id;
     return this.service.scan({ ...body, user_id: userId, ip });
@@ -26,6 +30,7 @@ export class SmartScanController {
   }
 
   @Get('stats')
+  @Throttle({ public: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Topluluk tarama istatistigi (public sosyal kanit)' })
   async stats() {
     return this.service.getPublicStats();

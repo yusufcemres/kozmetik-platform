@@ -268,14 +268,20 @@ export class SmartScanService {
 
   /**
    * Public topluluk istatistigi — homepage sosyal kanit sayaci.
-   * 1 saat Redis cache verilebilir ama oturumda 1 sorgu yeterli.
+   * 60sn in-memory cache: scraping defense + DB load azaltma (controller'da @Throttle 30/min de var).
    */
+  private statsCache: { value: { total_scans: number; total_scanners: number; unique_products: number; scans_this_month: number } | null; ts: number } = { value: null, ts: 0 };
+  private readonly STATS_CACHE_TTL = 60_000;
+
   async getPublicStats(): Promise<{
     total_scans: number;
     total_scanners: number;
     unique_products: number;
     scans_this_month: number;
   }> {
+    if (this.statsCache.value && Date.now() - this.statsCache.ts < this.STATS_CACHE_TTL) {
+      return this.statsCache.value;
+    }
     const rows = await this.history.manager.query(
       `SELECT
         COUNT(*)::int AS total_scans,
@@ -284,7 +290,9 @@ export class SmartScanService {
         COUNT(*) FILTER (WHERE created_at > date_trunc('month', NOW()))::int AS scans_this_month
        FROM scan_history`,
     );
-    return rows[0] || { total_scans: 0, total_scanners: 0, unique_products: 0, scans_this_month: 0 };
+    const value = rows[0] || { total_scans: 0, total_scanners: 0, unique_products: 0, scans_this_month: 0 };
+    this.statsCache = { value, ts: Date.now() };
+    return value;
   }
 
   async getUserHistory(userId: number, limit = 50): Promise<any[]> {

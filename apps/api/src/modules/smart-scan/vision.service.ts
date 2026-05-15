@@ -12,9 +12,24 @@ export interface VisionResult {
   ingredients_list?: string[];
 }
 
+/** MIME types accepted by both Gemini Vision and Claude Vision endpoints. */
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+/** Empty/failure response shared by validation rejects and provider fallbacks. */
+const EMPTY_VISION_RESULT: VisionResult = {
+  brand: null,
+  product_name: null,
+  product_type: null,
+  detected_text: null,
+  confidence: 0,
+};
+
 /**
- * Multi-modal vision: Gemini 2.0 Flash → Claude Haiku fallback.
+ * Multi-modal vision: Gemini 2.0 Flash → Claude Sonnet fallback.
  * Accepts base64 image, returns structured product detection.
+ *
+ * Defense-in-depth: bu metod direkt çağrıldığında da MIME whitelist enforce eder
+ * (DTO katmanı ilk savunma, bu ikinci savunma).
  */
 @Injectable()
 export class VisionService {
@@ -23,10 +38,23 @@ export class VisionService {
   constructor(private readonly config: ConfigService) {}
 
   async recognizeProduct(imageBase64: string, mimeType = 'image/jpeg'): Promise<VisionResult> {
+    // Defense-in-depth MIME whitelist (DTO controller seviyesinde de enforce ediliyor)
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      this.logger.warn(`Reddedilen MIME type: ${mimeType}`);
+      return EMPTY_VISION_RESULT;
+    }
+
+    // Strip data URI prefix if present (DTO base64'ü ham veya data URI kabul ediyor)
+    const cleanBase64 = imageBase64.replace(/^data:image\/(jpeg|jpg|png|webp);base64,/, '');
+    if (!cleanBase64) {
+      this.logger.warn('Bos image_base64 reddedildi');
+      return EMPTY_VISION_RESULT;
+    }
+
     const geminiKey = this.config.get<string>('GEMINI_API_KEY');
     if (geminiKey) {
       try {
-        return await this.gemini(imageBase64, mimeType, geminiKey);
+        return await this.gemini(cleanBase64, mimeType, geminiKey);
       } catch (err: any) {
         this.logger.warn(`Gemini failed: ${err.message}, trying Claude…`);
       }
@@ -35,19 +63,13 @@ export class VisionService {
     const claudeKey = this.config.get<string>('ANTHROPIC_API_KEY');
     if (claudeKey) {
       try {
-        return await this.claude(imageBase64, mimeType, claudeKey);
+        return await this.claude(cleanBase64, mimeType, claudeKey);
       } catch (err: any) {
         this.logger.error(`Claude vision failed: ${err.message}`);
       }
     }
 
-    return {
-      brand: null,
-      product_name: null,
-      product_type: null,
-      detected_text: null,
-      confidence: 0,
-    };
+    return EMPTY_VISION_RESULT;
   }
 
   private buildPrompt(): string {

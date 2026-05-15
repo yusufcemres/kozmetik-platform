@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import QuizResult, { QuizResultData } from '@/components/quiz/QuizResult';
+import { MedicalDisclaimer } from '@/components/public/MedicalDisclaimer';
 
 // === Types ===
 
@@ -254,7 +255,11 @@ export default function IngredientQuizPage() {
         <div className="max-w-2xl mx-auto text-center py-8">
           <span className="material-icon text-primary mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">quiz</span>
           <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface mb-2">İÇERİK BİLGİ TESTİ</h1>
-          <p className="text-on-surface-variant text-sm mb-10">Ne kadar biliyorsun? Hazırlan, sınav var.</p>
+          <p className="text-on-surface-variant text-sm mb-6">Ne kadar biliyorsun? Hazırlan, sınav var.</p>
+
+          <div className="text-left max-w-lg mx-auto mb-6">
+            <MedicalDisclaimer detail="İçerik bilgisi eğitim amaçlı testtir; klinik kullanım kararları için uzman önerisi gerekir." />
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
             <button onClick={() => setMode('quick')} className="curator-card p-6 text-left group hover:border-primary/30 transition-all">

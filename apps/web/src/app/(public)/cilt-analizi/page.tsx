@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { tracker } from '@/lib/analytics';
 import { saveSkinProfile } from '@/lib/profile-sync';
+import { MedicalDisclaimer } from '@/components/public/MedicalDisclaimer';
 
 // === Types ===
 
@@ -661,6 +662,8 @@ export default function SkinAnalysisPage() {
             </p>
             <p className="text-on-surface-variant/70 text-xs font-medium">Nasıl bir analiz istersin?</p>
           </div>
+
+          <MedicalDisclaimer detail="REVELA cilt analizi yapay zeka destekli bir öneri motorudur." />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Quick Test Card */}

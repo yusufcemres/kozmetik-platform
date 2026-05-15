@@ -19,8 +19,8 @@ export class UserAuthController {
   @Get('verify')
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Magic link token doğrula, JWT döndür' })
-  async verify(@Query('token') token: string) {
-    return this.service.verifyMagicLink(token);
+  async verify(@Query('token') token: string, @Ip() ip: string) {
+    return this.service.verifyMagicLink(token, ip);
   }
 
   @Get('me')
@@ -33,15 +33,15 @@ export class UserAuthController {
   @Get('me/export')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'KVKK: tüm kullanıcı verilerini JSON olarak indir' })
-  async exportMe(@Req() req: any) {
-    return this.service.exportUserData(req.user.user_id);
+  async exportMe(@Req() req: any, @Ip() ip: string) {
+    return this.service.exportUserData(req.user.user_id, ip);
   }
 
   @Delete('me')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'KVKK: hesabı ve tüm ilişkili verileri sil' })
-  async deleteMe(@Req() req: any) {
-    return this.service.deleteAccount(req.user.user_id);
+  async deleteMe(@Req() req: any, @Ip() ip: string) {
+    return this.service.deleteAccount(req.user.user_id, ip);
   }
 
   @Get('me/scan-history')

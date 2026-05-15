@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import QuizEngine, { QuizAnswers, QuizStep } from '@/components/quiz/QuizEngine';
 import QuizResult, { QuizResultData } from '@/components/quiz/QuizResult';
+import { MedicalDisclaimer } from '@/components/public/MedicalDisclaimer';
 
 // === Quiz Steps ===
 
@@ -263,7 +264,11 @@ export default function SkinAgeTestPage() {
         <div className="max-w-2xl mx-auto text-center py-8">
           <span className="material-icon text-primary mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">timer</span>
           <h1 className="text-3xl lg:text-4xl headline-tight text-on-surface mb-2">CİLT YAŞI TESTİ</h1>
-          <p className="text-on-surface-variant text-sm mb-10">Ayna yalan söyler, biz söylemeyiz.</p>
+          <p className="text-on-surface-variant text-sm mb-6">Ayna yalan söyler, biz söylemeyiz.</p>
+
+          <div className="text-left max-w-lg mx-auto mb-6">
+            <MedicalDisclaimer detail="Cilt yaşı tahmini eğlenceli bir göstergedir; tıbbi yaşlanma değerlendirmesi değildir." />
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
             <button onClick={() => setMode('quick')} className="curator-card p-6 text-left group hover:border-primary/30 transition-all">

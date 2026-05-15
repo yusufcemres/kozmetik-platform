@@ -67,6 +67,7 @@ export { UserSkinProfile } from './user-skin-profile.entity';
 // App Users (end-user magic link auth)
 export { AppUser } from './app-user.entity';
 export { MagicLinkToken } from './magic-link-token.entity';
+export { UserAction, UserActionType } from './user-action.entity';
 
 // Smart Scan
 export { UnknownScan } from './unknown-scan.entity';
