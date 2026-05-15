@@ -62,6 +62,15 @@ const dbModule = skipDb
           ssl: configService.get('DB_SSL', 'false') === 'true'
             ? { rejectUnauthorized: false }
             : false,
+          // 2026-05-15 audit (Madde 10): default pool 10 → 20 connection,
+          // idle timeout 3min (Neon Pooler 5min altında), connection acquire 5s.
+          // Render concurrency limit + Neon pgBouncer ile uyumlu.
+          extra: {
+            max: configService.get<number>('DB_POOL_MAX', 20),
+            idleTimeoutMillis: configService.get<number>('DB_IDLE_TIMEOUT_MS', 180_000),
+            connectionTimeoutMillis: configService.get<number>('DB_CONNECTION_TIMEOUT_MS', 5_000),
+            statement_timeout: configService.get<number>('DB_STATEMENT_TIMEOUT_MS', 30_000),
+          },
         }),
       }),
     ];

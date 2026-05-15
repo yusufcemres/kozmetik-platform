@@ -25,6 +25,13 @@ const EMPTY_VISION_RESULT: VisionResult = {
 };
 
 /**
+ * Vision API timeout. 2026-05-15 audit (Madde 9): Render cold start + Gemini/Claude
+ * yavaş yanıtlarında smart-scan endpoint'i kilitlenmesin diye 12 saniye.
+ * 12s = p99 vision yanıt süresinin yaklaşık 2x'i (tipik 3-5s).
+ */
+const VISION_TIMEOUT_MS = 12_000;
+
+/**
  * Multi-modal vision: Gemini 2.0 Flash → Claude Sonnet fallback.
  * Accepts base64 image, returns structured product detection.
  *
@@ -103,6 +110,7 @@ Emin değilsen null veya boş array döndür. Hallucinate etme.`;
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
       body: JSON.stringify({
         contents: [{
           parts: [
@@ -130,6 +138,7 @@ Emin değilsen null veya boş array döndür. Hallucinate etme.`;
         'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
+      signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 2048,

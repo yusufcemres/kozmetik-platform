@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
@@ -18,6 +19,30 @@ interface ReviewerDetail {
   };
   posts: Array<{ slug: string; title: string; excerpt: string | null; published_at: string | null }>;
   ingredients: Array<{ ingredient_id: number; inci_name: string; inci_slug: string }>;
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    const data = await apiFetch<ReviewerDetail>(`/blog/reviewers/${params.slug}`);
+    const r = data.reviewer;
+    const titleLine = r.title ? `${r.name}, ${r.title}` : r.name;
+    const description = r.bio
+      ? r.bio.slice(0, 160)
+      : `${titleLine}${r.specialty ? ` — ${r.specialty}` : ''}. REVELA bilim kurulu uzmanının yazıları, INCI yorumları ve kanıt değerlendirmeleri.`;
+    return {
+      title: titleLine,
+      description,
+      openGraph: {
+        title: `${titleLine} | REVELA Uzman`,
+        description,
+        type: 'profile',
+        images: r.avatar_url ? [{ url: r.avatar_url, alt: r.name }] : undefined,
+      },
+      alternates: { canonical: `/uzmanlar/${params.slug}` },
+    };
+  } catch {
+    return { title: 'Uzman', description: 'REVELA bilim kurulu uzman profili.' };
+  }
 }
 
 export default async function ReviewerDetailPage({ params }: { params: { slug: string } }) {
