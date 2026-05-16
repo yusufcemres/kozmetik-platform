@@ -17,7 +17,14 @@ export class CacheService implements OnModuleDestroy {
     try {
       const useTls = redisUrl.startsWith('rediss://');
       this.client = new Redis(redisUrl, {
-        maxRetriesPerRequest: null,
+        // Redis ulaşılamazsa komutu sonsuza dek bekletme — 3 deneme sonra reject,
+        // CacheService try/catch yakalar, çağıran DB'ye düşer (graceful degradation).
+        maxRetriesPerRequest: 3,
+        // TCP connect kurulamadan komut göndermesini engelle — yoksa kuyrukta birikip
+        // istek thread'ini bloke ediyor (production ETIMEDOUT 500 kaynağıydı).
+        enableOfflineQueue: false,
+        connectTimeout: 3_000,
+        commandTimeout: 1_500,
         enableReadyCheck: true,
         retryStrategy: (times) => Math.min(times * 500, 5000),
         reconnectOnError: (err) => {

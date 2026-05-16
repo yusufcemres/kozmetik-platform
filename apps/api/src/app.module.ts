@@ -64,12 +64,13 @@ const dbModule = skipDb
             ? { rejectUnauthorized: false }
             : false,
           // 2026-05-15 audit (Madde 10): default pool 10 → 20 connection,
-          // idle timeout 3min (Neon Pooler 5min altında), connection acquire 5s.
-          // Render concurrency limit + Neon pgBouncer ile uyumlu.
+          // idle timeout 3min (Neon Pooler 5min altında).
+          // 2026-05-16: Neon free tier auto-suspend wake-up 8-12s sürüyor,
+          // connect timeout 5s → 10s (production'da AggregateError ETIMEDOUT görüldü).
           extra: {
             max: configService.get<number>('DB_POOL_MAX', 20),
             idleTimeoutMillis: configService.get<number>('DB_IDLE_TIMEOUT_MS', 180_000),
-            connectionTimeoutMillis: configService.get<number>('DB_CONNECTION_TIMEOUT_MS', 5_000),
+            connectionTimeoutMillis: configService.get<number>('DB_CONNECTION_TIMEOUT_MS', 10_000),
             statement_timeout: configService.get<number>('DB_STATEMENT_TIMEOUT_MS', 30_000),
           },
         }),
