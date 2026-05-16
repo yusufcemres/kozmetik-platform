@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { isUnlocked, unlockStub, type PremiumFeature } from '@/lib/premium';
+import { apiFetch } from '@/lib/api';
+import { getUserToken } from '@/lib/user-auth';
 
 /**
  * Blur+reveal paywall overlay (Faz 2 #4 iskelet — Spotify Wrapped mekaniği).
@@ -63,7 +65,21 @@ export function PaywallOverlay({
       setUnlocked(true);
       return;
     }
+    // 1) Hızlı check: localStorage stub (offline UX, anlık)
     setUnlocked(isUnlocked(feature));
+
+    // 2) Backend check: kullanıcı login ise gerçek entitlement (Faz 3 PaymentsService)
+    // premium_until aktifse tüm feature'lar açık (Premium tier all-in).
+    if (getUserToken()) {
+      apiFetch<{ premium: boolean; premium_until: string | null }>('/payments/me/status')
+        .then((res) => {
+          if (res.premium) setUnlocked(true);
+        })
+        .catch(() => {
+          // 401/503 → sessiz, localStorage stub'a güven
+        });
+    }
+
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.feature === feature || detail?.feature === 'all') {
@@ -82,15 +98,21 @@ export function PaywallOverlay({
   const finalPrice = price ?? defaults.price;
 
   const handleUnlock = () => {
-    // TODO: Faz 3 — PayTR Subscription redirect
-    // window.location.href = `/odeme?feature=${feature}&price=${finalPrice}`;
-    //
-    // Şimdilik demo/test: localStorage flag, anında unlock.
     setSubmitting(true);
+    // Login ise /odeme sayfasına yönlendir (gerçek PayTR akışı). Login değilse magic
+    // link giriş sayfasına yönlendir, query'de ref=odeme ile dönüş hatırlanır.
+    if (getUserToken()) {
+      window.location.href = `/odeme?feature=${feature}`;
+    } else {
+      window.location.href = `/giris?ref=/odeme`;
+    }
+    // Fallback: localStorage stub (sadece dev/test, login değilse veya redirect bloklanırsa)
     setTimeout(() => {
-      unlockStub(feature);
-      setSubmitting(false);
-    }, 400);
+      if (!getUserToken()) {
+        unlockStub(feature);
+        setSubmitting(false);
+      }
+    }, 1500);
   };
 
   return (
@@ -121,7 +143,8 @@ export function PaywallOverlay({
             {submitting ? 'Yönlendiriliyor…' : 'Premium ile Aç'}
           </button>
           <p className="text-[10px] text-outline mt-3 leading-relaxed">
-            Demo modu — PayTR entegrasyonu Faz 3'te. Bu buton şu an sadece lokal flag set eder.
+            PayTR güvenli iframe → /odeme sayfasında plan seç. PayTR merchant onayı
+            beklerken 503 dönerse "yakında" mesajı görünür.
           </p>
         </div>
       </div>
