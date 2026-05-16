@@ -474,6 +474,54 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
   }
 
   /**
+   * Anonim compare — reminder email'deki unsubscribe_token ile auth'suz karşılaştırma.
+   *
+   * Akış:
+   *  1. Token ile "from" analizini bul (email-bağlı, ownership token üzerinden)
+   *  2. Aynı email_hash'e ait yeni bir analiz "to" varsa karşılaştır
+   *     (to opsiyonel; verilmezse from'dan sonraki en yakın aynı email'li analiz)
+   *  3. Token süresiz (unsubscribe edilene kadar) — opt-out olunca token NULL'lanır
+   *     ve link otomatik geçersizleşir
+   *
+   * Güvenlik:
+   *  - 64-hex token enumeration zor (256-bit entropy)
+   *  - Sadece aynı email_hash'in analizleri döner (cross-user data leak yok)
+   *  - Token bulunamadıysa NotFoundException (info leak yok, no email exposure)
+   */
+  async compareByToken(
+    token: string,
+    to?: number,
+  ): Promise<ReturnType<typeof SkinAnalysisService.prototype.compareForUser>> {
+    if (!token || token.length !== 64) {
+      throw new BadRequestException('Geçersiz token');
+    }
+    const fromAnalysis = await this.results.findOne({ where: { unsubscribe_token: token } });
+    if (!fromAnalysis || fromAnalysis.unsubscribed_at) {
+      throw new NotFoundException('Token bulunamadı veya iptal edilmiş');
+    }
+    // Aynı email_hash'in analizlerini topla — from + to (varsa parametre, yoksa otomatik)
+    let toAnalysis: SkinAnalysisResult | null = null;
+    if (to) {
+      toAnalysis = await this.results.findOne({
+        where: { analysis_id: String(to) as any, anonymous_email: fromAnalysis.anonymous_email },
+      });
+      if (!toAnalysis) {
+        throw new NotFoundException('Karşılaştırılacak yeni analiz bulunamadı (aynı email ile bağlı olmalı)');
+      }
+    } else {
+      // from'dan sonraki en yakın analiz
+      const rows = await this.results.find({
+        where: { anonymous_email: fromAnalysis.anonymous_email },
+        order: { created_at: 'DESC' },
+        take: 10,
+      });
+      toAnalysis = rows.find((r) => Number(r.analysis_id) > Number(fromAnalysis.analysis_id)) ?? null;
+    }
+
+    return this.shapeCompareResult(fromAnalysis, toAnalysis);
+  }
+
+  /**
    * Faz 2 başlangıcı (Gün 11 sonrası): iki analizi karşılaştır — trend grafiği için.
    *
    * Akış:
@@ -487,29 +535,19 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     userId: number,
     to: number,
     from?: number,
-  ): Promise<{
-    from: { analysis_id: number; created_at: string; scores: SkinScoreBreakdown; overall_score: number } | null;
-    to: { analysis_id: number; created_at: string; scores: SkinScoreBreakdown; overall_score: number };
-    delta: {
-      overall: number; // to - from (negatif = iyileşme)
-      by_dimension: Record<keyof SkinScoreBreakdown, number>;
-    } | null;
-    days_between: number | null;
-  }> {
+  ) {
     const toAnalysis = await this.results.findOne({
       where: { analysis_id: String(to) as any, user_id: userId },
     });
     if (!toAnalysis) {
       throw new NotFoundException('Karşılaştırılacak yeni analiz bulunamadı (sana ait olmayabilir)');
     }
-
     let fromAnalysis: SkinAnalysisResult | null = null;
     if (from) {
       fromAnalysis = await this.results.findOne({
         where: { analysis_id: String(from) as any, user_id: userId },
       });
     } else {
-      // Otomatik: to'dan önceki en yakın analiz
       const rows = await this.results.find({
         where: { user_id: userId },
         order: { created_at: 'DESC' },
@@ -517,26 +555,35 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
       });
       fromAnalysis = rows.find((r) => Number(r.analysis_id) < to) ?? null;
     }
+    return this.shapeCompareResult(fromAnalysis, toAnalysis);
+  }
 
+  /**
+   * compareForUser + compareByToken ortak shape logic'i — Day 12 öncesi refactor.
+   * Skor "yüksek = daha kötü" → delta < 0 = iyileşme.
+   */
+  private shapeCompareResult(
+    fromAnalysis: SkinAnalysisResult | null,
+    toAnalysis: SkinAnalysisResult | null,
+  ) {
+    if (!toAnalysis) {
+      throw new NotFoundException('Karşılaştırılacak yeni analiz yok');
+    }
     const toShape = {
       analysis_id: Number(toAnalysis.analysis_id),
       created_at: toAnalysis.created_at.toISOString(),
       scores: toAnalysis.scores,
       overall_score: toAnalysis.overall_score,
     };
-
     if (!fromAnalysis) {
       return { from: null, to: toShape, delta: null, days_between: null };
     }
-
     const fromShape = {
       analysis_id: Number(fromAnalysis.analysis_id),
       created_at: fromAnalysis.created_at.toISOString(),
       scores: fromAnalysis.scores,
       overall_score: fromAnalysis.overall_score,
     };
-
-    // Delta: to - from (skor düşmüşse delta negatif = iyileşme)
     const dimKeys: (keyof SkinScoreBreakdown)[] = [
       't_zone_oil', 'pore_visibility', 'wrinkles', 'pigmentation',
       'redness', 'under_eye_darkness', 'acne_count', 'fitzpatrick_type',
@@ -549,11 +596,9 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
         byDim[k] = tv - fv;
       }
     }
-
     const daysBetween = Math.round(
       (toAnalysis.created_at.getTime() - fromAnalysis.created_at.getTime()) / (1000 * 60 * 60 * 24),
     );
-
     return {
       from: fromShape,
       to: toShape,
@@ -789,9 +834,10 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     previousScore: number,
     previousDate: Date,
   ): Promise<boolean> {
-    // Reminder akışı: kullanıcı yeni analiz çeker → otomatik /karsilastir sayfasına gider
-    // (from=analysisId eski, to=new analysis_id), Faz 2 trend grafiğini görür.
-    const testUrl = `${this.siteUrl}/cilt-analizi/foto-test?ref=reminder&prev=${analysisId}`;
+    // Reminder akışı: kullanıcı foto-test sayfasında yeni analiz çeker, query'deki
+    // token + prev parametrelerini taşır → result CTA "Karşılaştır" /karsilastir?token=&from=&to=
+    // /karsilastir sayfası `compare-by-token` endpoint'ini auth'suz çağırır.
+    const testUrl = `${this.siteUrl}/cilt-analizi/foto-test?ref=reminder&prev=${analysisId}&token=${unsubToken}`;
     const unsubUrl = `${this.siteUrl}/cilt-analizi/abonelik-iptal?token=${unsubToken}`;
     const dateStr = previousDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
     return this.mail.send({

@@ -57,28 +57,42 @@ function CompareContent() {
   const params = useSearchParams();
   const to = params.get('to');
   const from = params.get('from');
+  const token = params.get('token'); // reminder email'den gelen anonim token (64 hex)
   const [data, setData] = useState<CompareResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!to) {
+    if (!to && !token) {
       setError('"to" query parametresi gerekli (yeni analiz ID).');
       setLoading(false);
       return;
     }
-    const qs = new URLSearchParams({ to });
-    if (from) qs.set('from', from);
-    apiFetch<CompareResponse>(`/skin-analysis/me/compare?${qs.toString()}`)
+    // Token modu (anonim): reminder email link'inden geldi → /compare-by-token
+    // JWT modu: kayıtlı kullanıcı → /me/compare
+    const endpoint = token
+      ? `/skin-analysis/compare-by-token/${encodeURIComponent(token)}${to ? `?to=${to}` : ''}`
+      : (() => {
+          const qs = new URLSearchParams({ to: to! });
+          if (from) qs.set('from', from);
+          return `/skin-analysis/me/compare?${qs.toString()}`;
+        })();
+
+    apiFetch<CompareResponse>(endpoint)
       .then(setData)
       .catch((err: any) => {
-        const msg = err instanceof ApiError && err.status === 401
-          ? 'Giriş yapman gerekiyor (karşılaştırma sadece kayıtlı kullanıcılar için).'
-          : err?.message || 'Karşılaştırma yüklenemedi';
+        let msg = err?.message || 'Karşılaştırma yüklenemedi';
+        if (err instanceof ApiError) {
+          if (err.status === 401) {
+            msg = 'Giriş yapman gerekiyor (karşılaştırma sadece kayıtlı kullanıcılar için).';
+          } else if (err.status === 404 && token) {
+            msg = 'Bağlantı geçersiz veya iptal edilmiş. Yeni analiz çekip sonuç sayfasında karşılaştır.';
+          }
+        }
         setError(msg);
       })
       .finally(() => setLoading(false));
-  }, [to, from]);
+  }, [to, from, token]);
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
@@ -166,6 +166,22 @@ export default function FotoTestPage() {
   const [uploadedScore, setUploadedScore] = useState<number | null>(null);
   // KVKK açık rıza versiyonu — backend doğrular, eksikse 400
   const [consentVersion, setConsentVersion] = useState<string>('');
+
+  // Reminder akışı: email'deki link `?ref=reminder&prev=<id>&token=<64hex>` taşır.
+  // Analiz tamamlanınca result CTA bu parametrelerle /karsilastir'a yönlenir
+  // (anonim compare — auth gerekmez, token email'in sahibi olduğunu doğrular).
+  const [reminderCtx, setReminderCtx] = useState<{ prev?: number; token?: string }>({});
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const sp = new URLSearchParams(window.location.search);
+    const prev = sp.get('prev');
+    const token = sp.get('token');
+    const prevId = prev ? parseInt(prev, 10) : NaN;
+    setReminderCtx({
+      prev: Number.isFinite(prevId) ? prevId : undefined,
+      token: token && token.length === 64 ? token : undefined,
+    });
+  }, []);
 
   const handleCapture = async (data: { base64: string; mime: string; guard_score: number }) => {
     setUploadedScore(data.guard_score);
@@ -492,11 +508,16 @@ export default function FotoTestPage() {
               Yeni Analiz
             </button>
             <Link
-              href={`/cilt-analizi/karsilastir?to=${result.analysis_id}`}
+              href={(() => {
+                const qs = new URLSearchParams({ to: String(result.analysis_id) });
+                if (reminderCtx.prev) qs.set('from', String(reminderCtx.prev));
+                if (reminderCtx.token) qs.set('token', reminderCtx.token);
+                return `/cilt-analizi/karsilastir?${qs.toString()}`;
+              })()}
               className="text-sm text-on-surface border border-primary/40 bg-primary/5 rounded-sm px-6 py-3 hover:bg-primary/10 transition-colors text-center inline-flex items-center justify-center gap-1.5"
             >
               <span className="material-icon material-icon-sm" aria-hidden="true">compare_arrows</span>
-              Eski Analizimle Karşılaştır
+              {reminderCtx.prev ? '28-Gün Karşılaştırması' : 'Eski Analizimle Karşılaştır'}
             </Link>
             <Link href="/cilt-analizi" className="text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm px-6 py-3 hover:bg-surface-container-low transition-colors text-center">
               Quiz'e Dön

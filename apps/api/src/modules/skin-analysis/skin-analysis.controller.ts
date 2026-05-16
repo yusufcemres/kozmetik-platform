@@ -65,6 +65,19 @@ export class SkinAnalysisController {
     return this.service.compareForUser(req.user.user_id, toId, fromId);
   }
 
+  /**
+   * Anonim compare — 28-gün reminder email'deki unsubscribe_token ile auth'suz erişim.
+   * Token aynı email'in tüm analizlerine bağlı; cross-user data leak yok.
+   */
+  @Get('compare-by-token/:token')
+  @Throttle({ public: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Reminder email token ile karşılaştırma (auth\'suz)' })
+  async compareByToken(@Param('token') token: string, @Query('to') to?: string) {
+    const toId = to ? parseInt(to, 10) : undefined;
+    if (to && !Number.isFinite(toId)) throw new BadRequestException('"to" geçersiz');
+    return this.service.compareByToken(token, toId);
+  }
+
   // ---- Email funnel (Faz 1 Gün 9) ----
 
   @Post(':id/subscribe')
