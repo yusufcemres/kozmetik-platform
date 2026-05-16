@@ -2,7 +2,7 @@
 
 Foto-bazlı cilt analizi (REVELA Foto Analiz V2). Yüz fotoğrafından 6-boyut skor + INCI önerisi üretir.
 
-**Durum:** Faz 1 MVP — backend canlı, frontend Gün 5-7'de, paywall Faz 2/3'te (Haziran, arkadaş şirket PayTR ile).
+**Durum:** Faz 1 MVP — Gün 1-10 tamam (16 May), Gün 11-12 (27-28 May) e2e + final pass. Paywall Faz 2/3'te (Haziran).
 
 ## Endpoint'ler
 
@@ -15,7 +15,8 @@ Yüz fotoğrafı analiz et. Ücretsiz tier, 3 req/min throttle. Anonim veya auth
   "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAA...",
   "image_mime": "image/jpeg",
   "store_photo": false,
-  "guard_score": 85
+  "guard_score": 85,
+  "consent_version": "v1-2026-05-26"
 }
 ```
 
@@ -23,9 +24,17 @@ Yüz fotoğrafı analiz et. Ücretsiz tier, 3 req/min throttle. Anonim veya auth
 - `image_mime` (zorunlu): `image/jpeg | image/png | image/webp` whitelist.
 - `store_photo` (opsiyonel): Foto'yu sunucuda sakla (premium opt-in, default `false`).
 - `guard_score` (opsiyonel): MediaPipe çekim guard kalite skoru (0-100).
+- `consent_version` (zorunlu, Gün 10): KVKK açık rıza versiyonu (`v{N}-YYYY-MM-DD`).
+  Eksikse 400. Frontend `PhotoConsentModal`'dan gelir.
 
 **Query:**
 - `email` (opsiyonel): Anonim kullanıcı için 28-gün reminder. SHA-256 hash'lenir.
+
+**Diğer endpoint'ler (Gün 9-10):**
+- `POST /:id/subscribe` — Email opt-in (welcome + 28-gün reminder cron).
+- `GET /unsubscribe/:token` — Tek tıkla opt-out (email link'inden).
+- `GET /me/export` (auth) — KVKK Madde 11/d veri taşınabilirlik (JSON).
+- `DELETE /me/delete-all` (auth) — KVKK Madde 11/e+f silme.
 
 **Response (200):**
 ```json
@@ -139,9 +148,13 @@ cd apps/api && pnpm test skin-analysis
 ## Plan / Roadmap
 
 - ✅ **Gün 1-2 (16 May):** Backend MVP + Vision adapt + test paketi
-- ⏳ **Gün 3 (18 May):** Render deploy + endpoint canlı test
-- ⏳ **Gün 4 (20 May):** MediaPipe FaceLandmarker POC (frontend çekim guard)
-- ⏳ **Gün 5-7 (21-23 May):** Frontend foto upload UI + radar chart
-- ⏳ **Gün 8-10 (24-26 May):** Email kayıt + Resend 28-gün cron + KVKK modal
-- ⏳ **Gün 11-12 (27-28 May):** E2e test + Faz 1 POC canlı
-- ⏳ **Faz 2/3 (Haziran):** Arkadaş şirketi PayTR + paywall (karşılaştırma + Premium)
+- ✅ **Gün 3 (16 May):** Render deploy + endpoint canlı test
+- ✅ **Gün 4 (16 May):** MediaPipe FaceLandmarker POC + çekim guard
+- ✅ **Gün 5-7 (16 May):** Frontend foto upload UI + radar chart + 6-boyut görsel
+- ✅ **Gün 8 (16 May):** INCI öneri kartları + REVELA ürün eşleştirme widget (DB enriched)
+- ✅ **Gün 9 (16 May):** Email opt-in + 28-gün reminder cron (Resend, daily 09:00)
+- ✅ **Gün 10 (16 May):** KVKK aydınlatma modal + açık rıza + Madde 11 hakları
+- ⏳ **Gün 11 (27 May):** E2e manuel test (5 farklı foto + Patron yüzü) → `journal/2026/05/2026-05-17_faz1-day11-checklist.md`
+- ⏳ **Gün 12 (28 May):** Faz 1 final pass + release notes + PR merge → POC tamamlandı
+- ⏳ **Faz 2 (Haziran başı):** Karşılaştırma sayfası (eski analiz × yeni analiz trend grafiği)
+- ⏳ **Faz 3 (Haziran sonu):** PayTR paywall + Premium tier (0/29/49/490 TL)
