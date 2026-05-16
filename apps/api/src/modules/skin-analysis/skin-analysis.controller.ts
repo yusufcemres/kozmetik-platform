@@ -1,7 +1,8 @@
-import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, NotFoundException, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { SkinAnalysisService } from './skin-analysis.service';
+import { SkinCoachService } from './skin-coach.service';
 import { SkinAnalysisRequestDto } from './dto/skin-analysis.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
 
@@ -14,7 +15,10 @@ import { AppJwtGuard } from '../user-auth/app-jwt.guard';
 @ApiTags('Skin Analysis')
 @Controller('skin-analysis')
 export class SkinAnalysisController {
-  constructor(private readonly service: SkinAnalysisService) {}
+  constructor(
+    private readonly service: SkinAnalysisService,
+    private readonly coach: SkinCoachService,
+  ) {}
 
   @Post()
   @Throttle({ public: { limit: 3, ttl: 60_000 } })
@@ -88,6 +92,26 @@ export class SkinAnalysisController {
   async historyByToken(@Param('token') token: string, @Query('limit') limit?: string) {
     const lim = Math.min(Math.max(parseInt(limit ?? '20', 10) || 20, 1), 50);
     return this.service.getHistoryByToken(token, lim);
+  }
+
+  /**
+   * Faz 2 #5 — AI Cilt Danışmanı sohbet (Premium feature, 49 TL/ay).
+   * Backend entitlement henüz yok (Faz 3'te); şimdilik anyone'a açık ama
+   * frontend paywall ile sınırlı.
+   */
+  @Post(':id/coach')
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'AI Cilt Danışmanı — analiz skoru üzerine soru sor' })
+  async coachAsk(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { question?: string },
+  ) {
+    if (!body?.question || typeof body.question !== 'string') {
+      throw new BadRequestException('question alanı zorunlu');
+    }
+    const analysis = await this.service.getById(id);
+    if (!analysis) throw new NotFoundException('Analiz bulunamadı');
+    return this.coach.askQuestion(analysis.scores, analysis.overall_score, body.question);
   }
 
   // ---- Email funnel (Faz 1 Gün 9) ----

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { apiFetch, ApiError } from '@/lib/api';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
 import { PaywallOverlay } from '@/components/skin-analysis/PaywallOverlay';
+import { AICoachWidget } from '@/components/skin-analysis/AICoachWidget';
 
 /**
  * Faz 2 başlangıcı — eski analiz vs yeni analiz karşılaştırma sayfası.
@@ -251,6 +252,13 @@ function CompareContent() {
           </p>
         </div>
       </PaywallOverlay>
+
+      {/* AI Cilt Danışmanı — Faz 2 #5, Premium feature 49 TL/ay */}
+      <div className="mb-8">
+        <PaywallOverlay feature="ai_chat">
+          <AICoachWidget analysisId={data.to.analysis_id} />
+        </PaywallOverlay>
+      </div>
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row gap-3">

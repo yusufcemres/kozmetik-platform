@@ -5,6 +5,7 @@ import { SkinAnalysisResult, UserAction } from '@database/entities';
 import { SkinAnalysisController } from './skin-analysis.controller';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinAnalysisCronService } from './skin-analysis.cron';
+import { SkinCoachService } from './skin-coach.service';
 import { VisionService } from '../smart-scan/vision.service';
 import { MailModule } from '../../common/mail/mail.module';
 
@@ -25,7 +26,7 @@ import { MailModule } from '../../common/mail/mail.module';
     MailModule,
   ],
   controllers: [SkinAnalysisController],
-  providers: [SkinAnalysisService, VisionService, SkinAnalysisCronService],
+  providers: [SkinAnalysisService, VisionService, SkinAnalysisCronService, SkinCoachService],
   exports: [SkinAnalysisService],
 })
 export class SkinAnalysisModule {}
