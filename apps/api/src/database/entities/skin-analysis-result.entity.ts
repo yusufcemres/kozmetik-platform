@@ -68,6 +68,28 @@ export class SkinAnalysisResult {
   @Column({ type: 'varchar', length: 255, nullable: true })
   user_agent: string | null;
 
+  /**
+   * Email funnel (Migration 032, Faz 1 Gün 9).
+   *
+   * subscription_email: opt-in plaintext (KVKK izinli; opt-out'ta NULL'a çekilir, hash sürer).
+   * welcome / reminder timestamp'ler: cron idempotency.
+   * unsubscribe_token: tek tıkla opt-out link (random 32-byte hex).
+   */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  subscription_email: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  welcome_email_sent_at: Date | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  reminder_email_sent_at: Date | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  unsubscribed_at: Date | null;
+
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  unsubscribe_token: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 }

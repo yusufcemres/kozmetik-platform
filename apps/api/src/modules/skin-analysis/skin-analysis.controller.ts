@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Ip, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Ip, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { SkinAnalysisService } from './skin-analysis.service';
@@ -43,5 +43,31 @@ export class SkinAnalysisController {
   async myHistory(@Req() req: any, @Query('limit') limit?: string) {
     const lim = Math.min(Math.max(parseInt(limit ?? '20', 10) || 20, 1), 100);
     return this.service.getUserHistory(req.user.user_id, lim);
+  }
+
+  // ---- Email funnel (Faz 1 Gün 9) ----
+
+  @Post(':id/subscribe')
+  @Throttle({ public: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Analiz sonucu email opt-in (welcome + 28-gün reminder)' })
+  async subscribe(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { email?: string },
+  ) {
+    if (!body?.email || typeof body.email !== 'string') {
+      throw new BadRequestException('email zorunlu');
+    }
+    return this.service.subscribeToEmail(id, body.email);
+  }
+
+  /**
+   * Tek tıkla opt-out — email içindeki link doğrudan bu GET'i çağırır.
+   * Token enumeration'a karşı: bilinmeyen token da success döner.
+   */
+  @Get('unsubscribe/:token')
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: '28-gün reminder abonelik iptali (tek tıkla)' })
+  async unsubscribe(@Param('token') token: string) {
+    return this.service.unsubscribeByToken(token);
   }
 }

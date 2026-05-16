@@ -69,6 +69,95 @@ const DIMENSION_LABELS: Record<string, string> = {
   fitzpatrick_type: 'Cilt Tonu (Fitzpatrick)',
 };
 
+type SubscribeState = 'idle' | 'submitting' | 'success' | 'error';
+
+function EmailOptInWidget({ analysisId }: { analysisId: number }) {
+  const [email, setEmail] = useState('');
+  const [state, setState] = useState<SubscribeState>('idle');
+  const [errorMsg, setErrorMsg] = useState<string>('');
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed)) {
+      setErrorMsg('Geçerli bir email adresi gir');
+      setState('error');
+      return;
+    }
+    setState('submitting');
+    setErrorMsg('');
+    try {
+      await apiFetch(`/skin-analysis/${analysisId}/subscribe`, {
+        method: 'POST',
+        body: JSON.stringify({ email: trimmed }),
+      });
+      setState('success');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Kayıt başarısız, lütfen tekrar dene');
+      setState('error');
+    }
+  };
+
+  if (state === 'success') {
+    return (
+      <div className="curator-card p-5 mb-8 bg-primary/5 border-primary/20">
+        <div className="flex items-start gap-3">
+          <span className="material-icon text-primary text-[24px] shrink-0" aria-hidden="true">mark_email_read</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-on-surface mb-1">Email'ine welcome bilgi gönderildi 🌿</p>
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              28 gün sonra hatırlatma maili alacaksın — INCI önerilerinin etkisini görmek için yeni bir analiz çek.
+              İstediğin zaman email içindeki linkten iptal edebilirsin.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="curator-card p-5 mb-8 border-primary/30">
+      <div className="flex items-start gap-3 mb-3">
+        <span className="material-icon text-primary text-[24px] shrink-0" aria-hidden="true">notifications_active</span>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-on-surface mb-1">28 gün sonra cildini tekrar değerlendir</p>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            Email bırak, 28 gün sonra hatırlatma yollayalım — INCI önerilerinin etkisini görelim, trend grafiğin oluşsun.
+            <strong className="block mt-1 text-on-surface">Spam yok, sadece bir hatırlatma. Tek tıkla iptal.</strong>
+          </p>
+        </div>
+      </div>
+      <form onSubmit={submit} className="flex flex-col sm:flex-row gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => { setEmail(e.target.value); if (state === 'error') setState('idle'); }}
+          placeholder="ornek@email.com"
+          disabled={state === 'submitting'}
+          className="flex-1 border border-outline-variant/40 rounded-sm px-3 py-2 text-sm bg-surface focus:border-primary focus:outline-none disabled:opacity-50"
+          required
+        />
+        <button
+          type="submit"
+          disabled={state === 'submitting'}
+          className="curator-btn-primary text-xs px-5 py-2 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {state === 'submitting' ? 'Kaydediliyor…' : 'Hatırlatma İste'}
+        </button>
+      </form>
+      {state === 'error' && (
+        <p className="text-xs text-error mt-2 flex items-center gap-1">
+          <span className="material-icon text-[14px]" aria-hidden="true">error_outline</span>
+          {errorMsg}
+        </p>
+      )}
+      <p className="text-[10px] text-outline mt-2 leading-relaxed">
+        Email'in KVKK uyumlu saklanır — opt-out anında <strong>silinir</strong>, sadece SHA-256 hash kalır.
+      </p>
+    </div>
+  );
+}
+
 export default function FotoTestPage() {
   const [phase, setPhase] = useState<'idle' | 'camera' | 'uploading' | 'result' | 'error'>('idle');
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -370,6 +459,9 @@ export default function FotoTestPage() {
               </div>
             </div>
           )}
+
+          {/* Email opt-in widget (Faz 1 Gün 9) */}
+          <EmailOptInWidget analysisId={result.analysis_id} />
 
           {/* Disclaimer + actions */}
           <p className="text-xs text-on-surface-variant italic text-center mb-6">

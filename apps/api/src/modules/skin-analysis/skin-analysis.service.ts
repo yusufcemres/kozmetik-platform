@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { createHash } from 'crypto';
+import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
+import { createHash, randomBytes } from 'crypto';
 import { SkinAnalysisResult } from '@database/entities';
 import { VisionService } from '../smart-scan/vision.service';
+import { MailService } from '../../common/mail/mail.service';
 import {
   IngredientRecommendation,
   SkinAnalysisRequestDto,
@@ -58,6 +60,8 @@ export class SkinAnalysisService {
     private readonly results: Repository<SkinAnalysisResult>,
     private readonly vision: VisionService,
     private readonly dataSource: DataSource,
+    private readonly mail: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   /**
@@ -425,5 +429,211 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
       order: { created_at: 'DESC' },
       take: Math.min(Math.max(limit, 1), 100),
     });
+  }
+
+  // ============================================================
+  // Email funnel (Faz 1 Gün 9): opt-in welcome + 28-gün reminder
+  // ============================================================
+
+  /** Site URL (welcome/unsubscribe link'leri için). */
+  private get siteUrl(): string {
+    return this.config
+      .get<string>('SITE_URL', 'https://kozmetik-platform.vercel.app')
+      .trim()
+      .replace(/\/+$/, '');
+  }
+
+  /**
+   * Kullanıcı analiz sonucunda email opt-in yaparsa: subscription_email + hash
+   * + unsubscribe_token kaydet, welcome email yolla. Opportunistic: aynı analiz_id
+   * tekrar opt-in olursa noop (idempotent).
+   */
+  async subscribeToEmail(
+    analysisId: number,
+    email: string,
+  ): Promise<{ subscribed: boolean; reason?: string }> {
+    const normalized = email.trim().toLowerCase();
+    // Basit email format guard — RFC 5322 değil ama abuse'i durdurur
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalized)) {
+      throw new BadRequestException('Geçersiz email formatı');
+    }
+    const analysis = await this.results.findOne({ where: { analysis_id: String(analysisId) as any } });
+    if (!analysis) throw new NotFoundException('Analiz bulunamadı');
+
+    // Idempotent — zaten subscribed ise welcome email tekrar yollama
+    if (analysis.subscription_email === normalized && analysis.welcome_email_sent_at) {
+      return { subscribed: true, reason: 'already_subscribed' };
+    }
+
+    const token = randomBytes(32).toString('hex');
+    const emailHash = createHash('sha256').update(normalized).digest('hex');
+
+    await this.results.update(
+      { analysis_id: String(analysisId) as any },
+      {
+        subscription_email: normalized,
+        anonymous_email: emailHash, // hash da yenile (eski boş olabilir)
+        unsubscribe_token: token,
+        unsubscribed_at: null, // re-subscribe ise resetle
+      },
+    );
+
+    // Welcome email (fire-and-forget, fail kullanıcıyı bloke etmesin)
+    void this.sendWelcomeEmail(analysisId, normalized, token, analysis.overall_score).then((sent) => {
+      if (sent) {
+        void this.results.update(
+          { analysis_id: String(analysisId) as any },
+          { welcome_email_sent_at: new Date() },
+        );
+      }
+    });
+
+    return { subscribed: true };
+  }
+
+  /** Tek tıkla opt-out (email içindeki link). subscription_email NULL'lar; hash sürer. */
+  async unsubscribeByToken(token: string): Promise<{ success: boolean }> {
+    if (!token || token.length !== 64) {
+      throw new BadRequestException('Geçersiz token');
+    }
+    const result = await this.results.update(
+      { unsubscribe_token: token },
+      {
+        subscription_email: null,
+        unsubscribed_at: new Date(),
+        unsubscribe_token: null,
+      },
+    );
+    if (!result.affected) {
+      // Token bulunamadı / zaten kullanılmış — kullanıcıya yine de "başarılı" göster
+      // (token enumeration'a karşı no info leak)
+      this.logger.warn(`Unsubscribe token not found: ${token.slice(0, 8)}…`);
+    }
+    return { success: true };
+  }
+
+  /**
+   * Daily cron entry point. 28+ gün önce yapılmış, opt-in yapılmış,
+   * reminder yollanmamış analizleri bulup hatırlatma yolla.
+   *
+   * @returns gönderilen email sayısı (log için)
+   */
+  async sendDueReminders(): Promise<{ sent: number; failed: number }> {
+    const cutoff = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000);
+    const candidates = await this.results.find({
+      where: {
+        subscription_email: Not(IsNull()),
+        reminder_email_sent_at: IsNull(),
+        unsubscribed_at: IsNull(),
+        created_at: LessThan(cutoff),
+      },
+      take: 100, // güvenlik: tek seferde 100'den fazla yollama (Resend rate)
+      order: { created_at: 'ASC' },
+    });
+
+    let sent = 0;
+    let failed = 0;
+    for (const a of candidates) {
+      if (!a.subscription_email || !a.unsubscribe_token) {
+        failed++;
+        continue;
+      }
+      const ok = await this.sendReminderEmail(
+        Number(a.analysis_id),
+        a.subscription_email,
+        a.unsubscribe_token,
+        a.overall_score,
+        a.created_at,
+      );
+      if (ok) {
+        await this.results.update(
+          { analysis_id: a.analysis_id },
+          { reminder_email_sent_at: new Date() },
+        );
+        sent++;
+      } else {
+        failed++;
+      }
+    }
+    if (candidates.length > 0) {
+      this.logger.log(`Reminder cron: ${sent} sent, ${failed} failed (${candidates.length} candidates)`);
+    }
+    return { sent, failed };
+  }
+
+  // ---- Email template'leri (inline HTML, user-auth Resend pattern'i ile uyumlu) ----
+
+  private async sendWelcomeEmail(
+    analysisId: number,
+    email: string,
+    unsubToken: string,
+    score: number,
+  ): Promise<boolean> {
+    const resultUrl = `${this.siteUrl}/cilt-analizi/foto-test?ref=email&analysis=${analysisId}`;
+    const unsubUrl = `${this.siteUrl}/cilt-analizi/abonelik-iptal?token=${unsubToken}`;
+    return this.mail.send({
+      to: email,
+      subject: 'REVELA cilt analizin kaydedildi 🌿',
+      html: this.welcomeTemplate(score, resultUrl, unsubUrl),
+    });
+  }
+
+  private async sendReminderEmail(
+    analysisId: number,
+    email: string,
+    unsubToken: string,
+    previousScore: number,
+    previousDate: Date,
+  ): Promise<boolean> {
+    const testUrl = `${this.siteUrl}/cilt-analizi/foto-test?ref=reminder&prev=${analysisId}`;
+    const unsubUrl = `${this.siteUrl}/cilt-analizi/abonelik-iptal?token=${unsubToken}`;
+    const dateStr = previousDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+    return this.mail.send({
+      to: email,
+      subject: '28 gün geçti — cildin nasıl değişti? 📸',
+      html: this.reminderTemplate(previousScore, dateStr, testUrl, unsubUrl),
+    });
+  }
+
+  private welcomeTemplate(score: number, resultUrl: string, unsubUrl: string): string {
+    return `
+      <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a">
+        <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;margin:0 0 8px">REVELA</h1>
+        <p style="color:#6b6b6b;font-size:14px;margin:0 0 24px">Cilt Analizi · 6-Boyut Skoru</p>
+        <h2 style="font-size:18px;margin:0 0 12px">Analizin kaydedildi 🌿</h2>
+        <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 16px">
+          Genel cilt skorun: <strong style="color:#1a1a1a;font-size:18px">${score}/100</strong>
+          <span style="color:#9a9a9a;font-size:12px"> (yüksek = daha şiddetli)</span>
+        </p>
+        <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 20px">
+          28 gün sonra tekrar fotoğraf çekersen seninle iletişime geçeriz — INCI önerilerinin etkisini görmek için.
+        </p>
+        <a href="${resultUrl}" style="display:inline-block;background:#1a1a1a;color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px">Sonucu Tekrar Aç</a>
+        <p style="font-size:12px;color:#9a9a9a;margin:32px 0 0">
+          Bu hatırlatmayı istemiyorsan <a href="${unsubUrl}" style="color:#9a9a9a">tek tıkla iptal et</a>.
+        </p>
+      </div>
+    `;
+  }
+
+  private reminderTemplate(prevScore: number, prevDate: string, testUrl: string, unsubUrl: string): string {
+    return `
+      <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a">
+        <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.02em;margin:0 0 8px">REVELA</h1>
+        <p style="color:#6b6b6b;font-size:14px;margin:0 0 24px">28-Gün Karşılaştırma</p>
+        <h2 style="font-size:18px;margin:0 0 12px">Cildin nasıl değişti? 📸</h2>
+        <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 16px">
+          <strong>${prevDate}</strong> tarihindeki analizinde genel skorun <strong>${prevScore}/100</strong>'dü.
+          INCI önerilerini takip ettiysen şimdi farkı görme zamanı.
+        </p>
+        <p style="font-size:14px;line-height:1.6;color:#333;margin:0 0 20px">
+          Yeni bir fotoğraf çek — REVELA aynı 6 boyutta yeni skorunu çıkarsın, trend grafiğini görelim.
+        </p>
+        <a href="${testUrl}" style="display:inline-block;background:#1a1a1a;color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:600;font-size:14px">Yeni Analiz Çek</a>
+        <p style="font-size:12px;color:#9a9a9a;margin:32px 0 0">
+          Hatırlatma istemiyorsan <a href="${unsubUrl}" style="color:#9a9a9a">tek tıkla iptal et</a>.
+        </p>
+      </div>
+    `;
   }
 }
