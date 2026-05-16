@@ -473,6 +473,98 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     });
   }
 
+  /**
+   * Faz 2 başlangıcı (Gün 11 sonrası): iki analizi karşılaştır — trend grafiği için.
+   *
+   * Akış:
+   *  - `to` (yeni) zorunlu, kullanıcının analizi olmalı
+   *  - `from` (eski) opsiyonel — verilmezse otomatik bir önceki analizi seçer
+   *  - 6 boyutta delta + overall delta + reminder email "yeni analiz çek" CTA destinasyonu
+   *
+   * Skor "yüksek = daha kötü" olduğu için delta < 0 = iyileşme (✅ trend up).
+   */
+  async compareForUser(
+    userId: number,
+    to: number,
+    from?: number,
+  ): Promise<{
+    from: { analysis_id: number; created_at: string; scores: SkinScoreBreakdown; overall_score: number } | null;
+    to: { analysis_id: number; created_at: string; scores: SkinScoreBreakdown; overall_score: number };
+    delta: {
+      overall: number; // to - from (negatif = iyileşme)
+      by_dimension: Record<keyof SkinScoreBreakdown, number>;
+    } | null;
+    days_between: number | null;
+  }> {
+    const toAnalysis = await this.results.findOne({
+      where: { analysis_id: String(to) as any, user_id: userId },
+    });
+    if (!toAnalysis) {
+      throw new NotFoundException('Karşılaştırılacak yeni analiz bulunamadı (sana ait olmayabilir)');
+    }
+
+    let fromAnalysis: SkinAnalysisResult | null = null;
+    if (from) {
+      fromAnalysis = await this.results.findOne({
+        where: { analysis_id: String(from) as any, user_id: userId },
+      });
+    } else {
+      // Otomatik: to'dan önceki en yakın analiz
+      const rows = await this.results.find({
+        where: { user_id: userId },
+        order: { created_at: 'DESC' },
+        take: 10,
+      });
+      fromAnalysis = rows.find((r) => Number(r.analysis_id) < to) ?? null;
+    }
+
+    const toShape = {
+      analysis_id: Number(toAnalysis.analysis_id),
+      created_at: toAnalysis.created_at.toISOString(),
+      scores: toAnalysis.scores,
+      overall_score: toAnalysis.overall_score,
+    };
+
+    if (!fromAnalysis) {
+      return { from: null, to: toShape, delta: null, days_between: null };
+    }
+
+    const fromShape = {
+      analysis_id: Number(fromAnalysis.analysis_id),
+      created_at: fromAnalysis.created_at.toISOString(),
+      scores: fromAnalysis.scores,
+      overall_score: fromAnalysis.overall_score,
+    };
+
+    // Delta: to - from (skor düşmüşse delta negatif = iyileşme)
+    const dimKeys: (keyof SkinScoreBreakdown)[] = [
+      't_zone_oil', 'pore_visibility', 'wrinkles', 'pigmentation',
+      'redness', 'under_eye_darkness', 'acne_count', 'fitzpatrick_type',
+    ];
+    const byDim = {} as Record<keyof SkinScoreBreakdown, number>;
+    for (const k of dimKeys) {
+      const fv = fromAnalysis.scores[k];
+      const tv = toAnalysis.scores[k];
+      if (typeof fv === 'number' && typeof tv === 'number') {
+        byDim[k] = tv - fv;
+      }
+    }
+
+    const daysBetween = Math.round(
+      (toAnalysis.created_at.getTime() - fromAnalysis.created_at.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    return {
+      from: fromShape,
+      to: toShape,
+      delta: {
+        overall: toAnalysis.overall_score - fromAnalysis.overall_score,
+        by_dimension: byDim,
+      },
+      days_between: daysBetween,
+    };
+  }
+
   // ============================================================
   // KVKK Madde 11 — Veri Hakları (Faz 1 Gün 10)
   // ============================================================
@@ -697,6 +789,8 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     previousScore: number,
     previousDate: Date,
   ): Promise<boolean> {
+    // Reminder akışı: kullanıcı yeni analiz çeker → otomatik /karsilastir sayfasına gider
+    // (from=analysisId eski, to=new analysis_id), Faz 2 trend grafiğini görür.
     const testUrl = `${this.siteUrl}/cilt-analizi/foto-test?ref=reminder&prev=${analysisId}`;
     const unsubUrl = `${this.siteUrl}/cilt-analizi/abonelik-iptal?token=${unsubToken}`;
     const dateStr = previousDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });

@@ -45,6 +45,26 @@ export class SkinAnalysisController {
     return this.service.getUserHistory(req.user.user_id, lim);
   }
 
+  /**
+   * Faz 2 — eski analiz vs yeni analiz karşılaştırma.
+   * `to` zorunlu (yeni analiz id), `from` opsiyonel (otomatik bir önceki).
+   */
+  @Get('me/compare')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 30, ttl: 60_000 } })
+  @ApiOperation({ summary: 'İki analizi karşılaştır — trend grafiği için' })
+  async compareMine(
+    @Req() req: any,
+    @Query('to') to: string,
+    @Query('from') from?: string,
+  ) {
+    const toId = parseInt(to ?? '', 10);
+    if (!Number.isFinite(toId)) throw new BadRequestException('"to" query parametre sayısal olmalı');
+    const fromId = from ? parseInt(from, 10) : undefined;
+    if (from && !Number.isFinite(fromId)) throw new BadRequestException('"from" geçersiz');
+    return this.service.compareForUser(req.user.user_id, toId, fromId);
+  }
+
   // ---- Email funnel (Faz 1 Gün 9) ----
 
   @Post(':id/subscribe')

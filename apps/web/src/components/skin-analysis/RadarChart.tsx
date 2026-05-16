@@ -17,28 +17,53 @@ export interface RadarDimension {
   value: number;
 }
 
-export interface RadarChartProps {
+/**
+ * Tek bir veri katmanı — multi-overlay için (örn. eski analiz vs yeni analiz).
+ * Day 11 sonrası Faz 2 karşılaştırma sayfası için eklendi.
+ */
+export interface RadarDataset {
   dimensions: RadarDimension[];
+  fillColor?: string;
+  strokeColor?: string;
+  /** Etiket (legend için, opsiyonel). Örn. "Eski analiz (5 Mayıs)" */
+  label?: string;
+}
+
+export interface RadarChartProps {
+  /** Tek dataset modu (legacy). datasets verilirse yok sayılır. */
+  dimensions?: RadarDimension[];
+  /** Çoklu overlay modu — eski/yeni karşılaştırma vs. */
+  datasets?: RadarDataset[];
   /** SVG boyutu (kare). Default 320. */
   size?: number;
-  /** Renk teması — varsayılan primary (M3) */
+  /** Single mode renk override (legacy) */
   fillColor?: string;
   strokeColor?: string;
 }
 
-export function RadarChart({
-  dimensions,
-  size = 320,
-  fillColor = 'rgb(59 130 246 / 0.25)', // blue-500 25%
-  strokeColor = 'rgb(59 130 246)',
-}: RadarChartProps) {
-  if (dimensions.length < 3) return null;
+const DEFAULT_FILL = 'rgb(59 130 246 / 0.25)';
+const DEFAULT_STROKE = 'rgb(59 130 246)';
+
+export function RadarChart(props: RadarChartProps) {
+  const size = props.size ?? 320;
+
+  // Normalize: dual mode (datasets) ya da single mode (dimensions)
+  const layers: RadarDataset[] = props.datasets ?? [
+    {
+      dimensions: props.dimensions ?? [],
+      fillColor: props.fillColor ?? DEFAULT_FILL,
+      strokeColor: props.strokeColor ?? DEFAULT_STROKE,
+    },
+  ];
+
+  const baseDims = layers[0]?.dimensions ?? [];
+  if (baseDims.length < 3) return null;
 
   const cx = size / 2;
   const cy = size / 2;
   const radius = size * 0.36;
   const labelRadius = size * 0.46;
-  const N = dimensions.length;
+  const N = baseDims.length;
 
   // Her boyut için açı (üst noktadan başla, saat yönü)
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / N;
@@ -53,13 +78,21 @@ export function RadarChart({
   // Konsantrik grid (20-40-60-80-100)
   const gridLevels = [20, 40, 60, 80, 100];
 
-  // Veri polygon path
-  const dataPath = dimensions
-    .map((d, i) => {
-      const [x, y] = point(i, d.value);
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+  // Her dataset için path üret
+  const buildPath = (dims: RadarDimension[]) =>
+    dims
+      .map((d, i) => {
+        const [x, y] = point(i, d.value);
+        return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+      })
+      .join(' ') + ' Z';
+
+  const ariaSummary = layers
+    .map((ds, idx) => {
+      const prefix = ds.label ? `${ds.label}: ` : layers.length > 1 ? `Set ${idx + 1}: ` : '';
+      return prefix + ds.dimensions.map((d) => `${d.label} ${d.value}`).join(', ');
     })
-    .join(' ') + ' Z';
+    .join(' | ');
 
   return (
     <svg
@@ -68,7 +101,7 @@ export function RadarChart({
       viewBox={`0 0 ${size} ${size}`}
       className="block mx-auto"
       role="img"
-      aria-label={`6-boyut cilt skoru radar grafiği — ${dimensions.map((d) => `${d.label}: ${d.value}`).join(', ')}`}
+      aria-label={`Cilt skoru radar grafiği — ${ariaSummary}`}
     >
       {/* Grid: konsantrik daire/polygon */}
       {gridLevels.map((lvl) => {
@@ -95,7 +128,7 @@ export function RadarChart({
       })}
 
       {/* Eksen çizgileri (her boyut için merkezden kenara) */}
-      {dimensions.map((d, i) => {
+      {baseDims.map((d, i) => {
         const a = angle(i);
         const x = cx + radius * Math.cos(a);
         const y = cy + radius * Math.sin(a);
@@ -114,41 +147,38 @@ export function RadarChart({
         );
       })}
 
-      {/* Veri polygon (dolgu + kontur) */}
-      <path d={dataPath} fill={fillColor} stroke={strokeColor} strokeWidth={2} strokeLinejoin="round" />
-
-      {/* Veri noktaları */}
-      {dimensions.map((d, i) => {
-        const [x, y] = point(i, d.value);
-        return <circle key={`pt-${d.key}`} cx={x} cy={y} r={4} fill={strokeColor} />;
+      {/* Her dataset için polygon + noktalar (multi-overlay) */}
+      {layers.map((ds, idx) => {
+        const fill = ds.fillColor ?? DEFAULT_FILL;
+        const stroke = ds.strokeColor ?? DEFAULT_STROKE;
+        return (
+          <g key={`layer-${idx}`}>
+            <path d={buildPath(ds.dimensions)} fill={fill} stroke={stroke} strokeWidth={2} strokeLinejoin="round" />
+            {ds.dimensions.map((d, i) => {
+              const [x, y] = point(i, d.value);
+              return <circle key={`pt-${idx}-${d.key}`} cx={x} cy={y} r={4} fill={stroke} />;
+            })}
+          </g>
+        );
       })}
 
-      {/* Etiketler */}
-      {dimensions.map((d, i) => {
+      {/* Etiketler — baseDims temel alınır, dual modda her dataset için değer satırı */}
+      {baseDims.map((d, i) => {
         const a = angle(i);
         const x = cx + labelRadius * Math.cos(a);
         const y = cy + labelRadius * Math.sin(a);
-        // Etiket sağa/sola ortalamak için x koordinatına göre anchor
         const anchor = Math.abs(Math.cos(a)) < 0.2 ? 'middle' : Math.cos(a) > 0 ? 'start' : 'end';
+        // Dual modda: aynı index'teki tüm dataset değerlerini yan yana göster (eski → yeni)
+        const valueLine = layers.length === 1
+          ? String(d.value)
+          : layers.map((ds) => ds.dimensions[i]?.value ?? '-').join(' → ');
         return (
           <g key={`lbl-${d.key}`}>
-            <text
-              x={x}
-              y={y}
-              textAnchor={anchor}
-              dominantBaseline="middle"
-              className="fill-on-surface text-[11px] font-medium"
-            >
+            <text x={x} y={y} textAnchor={anchor} dominantBaseline="middle" className="fill-on-surface text-[11px] font-medium">
               {d.label}
             </text>
-            <text
-              x={x}
-              y={y + 12}
-              textAnchor={anchor}
-              dominantBaseline="middle"
-              className="fill-on-surface-variant text-[10px]"
-            >
-              {d.value}
+            <text x={x} y={y + 12} textAnchor={anchor} dominantBaseline="middle" className="fill-on-surface-variant text-[10px]">
+              {valueLine}
             </text>
           </g>
         );

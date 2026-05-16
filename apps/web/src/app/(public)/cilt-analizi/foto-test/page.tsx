@@ -487,11 +487,18 @@ export default function FotoTestPage() {
             ⚠️ Bu analiz tıbbi tanı değildir. Cilt sorunlarınız için lütfen dermatologa başvurun.
           </p>
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button onClick={reset} className="curator-btn-primary text-sm px-6 py-3">
               Yeni Analiz
             </button>
-            <Link href="/cilt-analizi" className="text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm px-6 py-3 hover:bg-surface-container-low transition-colors">
+            <Link
+              href={`/cilt-analizi/karsilastir?to=${result.analysis_id}`}
+              className="text-sm text-on-surface border border-primary/40 bg-primary/5 rounded-sm px-6 py-3 hover:bg-primary/10 transition-colors text-center inline-flex items-center justify-center gap-1.5"
+            >
+              <span className="material-icon material-icon-sm" aria-hidden="true">compare_arrows</span>
+              Eski Analizimle Karşılaştır
+            </Link>
+            <Link href="/cilt-analizi" className="text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm px-6 py-3 hover:bg-surface-container-low transition-colors text-center">
               Quiz'e Dön
             </Link>
           </div>
