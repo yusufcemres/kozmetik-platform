@@ -490,8 +490,12 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     if (!anchor || anchor.unsubscribed_at) {
       throw new NotFoundException('Token bulunamadı veya iptal edilmiş');
     }
+    const emailHash = anchor.anonymous_email;
+    if (!emailHash) {
+      throw new NotFoundException('Token bulundu ama email_hash kayıtsız');
+    }
     const rows = await this.results.find({
-      where: { anonymous_email: anchor.anonymous_email },
+      where: { anonymous_email: emailHash },
       order: { created_at: 'DESC' },
       take: Math.min(Math.max(limit, 1), 50),
     });
@@ -529,11 +533,16 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     if (!fromAnalysis || fromAnalysis.unsubscribed_at) {
       throw new NotFoundException('Token bulunamadı veya iptal edilmiş');
     }
+    // anonymous_email hash zorunlu — token oluştuğunda yazılmış olmalı
+    const emailHash = fromAnalysis.anonymous_email;
+    if (!emailHash) {
+      throw new NotFoundException('Token bulundu ama email_hash kayıtsız (legacy kayıt)');
+    }
     // Aynı email_hash'in analizlerini topla — from + to (varsa parametre, yoksa otomatik)
     let toAnalysis: SkinAnalysisResult | null = null;
     if (to) {
       toAnalysis = await this.results.findOne({
-        where: { analysis_id: String(to) as any, anonymous_email: fromAnalysis.anonymous_email },
+        where: { analysis_id: String(to) as any, anonymous_email: emailHash },
       });
       if (!toAnalysis) {
         throw new NotFoundException('Karşılaştırılacak yeni analiz bulunamadı (aynı email ile bağlı olmalı)');
@@ -541,7 +550,7 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     } else {
       // from'dan sonraki en yakın analiz
       const rows = await this.results.find({
-        where: { anonymous_email: fromAnalysis.anonymous_email },
+        where: { anonymous_email: emailHash },
         order: { created_at: 'DESC' },
         take: 10,
       });
