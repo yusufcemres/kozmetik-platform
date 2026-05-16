@@ -7,6 +7,7 @@ import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
 import { PhotoConsentModal, CONSENT_VERSION } from '@/components/skin-analysis/PhotoConsentModal';
 import { apiFetch } from '@/lib/api';
+import { scoreSkinOnDevice, type OnDeviceScoreResult } from '@/lib/skin-analysis/on-device-scorer';
 
 /**
  * Foto Analiz Faz 1 demo sayfası — MediaPipe çekim guard + skin-analysis API e2e test.
@@ -167,6 +168,10 @@ export default function FotoTestPage() {
   // KVKK açık rıza versiyonu — backend doğrular, eksikse 400
   const [consentVersion, setConsentVersion] = useState<string>('');
 
+  // Faz 2 #3 — on-device analiz toggle (Vision API'siz lokal CV skoru)
+  const [onDeviceMode, setOnDeviceMode] = useState(false);
+  const [onDeviceResult, setOnDeviceResult] = useState<OnDeviceScoreResult | null>(null);
+
   // Reminder akışı: email'deki link `?ref=reminder&prev=<id>&token=<64hex>` taşır.
   // Analiz tamamlanınca result CTA bu parametrelerle /karsilastir'a yönlenir
   // (anonim compare — auth gerekmez, token email'in sahibi olduğunu doğrular).
@@ -184,6 +189,8 @@ export default function FotoTestPage() {
   }, []);
 
   const handleCapture = async (data: { base64: string; mime: string; guard_score: number }) => {
+    // On-device mod aktifse Vision API'yi skip — raw callback (handleCaptureRaw) hallediyor
+    if (onDeviceMode) return;
     setUploadedScore(data.guard_score);
     setPhase('uploading');
     setError(null);
@@ -210,8 +217,44 @@ export default function FotoTestPage() {
     setPhase('camera');
   };
 
+  /**
+   * On-device skor handler — Vision API'ye gitmeden lokal CV ile hesaplama.
+   * CaptureGuard'tan ImageData + landmarker geçer. Başarısızsa Vision'a fallback.
+   */
+  const handleCaptureRaw = (data: {
+    base64: string;
+    mime: string;
+    guard_score: number;
+    imageData: ImageData;
+    landmarkerResult: unknown;
+  }) => {
+    if (!onDeviceMode) return; // sadece toggle on iken devreye gir
+    setUploadedScore(data.guard_score);
+    const local = scoreSkinOnDevice(data.landmarkerResult as any, data.imageData);
+    if (local) {
+      setOnDeviceResult(local);
+      // Result render bloku için map'le — IngredientRec[] yerine boş recommendations
+      // (DB lookup on-device'te yok). model_version on-device olduğu için UI'da rozet gösterilir.
+      setResult({
+        scores: local.scores,
+        overall_score: local.overall_score,
+        recommendations: {},
+        model_version: local.model_version,
+        analysis_id: 0, // 0 = ephemeral, DB'de yok
+        created_at: new Date().toISOString(),
+      });
+      setPhase('result');
+    } else {
+      // Landmark/ROI fail → kullanıcıya bildir, mevcut Vision akışını dene
+      setError('Lokal analiz yapılamadı (yüz yeterli netlikte değil). AI Vision yedeği deneniyor…');
+      setOnDeviceMode(false);
+      // handleDetected (onCapture) zaten Vision akışını tetikleyecek
+    }
+  };
+
   const reset = () => {
     setResult(null);
+    setOnDeviceResult(null);
     setError(null);
     setUploadedScore(null);
     setConsentVersion('');
@@ -252,11 +295,36 @@ export default function FotoTestPage() {
           <p className="text-[10px] text-outline mt-3">
             Devam etmeden önce KVKK aydınlatma metnini okuyup açık rıza verirsin.
           </p>
+
+          {/* Faz 2 #3 — On-device analiz toggle */}
+          <div className="mt-6 inline-flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-full">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={onDeviceMode}
+                onChange={(e) => setOnDeviceMode(e.target.checked)}
+                className="accent-primary"
+              />
+              <span className="text-xs text-on-surface">
+                <span className="font-semibold">⚡ Lokal Analiz</span>
+                <span className="text-on-surface-variant ml-1">(Vision'sız, %100 cihazda)</span>
+              </span>
+            </label>
+          </div>
+          <p className="text-[10px] text-outline mt-2 max-w-xs mx-auto leading-relaxed">
+            {onDeviceMode
+              ? 'Foto hiçbir sunucuya gitmez. Cihazınızda MediaPipe + klasik CV ile saniyede skor üretilir. Doğruluk Vision\'ın ~%65\'i.'
+              : 'AI Vision (Gemini/Claude) ile bulut analiz — daha doğru ama foto API\'lere geçici gönderilir.'}
+          </p>
         </div>
       )}
 
       {phase === 'camera' && (
-        <CaptureGuard onCapture={handleCapture} onCancel={reset} />
+        <CaptureGuard
+          onCapture={handleCapture}
+          onCaptureRaw={handleCaptureRaw}
+          onCancel={reset}
+        />
       )}
 
       <PhotoConsentModal
@@ -292,7 +360,23 @@ export default function FotoTestPage() {
         <div>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-on-surface mb-2">Cilt Analizi Sonucu</h2>
-            <p className="text-on-surface-variant text-sm">Analiz ID: {result.analysis_id} · Model: {result.model_version}</p>
+            {result.model_version === 'on-device-cv-v1' ? (
+              <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium mb-1">
+                <span className="material-icon text-[14px]" aria-hidden="true">offline_bolt</span>
+                Lokal Analiz — foto cihazınızdan çıkmadı
+              </div>
+            ) : null}
+            <p className="text-on-surface-variant text-sm">
+              {result.model_version === 'on-device-cv-v1'
+                ? `Model: ${result.model_version} · Ephemeral (DB'ye kaydedilmedi)`
+                : `Analiz ID: ${result.analysis_id} · Model: ${result.model_version}`}
+            </p>
+            {result.model_version === 'on-device-cv-v1' && onDeviceResult && (
+              <p className="text-[10px] text-outline mt-2 max-w-md mx-auto leading-relaxed">
+                Bu skor cihazınızda MediaPipe face landmark + klasik CV ile hesaplandı (~%65 doğruluk).
+                Tam karşılaştırma + INCI öneri + Premium AI sohbet için "AI Vision ile Çek" toggle'ını kapat ve tekrar dene.
+              </p>
+            )}
           </div>
 
           {/* Overall + Guard Score */}
@@ -495,8 +579,8 @@ export default function FotoTestPage() {
             </div>
           )}
 
-          {/* Email opt-in widget (Faz 1 Gün 9) */}
-          <EmailOptInWidget analysisId={result.analysis_id} />
+          {/* Email opt-in widget — sadece DB kaydı varsa (on-device ephemeral değil) */}
+          {result.analysis_id > 0 && <EmailOptInWidget analysisId={result.analysis_id} />}
 
           {/* Disclaimer + actions */}
           <p className="text-xs text-on-surface-variant italic text-center mb-6">
@@ -507,18 +591,20 @@ export default function FotoTestPage() {
             <button onClick={reset} className="curator-btn-primary text-sm px-6 py-3">
               Yeni Analiz
             </button>
-            <Link
-              href={(() => {
-                const qs = new URLSearchParams({ to: String(result.analysis_id) });
-                if (reminderCtx.prev) qs.set('from', String(reminderCtx.prev));
-                if (reminderCtx.token) qs.set('token', reminderCtx.token);
-                return `/cilt-analizi/karsilastir?${qs.toString()}`;
-              })()}
-              className="text-sm text-on-surface border border-primary/40 bg-primary/5 rounded-sm px-6 py-3 hover:bg-primary/10 transition-colors text-center inline-flex items-center justify-center gap-1.5"
-            >
-              <span className="material-icon material-icon-sm" aria-hidden="true">compare_arrows</span>
-              {reminderCtx.prev ? '28-Gün Karşılaştırması' : 'Eski Analizimle Karşılaştır'}
-            </Link>
+            {result.analysis_id > 0 && (
+              <Link
+                href={(() => {
+                  const qs = new URLSearchParams({ to: String(result.analysis_id) });
+                  if (reminderCtx.prev) qs.set('from', String(reminderCtx.prev));
+                  if (reminderCtx.token) qs.set('token', reminderCtx.token);
+                  return `/cilt-analizi/karsilastir?${qs.toString()}`;
+                })()}
+                className="text-sm text-on-surface border border-primary/40 bg-primary/5 rounded-sm px-6 py-3 hover:bg-primary/10 transition-colors text-center inline-flex items-center justify-center gap-1.5"
+              >
+                <span className="material-icon material-icon-sm" aria-hidden="true">compare_arrows</span>
+                {reminderCtx.prev ? '28-Gün Karşılaştırması' : 'Eski Analizimle Karşılaştır'}
+              </Link>
+            )}
             <Link href="/cilt-analizi" className="text-sm text-on-surface-variant border border-outline-variant/30 rounded-sm px-6 py-3 hover:bg-surface-container-low transition-colors text-center">
               Quiz'e Dön
             </Link>

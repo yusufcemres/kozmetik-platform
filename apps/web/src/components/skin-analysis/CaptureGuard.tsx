@@ -23,6 +23,20 @@ import { MedicalDisclaimer } from '@/components/public/MedicalDisclaimer';
 export interface CaptureGuardProps {
   /** Foto çekildi + kalite geçti → base64 + mime + guard_score gönderir */
   onCapture: (data: { base64: string; mime: string; guard_score: number }) => void;
+  /**
+   * Faz 2 #3 — on-device scorer için ham veri.
+   * Verilmişse `onCapture`'a ek olarak çağrılır, ImageData + landmarker
+   * sonucunu da geçirir. Caller bunları on-device skorlama için kullanır
+   * (Vision API'ye gitmeden).
+   */
+  onCaptureRaw?: (data: {
+    base64: string;
+    mime: string;
+    guard_score: number;
+    imageData: ImageData;
+    // FaceLandmarkerResult — type import etmemek için unknown
+    landmarkerResult: unknown;
+  }) => void;
   /** Vazgeç (modal kapat) */
   onCancel?: () => void;
   /** Default mod — 'camera' (canlı çekim) veya 'upload' (galeriden seç). Default 'camera'. */
@@ -31,7 +45,7 @@ export interface CaptureGuardProps {
 
 type CaptureMode = 'camera' | 'upload';
 
-export function CaptureGuard({ onCapture, onCancel, defaultMode = 'camera' }: CaptureGuardProps) {
+export function CaptureGuard({ onCapture, onCaptureRaw, onCancel, defaultMode = 'camera' }: CaptureGuardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,6 +158,13 @@ export function CaptureGuard({ onCapture, onCancel, defaultMode = 'camera' }: Ca
       if (qual.passed) {
         const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1] ?? '';
         onCapture({ base64, mime: 'image/jpeg', guard_score: qual.overall });
+        onCaptureRaw?.({
+          base64,
+          mime: 'image/jpeg',
+          guard_score: qual.overall,
+          imageData,
+          landmarkerResult,
+        });
       }
     } catch (err: any) {
       setError(err.message || 'Foto işlenemedi');
@@ -151,7 +172,7 @@ export function CaptureGuard({ onCapture, onCancel, defaultMode = 'camera' }: Ca
     } finally {
       URL.revokeObjectURL(url);
     }
-  }, [onCapture]);
+  }, [onCapture, onCaptureRaw]);
 
   // Foto çek + analiz
   const handleCapture = useCallback(async () => {
@@ -191,8 +212,15 @@ export function CaptureGuard({ onCapture, onCancel, defaultMode = 'camera' }: Ca
     if (qual.passed) {
       const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1] ?? '';
       onCapture({ base64, mime: 'image/jpeg', guard_score: qual.overall });
+      onCaptureRaw?.({
+        base64,
+        mime: 'image/jpeg',
+        guard_score: qual.overall,
+        imageData,
+        landmarkerResult,
+      });
     }
-  }, [onCapture]);
+  }, [onCapture, onCaptureRaw]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
