@@ -63,4 +63,15 @@ export class PaymentsController {
   async myStatus(@Req() req: any) {
     return this.service.getPremiumStatus(req.user.user_id);
   }
+
+  /**
+   * Kullanıcının ödeme geçmişi — Premium dashboard sayfası için.
+   */
+  @Get('me/history')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Kullanıcının ödeme geçmişi' })
+  async myHistory(@Req() req: any) {
+    return this.service.getMyPayments(req.user.user_id);
+  }
 }

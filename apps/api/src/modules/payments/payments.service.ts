@@ -239,4 +239,35 @@ export class PaymentsService {
       premium_until: user.premium_until.toISOString(),
     };
   }
+
+  /**
+   * Kullanıcının ödeme geçmişi — /premium dashboard için.
+   * Pending kayıtlar dahil (iptal/iade hatası geriye dönük görülsün).
+   */
+  async getMyPayments(userId: number, limit = 50): Promise<Array<{
+    payment_id: number;
+    merchant_oid: string;
+    plan_code: PaymentPlanCode;
+    amount_kurus: number;
+    status: string;
+    created_at: string;
+    ipn_received_at: string | null;
+    failure_reason: string | null;
+  }>> {
+    const rows = await this.payments.find({
+      where: { user_id: userId },
+      order: { created_at: 'DESC' },
+      take: Math.min(Math.max(limit, 1), 100),
+    });
+    return rows.map((r) => ({
+      payment_id: Number(r.payment_id),
+      merchant_oid: r.merchant_oid,
+      plan_code: r.plan_code,
+      amount_kurus: r.amount_kurus,
+      status: r.status,
+      created_at: r.created_at.toISOString(),
+      ipn_received_at: r.ipn_received_at?.toISOString() ?? null,
+      failure_reason: r.failure_reason,
+    }));
+  }
 }
