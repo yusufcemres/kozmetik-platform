@@ -37,9 +37,17 @@ export class SkinAnalysisResult {
   @Column({ type: 'smallint' })
   overall_score: number;
 
-  /** Her boyut için INCI öneri listesi (frontend kart render için) */
+  /**
+   * Her boyut için INCI öneri (compact storage formatı).
+   * Day 8 öncesi: `string[]` — Day 8 sonrası: `{display_name, ingredient_id}[]`
+   * (tam product listesi storage'a yazılmaz, gösterimde live çekilir; jsonb runtime'da
+   * format değişikliğini eski kayıtlarla geriye dönük tutar).
+   */
   @Column({ type: 'jsonb', nullable: true })
-  recommendations: Record<string, string[]> | null;
+  recommendations:
+    | Record<string, string[]>
+    | Record<string, Array<{ display_name: string; ingredient_id: number | null }>>
+    | null;
 
   /** Çekim guard skoru (MediaPipe + parlaklık + bulanıklık, 0-100) */
   @Column({ type: 'smallint', nullable: true })

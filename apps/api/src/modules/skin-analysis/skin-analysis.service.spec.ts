@@ -15,7 +15,9 @@ describe('SkinAnalysisService — pure logic', () => {
   let service: SkinAnalysisService;
 
   beforeEach(() => {
-    service = new SkinAnalysisService({} as any, {} as any);
+    // 3. arg DataSource (Day 8 enriched recommendations) — bu test pure logic test'i,
+    // DB'ye dokunmuyor, mock yeterli.
+    service = new SkinAnalysisService({} as any, {} as any, {} as any);
   });
 
   describe('parseSkinJSON (private, reflection ile)', () => {
@@ -121,8 +123,11 @@ describe('SkinAnalysisService — pure logic', () => {
     });
   });
 
-  describe('buildRecommendations (private)', () => {
-    const build = (s: any) => (service as any).buildRecommendations(s);
+  describe('buildStaticFallbackRecommendations (private, Day 8)', () => {
+    // Day 8'de buildRecommendations kaldırılıp enriched (DB-bound) + static fallback
+    // ikilisine dönüştü. Bu test fallback path'i: DB lookup fail olduğunda kullanıcı
+    // yine ingredient: null + display_name + products: [] olarak görür.
+    const build = (s: any) => (service as any).buildStaticFallbackRecommendations(s);
 
     it('skor <40 → öneri yok', () => {
       const recs = build({
@@ -132,13 +137,18 @@ describe('SkinAnalysisService — pure logic', () => {
       expect(Object.keys(recs)).toHaveLength(0);
     });
 
-    it('skor ≥40 → top 3 INCI öneri döner', () => {
+    it('skor ≥40 → top 3 IngredientRecommendation döner (DB metadata null fallback)', () => {
       const recs = build({
         t_zone_oil: 75, pore_visibility: 30, wrinkles: 30,
         pigmentation: 60, redness: 30, under_eye_darkness: 30,
       });
-      expect(recs.t_zone_oil).toEqual(['Niacinamide', 'Salicylic Acid (BHA)', 'Zinc PCA']);
-      expect(recs.pigmentation).toContain('Vitamin C');
+      expect(recs.t_zone_oil).toHaveLength(3);
+      expect(recs.t_zone_oil[0]).toMatchObject({
+        ingredient: null,
+        display_name: 'Niacinamide',
+        products: [],
+      });
+      expect(recs.pigmentation.map((r: any) => r.display_name)).toContain('Vitamin C');
       expect(recs.wrinkles).toBeUndefined(); // 30 < 40
     });
 
@@ -148,7 +158,7 @@ describe('SkinAnalysisService — pure logic', () => {
         pigmentation: 30, redness: 30, under_eye_darkness: 30,
         acne_count: 45,
       });
-      expect(recs.acne_count).toContain('Salicylic Acid (BHA)');
+      expect(recs.acne_count.map((r: any) => r.display_name)).toContain('Salicylic Acid (BHA)');
     });
   });
 });

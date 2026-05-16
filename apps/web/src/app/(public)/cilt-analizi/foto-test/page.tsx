@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, API_BASE_URL } from '@/lib/api';
 
 /**
  * Foto Analiz Faz 1 demo sayfası — MediaPipe çekim guard + skin-analysis API e2e test.
@@ -18,14 +19,44 @@ import { apiFetch } from '@/lib/api';
  * 3. 6-boyut skor + INCI öneri render
  */
 
+interface IngredientRec {
+  ingredient: {
+    ingredient_id: number;
+    inci_name: string;
+    common_name: string | null;
+    ingredient_slug: string;
+    evidence_grade: 'A' | 'B' | 'C' | 'D' | 'F' | null;
+    function_summary: string | null;
+    allergen_flag: boolean;
+    fragrance_flag: boolean;
+  } | null;
+  display_name: string;
+  products: Array<{
+    product_id: number;
+    product_slug: string;
+    product_name: string;
+    brand_name: string;
+    image_url: string | null;
+    price: number | null;
+  }>;
+}
+
 interface AnalysisResult {
   scores: Record<string, number>;
   overall_score: number;
-  recommendations: Record<string, string[]>;
+  recommendations: Record<string, IngredientRec[]>;
   model_version: string;
   analysis_id: number;
   created_at: string;
 }
+
+const EVIDENCE_GRADE_STYLE: Record<string, string> = {
+  A: 'bg-green-100 text-green-700 border-green-200',
+  B: 'bg-lime-100 text-lime-700 border-lime-200',
+  C: 'bg-amber-100 text-amber-700 border-amber-200',
+  D: 'bg-orange-100 text-orange-700 border-orange-200',
+  F: 'bg-red-100 text-red-700 border-red-200',
+};
 
 const DIMENSION_LABELS: Record<string, string> = {
   t_zone_oil: 'T-Bölge Parlama',
@@ -190,28 +221,151 @@ export default function FotoTestPage() {
             )}
           </div>
 
-          {/* INCI Recommendations */}
+          {/* INCI Recommendations + REVELA ürün widget (Day 8) */}
           {Object.keys(result.recommendations).length > 0 && (
-            <div className="curator-card p-5 mb-8">
-              <h3 className="text-base font-semibold text-on-surface mb-4">Önerilen Aktif Bileşenler (skor ≥40)</h3>
-              <div className="space-y-4">
-                {Object.entries(result.recommendations).map(([dim, inciList]) => (
-                  <div key={dim}>
-                    <p className="text-xs text-on-surface-variant uppercase tracking-wider mb-2">
+            <div className="mb-8">
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-on-surface mb-1">Önerilen Aktif Bileşenler</h3>
+                <p className="text-xs text-on-surface-variant">
+                  Skoru ≥40 olan boyutlar için seçilen INCI'ler ve REVELA katalogundaki ürünler.
+                </p>
+              </div>
+              <div className="space-y-6">
+                {Object.entries(result.recommendations).map(([dim, items]) => (
+                  <section key={dim} className="curator-card p-5">
+                    <h4 className="text-sm font-semibold text-on-surface mb-3 flex items-center gap-2">
+                      <span className="material-icon text-primary text-[18px]" aria-hidden="true">target</span>
                       {DIMENSION_LABELS[dim] || dim} için
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {inciList.map((inci) => (
-                        <Link
-                          key={inci}
-                          href={`/icerikler?q=${encodeURIComponent(inci)}`}
-                          className="px-3 py-1.5 bg-primary/5 border border-primary/20 rounded-full text-xs text-primary hover:bg-primary/10 transition-colors"
+                    </h4>
+                    <div className="space-y-4">
+                      {items.map((it, idx) => (
+                        <article
+                          key={(it.ingredient?.ingredient_id ?? `static-${idx}`) + dim}
+                          className="border border-outline-variant/30 rounded-sm p-4 bg-surface-container-lowest"
                         >
-                          {inci}
-                        </Link>
+                          {/* INCI başlık satırı: isim + evidence grade + uyarılar */}
+                          <header className="flex items-start gap-2 mb-2">
+                            <div className="flex-1 min-w-0">
+                              {it.ingredient?.ingredient_slug ? (
+                                <Link
+                                  href={`/icerikler/${it.ingredient.ingredient_slug}`}
+                                  className="text-sm font-bold text-on-surface hover:text-primary transition-colors block truncate"
+                                >
+                                  {it.display_name}
+                                </Link>
+                              ) : (
+                                <span className="text-sm font-bold text-on-surface block truncate">
+                                  {it.display_name}
+                                </span>
+                              )}
+                              {it.ingredient?.inci_name && it.ingredient.common_name && it.ingredient.common_name !== it.ingredient.inci_name && (
+                                <span className="text-[10px] text-outline italic block">
+                                  INCI: {it.ingredient.inci_name}
+                                </span>
+                              )}
+                            </div>
+                            {it.ingredient?.evidence_grade && (
+                              <span
+                                className={`text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded border ${
+                                  EVIDENCE_GRADE_STYLE[it.ingredient.evidence_grade] || ''
+                                }`}
+                                title="Kanıt skoru (A=güçlü, F=zayıf)"
+                              >
+                                {it.ingredient.evidence_grade}
+                              </span>
+                            )}
+                          </header>
+
+                          {/* Fonksiyon açıklaması */}
+                          {it.ingredient?.function_summary && (
+                            <p className="text-xs text-on-surface-variant leading-relaxed mb-3">
+                              {it.ingredient.function_summary}
+                            </p>
+                          )}
+
+                          {/* Uyarı rozetleri */}
+                          {(it.ingredient?.allergen_flag || it.ingredient?.fragrance_flag) && (
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {it.ingredient.allergen_flag && (
+                                <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                  Alerjen
+                                </span>
+                              )}
+                              {it.ingredient.fragrance_flag && (
+                                <span className="text-[10px] text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+                                  Parfüm
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* REVELA ürün widget */}
+                          {it.products.length > 0 ? (
+                            <div className="border-t border-outline-variant/20 pt-3 mt-1">
+                              <p className="text-[10px] uppercase tracking-wider text-outline mb-2 font-semibold">
+                                Bu INCI'yi içeren REVELA ürünleri
+                              </p>
+                              <div className="space-y-2">
+                                {it.products.map((p) => (
+                                  <Link
+                                    key={p.product_id}
+                                    href={`/urunler/${p.product_slug}`}
+                                    className="group flex items-center gap-3 p-2 rounded-sm hover:bg-surface-container-low transition-colors"
+                                  >
+                                    <div className="w-12 h-12 bg-surface-container rounded-sm overflow-hidden shrink-0 relative">
+                                      {p.image_url && !p.image_url.includes('placehold.co') && !p.image_url.includes('dicebear') ? (
+                                        <Image
+                                          src={p.image_url}
+                                          alt={p.product_name}
+                                          fill
+                                          sizes="48px"
+                                          className="object-contain"
+                                        />
+                                      ) : (
+                                        <span className="material-icon text-outline-variant flex items-center justify-center h-full text-[18px]" aria-hidden="true">
+                                          inventory_2
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] text-outline uppercase tracking-wider truncate">
+                                        {p.brand_name}
+                                      </p>
+                                      <p className="text-xs font-medium text-on-surface truncate group-hover:text-primary transition-colors">
+                                        {p.product_name}
+                                      </p>
+                                    </div>
+                                    {p.price != null && (
+                                      <span className="text-[11px] font-semibold text-on-surface shrink-0">
+                                        ₺{p.price.toFixed(0)}
+                                      </span>
+                                    )}
+                                    <span
+                                      className="material-icon text-outline-variant group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0"
+                                      style={{ fontSize: '14px' }}
+                                      aria-hidden="true"
+                                    >
+                                      arrow_forward
+                                    </span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="border-t border-outline-variant/20 pt-3 mt-1">
+                              <Link
+                                href={`/urunler?search=${encodeURIComponent(it.display_name)}`}
+                                className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+                              >
+                                Bu INCI'yi içeren ürünleri ara
+                                <span className="material-icon text-[12px]" aria-hidden="true">arrow_forward</span>
+                              </Link>
+                            </div>
+                          )}
+                        </article>
                       ))}
                     </div>
-                  </div>
+                  </section>
                 ))}
               </div>
             </div>

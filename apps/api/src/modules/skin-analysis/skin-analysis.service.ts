@@ -1,10 +1,15 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { createHash } from 'crypto';
 import { SkinAnalysisResult } from '@database/entities';
 import { VisionService } from '../smart-scan/vision.service';
-import { SkinAnalysisRequestDto, SkinAnalysisResponse, SkinScoreBreakdown } from './dto/skin-analysis.dto';
+import {
+  IngredientRecommendation,
+  SkinAnalysisRequestDto,
+  SkinAnalysisResponse,
+  SkinScoreBreakdown,
+} from './dto/skin-analysis.dto';
 
 /**
  * Foto analiz iş mantığı.
@@ -52,7 +57,19 @@ export class SkinAnalysisService {
     @InjectRepository(SkinAnalysisResult)
     private readonly results: Repository<SkinAnalysisResult>,
     private readonly vision: VisionService,
+    private readonly dataSource: DataSource,
   ) {}
+
+  /**
+   * Enriched recommendations cache — DIMENSION_INCI_MAP statik olduğu için
+   * SQL sonucu uzun süre değişmiyor. Process boyu cache (1 saat TTL).
+   * (CacheService Redis ile yer kazandırırdı ama bu modüle eklemeden process-local yeterli.)
+   */
+  private recommendationsCache: { value: Record<string, IngredientRecommendation[]> | null; ts: number } = {
+    value: null,
+    ts: 0,
+  };
+  private readonly REC_CACHE_TTL = 60 * 60 * 1000;
 
   async analyze(
     dto: SkinAnalysisRequestDto,
@@ -80,7 +97,12 @@ export class SkinAnalysisService {
     }
 
     const overall_score = this.calculateOverall(scores);
-    const recommendations = this.buildRecommendations(scores);
+    // Day 8: enriched recommendations (ingredient metadata + REVELA ürünleri).
+    // DB lookup fail olursa eski statik fallback'e düşer — analiz bozulmaz.
+    const recommendations = await this.buildEnrichedRecommendations(scores).catch((err) => {
+      this.logger.warn(`Enriched recommendations failed, fallback to static: ${err.message}`);
+      return this.buildStaticFallbackRecommendations(scores);
+    });
 
     const saved = await this.results.save(
       this.results.create({
@@ -88,7 +110,9 @@ export class SkinAnalysisService {
         anonymous_email: context.email ? createHash('sha256').update(context.email.toLowerCase()).digest('hex') : null,
         scores,
         overall_score,
-        recommendations,
+        // DB JSON column'una display_name + ingredient_id mapping kaydederiz —
+        // tam product listesi cache-bound, her gösterimde taze çekilir.
+        recommendations: this.compactRecommendationsForStorage(recommendations),
         guard_score: dto.guard_score ?? null,
         model_version: `${visionResult.model}-skin-v1`,
         photo_blob: dto.store_photo ? dto.image_base64 : null,
@@ -100,7 +124,7 @@ export class SkinAnalysisService {
     return {
       scores,
       overall_score,
-      recommendations: recommendations as Record<keyof SkinScoreBreakdown, string[]>,
+      recommendations,
       model_version: saved.model_version,
       analysis_id: Number(saved.analysis_id),
       created_at: saved.created_at.toISOString(),
@@ -189,16 +213,203 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
     return weightSum > 0 ? Math.round(sum / weightSum) : 0;
   }
 
-  private buildRecommendations(scores: SkinScoreBreakdown): Record<string, string[]> {
-    const recs: Record<string, string[]> = {};
+  /** Fallback — DB lookup başarısızsa kullanıcı yine de INCI önerisi görür. */
+  private buildStaticFallbackRecommendations(scores: SkinScoreBreakdown): Record<string, IngredientRecommendation[]> {
+    const recs: Record<string, IngredientRecommendation[]> = {};
     for (const [dim, list] of Object.entries(this.DIMENSION_INCI_MAP)) {
       const score = scores[dim as keyof SkinScoreBreakdown];
-      // Sadece "sorunlu" boyutlar için öneri (≥40 skor)
       if (typeof score === 'number' && score >= 40 && list.length > 0) {
-        recs[dim] = list.slice(0, 3); // Top 3
+        recs[dim] = list.slice(0, 3).map((name) => ({
+          ingredient: null,
+          display_name: name,
+          products: [],
+        }));
       }
     }
     return recs;
+  }
+
+  /**
+   * Day 8: REVELA `ingredients` tablosundan INCI metadata + her INCI için top 3 ürün.
+   *
+   * Performance:
+   * - Tüm sorunlu boyutların INCI'leri tek query'de fuzzy match'lenir (similarity OR ILIKE)
+   * - Top 3 ürün PARTITION BY ile tek query — Render free tier'da ~150ms toplam
+   * - Sonuç process-local cache'lenir (1 saat) çünkü DIMENSION_INCI_MAP statik
+   *
+   * Skor <40 olan boyutlar için öneri çıkarılmaz (zaten temiz, INCI gerekmez).
+   */
+  private async buildEnrichedRecommendations(
+    scores: SkinScoreBreakdown,
+  ): Promise<Record<string, IngredientRecommendation[]>> {
+    // Hangi boyutlar problemli ve hangi INCI isimleri lazım, çıkar
+    const dimToNames = new Map<string, string[]>();
+    const allNames = new Set<string>();
+    for (const [dim, list] of Object.entries(this.DIMENSION_INCI_MAP)) {
+      const score = scores[dim as keyof SkinScoreBreakdown];
+      if (typeof score === 'number' && score >= 40 && list.length > 0) {
+        const top = list.slice(0, 3);
+        dimToNames.set(dim, top);
+        top.forEach((n) => allNames.add(n));
+      }
+    }
+    if (dimToNames.size === 0) return {};
+
+    // Cache hit?
+    if (
+      this.recommendationsCache.value &&
+      Date.now() - this.recommendationsCache.ts < this.REC_CACHE_TTL
+    ) {
+      // Cache global — sadece bu çağrıya konu olan boyutları filtrele
+      const filtered: Record<string, IngredientRecommendation[]> = {};
+      for (const dim of dimToNames.keys()) {
+        if (this.recommendationsCache.value[dim]) filtered[dim] = this.recommendationsCache.value[dim];
+      }
+      if (Object.keys(filtered).length === dimToNames.size) return filtered;
+    }
+
+    // 1) INCI ismi → ingredient metadata lookup (paranthesis temizle, common_name + inci_name fuzzy)
+    const normalizedNames = Array.from(allNames).map((n) =>
+      n.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase(),
+    );
+    const ingredientRows: Array<{
+      ingredient_id: number;
+      inci_name: string;
+      common_name: string | null;
+      ingredient_slug: string;
+      evidence_grade: string | null;
+      function_summary: string | null;
+      allergen_flag: boolean;
+      fragrance_flag: boolean;
+      query_name: string;
+    }> = await this.dataSource.query(
+      `
+      SELECT DISTINCT ON (q.query_name)
+        i.ingredient_id, i.inci_name, i.common_name, i.ingredient_slug,
+        i.evidence_grade, i.function_summary, i.allergen_flag, i.fragrance_flag,
+        q.query_name
+      FROM unnest($1::text[]) AS q(query_name)
+      LEFT JOIN LATERAL (
+        SELECT *
+        FROM ingredients ing
+        WHERE LOWER(ing.inci_name) = q.query_name
+           OR LOWER(COALESCE(ing.common_name, '')) = q.query_name
+           OR LOWER(ing.inci_name) LIKE q.query_name || '%'
+        ORDER BY
+          CASE WHEN LOWER(ing.inci_name) = q.query_name THEN 0 ELSE 1 END,
+          length(ing.inci_name) ASC
+        LIMIT 1
+      ) i ON true
+      WHERE i.ingredient_id IS NOT NULL
+      `,
+      [normalizedNames],
+    );
+
+    // query_name → ingredient map (statik INCI ismini bu lookup'a bağla)
+    const nameToIngredient = new Map<string, typeof ingredientRows[number]>();
+    for (const row of ingredientRows) {
+      nameToIngredient.set(row.query_name, row);
+    }
+
+    // 2) Top 3 ürün her ingredient için — tek query (PARTITION BY) ile
+    const ingredientIds = ingredientRows.map((r) => r.ingredient_id);
+    const productRows: Array<{
+      ingredient_id: number;
+      product_id: number;
+      product_slug: string;
+      product_name: string;
+      brand_name: string;
+      image_url: string | null;
+      price: number | null;
+    }> = ingredientIds.length === 0 ? [] : await this.dataSource.query(
+      `
+      SELECT ingredient_id, product_id, product_slug, product_name, brand_name, image_url, price
+      FROM (
+        SELECT
+          pi.ingredient_id,
+          p.product_id, p.product_slug, p.product_name,
+          b.brand_name,
+          (SELECT image_url FROM product_images img WHERE img.product_id = p.product_id ORDER BY img.sort_order ASC LIMIT 1) AS image_url,
+          (SELECT MIN(al.price_snapshot)::float FROM affiliate_links al WHERE al.product_id = p.product_id AND al.verification_status NOT IN ('needs_review', 'dead')) AS price,
+          ROW_NUMBER() OVER (
+            PARTITION BY pi.ingredient_id
+            ORDER BY pi.inci_order_rank ASC NULLS LAST, COALESCE(p.review_count, 0) DESC
+          ) AS rn
+        FROM product_ingredients pi
+        JOIN products p ON p.product_id = pi.product_id
+        JOIN brands b ON b.brand_id = p.brand_id
+        WHERE pi.ingredient_id = ANY($1::int[])
+          AND p.status = 'published'
+          AND pi.inci_order_rank <= 10
+          AND pi.match_status != 'pending_review'
+      ) ranked
+      WHERE rn <= 3
+      ORDER BY ingredient_id, rn
+      `,
+      [ingredientIds],
+    );
+
+    // ingredient_id → products map
+    const idToProducts = new Map<number, IngredientRecommendation['products']>();
+    for (const p of productRows) {
+      if (!idToProducts.has(p.ingredient_id)) idToProducts.set(p.ingredient_id, []);
+      idToProducts.get(p.ingredient_id)!.push({
+        product_id: p.product_id,
+        product_slug: p.product_slug,
+        product_name: p.product_name,
+        brand_name: p.brand_name,
+        image_url: p.image_url,
+        price: p.price != null ? Number(p.price) : null,
+      });
+    }
+
+    // 3) Sonucu boyut bazlı yapıya çevir
+    const result: Record<string, IngredientRecommendation[]> = {};
+    for (const [dim, names] of dimToNames.entries()) {
+      result[dim] = names.map((name) => {
+        const norm = name.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase();
+        const ing = nameToIngredient.get(norm);
+        return {
+          ingredient: ing
+            ? {
+                ingredient_id: ing.ingredient_id,
+                inci_name: ing.inci_name,
+                common_name: ing.common_name,
+                ingredient_slug: ing.ingredient_slug,
+                evidence_grade: (ing.evidence_grade as 'A' | 'B' | 'C' | 'D' | 'F' | null) ?? null,
+                function_summary: ing.function_summary,
+                allergen_flag: !!ing.allergen_flag,
+                fragrance_flag: !!ing.fragrance_flag,
+              }
+            : null,
+          display_name: ing?.common_name || ing?.inci_name || name,
+          products: ing ? idToProducts.get(ing.ingredient_id) ?? [] : [],
+        };
+      });
+    }
+
+    // Cache global sonucu (tüm DIMENSION_INCI_MAP girdileri için, sonraki çağrıda
+    // farklı skor profili gelse bile cache hit alır)
+    this.recommendationsCache = { value: { ...this.recommendationsCache.value, ...result }, ts: Date.now() };
+
+    return result;
+  }
+
+  /**
+   * DB JSON column'una kaydederken full product listesi şişme yapmasın diye
+   * sadece display_name + ingredient_id kaydederiz; gösterimde live çekilir.
+   */
+  private compactRecommendationsForStorage(
+    enriched: Record<string, IngredientRecommendation[]>,
+  ): Record<string, Array<{ display_name: string; ingredient_id: number | null }>> {
+    const out: Record<string, Array<{ display_name: string; ingredient_id: number | null }>> = {};
+    for (const [dim, items] of Object.entries(enriched)) {
+      out[dim] = items.map((it) => ({
+        display_name: it.display_name,
+        ingredient_id: it.ingredient?.ingredient_id ?? null,
+      }));
+    }
+    return out;
   }
 
   async getById(analysisId: number, userId?: number): Promise<SkinAnalysisResult | null> {

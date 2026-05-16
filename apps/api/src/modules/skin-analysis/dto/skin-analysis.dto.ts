@@ -59,13 +59,43 @@ export interface SkinScoreBreakdown {
   fitzpatrick_type?: number;
 }
 
+/**
+ * Tek bir INCI önerisi — Day 8 ile zenginleştirildi:
+ * statik isim string'i yerine REVELA `ingredients` tablosundan gerçek metadata +
+ * o INCI'yi içeren top 3 REVELA ürünü ile geri döner.
+ */
+export interface IngredientRecommendation {
+  /** REVELA DB'de bulunan ingredient metadata; bulunmamışsa null (sadece display_name var) */
+  ingredient: {
+    ingredient_id: number;
+    inci_name: string;
+    common_name: string | null;
+    ingredient_slug: string;
+    evidence_grade: 'A' | 'B' | 'C' | 'D' | 'F' | null;
+    function_summary: string | null;
+    allergen_flag: boolean;
+    fragrance_flag: boolean;
+  } | null;
+  /** Kullanıcıya gösterilecek isim (DB match yoksa statik öneriden gelir) */
+  display_name: string;
+  /** Bu INCI'yi içeren REVELA katalog ürünleri (top 3, key-ingredient sırasıyla) */
+  products: Array<{
+    product_id: number;
+    product_slug: string;
+    product_name: string;
+    brand_name: string;
+    image_url: string | null;
+    price: number | null;
+  }>;
+}
+
 export interface SkinAnalysisResponse {
   /** Skor JSON (6-boyut) */
   scores: SkinScoreBreakdown;
   /** Genel skor (ağırlıklı ortalama, 0-100) */
   overall_score: number;
-  /** Her boyut için INCI öneri (boyut → top INCI'ler) */
-  recommendations: Record<keyof SkinScoreBreakdown, string[]>;
+  /** Her boyut için INCI öneri (boyut → enriched INCI kart listesi) */
+  recommendations: Record<string, IngredientRecommendation[]>;
   /** Hangi model versiyonu kullanıldı (deterministiklik garantisi) */
   model_version: string;
   /** Analiz timestamp + analiz_id (DB primary key) */
