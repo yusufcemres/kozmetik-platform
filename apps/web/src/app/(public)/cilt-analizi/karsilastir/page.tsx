@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch, ApiError } from '@/lib/api';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
+import { PaywallOverlay } from '@/components/skin-analysis/PaywallOverlay';
 
 /**
  * Faz 2 başlangıcı — eski analiz vs yeni analiz karşılaştırma sayfası.
@@ -219,35 +220,37 @@ function CompareContent() {
         </div>
       </div>
 
-      {/* Boyut bazlı delta tablo */}
-      <div className="curator-card p-5 mb-8">
-        <h2 className="text-base font-semibold text-on-surface mb-4">Boyut Değişimleri</h2>
-        <div className="space-y-2">
-          {RADAR_KEYS.map((k) => {
-            const fromVal = data.from!.scores[k] as number;
-            const toVal = data.to.scores[k] as number;
-            const delta = data.delta!.by_dimension[k] ?? 0;
-            const color = delta < -3 ? 'text-score-high' : delta > 3 ? 'text-error' : 'text-on-surface-variant';
-            const icon = delta < -3 ? 'arrow_downward' : delta > 3 ? 'arrow_upward' : 'remove';
-            return (
-              <div key={k} className="flex items-center gap-3 py-2 border-b border-outline-variant/15 last:border-0">
-                <span className="text-sm text-on-surface flex-1">{DIMENSION_LABELS[k]}</span>
-                <span className="text-xs text-on-surface-variant w-10 text-right">{fromVal}</span>
-                <span className="material-icon text-outline text-[14px]" aria-hidden="true">arrow_forward</span>
-                <span className="text-xs text-on-surface w-10 text-right font-medium">{toVal}</span>
-                <span className={`flex items-center gap-1 ${color} font-semibold text-xs w-16 justify-end`}>
-                  <span className="material-icon text-[14px]" aria-hidden="true">{icon}</span>
-                  {delta > 0 ? '+' : ''}{delta}
-                </span>
-              </div>
-            );
-          })}
+      {/* Boyut bazlı delta tablo — Faz 2 #4 paywall (29 TL one-time, demo unlock) */}
+      <PaywallOverlay feature="compare_delta">
+        <div className="curator-card p-5 mb-8">
+          <h2 className="text-base font-semibold text-on-surface mb-4">Boyut Değişimleri</h2>
+          <div className="space-y-2">
+            {RADAR_KEYS.map((k) => {
+              const fromVal = data.from!.scores[k] as number;
+              const toVal = data.to.scores[k] as number;
+              const delta = data.delta!.by_dimension[k] ?? 0;
+              const color = delta < -3 ? 'text-score-high' : delta > 3 ? 'text-error' : 'text-on-surface-variant';
+              const icon = delta < -3 ? 'arrow_downward' : delta > 3 ? 'arrow_upward' : 'remove';
+              return (
+                <div key={k} className="flex items-center gap-3 py-2 border-b border-outline-variant/15 last:border-0">
+                  <span className="text-sm text-on-surface flex-1">{DIMENSION_LABELS[k]}</span>
+                  <span className="text-xs text-on-surface-variant w-10 text-right">{fromVal}</span>
+                  <span className="material-icon text-outline text-[14px]" aria-hidden="true">arrow_forward</span>
+                  <span className="text-xs text-on-surface w-10 text-right font-medium">{toVal}</span>
+                  <span className={`flex items-center gap-1 ${color} font-semibold text-xs w-16 justify-end`}>
+                    <span className="material-icon text-[14px]" aria-hidden="true">{icon}</span>
+                    {delta > 0 ? '+' : ''}{delta}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-outline mt-3 leading-relaxed">
+            💡 Skor azalan boyutlarda INCI önerilerinin etkisi gözleniyor. Artan boyutlar için
+            mevcut bakım rutinin yeterli olmayabilir — yeni öneriler için son analiz sonuç sayfana dön.
+          </p>
         </div>
-        <p className="text-[10px] text-outline mt-3 leading-relaxed">
-          💡 Skor azalan boyutlarda INCI önerilerinin etkisi gözleniyor. Artan boyutlar için
-          mevcut bakım rutinin yeterli olmayabilir — yeni öneriler için son analiz sonuç sayfana dön.
-        </p>
-      </div>
+      </PaywallOverlay>
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row gap-3">
