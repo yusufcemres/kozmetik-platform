@@ -28,6 +28,8 @@ export interface CaptureQualityScore {
   reasons: string[];
   /** True ise upload edilebilir, false ise tekrar çek */
   passed: boolean;
+  /** True ise face detection modeli yüklenemedi (CDN/CSP fail), server-side validation devreye girer */
+  face_detection_unavailable?: boolean;
 }
 
 const PASS_THRESHOLD = 70;
@@ -48,15 +50,23 @@ export function analyzeCaptureQuality(
   const reasons: string[] = [];
 
   // 1. Face presence — landmark var mı, 478 nokta tam mı
+  // landmarkerResult === null → MediaPipe CDN/CSP fail. Server-side vision face_not_detected
+  // ile validate edecek; client-side guard'ı düşürüp upload'u bloke etme.
+  const landmarkerLoaded = landmarkerResult !== null;
   const hasFace = !!(landmarkerResult && landmarkerResult.faceLandmarks && landmarkerResult.faceLandmarks.length > 0);
   const facePoints = hasFace ? landmarkerResult!.faceLandmarks[0] : [];
-  const face_presence = hasFace && facePoints.length >= 400 ? 100 : 0;
-  if (face_presence < 50) {
+  const face_presence = !landmarkerLoaded
+    ? 75 // neutral — bilinmiyor, server karar verecek
+    : hasFace && facePoints.length >= 400
+      ? 100
+      : 0;
+  if (landmarkerLoaded && face_presence < 50) {
     reasons.push('Yüz tespit edilemedi — fotoğrafa yüzünüzün net görünmesi gerekiyor');
   }
 
   // 2. Face centering — yüz frame ortasında mı, oval içine sığıyor mu
-  let face_centered = 0;
+  // Landmarker yoksa neutral 70 (bilinmiyor, brightness+sharpness'a güveniyoruz)
+  let face_centered = !landmarkerLoaded ? 70 : 0;
   if (hasFace && facePoints.length > 0) {
     // Bounding box hesapla
     let minX = 1, maxX = 0, minY = 1, maxY = 0;
@@ -153,10 +163,15 @@ export function analyzeCaptureQuality(
     overall = Math.round(face_presence * 0.5); // Yüz yoksa kritik fail
   }
 
+  if (!landmarkerLoaded) {
+    reasons.push('Yüz tespit modeli yüklenemedi — fotoğraf sunucuda doğrulanacak');
+  }
+
   return {
     overall,
     breakdown: { face_presence, face_centered, brightness, sharpness },
     reasons,
     passed: overall >= PASS_THRESHOLD,
+    face_detection_unavailable: !landmarkerLoaded,
   };
 }

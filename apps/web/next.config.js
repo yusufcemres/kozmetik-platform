@@ -88,12 +88,12 @@ const nextConfig = {
     const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1').trim().replace(/\/api\/v1\/?$/, '');
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
       "media-src 'self' blob:",
-      `connect-src 'self' ${apiOrigin} https://www.google-analytics.com https://*.google-analytics.com https://*.ingest.sentry.io https://generativelanguage.googleapis.com`,
+      `connect-src 'self' ${apiOrigin} https://www.google-analytics.com https://*.google-analytics.com https://*.ingest.sentry.io https://generativelanguage.googleapis.com https://cdn.jsdelivr.net https://storage.googleapis.com`,
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
