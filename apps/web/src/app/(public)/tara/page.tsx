@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { detectBarcodeFromVideo, captureVideoFrame, blobToBase64, fileToResizedBase64, detectBarcodeFromBlob } from '@/lib/barcode';
 import { smartScan, ScanResponse } from '@/lib/smart-scan';
+import { ApiError } from '@/lib/api';
 
 type Phase = 'idle' | 'permission' | 'scanning' | 'processing' | 'result' | 'error' | 'batch';
 
@@ -231,7 +232,13 @@ export default function TaraPage() {
       }
     } catch (err: any) {
       setPhase('error');
-      setError(err.message || 'Tarama başarısız');
+      // 503 → AI provider'lar (Gemini + Claude) ulaşılamıyor; "Ürün bulunamadı"
+      // yerine net mesaj göster, kullanıcı yanlış yere bakmasın.
+      if (err instanceof ApiError && err.status === 503) {
+        setError('AI görsel tanıma servisi şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene veya katalogda manuel ara.');
+      } else {
+        setError(err.message || 'Tarama başarısız');
+      }
     }
   };
 
@@ -270,7 +277,11 @@ export default function TaraPage() {
       await handleDetected({ image_base64: base64, image_mime: mime });
     } catch (err: any) {
       setPhase('error');
-      setError(err.message || 'Foto islenemedi');
+      if (err instanceof ApiError && err.status === 503) {
+        setError('AI görsel tanıma servisi şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene veya katalogda manuel ara.');
+      } else {
+        setError(err.message || 'Foto islenemedi');
+      }
     }
   };
 

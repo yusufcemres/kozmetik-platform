@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
@@ -147,6 +147,14 @@ export class SmartScanService {
       // Cache check — enrichment varsa cache atla (DB'ye yeni veri yazılır)
       const visionResult = await this.vision.recognizeProduct(req.image_base64, req.image_mime);
       this.logger.log(`Vision: brand=${visionResult.brand} product=${visionResult.product_name} inci_count=${(visionResult.ingredients_list || []).length} conf=${visionResult.confidence}`);
+
+      // Provider'lar fail olduysa "Ürün bulunamadı" yerine 503 — frontend
+      // "AI okuyucu geçici olarak kullanılamıyor, biraz sonra dene" gösterir.
+      if (visionResult.provider_unavailable) {
+        throw new ServiceUnavailableException(
+          'AI görsel tanıma servisi şu an yanıt vermiyor. Lütfen birkaç dakika sonra tekrar deneyin.',
+        );
+      }
 
       const hasIncis = (visionResult.ingredients_list || []).length >= 3;
 

@@ -10,6 +10,12 @@ export interface VisionResult {
   raw?: string;
   /** Etiketten okunan INCI listesi (var ise). Smart-scan'de mevcut uruni enrich eder. */
   ingredients_list?: string[];
+  /**
+   * True ise hem Gemini hem Claude provider'a hiç ulaşılamadı (quota/auth/timeout).
+   * Smart-scan service bunu yakalayıp 503 döner — "Ürün bulunamadı" yerine
+   * "AI okuyucu geçici olarak kullanılamıyor" göster.
+   */
+  provider_unavailable?: boolean;
 }
 
 /** MIME types accepted by both Gemini Vision and Claude Vision endpoints. */
@@ -58,8 +64,14 @@ export class VisionService {
       return EMPTY_VISION_RESULT;
     }
 
+    // Provider erişim durumunu izle: en az bir provider başarılı yanıt verdiyse
+    // empty sonuç "okunamayan etiket" anlamına gelir; ikisi de fail olursa "AI offline".
+    let geminiAttempted = false;
+    let claudeAttempted = false;
+
     const geminiKey = this.config.get<string>('GEMINI_API_KEY');
     if (geminiKey) {
+      geminiAttempted = true;
       try {
         return await this.gemini(cleanBase64, mimeType, geminiKey);
       } catch (err: any) {
@@ -69,6 +81,7 @@ export class VisionService {
 
     const claudeKey = this.config.get<string>('ANTHROPIC_API_KEY');
     if (claudeKey) {
+      claudeAttempted = true;
       try {
         return await this.claude(cleanBase64, mimeType, claudeKey);
       } catch (err: any) {
@@ -76,7 +89,12 @@ export class VisionService {
       }
     }
 
-    return EMPTY_VISION_RESULT;
+    // Buraya düştüysek: ya hiç key yoktu (deneme yok) ya da denenen tüm
+    // provider'lar throw etti. Her iki durum da "AI okuyucu offline" demek.
+    if (!geminiAttempted && !claudeAttempted) {
+      this.logger.error('Vision provider yapılandırılmamış: GEMINI_API_KEY ve ANTHROPIC_API_KEY yok');
+    }
+    return { ...EMPTY_VISION_RESULT, provider_unavailable: true };
   }
 
   /**
