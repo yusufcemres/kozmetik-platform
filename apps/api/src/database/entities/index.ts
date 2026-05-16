@@ -69,6 +69,7 @@ export { AppUser } from './app-user.entity';
 export { MagicLinkToken } from './magic-link-token.entity';
 export { UserAction, UserActionType } from './user-action.entity';
 export { SkinAnalysisResult } from './skin-analysis-result.entity';
+export { Payment, type PaymentStatus, type PaymentPlanCode } from './payment.entity';
 
 // Smart Scan
 export { UnknownScan } from './unknown-scan.entity';
