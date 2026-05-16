@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { createHash, randomBytes } from 'crypto';
-import { SkinAnalysisResult } from '@database/entities';
+import { SkinAnalysisResult, UserAction, UserActionType } from '@database/entities';
 import { VisionService } from '../smart-scan/vision.service';
 import { MailService } from '../../common/mail/mail.service';
 import {
@@ -58,11 +58,40 @@ export class SkinAnalysisService {
   constructor(
     @InjectRepository(SkinAnalysisResult)
     private readonly results: Repository<SkinAnalysisResult>,
+    @InjectRepository(UserAction)
+    private readonly userActions: Repository<UserAction>,
     private readonly vision: VisionService,
     private readonly dataSource: DataSource,
     private readonly mail: MailService,
     private readonly config: ConfigService,
   ) {}
+
+  /**
+   * KVKK Madde 8 audit log — fail silent (kullanıcı flow'u kesilmesin).
+   * user-auth.service.ts'teki audit() ile aynı pattern.
+   */
+  private async audit(
+    action_type: UserActionType,
+    params: { user_id?: number | null; email?: string; ip?: string; user_agent?: string; details?: Record<string, unknown> } = {},
+  ): Promise<void> {
+    try {
+      const email_hash = params.email
+        ? createHash('sha256').update(params.email.toLowerCase().trim()).digest('hex')
+        : null;
+      await this.userActions.save(
+        this.userActions.create({
+          user_id: params.user_id ?? null,
+          action_type,
+          email_hash,
+          ip: params.ip ?? null,
+          user_agent: params.user_agent ? params.user_agent.slice(0, 255) : null,
+          details: params.details ?? null,
+        }),
+      );
+    } catch (err: any) {
+      this.logger.warn(`audit log failed: ${err.message}`);
+    }
+  }
 
   /**
    * Enriched recommendations cache — DIMENSION_INCI_MAP statik olduğu için
@@ -79,6 +108,19 @@ export class SkinAnalysisService {
     dto: SkinAnalysisRequestDto,
     context: { user_id?: number; ip?: string; user_agent?: string; email?: string } = {},
   ): Promise<SkinAnalysisResponse> {
+    // KVKK Madde 8 — açık rıza audit log (her analiz için, versiyon değişikliği denetlenir).
+    void this.audit('CONSENT_UPDATE', {
+      user_id: context.user_id ?? null,
+      email: context.email,
+      ip: context.ip,
+      user_agent: context.user_agent,
+      details: {
+        scope: 'skin_analysis_biometric',
+        consent_version: dto.consent_version,
+        photo_storage_opt_in: !!dto.store_photo,
+      },
+    });
+
     // Gerçek vision çağrısı — başarısızsa BadRequest (cilt analizinde "hayal etme" politikası,
     // placeholder skor kullanıcıya verilmemeli)
     const visionResult = await this.vision.callVisionWithPrompt(
@@ -429,6 +471,76 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
       order: { created_at: 'DESC' },
       take: Math.min(Math.max(limit, 1), 100),
     });
+  }
+
+  // ============================================================
+  // KVKK Madde 11 — Veri Hakları (Faz 1 Gün 10)
+  // ============================================================
+
+  /**
+   * KVKK Madde 11 (e+f) — kullanıcının kişisel verilerinin silinmesini isteme hakkı.
+   * Tüm skin_analysis_results kayıtlarını siler (foto blob + skor + email).
+   * Audit log ACCOUNT_DELETE scope=skin_analysis ile yazılır.
+   */
+  async deleteAllForUser(
+    userId: number,
+    context: { ip?: string; user_agent?: string } = {},
+  ): Promise<{ deleted: number }> {
+    const result = await this.results.delete({ user_id: userId });
+    const deleted = result.affected ?? 0;
+    void this.audit('ACCOUNT_DELETE', {
+      user_id: userId,
+      ip: context.ip,
+      user_agent: context.user_agent,
+      details: { scope: 'skin_analysis', deleted_count: deleted },
+    });
+    return { deleted };
+  }
+
+  /**
+   * KVKK Madde 11 (d) — veri taşınabilirlik hakkı.
+   * Kullanıcının tüm analizlerini structured JSON formatında export eder.
+   * Audit log DATA_EXPORT scope=skin_analysis ile yazılır.
+   */
+  async exportForUser(
+    userId: number,
+    context: { ip?: string; user_agent?: string } = {},
+  ): Promise<{
+    user_id: number;
+    exported_at: string;
+    analyses: Array<{
+      analysis_id: number;
+      created_at: string;
+      scores: SkinScoreBreakdown;
+      overall_score: number;
+      guard_score: number | null;
+      model_version: string;
+      recommendations: SkinAnalysisResult['recommendations'];
+    }>;
+  }> {
+    const rows = await this.results.find({
+      where: { user_id: userId },
+      order: { created_at: 'DESC' },
+    });
+    void this.audit('DATA_EXPORT', {
+      user_id: userId,
+      ip: context.ip,
+      user_agent: context.user_agent,
+      details: { scope: 'skin_analysis', exported_count: rows.length },
+    });
+    return {
+      user_id: userId,
+      exported_at: new Date().toISOString(),
+      analyses: rows.map((r) => ({
+        analysis_id: Number(r.analysis_id),
+        created_at: r.created_at.toISOString(),
+        scores: r.scores,
+        overall_score: r.overall_score,
+        guard_score: r.guard_score,
+        model_version: r.model_version,
+        recommendations: r.recommendations,
+      })),
+    };
   }
 
   // ============================================================

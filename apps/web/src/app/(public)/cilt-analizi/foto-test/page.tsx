@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
-import { apiFetch, API_BASE_URL } from '@/lib/api';
+import { PhotoConsentModal, CONSENT_VERSION } from '@/components/skin-analysis/PhotoConsentModal';
+import { apiFetch } from '@/lib/api';
 
 /**
  * Foto Analiz Faz 1 demo sayfası — MediaPipe çekim guard + skin-analysis API e2e test.
@@ -159,10 +160,12 @@ function EmailOptInWidget({ analysisId }: { analysisId: number }) {
 }
 
 export default function FotoTestPage() {
-  const [phase, setPhase] = useState<'idle' | 'camera' | 'uploading' | 'result' | 'error'>('idle');
+  const [phase, setPhase] = useState<'idle' | 'consent' | 'camera' | 'uploading' | 'result' | 'error'>('idle');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadedScore, setUploadedScore] = useState<number | null>(null);
+  // KVKK açık rıza versiyonu — backend doğrular, eksikse 400
+  const [consentVersion, setConsentVersion] = useState<string>('');
 
   const handleCapture = async (data: { base64: string; mime: string; guard_score: number }) => {
     setUploadedScore(data.guard_score);
@@ -175,6 +178,7 @@ export default function FotoTestPage() {
           image_base64: data.base64,
           image_mime: data.mime,
           guard_score: data.guard_score,
+          consent_version: consentVersion || CONSENT_VERSION,
         }),
       });
       setResult(res);
@@ -185,10 +189,16 @@ export default function FotoTestPage() {
     }
   };
 
+  const handleConsentAccept = (version: string) => {
+    setConsentVersion(version);
+    setPhase('camera');
+  };
+
   const reset = () => {
     setResult(null);
     setError(null);
     setUploadedScore(null);
+    setConsentVersion('');
     setPhase('idle');
   };
 
@@ -220,15 +230,24 @@ export default function FotoTestPage() {
           <p className="text-xs text-on-surface-variant/70 max-w-sm mx-auto mb-6">
             Foto cihazınızdan çıkmaz — sadece skor değerleri kaydedilir.
           </p>
-          <button onClick={() => setPhase('camera')} className="curator-btn-primary text-sm px-8 py-3">
+          <button onClick={() => setPhase('consent')} className="curator-btn-primary text-sm px-8 py-3">
             Kamera Aç
           </button>
+          <p className="text-[10px] text-outline mt-3">
+            Devam etmeden önce KVKK aydınlatma metnini okuyup açık rıza verirsin.
+          </p>
         </div>
       )}
 
       {phase === 'camera' && (
         <CaptureGuard onCapture={handleCapture} onCancel={reset} />
       )}
+
+      <PhotoConsentModal
+        open={phase === 'consent'}
+        onAccept={handleConsentAccept}
+        onDecline={reset}
+      />
 
       {phase === 'uploading' && (
         <div className="text-center py-16">

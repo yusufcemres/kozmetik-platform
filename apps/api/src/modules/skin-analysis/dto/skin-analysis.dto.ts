@@ -34,6 +34,19 @@ export class SkinAnalysisRequestDto {
   @ApiPropertyOptional({ description: 'Çekim guard kalite skoru (0-100, MediaPipe)' })
   @IsOptional()
   guard_score?: number;
+
+  /**
+   * KVKK açık rıza versiyonu (Faz 1 Gün 10).
+   * Format: "v{N}-{YYYY-MM-DD}" — örn. "v1-2026-05-26".
+   * Frontend ConsentModal'dan gelen onaylı versiyon; eksikse 400.
+   * Versiyon değiştiğinde kullanıcıdan tekrar açık rıza alınır.
+   */
+  @ApiProperty({ example: 'v1-2026-05-26', description: 'KVKK açık rıza versiyonu' })
+  @IsString()
+  @Matches(/^v\d+-\d{4}-\d{2}-\d{2}$/, {
+    message: 'consent_version "v{N}-YYYY-MM-DD" formatında olmalı',
+  })
+  consent_version: string;
 }
 
 /**

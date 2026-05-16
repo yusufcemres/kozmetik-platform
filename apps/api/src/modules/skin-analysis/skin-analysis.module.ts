@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { SkinAnalysisResult } from '@database/entities';
+import { SkinAnalysisResult, UserAction } from '@database/entities';
 import { SkinAnalysisController } from './skin-analysis.controller';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinAnalysisCronService } from './skin-analysis.cron';
@@ -20,7 +20,7 @@ import { MailModule } from '../../common/mail/mail.module';
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SkinAnalysisResult]),
+    TypeOrmModule.forFeature([SkinAnalysisResult, UserAction]),
     ConfigModule,
     MailModule,
   ],

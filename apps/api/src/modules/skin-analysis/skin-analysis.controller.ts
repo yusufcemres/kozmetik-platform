@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Headers, Ip, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { SkinAnalysisService } from './skin-analysis.service';
@@ -69,5 +69,23 @@ export class SkinAnalysisController {
   @ApiOperation({ summary: '28-gün reminder abonelik iptali (tek tıkla)' })
   async unsubscribe(@Param('token') token: string) {
     return this.service.unsubscribeByToken(token);
+  }
+
+  // ---- KVKK Madde 11 — Veri Hakları (Faz 1 Gün 10) ----
+
+  @Get('me/export')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({ summary: 'KVKK Madde 11(d) — analiz verilerini JSON export et' })
+  async exportMine(@Req() req: any, @Ip() ip: string, @Headers('user-agent') ua?: string) {
+    return this.service.exportForUser(req.user.user_id, { ip, user_agent: ua });
+  }
+
+  @Delete('me/delete-all')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 3, ttl: 60_000 } })
+  @ApiOperation({ summary: 'KVKK Madde 11(e+f) — tüm cilt analizi kayıtlarını sil' })
+  async deleteMine(@Req() req: any, @Ip() ip: string, @Headers('user-agent') ua?: string) {
+    return this.service.deleteAllForUser(req.user.user_id, { ip, user_agent: ua });
   }
 }

@@ -15,9 +15,9 @@ describe('SkinAnalysisService — pure logic', () => {
   let service: SkinAnalysisService;
 
   beforeEach(() => {
-    // 5 arg: results repo, vision, dataSource (G8), mail (G9), config (G9).
+    // 6 arg: results, userActions (G10 audit), vision, dataSource (G8), mail (G9), config (G9).
     // Pure logic test'i, hiçbiri çağrılmıyor — mock yeterli.
-    service = new SkinAnalysisService({} as any, {} as any, {} as any, {} as any, {} as any);
+    service = new SkinAnalysisService({} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
   });
 
   describe('parseSkinJSON (private, reflection ile)', () => {
