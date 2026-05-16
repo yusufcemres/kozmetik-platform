@@ -252,10 +252,17 @@ function CompareContent() {
       {/* CTA */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Link
-          href={`/cilt-analizi/foto-test?ref=compare&prev=${data.to.analysis_id}`}
+          href={`/cilt-analizi/foto-test?ref=compare&prev=${data.to.analysis_id}${token ? `&token=${token}` : ''}`}
           className="curator-btn-primary flex-1 text-sm py-3 text-center"
         >
           Yeni Analiz Çek
+        </Link>
+        <Link
+          href={token ? `/cilt-analizi/trend?token=${token}` : '/cilt-analizi/trend'}
+          className="flex-1 text-sm text-center text-on-surface border border-primary/40 bg-primary/5 rounded-sm py-3 hover:bg-primary/10 transition-colors inline-flex items-center justify-center gap-1.5"
+        >
+          <span className="material-icon material-icon-sm" aria-hidden="true">timeline</span>
+          Tüm Trendi Gör
         </Link>
         <Link
           href="/cilt-analizi/veri-haklarim"

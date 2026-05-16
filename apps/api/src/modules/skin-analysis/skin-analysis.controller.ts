@@ -78,6 +78,18 @@ export class SkinAnalysisController {
     return this.service.compareByToken(token, toId);
   }
 
+  /**
+   * Anonim tam geçmiş — reminder token ile auth'suz tüm analizler.
+   * Faz 2 #2 trend history chart için.
+   */
+  @Get('history-by-token/:token')
+  @Throttle({ public: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Reminder email token ile geçmiş analizler (auth\'suz)' })
+  async historyByToken(@Param('token') token: string, @Query('limit') limit?: string) {
+    const lim = Math.min(Math.max(parseInt(limit ?? '20', 10) || 20, 1), 50);
+    return this.service.getHistoryByToken(token, lim);
+  }
+
   // ---- Email funnel (Faz 1 Gün 9) ----
 
   @Post(':id/subscribe')

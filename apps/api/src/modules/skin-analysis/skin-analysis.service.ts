@@ -474,6 +474,36 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
   }
 
   /**
+   * Anonim history — reminder email token'iyle auth'suz tüm geçmiş.
+   * Faz 2 #2 trend history chart için. Aynı email_hash'in tüm analizleri döner.
+   */
+  async getHistoryByToken(token: string, limit = 20): Promise<Array<{
+    analysis_id: number;
+    created_at: string;
+    scores: SkinScoreBreakdown;
+    overall_score: number;
+  }>> {
+    if (!token || token.length !== 64) {
+      throw new BadRequestException('Geçersiz token');
+    }
+    const anchor = await this.results.findOne({ where: { unsubscribe_token: token } });
+    if (!anchor || anchor.unsubscribed_at) {
+      throw new NotFoundException('Token bulunamadı veya iptal edilmiş');
+    }
+    const rows = await this.results.find({
+      where: { anonymous_email: anchor.anonymous_email },
+      order: { created_at: 'DESC' },
+      take: Math.min(Math.max(limit, 1), 50),
+    });
+    return rows.map((r) => ({
+      analysis_id: Number(r.analysis_id),
+      created_at: r.created_at.toISOString(),
+      scores: r.scores,
+      overall_score: r.overall_score,
+    }));
+  }
+
+  /**
    * Anonim compare — reminder email'deki unsubscribe_token ile auth'suz karşılaştırma.
    *
    * Akış:
