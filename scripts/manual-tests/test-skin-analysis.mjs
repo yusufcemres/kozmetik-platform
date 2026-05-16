@@ -54,6 +54,9 @@ const base64 = buffer.toString('base64');
 
 const startTs = Date.now();
 
+// Day 10: consent_version zorunlu. Frontend ConsentModal'daki CONSENT_VERSION ile aynı.
+const CONSENT_VERSION = process.env.CONSENT_VERSION || 'v1-2026-05-26';
+
 try {
   const res = await fetch(`${API}/api/v1/skin-analysis`, {
     method: 'POST',
@@ -61,6 +64,7 @@ try {
     body: JSON.stringify({
       image_base64: base64,
       image_mime: mime,
+      consent_version: CONSENT_VERSION,
     }),
   });
 
@@ -90,17 +94,38 @@ try {
   console.log(`🆔 Analysis ID: ${body.analysis_id}`);
   console.log('');
 
+  // Day 8: enriched recommendations — IngredientRec[] (ingredient + display_name + products)
   if (Object.keys(body.recommendations).length > 0) {
     console.log('💡 INCI Önerileri (sorunlu boyutlar ≥40):');
-    for (const [dim, inciList] of Object.entries(body.recommendations)) {
-      console.log(`  ${dim}:`);
-      for (const inci of inciList) {
-        console.log(`    • ${inci}`);
+    for (const [dim, items] of Object.entries(body.recommendations)) {
+      console.log(`  📍 ${dim}:`);
+      // Backward-compat: items eski format (string[]) ya da yeni (IngredientRec[])
+      const list = Array.isArray(items) ? items : [];
+      for (const it of list) {
+        if (typeof it === 'string') {
+          console.log(`    • ${it}`);
+        } else {
+          const grade = it.ingredient?.evidence_grade ? ` [${it.ingredient.evidence_grade}]` : '';
+          const slug = it.ingredient?.ingredient_slug
+            ? ` (/icerikler/${it.ingredient.ingredient_slug})`
+            : ' (DB matched yok)';
+          console.log(`    • ${it.display_name}${grade}${slug}`);
+          if (it.products?.length > 0) {
+            for (const p of it.products.slice(0, 3)) {
+              const price = p.price != null ? ` — ₺${p.price.toFixed(0)}` : '';
+              console.log(`        → ${p.brand_name} / ${p.product_name}${price}`);
+            }
+          }
+        }
       }
     }
   } else {
     console.log('💡 Tüm boyutlar normal aralıkta — öneri yok');
   }
+
+  console.log('');
+  console.log('💾 Saklamak için Analysis ID:', body.analysis_id);
+  console.log('   Subscribe test: ANALYSIS_ID=' + body.analysis_id + ' node scripts/manual-tests/test-skin-analysis-funnel.mjs');
 } catch (err) {
   console.error(`💥 Network error: ${err.message}`);
   process.exit(1);

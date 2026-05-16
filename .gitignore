@@ -47,6 +47,12 @@ MORNING_REPORT_SUPPLEMENT_INGEST_*.md
 # Internal audit dumps
 apps/api/src/scripts/night-shift/_*.json
 
+# Day 11 e2e test foto fixtures — KVKK biyometrik veri, repo'ya sızmasın
+scripts/manual-tests/fixtures/*.jpg
+scripts/manual-tests/fixtures/*.jpeg
+scripts/manual-tests/fixtures/*.png
+scripts/manual-tests/fixtures/*.webp
+
 # Podcast audio binaries (büyük dosyalar — Spotify'a manuel upload)
 podcast-pilot/**/audio/
 *.mp3
