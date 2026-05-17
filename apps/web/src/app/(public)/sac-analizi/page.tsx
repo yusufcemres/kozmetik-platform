@@ -88,6 +88,74 @@ const STEPS: QuizStep[] = [
       { value: 'moisture', label: 'Nem & yumuşaklık', icon: 'water_drop' },
     ],
   },
+  // 2026-05-18: 5 ek soru — saç analizi derinleştirme (kişisel profil + lifestyle)
+  {
+    id: 'age',
+    question: 'Yaş aralığın?',
+    description: 'Saç bakım önerilerini yaşa göre optimize ediyoruz.',
+    type: 'single',
+    options: [
+      { value: '18_24', label: '18-24', icon: 'face' },
+      { value: '25_34', label: '25-34', icon: 'face_2' },
+      { value: '35_44', label: '35-44', icon: 'face_3' },
+      { value: '45_54', label: '45-54', icon: 'face_4' },
+      { value: '55_plus', label: '55+', icon: 'face_5' },
+    ],
+  },
+  {
+    id: 'wash_freq',
+    question: 'Saçını ne sıklıkla yıkıyorsun?',
+    description: 'Yıkama frekansı saç derisi yağlanma dengesi için kritik.',
+    type: 'single',
+    options: [
+      { value: 'daily', label: 'Her gün', description: 'Yağlanma çok hızlı', icon: 'autorenew' },
+      { value: 'every_other', label: '2 günde bir', description: 'Genel dengeli ritim', icon: 'schedule' },
+      { value: 'twice_week', label: 'Haftada 2 kez', description: 'Kuru/orta saç', icon: 'event_available' },
+      { value: 'weekly', label: 'Haftada 1', description: 'Çok kuru saç', icon: 'event' },
+      { value: 'rare', label: 'Daha seyrek', description: 'Co-wash veya minimal', icon: 'event_busy' },
+    ],
+  },
+  {
+    id: 'hair_length',
+    question: 'Saç uzunluğun?',
+    description: 'Bakım miktarı + maske tavsiyesi için.',
+    type: 'single',
+    options: [
+      { value: 'short', label: 'Kısa (kulak hizası altı)', icon: 'unfold_less' },
+      { value: 'medium', label: 'Orta (omuz hizası)', icon: 'horizontal_rule' },
+      { value: 'long', label: 'Uzun (sırt orta)', icon: 'unfold_more' },
+      { value: 'extra_long', label: 'Çok uzun (bel hizası)', icon: 'expand' },
+    ],
+  },
+  {
+    id: 'stress_sleep',
+    question: 'Stres + uyku düzenin nasıl?',
+    description: 'Saç dökülme/kırılma genelde stres ve uyku ile bağlantılı.',
+    type: 'single',
+    options: [
+      { value: 'great', label: 'İkisi de iyi', description: 'Düşük stres, 7+ saat uyku', icon: 'sentiment_very_satisfied' },
+      { value: 'okay', label: 'İdare eder', description: 'Orta stres, ~6 saat uyku', icon: 'sentiment_neutral' },
+      { value: 'stressed', label: 'Yoğun stres altında', description: 'Uyku kalitesi düşük', icon: 'sentiment_dissatisfied' },
+      { value: 'insomnia', label: 'Uyku problemi var', description: '<5 saat veya uykusuzluk', icon: 'bedtime_off' },
+    ],
+  },
+  {
+    id: 'current_products',
+    question: 'Şu an düzenli kullandığın ürünler?',
+    description: 'Mevcut rutini bilirsek daha doğru öneri sunarız (birden fazla seçilebilir).',
+    type: 'multi',
+    maxSelections: 5,
+    options: [
+      { value: 'shampoo_only', label: 'Sadece şampuan', icon: 'water_drop' },
+      { value: 'conditioner', label: 'Saç kremi / krem-balsam', icon: 'opacity' },
+      { value: 'mask', label: 'Saç maskesi (haftalık)', icon: 'masks' },
+      { value: 'oil_serum', label: 'Saç yağı / serum', icon: 'colorize' },
+      { value: 'leave_in', label: 'Durulanmayan krem', icon: 'spa' },
+      { value: 'heat_protect', label: 'Isı koruyucu sprey', icon: 'local_fire_department' },
+      { value: 'scalp_treatment', label: 'Saç derisi bakımı (tonik/serum)', icon: 'science' },
+      { value: 'supplement', label: 'Saç takviyesi (biotin, kolajen)', icon: 'medication' },
+    ],
+  },
 ];
 
 // === Analysis ===
