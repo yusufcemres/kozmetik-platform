@@ -235,8 +235,10 @@ export default function FotoTestPage() {
       setOnDeviceResult(local);
       // Result render bloku için map'le — IngredientRec[] yerine boş recommendations
       // (DB lookup on-device'te yok). model_version on-device olduğu için UI'da rozet gösterilir.
+      // OnDeviceSkinScore → AnalysisResult.scores Record<string,number> cast:
+      // tipler kesin keys olduğu için runtime safe, sadece TS index signature istiyor.
       setResult({
-        scores: local.scores,
+        scores: local.scores as unknown as Record<string, number>,
         overall_score: local.overall_score,
         recommendations: {},
         model_version: local.model_version,
