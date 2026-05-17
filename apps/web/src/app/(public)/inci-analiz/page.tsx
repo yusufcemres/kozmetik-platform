@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { fileToResizedBase64 } from '@/lib/barcode';
+import { smartScan } from '@/lib/smart-scan';
 
 interface AnalysisToken {
   rank: number;
@@ -76,6 +78,40 @@ function InciAnalysisInner() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Foto upload — etiket fotoğrafından INCI okuma (2026-05-18, smart-scan vision pipeline reuse)
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = ''; // reset
+    setError(null);
+    setPhotoBusy(true);
+    try {
+      const { base64, mime } = await fileToResizedBase64(file, 1600, 0.82);
+      const res = await smartScan({ image_base64: base64, image_mime: mime });
+      // Vision response içinde ingredients_list olmalı
+      const inciList: string[] = res.vision_result?.ingredients_list || [];
+      if (inciList.length === 0) {
+        setError('Fotoğrafta INCI listesi okunamadı. Daha net bir etiket fotoğrafı dene veya elle yapıştır.');
+        setPhotoBusy(false);
+        return;
+      }
+      // Listeyi textarea'ya doldur
+      setText(inciList.join(', '));
+      setPhotoBusy(false);
+      // Otomatik analiz et (kullanıcı yeniden butona basmasın)
+      setTimeout(() => {
+        const btn = document.querySelector<HTMLButtonElement>('[data-inci-analyze]');
+        btn?.click();
+      }, 100);
+    } catch (err: any) {
+      setError(err?.message || 'Foto işlenemedi');
+      setPhotoBusy(false);
+    }
+  };
 
   // Prefill from query string (/tara -> Pionér rozet akışı)
   useEffect(() => {
@@ -120,6 +156,62 @@ function InciAnalysisInner() {
         </p>
       </div>
 
+      {/* Foto okuma — etiketin fotoğrafını çek veya galeriden seç, AI Vision INCI'leri çıkarır */}
+      <div className="curator-card p-5 mb-4 border-l-2 border-l-primary/40">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-on-surface mb-0.5 flex items-center gap-1.5">
+              <span className="material-icon text-primary text-[18px]" aria-hidden="true">photo_camera</span>
+              Etiketten Hızlı Oku
+            </p>
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              Ürünün arkasındaki INCI listesinin fotoğrafını çek; AI Vision otomatik okuyup analiz etsin.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              disabled={photoBusy}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-2 border border-primary/40 text-primary rounded-sm hover:bg-primary/5 transition-colors disabled:opacity-50"
+            >
+              <span className="material-icon text-[14px]" aria-hidden="true">photo_camera</span>
+              Foto Çek
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              disabled={photoBusy}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-2 border border-outline-variant/40 text-on-surface rounded-sm hover:bg-surface-container-low transition-colors disabled:opacity-50"
+            >
+              <span className="material-icon text-[14px]" aria-hidden="true">photo_library</span>
+              Galeriden
+            </button>
+          </div>
+        </div>
+        {photoBusy && (
+          <p className="text-xs text-primary mt-3 flex items-center gap-1.5">
+            <span className="material-icon text-[14px] animate-spin" aria-hidden="true">progress_activity</span>
+            Foto işleniyor, Vision INCI'leri okuyor (5-12 sn)…
+          </p>
+        )}
+      </div>
+
       {/* Input */}
       <div className="curator-card p-5 mb-8">
         <label className="label-caps text-outline mb-2 block tracking-wider">
@@ -136,6 +228,7 @@ function InciAnalysisInner() {
           <button
             onClick={handleAnalyze}
             disabled={loading || !text.trim()}
+            data-inci-analyze
             className="bg-primary text-on-primary px-5 py-2 rounded-md text-sm font-medium disabled:opacity-50 hover:opacity-90 transition"
           >
             {loading ? 'Analiz ediliyor…' : 'Analiz Et'}
