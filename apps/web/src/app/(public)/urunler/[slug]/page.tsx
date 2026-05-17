@@ -4,6 +4,12 @@ import Image from 'next/image';
 import { notFound, redirect } from 'next/navigation';
 import { apiFetch, SITE_URL } from '@/lib/api';
 import { formatPrice } from '@/lib/format';
+
+/**
+ * ISR — 60 saniyede bir cache yenilenir. (2026-05-17, takviyeler page ile aynı
+ * gerekçe — back-office veri güncellemelerinin sayfaya hızlı yansıması için.)
+ */
+export const revalidate = 60;
 import FavoriteButton from '@/components/public/FavoriteButton';
 import ShareButton from '@/components/public/ShareButton';
 import PriceChart from '@/components/public/PriceChart';

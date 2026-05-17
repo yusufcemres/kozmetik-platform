@@ -3,6 +3,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
+
+/**
+ * ISR — 60 saniyede bir cache yenilenir. Next.js default `force-cache` davranışı
+ * food_sources/INCI gibi back-office'ten gelen veri güncellendiğinde sayfayı eski
+ * tutuyor; 60 sn revalidate ile manuel deploy gerekmeden taze veri akar.
+ *
+ * (2026-05-17 — backfill food_sources sonrası UI cache sorununu çözdü.)
+ */
+export const revalidate = 60;
 import { formatPrice } from '@/lib/format';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
