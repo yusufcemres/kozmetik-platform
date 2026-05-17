@@ -137,12 +137,17 @@ export default function PriceChart({ productId }: { productId: number }) {
   if (!data || data.platforms.length === 0) return (
     <div className="curator-card p-5 mb-4">
       <h3 className="label-caps text-on-surface-variant tracking-[0.2em] mb-4">Fiyat Takip</h3>
-      <div className="flex flex-col items-center justify-center py-8 text-center">
-        <span className="material-icon text-outline-variant/40 mb-3" style={{ fontSize: '40px' }} aria-hidden="true">
+      <div className="flex flex-col items-center justify-center py-6 text-center">
+        <span className="material-icon text-outline-variant/40 mb-3" style={{ fontSize: '36px' }} aria-hidden="true">
           show_chart
         </span>
-        <p className="text-sm text-on-surface-variant">Fiyat geçmişi henüz toplanıyor...</p>
-        <p className="text-xs text-outline mt-1">Yakında burada fiyat değişim grafiği görüntülenecek</p>
+        <p className="text-sm text-on-surface-variant max-w-xs">
+          Bu ürün için fiyat geçmişi henüz oluşmadı.
+        </p>
+        <p className="text-[11px] text-outline mt-2 max-w-xs leading-relaxed">
+          REVELA fiyatları her gün 04:00'te otomatik güncellenir. Yeni eklenen ürünlerde
+          ilk 24-48 saatte trend grafiği oluşur. Affiliate link yoksa takip yapılmaz.
+        </p>
       </div>
     </div>
   );

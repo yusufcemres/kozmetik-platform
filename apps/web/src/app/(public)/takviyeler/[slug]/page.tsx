@@ -807,7 +807,11 @@ export default async function SupplementDetailPage({
                   const dose = Number(nf.amount_per_serving) || 0;
                   const doseUnit = nf.unit || '';
                   const allFoods = ing.food_sources || [];
-                  const hasUsableFoods = allFoods.length > 0 && allFoods[0].amount_per_100g > 0;
+                  // 2026-05-17 fix: amount=0 + note kayıtları (kollajen, NEM, probiyotik gibi
+                  // patentli/animal source ekstraktlar) artık gösteriliyor. "Veri yakında" sadece
+                  // gerçekten boş array kalıyor.
+                  const hasAnyFoods = allFoods.length > 0;
+                  const hasQuantifiableFoods = allFoods.some((f) => f.amount_per_100g > 0);
                   const topFoods = allFoods.slice(0, 3);
                   const restFoods = allFoods.slice(3);
                   const renderFoodRow = (fs: FoodSource, i: number) => {
@@ -815,12 +819,19 @@ export default async function SupplementDetailPage({
                       ? Math.round((dose / fs.amount_per_100g) * 100)
                       : null;
                     return (
-                      <div key={i} className="flex items-baseline gap-1.5 py-0.5 text-xs leading-snug">
-                        <span className="text-on-surface min-w-0 flex-1 break-words">{fs.food_name}</span>
-                        {dose > 0 && neededGrams !== null && (
-                          <span className={`tabular-nums font-semibold shrink-0 ml-auto pl-1 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
-                            ~{neededGrams}g
-                          </span>
+                      <div key={i} className="py-0.5 leading-snug">
+                        <div className="flex items-baseline gap-1.5 text-xs">
+                          <span className="text-on-surface min-w-0 flex-1 break-words">{fs.food_name}</span>
+                          {dose > 0 && neededGrams !== null && (
+                            <span className={`tabular-nums font-semibold shrink-0 ml-auto pl-1 ${neededGrams <= 100 ? 'text-score-high' : neededGrams <= 300 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                              ~{neededGrams}g
+                            </span>
+                          )}
+                        </div>
+                        {fs.note && (
+                          <p className="text-[10px] text-outline mt-0.5 italic break-words leading-tight">
+                            {fs.note}
+                          </p>
                         )}
                       </div>
                     );
@@ -831,23 +842,28 @@ export default async function SupplementDetailPage({
                         {ing.common_name || ing.inci_name}
                         {dose > 0 && <span className="text-outline font-normal ml-1.5 text-[10px]">({Number.isInteger(dose) ? dose : dose.toFixed(1)} {doseUnit})</span>}
                       </h3>
-                      {hasUsableFoods ? (
+                      {hasAnyFoods ? (
                         <>
                           {topFoods.map(renderFoodRow)}
                           {restFoods.length > 0 && (
                             <details className="group/more mt-1.5">
                               <summary className="text-[10px] text-primary cursor-pointer hover:underline list-none [&::-webkit-details-marker]:hidden">
-                                <span className="group-open/more:hidden">+{restFoods.length} gıda</span>
+                                <span className="group-open/more:hidden">+{restFoods.length} kaynak</span>
                                 <span className="hidden group-open/more:inline">− gizle</span>
                               </summary>
                               <div className="mt-1">{restFoods.map(renderFoodRow)}</div>
                             </details>
                           )}
+                          {!hasQuantifiableFoods && (
+                            <p className="text-[10px] text-outline mt-1.5 italic">
+                              Bu bileşen gıdadan kantitatif olarak alınmaz; ekstrakte/sentezlenmiş takviye olarak kullanılır.
+                            </p>
+                          )}
                         </>
                       ) : (
-                        <div className="flex items-center gap-1 py-0.5 text-xs text-outline">
-                          <span className="material-icon text-[12px]" aria-hidden="true">hourglass_empty</span>
-                          <span>Veri yakında</span>
+                        <div className="flex items-start gap-1 py-0.5 text-xs text-outline">
+                          <span className="material-icon text-[12px] mt-0.5" aria-hidden="true">hourglass_empty</span>
+                          <span>Bu bileşen için doğal gıda kaynağı verisi henüz toplanmadı.</span>
                         </div>
                       )}
                     </div>
