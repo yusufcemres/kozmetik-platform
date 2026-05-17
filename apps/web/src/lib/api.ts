@@ -56,6 +56,10 @@ export async function apiFetch<T>(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+        // 2026-05-17 — Next.js default fetch cache 'force-cache' supplement food_sources
+        // ve product detail gibi DB-yenilenen verileri donduruyordu. ISR + bu opt-out
+        // kombinasyonu fresh-on-every-request, ISR sayfa fragmant'ları yine cache'li.
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
