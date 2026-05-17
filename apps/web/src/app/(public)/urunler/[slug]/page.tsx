@@ -237,9 +237,60 @@ function getScoreBarColor(score: number): string {
   return 'bg-score-low';
 }
 
+// === Audience-aware scoring (2026-05-17) ===
+// Bebek/çocuk ürünleri yetişkin ihtiyaçları ile skorlandığında yanlış sonuç çıkıyor
+// (CeraVe Baby Lotion → Sivilce/Akne %43, %36 genel uyum gibi). UI tarafından
+// audience'a göre relevant need_id'leri filter ile gizliyoruz.
+
+const BABY_RELEVANT_NEED_IDS = new Set([4, 5, 8, 10, 11, 19]);
+// 4: Kuruluk, 5: Bariyer, 8: Güneş Koruması, 10: Nemlendirme, 11: Hassasiyet, 19: Kızarıklık/Rozasea
+
+const CHILD_RELEVANT_NEED_IDS = new Set([1, 4, 5, 8, 10, 11, 19]);
+// + 1: Sivilce (çocukluk çağı sonu / preteen)
+
+const PREGNANT_RELEVANT_NEED_IDS = new Set([2, 3, 4, 5, 10, 11, 18, 19, 22]);
+// Hamilelik için: leke (melasma), kuruluk, çatlaklar, hassasiyet, vs.
+
+function isInfantAudience(audience?: string | null): boolean {
+  return !!audience && audience.startsWith('infant_');
+}
+function isChildAudience(audience?: string | null): boolean {
+  return !!audience && audience.startsWith('child_');
+}
+function isPregnantAudience(audience?: string | null): boolean {
+  return audience === 'pregnant' || audience === 'breastfeeding';
+}
+
+function getRelevantNeedIds(audience?: string | null): Set<number> | null {
+  if (isInfantAudience(audience)) return BABY_RELEVANT_NEED_IDS;
+  if (isChildAudience(audience)) return CHILD_RELEVANT_NEED_IDS;
+  if (isPregnantAudience(audience)) return PREGNANT_RELEVANT_NEED_IDS;
+  return null; // adult — tüm needs'ler relevant
+}
+
+function filterNeedScoresByAudience(
+  scores: NeedScore[],
+  audience?: string | null,
+): NeedScore[] {
+  const relevant = getRelevantNeedIds(audience);
+  if (!relevant) return scores;
+  return scores.filter((ns) => relevant.has(ns.need?.need_id ?? ns.need_id));
+}
+
+function getAudienceLabel(audience?: string | null): { icon: string; label: string } | null {
+  if (isInfantAudience(audience)) return { icon: 'child_care', label: 'Bebek Ürünü' };
+  if (isChildAudience(audience)) return { icon: 'child_friendly', label: 'Çocuk Ürünü' };
+  if (isPregnantAudience(audience)) return { icon: 'pregnant_woman', label: 'Hamile / Emziren' };
+  return null;
+}
+
 function getLowScoreExplanation(product: Product, avgScore: number): string[] {
   const reasons: string[] = [];
-  const needScores = product.need_scores || [];
+  // Audience-aware: bebek/çocuk ürünü için yetişkin needs'lerini hesaba katma
+  const needScores = filterNeedScoresByAudience(
+    product.need_scores || [],
+    product.target_audience,
+  );
 
   // Düşük skorlu ihtiyaçları bul
   const lowNeeds = needScores
@@ -451,11 +502,17 @@ export default async function ProductDetailPage({
   const allActiveLinks = (product.affiliate_links || []).filter((l) => l.is_active);
   const activeLinks = allActiveLinks.filter((l) => !SEARCH_ONLY_PLATFORMS.has(l.platform));
   const searchOnlyLinks = allActiveLinks.filter((l) => SEARCH_ONLY_PLATFORMS.has(l.platform));
+  // Audience-aware: bebek/çocuk/hamile ürünleri için irrelevant needs'leri hesaba katma
+  const audienceFilteredNeedScores = filterNeedScoresByAudience(
+    product.need_scores || [],
+    product.target_audience,
+  );
+  const audienceBadge = getAudienceLabel(product.target_audience);
   const avgScore =
-    product.need_scores && product.need_scores.length > 0
+    audienceFilteredNeedScores.length > 0
       ? Math.round(
-          product.need_scores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) /
-            product.need_scores.length,
+          audienceFilteredNeedScores.reduce((s, ns) => s + Number(ns.compatibility_score), 0) /
+            audienceFilteredNeedScores.length,
         )
       : null;
 
@@ -844,12 +901,15 @@ export default async function ProductDetailPage({
           );
         })()}
 
-        {/* Uyumluluk Skorları (need_scores) — sol kolonda REVELA Skoru'nun altında */}
-        {product.need_scores && product.need_scores.length > 0 && (
+        {/* Uyumluluk Skorları (need_scores) — sol kolonda REVELA Skoru'nun altında.
+            Audience-aware: bebek/çocuk/hamile ürünleri için sadece relevant needs gösterilir. */}
+        {audienceFilteredNeedScores.length > 0 && (
           <section className="curator-card p-3 md:p-4">
             <details open className="group">
               <summary className="flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] text-[10px] flex-1">Uyumluluk Skorları</h2>
+                <h2 className="label-caps text-on-surface-variant tracking-[0.2em] text-[10px] flex-1">
+                  {audienceBadge ? `${audienceBadge.label} Uyumluluğu` : 'Uyumluluk Skorları'}
+                </h2>
                 <p className="text-[9px] text-on-surface-variant leading-relaxed">
                   <span className="font-medium text-score-high">%70+</span> yüksek
                   <span className="font-medium text-score-medium"> · %40-69</span> orta
@@ -863,8 +923,17 @@ export default async function ProductDetailPage({
                   expand_more
                 </span>
               </summary>
+              {audienceBadge && (
+                <p className="mt-1 text-[10px] text-on-surface-variant leading-relaxed bg-primary/5 border border-primary/15 rounded-sm px-2 py-1.5 flex items-start gap-1.5">
+                  <span className="material-icon text-primary text-[14px] mt-0.5" aria-hidden="true">{audienceBadge.icon}</span>
+                  <span>
+                    Bu ürün <strong>{audienceBadge.label.toLowerCase()}</strong> için formüle edilmiştir.
+                    Yetişkin ihtiyaçları (akne, anti-aging, leke vs.) skorlamaya dahil edilmemiştir.
+                  </span>
+                </p>
+              )}
               <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1">
-                {product.need_scores
+                {audienceFilteredNeedScores
                   .slice()
                   .sort((a, b) => Number(b.compatibility_score) - Number(a.compatibility_score))
                   .map((ns) => {
