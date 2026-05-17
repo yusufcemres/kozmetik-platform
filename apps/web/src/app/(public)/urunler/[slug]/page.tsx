@@ -121,9 +121,7 @@ interface Product {
 
 async function getProduct(slug: string): Promise<Product | null> {
   try {
-    return await apiFetch<Product>(`/products/slug/${slug}`, {
-      next: { revalidate: 300 },
-    } as any);
+    return await apiFetch<Product>(`/products/slug/${slug}`);
   } catch {
     return null;
   }
@@ -168,9 +166,7 @@ interface ProductFullResponse {
  */
 async function getProductFull(slug: string): Promise<ProductFullResponse | null> {
   try {
-    return await apiFetch<ProductFullResponse>(`/products/slug/${slug}/full`, {
-      next: { revalidate: 300 },
-    } as any);
+    return await apiFetch<ProductFullResponse>(`/products/slug/${slug}/full`);
   } catch {
     return null;
   }
@@ -400,7 +396,6 @@ async function getSimilarProducts(productId: number): Promise<SimilarProductResu
   try {
     return await apiFetch<SimilarProductResult[]>(
       `/products/${productId}/similar?limit=4`,
-      { next: { revalidate: 300 } } as any,
     );
   } catch {
     return [];

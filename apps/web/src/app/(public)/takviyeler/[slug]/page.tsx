@@ -130,9 +130,7 @@ interface Interaction {
 
 async function getProduct(slug: string): Promise<Product | null> {
   try {
-    return await apiFetch<Product>(`/products/slug/${slug}`, {
-      next: { revalidate: 300 },
-    } as any);
+    return await apiFetch<Product>(`/products/slug/${slug}`);
   } catch {
     return null;
   }
@@ -140,9 +138,7 @@ async function getProduct(slug: string): Promise<Product | null> {
 
 async function getSupplementScore(productId: number): Promise<SupplementScore | null> {
   try {
-    return await apiFetch<SupplementScore>(`/supplements/${productId}/score`, {
-      next: { revalidate: 300 },
-    });
+    return await apiFetch<SupplementScore>(`/supplements/${productId}/score`);
   } catch {
     return null;
   }
@@ -150,9 +146,7 @@ async function getSupplementScore(productId: number): Promise<SupplementScore | 
 
 async function getSupplementDetail(productId: number): Promise<SupplementDetail | null> {
   try {
-    return await apiFetch<SupplementDetail>(`/supplements/${productId}`, {
-      next: { revalidate: 300 },
-    } as any);
+    return await apiFetch<SupplementDetail>(`/supplements/${productId}`);
   } catch {
     return null;
   }
@@ -167,9 +161,7 @@ type ReviewsAggregate = {
 
 async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate | null> {
   try {
-    return await apiFetch<ReviewsAggregate>(`/products/${productId}/reviews/aggregate`, {
-      next: { revalidate: 120 },
-    } as any);
+    return await apiFetch<ReviewsAggregate>(`/products/${productId}/reviews/aggregate`);
   } catch {
     return null;
   }
@@ -177,9 +169,7 @@ async function getReviewsAggregate(productId: number): Promise<ReviewsAggregate 
 
 async function getInteractionsByIngredient(ingredientId: number): Promise<Interaction[]> {
   try {
-    return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`, {
-      next: { revalidate: 300 },
-    } as any);
+    return await apiFetch<Interaction[]>(`/interactions/by-ingredient/${ingredientId}`);
   } catch {
     return [];
   }
