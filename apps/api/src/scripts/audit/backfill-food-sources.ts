@@ -321,6 +321,51 @@ const BACKFILL: Record<string, FoodEntry[]> = {
   ],
 };
 
+// Slug bulunamazsa alternatif slug'ları dene — DB'de TR vs EN slug, farklı yazım varyasyonları
+// için 2026-05-17 dry-run'da bulunamayanlar:
+const SLUG_ALIASES: Record<string, string[]> = {
+  'folik-asit': ['folate', 'folic-acid', 'folik-asid', 'b9'],
+  'chromium': ['krom', 'krom-pikolinat', 'chromium-picolinate'],
+  'l-arjinin': ['l-arginine', 'arginine', 'arjinin', 'l-arginin'],
+  'l-teanin': ['l-theanine', 'theanine', 'teanin'],
+  'l-glutamin': ['l-glutamine', 'glutamine', 'glutamin'],
+  'koenzim-q10': ['coenzyme-q10', 'coq10', 'ubiquinol', 'ubikinon', 'ko-enzim-q10'],
+  'probiotic': ['probiyotik', 'lactobacillus', 'bifidobacterium'],
+};
+
+async function findIngredient(client: any, slug: string): Promise<{ ingredient_id: number; common_name: string; food_sources: unknown; matched_slug: string } | null> {
+  // Önce ana slug'ı dene
+  let res = await client.query(
+    `SELECT ingredient_id, common_name, food_sources, ingredient_slug AS matched_slug
+     FROM ingredients WHERE ingredient_slug = $1`,
+    [slug],
+  );
+  if (res.rows.length > 0) return res.rows[0];
+
+  // Sonra alias'ları sırayla dene
+  const aliases = SLUG_ALIASES[slug] || [];
+  for (const alt of aliases) {
+    res = await client.query(
+      `SELECT ingredient_id, common_name, food_sources, ingredient_slug AS matched_slug
+       FROM ingredients WHERE ingredient_slug = $1`,
+      [alt],
+    );
+    if (res.rows.length > 0) return res.rows[0];
+  }
+
+  // Son çare: fuzzy ILIKE (sadece dry-run debug için)
+  res = await client.query(
+    `SELECT ingredient_id, common_name, food_sources, ingredient_slug AS matched_slug
+     FROM ingredients
+     WHERE ingredient_slug ILIKE $1
+     LIMIT 1`,
+    [`%${slug.replace(/-/g, '%')}%`],
+  );
+  if (res.rows.length > 0) return res.rows[0];
+
+  return null;
+}
+
 async function main() {
   const dryRun = !process.argv.includes('--run');
   const client = newClient();
@@ -331,17 +376,16 @@ async function main() {
   let updated = 0;
   let skipped = 0;
   for (const [slug, entries] of Object.entries(BACKFILL)) {
-    const res = await client.query(
-      `SELECT ingredient_id, common_name, food_sources FROM ingredients WHERE ingredient_slug = $1`,
-      [slug],
-    );
-    if (res.rows.length === 0) {
-      console.log(`  ⚠️  ${slug} bulunamadı, atlandı`);
+    const row = await findIngredient(client, slug);
+    if (!row) {
+      console.log(`  ⚠️  ${slug} bulunamadı (alias + fuzzy denendi), atlandı`);
       continue;
     }
-    const row = res.rows[0];
-    const existing = row.food_sources;
-    const hasExisting = Array.isArray(existing) && existing.length >= 3;
+    if (row.matched_slug !== slug) {
+      console.log(`  🔗 ${slug.padEnd(20)} → DB'de "${row.matched_slug}" olarak bulundu (alias)`);
+    }
+    const existing = (Array.isArray(row.food_sources) ? row.food_sources : []) as unknown[];
+    const hasExisting = existing.length >= 3;
 
     if (hasExisting) {
       console.log(`  ↳ ${slug.padEnd(15)} ${String(existing.length).padEnd(2)} mevcut kayıt → SKIP (idempotent, mevcut veriyi bozma)`);
@@ -349,7 +393,7 @@ async function main() {
       continue;
     }
 
-    console.log(`  ✔ ${slug.padEnd(15)} ${String(existing?.length || 0).padEnd(2)} → ${entries.length} kaynak (${row.common_name || 'no-name'})`);
+    console.log(`  ✔ ${slug.padEnd(15)} ${String(existing.length).padEnd(2)} → ${entries.length} kaynak (${row.common_name || 'no-name'})`);
     if (!dryRun) {
       await client.query(
         `UPDATE ingredients SET food_sources = $1::jsonb, updated_at = NOW() WHERE ingredient_id = $2`,
