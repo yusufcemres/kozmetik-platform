@@ -406,6 +406,41 @@ async function main() {
   console.log(`\n  ${updated} ingredient ${dryRun ? 'güncellenmeye hazır' : 'güncellendi'}, ${skipped} atlandı (mevcut yeterli veri).`);
   if (dryRun) console.log(`\n  Uygulamak için: --run`);
 
+  // 2026-05-17 — Cache invalidation: DB UPDATE'den sonra Redis'teki cached
+  // supplement detail response'ları temizle ki UI hemen taze veriyi göstersin.
+  // products.service.ts cache 10 dk TTL — bu olmadan değişiklik UI'ya yansımıyor.
+  // Cache her --run'da temizlensin — idempotent runs için de (UI hemen güncel)
+  if (!dryRun) {
+    const redisUrl = process.env.REDIS_URL;
+    if (redisUrl) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Redis = require('ioredis');
+        const useTls = redisUrl.startsWith('rediss://');
+        const redis = new Redis(redisUrl, {
+          maxRetriesPerRequest: 3,
+          enableOfflineQueue: false,
+          connectTimeout: 3000,
+          commandTimeout: 2000,
+          ...(useTls ? { tls: { rejectUnauthorized: false } } : {}),
+        });
+        // product:slug:* + supplement:slug:* her ikisini de temizle
+        for (const pattern of ['product:slug:*', 'supplement:slug:*', 'ingredient:slug:*']) {
+          const keys = await redis.keys(pattern);
+          if (keys.length > 0) {
+            await redis.del(...keys);
+            console.log(`  🗑️  Cache invalidated: ${pattern} (${keys.length} key)`);
+          }
+        }
+        await redis.quit();
+      } catch (err: any) {
+        console.log(`  ⚠️  Redis cache invalidate fail: ${err.message} — cache TTL ile (10 dk) otomatik temizlenir`);
+      }
+    } else {
+      console.log(`  ⚠️  REDIS_URL yok, cache invalidate atlandı — 10 dk cache TTL bekle`);
+    }
+  }
+
   await client.end();
 }
 
