@@ -26,14 +26,25 @@ export function trackGA(name: string, params?: GtagParams): void {
 }
 
 export const GAEvents = {
+  // LAUNCH_CHECKLIST 5 ana event (2026-05-19 polish)
+  quizStart: (quizType: string) =>
+    trackGA('quiz_start', { quiz_type: quizType }),
   quizCompleted: (skinType: string, recCount: number) =>
-    trackGA('quiz_completed', { skin_type: skinType, rec_count: recCount }),
+    trackGA('quiz_complete', { skin_type: skinType, rec_count: recCount }),
+  aiSearchQuery: (query: string, matchedIntent?: string, resultsCount?: number) =>
+    trackGA('ai_search_query', { search_term: query, matched_intent: matchedIntent, results: resultsCount }),
+  blogPostView: (slug: string, title?: string) =>
+    trackGA('blog_post_view', { post_slug: slug, post_title: title }),
+  affiliateClick: (platform: string, productId: number, price?: number) =>
+    trackGA('affiliate_click', { platform, product_id: productId, value: price, currency: 'TRY' }),
+  favoriteAdd: (productId: number) =>
+    trackGA('favorite_add', { product_id: productId }),
+
+  // Ek event'ler (eski + smart-scan)
   scanSuccess: (method: string, confidence: number, productId?: number) =>
     trackGA('scan_success', { method, confidence, product_id: productId }),
   scanFailed: (method: string, reason?: string) =>
     trackGA('scan_failed', { method, reason }),
-  affiliateClick: (platform: string, productId: number, price?: number) =>
-    trackGA('affiliate_click', { platform, product_id: productId, value: price, currency: 'TRY' }),
   shareClick: (contentType: string, itemId: string | number) =>
     trackGA('share_click', { content_type: contentType, item_id: String(itemId) }),
   favoriteToggle: (productId: number, added: boolean) =>

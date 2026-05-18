@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { GAEvents } from '@/lib/analytics';
 
 interface ShortcutResult {
   type: 'shortcut';
@@ -38,6 +39,12 @@ export default function AiSearchPage() {
         body: JSON.stringify({ query }),
       });
       setResult(res);
+      // GA4 event: matched_intent + results count
+      const intent = res.type === 'shortcut' ? res.intent : res.type;
+      const count = res.type === 'shortcut'
+        ? (res.products?.length ?? 0) + (res.ingredients?.length ?? 0) + (res.posts?.length ?? 0)
+        : res.type === 'fallback' ? (res.products?.length ?? 0) : 0;
+      GAEvents.aiSearchQuery(query, intent, count);
     } catch (e: any) {
       setErr(e.message || 'Arama başarısız');
     } finally {

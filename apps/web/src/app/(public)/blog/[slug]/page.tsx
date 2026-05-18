@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { BlogPostViewTracker } from '@/components/public/BlogPostViewTracker';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -73,6 +74,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
   return (
     <main className="container mx-auto max-w-3xl px-4 py-12">
+      <BlogPostViewTracker slug={post.slug} title={post.title} />
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger

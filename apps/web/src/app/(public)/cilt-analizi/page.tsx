@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { tracker } from '@/lib/analytics';
+import { tracker, GAEvents } from '@/lib/analytics';
 import { saveSkinProfile } from '@/lib/profile-sync';
 import { MedicalDisclaimer } from '@/components/public/MedicalDisclaimer';
 
@@ -539,6 +539,7 @@ export default function SkinAnalysisPage() {
       total_steps: totalSteps,
       total_time_ms: Date.now() - quizStartTime.current,
     });
+    GAEvents.quizCompleted(quiz.skin_type || 'unknown', needs.length);
 
     // Profile persistence: localStorage + cookie + backend tek seferde
     saveSkinProfile({
@@ -668,7 +669,7 @@ export default function SkinAnalysisPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Quick Test Card */}
             <button
-              onClick={() => { setQuizMode('quick'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
+              onClick={() => { setQuizMode('quick'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); GAEvents.quizStart('skin_quick'); }}
               className="curator-card p-6 md:p-7 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -690,7 +691,7 @@ export default function SkinAnalysisPage() {
 
             {/* Detailed Test Card */}
             <button
-              onClick={() => { setQuizMode('detailed'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); }}
+              onClick={() => { setQuizMode('detailed'); setStep(1); quizStartTime.current = Date.now(); stepStartTime.current = Date.now(); GAEvents.quizStart('skin_detailed'); }}
               className="curator-card p-6 md:p-7 text-left hover:border-primary hover:ring-1 hover:ring-primary transition-all group relative"
             >
               <div className="absolute top-3 right-3">

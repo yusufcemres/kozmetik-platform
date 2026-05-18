@@ -1,6 +1,7 @@
 'use client';
 
 import { useFavorites } from '@/hooks/useFavorites';
+import { GAEvents } from '@/lib/analytics';
 
 interface Props {
   product_id: number;
@@ -18,7 +19,10 @@ export default function FavoriteButton({ product_id, product_name, product_slug,
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const wasFav = fav;
     void toggle({ product_id, product_name, product_slug, brand_name, image_url });
+    // GA4 sadece "add" event yolla (LAUNCH_CHECKLIST favorite_add)
+    if (!wasFav) GAEvents.favoriteAdd(product_id);
   };
 
   const sizeClasses = size === 'sm' ? 'w-8 h-8' : 'w-10 h-10';
