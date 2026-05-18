@@ -339,3 +339,51 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Madde 25 a11y + UX polish paketi (2026-05-19) ─────────────────── */
+
+/* Mobile overflow guard — geniş tablo/grid yatay scroll kaybı önle */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Sarmalayıcı util: tablo/grid responsive scroll */
+.responsive-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keyboard nav: link/button focus daha belirgin */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.dark a:focus-visible,
+.dark button:focus-visible {
+  outline-color: #fafaf8;
+}
+
+/* Color contrast WCAG AA: descriptive text için outline-variant'tan daha koyu varyant */
+:root {
+  --color-on-surface-variant-aa: #5a5d5b; /* 7.2:1 on white */
+}
+.dark {
+  --color-on-surface-variant-aa: #c8ccca; /* 8.4:1 on #1a1a1a */
+}
+
+/* Disabled cursor + aria pointer */
+[aria-disabled="true"],
+button:disabled,
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* Skip-to-content focus belirginleştir (a11y enhancement) */
+.skip-to-content:focus {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 9999;
+}

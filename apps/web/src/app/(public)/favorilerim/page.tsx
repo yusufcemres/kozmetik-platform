@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { EmptyState } from '@/components/public/EmptyState';
 import Image from 'next/image';
 import {
   getFavorites, removeFavorite, FavoriteItem,
@@ -94,14 +95,13 @@ export default function FavoritesPage() {
       {tab === 'favorites' && (
         <>
           {favorites.length === 0 ? (
-            <div className="text-center py-24">
-              <span className="material-icon text-outline-variant mb-4 block" style={{ fontSize: '64px' }} aria-hidden="true">favorite_border</span>
-              <p className="text-on-surface-variant">Henüz favorin yok</p>
-              <p className="text-sm text-outline mt-2">Ürün sayfalarındaki kalp ikonuna tıklayarak favori ekle</p>
-              <Link href="/urunler" className="inline-flex items-center gap-1 mt-4 label-caps text-primary hover:underline underline-offset-4">
-                Ürünleri Keşfet <span className="material-icon material-icon-sm" aria-hidden="true">arrow_forward</span>
-              </Link>
-            </div>
+            <EmptyState
+              icon="favorite_border"
+              title="Henüz favorin yok"
+              description="Ürün sayfalarındaki kalp ikonuna tıklayarak favori ekle, burada toplansın."
+              cta={{ label: 'Ürünleri Keşfet', href: '/urunler' }}
+              size="lg"
+            />
           ) : (
             <div className="space-y-3">
               {favorites.map((fav) => (

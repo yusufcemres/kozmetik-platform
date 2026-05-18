@@ -5,6 +5,7 @@ import PageHeader from '@/components/admin/PageHeader';
 import { api } from '@/lib/api';
 import { formatPriceFromKurus as formatTL } from '@/lib/format';
 import { useToast } from '@/components/admin/Toast';
+import { EmptyState } from '@/components/public/EmptyState';
 
 interface Payment {
   payment_id: number;
@@ -186,7 +187,7 @@ export default function AdminPaymentsPage() {
         </button>
       </div>
 
-      <div className="curator-card overflow-x-auto">
+      <div className="curator-card responsive-table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-surface-container-low">
             <tr>
@@ -205,7 +206,16 @@ export default function AdminPaymentsPage() {
               <tr><td colSpan={8} className="px-3 py-8 text-center text-on-surface-variant">Yükleniyor…</td></tr>
             )}
             {!loading && items.length === 0 && (
-              <tr><td colSpan={8} className="px-3 py-8 text-center text-on-surface-variant">Kayıt yok</td></tr>
+              <tr>
+                <td colSpan={8}>
+                  <EmptyState
+                    icon="payments"
+                    title="Henüz ödeme kaydı yok"
+                    description="PayTR onayı sonrası kullanıcı ödemeleri burada görünecek."
+                    size="sm"
+                  />
+                </td>
+              </tr>
             )}
             {items.map((p) => (
               <tr key={p.payment_id} className="border-t border-outline-variant/20">
