@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { UserAwareThrottlerGuard } from './common/guards/user-aware-throttler.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { HealthController } from './health.controller';
 import { AuthModule } from './modules/auth/auth.module';
@@ -97,7 +98,10 @@ const featureModules = skipDb
       isGlobal: true,
       envFilePath: '../../.env',
     }),
-    // Global rate limiting: 60 req/min per IP for public endpoints
+    // Global rate limiting: 60 req/min per IP (anonim) ya da user_id (auth'lu).
+    // 2026-05-19 Bilinen Kısıt #4 — UserAwareThrottlerGuard custom tracker
+    // req.user.user_id varsa onu, yoksa IP'yi key olarak kullanır → premium kullanıcı
+    // anonim trafikten ayrı havuza düşer.
     ThrottlerModule.forRoot([{
       name: 'public',
       ttl: 60000,
@@ -109,7 +113,7 @@ const featureModules = skipDb
   ],
   controllers: [HealthController],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: UserAwareThrottlerGuard },
   ],
 })
 export class AppModule {}
