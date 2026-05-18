@@ -7,6 +7,7 @@ import { AppUser, MagicLinkToken, UserFavorite, ScanHistory, PushSubscription, U
 import { UserAuthService } from './user-auth.service';
 import { UserAuthController } from './user-auth.controller';
 import { AppJwtStrategy } from './app-jwt.strategy';
+import { MailModule } from '@common/mail/mail.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AppJwtStrategy } from './app-jwt.strategy';
         secret: c.get<string>('JWT_SECRET', 'change-me'),
       }),
     }),
+    MailModule,
   ],
   controllers: [UserAuthController],
   providers: [UserAuthService, AppJwtStrategy],

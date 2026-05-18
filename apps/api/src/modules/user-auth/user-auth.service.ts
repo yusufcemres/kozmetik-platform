@@ -13,6 +13,8 @@ import {
   UserAction,
   UserActionType,
 } from '@database/entities';
+import { MailService } from '@common/mail/mail.service';
+import { buildWelcomeHtml } from '@common/mail/templates';
 
 // Audit hardening 2026-05-15: token TTL 20→10 dk, IP rate 5→2/min
 // SHA256 hash + 32 byte random = 256-bit entropy. 2 deneme/dk × 10 dk = 20 brute force penceresi (yeterli).
@@ -36,7 +38,24 @@ export class UserAuthService {
     @InjectRepository(UserAction) private readonly userActions: Repository<UserAction>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
   ) {}
+
+  /**
+   * İlk login welcome maili — kullanıcı yeni oluşturulduğunda 1 kez gönderilir.
+   * Fire-and-forget; mail başarısız olsa bile login akışı bozulmaz.
+   */
+  private sendWelcomeMail(email: string, displayName?: string | null): void {
+    void this.mail.send({
+      to: email,
+      subject: 'REVELA\'ya hoş geldin 🌿',
+      html: buildWelcomeHtml({
+        to: email,
+        siteUrl: this.config.get<string>('SITE_URL', 'https://revela.com.tr'),
+        displayName,
+      }),
+    }).catch(() => {});
+  }
 
   /**
    * KVKK + denetim audit log — Madde 8 (2026-05-15) ile eklendi.
@@ -194,8 +213,10 @@ export class UserAuthService {
     await this.tokens.save(record);
 
     let user = await this.users.findOne({ where: { email: record.email } });
+    let isNewUser = false;
     if (!user) {
       user = await this.users.save(this.users.create({ email: record.email, is_active: true }));
+      isNewUser = true;
     }
     user.last_login_at = new Date();
     await this.users.save(user);
@@ -206,6 +227,7 @@ export class UserAuthService {
     );
 
     void this.audit('LOGIN_SUCCESS', { user_id: user.user_id, email: user.email, ip });
+    if (isNewUser) this.sendWelcomeMail(user.email, user.display_name);
 
     return {
       token: jwtToken,
@@ -333,6 +355,7 @@ export class UserAuthService {
   ): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
     const normalized = this.normalizeEmail(email);
     let user = await this.users.findOne({ where: { email: normalized } });
+    let isNewUser = false;
     if (!user) {
       user = await this.users.save(
         this.users.create({
@@ -341,12 +364,14 @@ export class UserAuthService {
           is_active: true,
         }),
       );
+      isNewUser = true;
     } else if (displayName && !user.display_name) {
       // Mevcut user, display_name boşsa OAuth'tan gelenle doldur
       user.display_name = displayName.trim().slice(0, 100);
     }
     user.last_login_at = new Date();
     await this.users.save(user);
+    if (isNewUser) this.sendWelcomeMail(user.email, user.display_name);
 
     const token = await this.jwt.signAsync(
       { sub: user.user_id, email: user.email, kind: 'app' },
