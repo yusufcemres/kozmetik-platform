@@ -270,4 +270,177 @@ export class PaymentsService {
       failure_reason: r.failure_reason,
     }));
   }
+
+  // ── ADMIN AUDIT ─────────────────────────────────────────────────────────
+
+  /**
+   * Admin: tüm ödemeler — filtre + paginate.
+   * Faz 5 Madde 25b (Admin payment audit panel).
+   */
+  async adminGetPayments(opts: {
+    status?: string;
+    plan_code?: string;
+    email?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{
+    items: Array<{
+      payment_id: number;
+      user_id: number;
+      email: string | null;
+      merchant_oid: string;
+      plan_code: PaymentPlanCode;
+      amount_kurus: number;
+      status: string;
+      created_at: string;
+      ipn_received_at: string | null;
+      failure_reason: string | null;
+    }>;
+    total: number;
+  }> {
+    const limit = Math.min(Math.max(opts.limit ?? 50, 1), 200);
+    const offset = Math.max(opts.offset ?? 0, 0);
+
+    const qb = this.payments
+      .createQueryBuilder('p')
+      .leftJoin(AppUser, 'u', 'u.user_id = p.user_id')
+      .select([
+        'p.payment_id AS payment_id',
+        'p.user_id AS user_id',
+        'u.email AS email',
+        'p.merchant_oid AS merchant_oid',
+        'p.plan_code AS plan_code',
+        'p.amount_kurus AS amount_kurus',
+        'p.status AS status',
+        'p.created_at AS created_at',
+        'p.ipn_received_at AS ipn_received_at',
+        'p.failure_reason AS failure_reason',
+      ])
+      .orderBy('p.created_at', 'DESC');
+
+    if (opts.status) qb.andWhere('p.status = :status', { status: opts.status });
+    if (opts.plan_code) qb.andWhere('p.plan_code = :plan_code', { plan_code: opts.plan_code });
+    if (opts.email) qb.andWhere('LOWER(u.email) LIKE :email', { email: `%${opts.email.toLowerCase()}%` });
+
+    const total = await qb.getCount();
+    const rows = await qb.limit(limit).offset(offset).getRawMany();
+
+    return {
+      items: rows.map((r) => ({
+        payment_id: Number(r.payment_id),
+        user_id: Number(r.user_id),
+        email: r.email ?? null,
+        merchant_oid: r.merchant_oid,
+        plan_code: r.plan_code,
+        amount_kurus: Number(r.amount_kurus),
+        status: r.status,
+        created_at: new Date(r.created_at).toISOString(),
+        ipn_received_at: r.ipn_received_at ? new Date(r.ipn_received_at).toISOString() : null,
+        failure_reason: r.failure_reason,
+      })),
+      total,
+    };
+  }
+
+  /**
+   * Admin: manuel iade — status='refunded' işaretler ve premium_until'ı revoke eder.
+   * PayTR'ye gerçek iade isteği gönderilmez (manuel banka iadesi sonrası kayıt güncellemesi).
+   */
+  async adminRefund(paymentId: number, adminUserId: number, reason: string): Promise<{
+    payment_id: number;
+    status: string;
+    user_premium_until: string | null;
+  }> {
+    const payment = await this.payments.findOne({ where: { payment_id: String(paymentId) } });
+    if (!payment) throw new BadRequestException(`Payment ${paymentId} bulunamadı`);
+    if (payment.status === 'refunded') {
+      throw new BadRequestException(`Payment ${paymentId} zaten iade edilmiş`);
+    }
+
+    payment.status = 'refunded';
+    payment.failure_reason = `[REFUND admin=${adminUserId}] ${reason || 'manuel iade'}`;
+    await this.payments.save(payment);
+
+    let user: AppUser | null = null;
+    if (payment.user_id != null) {
+      user = await this.users.findOne({ where: { user_id: payment.user_id } });
+      if (user) {
+        user.premium_until = null;
+        await this.users.save(user);
+      }
+    }
+
+    this.logger.warn(`Manual refund: payment_id=${paymentId} admin=${adminUserId} user=${payment.user_id}`);
+
+    return {
+      payment_id: paymentId,
+      status: 'refunded',
+      user_premium_until: user?.premium_until?.toString() ?? null,
+    };
+  }
+
+  /**
+   * Admin: manuel premium grant — kullanıcıya premium_until override.
+   * Test, kampanya, müşteri hizmetleri kompensasyonu için.
+   */
+  async adminGrantPremium(userId: number, days: number, adminUserId: number, reason: string): Promise<{
+    user_id: number;
+    premium_until: string;
+  }> {
+    if (days < 1 || days > 3650) {
+      throw new BadRequestException('days 1-3650 arasında olmalı');
+    }
+    const user = await this.users.findOne({ where: { user_id: userId } });
+    if (!user) throw new BadRequestException(`User ${userId} bulunamadı`);
+
+    const base = user.premium_until && user.premium_until > new Date()
+      ? user.premium_until
+      : new Date();
+    const newUntil = new Date(base.getTime() + days * 86_400_000);
+    user.premium_until = newUntil;
+    await this.users.save(user);
+
+    this.logger.warn(`Manual premium grant: user=${userId} +${days}d admin=${adminUserId} reason=${reason}`);
+
+    return {
+      user_id: userId,
+      premium_until: newUntil.toISOString(),
+    };
+  }
+
+  /**
+   * Admin: dashboard özet — toplam gelir, kullanıcı, iade.
+   */
+  async adminSummary(): Promise<{
+    total_revenue_kurus: number;
+    total_payments_success: number;
+    total_payments_pending: number;
+    total_payments_failed: number;
+    total_payments_refunded: number;
+    total_premium_users: number;
+    last_30d_revenue_kurus: number;
+  }> {
+    const [summary] = await this.payments.manager.query(`
+      SELECT
+        COALESCE(SUM(CASE WHEN status = 'success' THEN amount_kurus ELSE 0 END), 0)::bigint AS total_revenue_kurus,
+        COUNT(*) FILTER (WHERE status = 'success')::int AS total_payments_success,
+        COUNT(*) FILTER (WHERE status = 'pending')::int AS total_payments_pending,
+        COUNT(*) FILTER (WHERE status = 'failed')::int AS total_payments_failed,
+        COUNT(*) FILTER (WHERE status = 'refunded')::int AS total_payments_refunded,
+        COALESCE(SUM(CASE WHEN status = 'success' AND created_at > NOW() - INTERVAL '30 days' THEN amount_kurus ELSE 0 END), 0)::bigint AS last_30d_revenue_kurus
+      FROM payments
+    `);
+    const [premiumUsers] = await this.users.manager.query(
+      `SELECT COUNT(*)::int AS n FROM app_users WHERE premium_until > NOW()`,
+    );
+    return {
+      total_revenue_kurus: Number(summary.total_revenue_kurus),
+      total_payments_success: summary.total_payments_success,
+      total_payments_pending: summary.total_payments_pending,
+      total_payments_failed: summary.total_payments_failed,
+      total_payments_refunded: summary.total_payments_refunded,
+      total_premium_users: premiumUsers.n,
+      last_30d_revenue_kurus: Number(summary.last_30d_revenue_kurus),
+    };
+  }
 }

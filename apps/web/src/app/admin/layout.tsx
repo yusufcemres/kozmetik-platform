@@ -29,6 +29,7 @@ const navItems = [
   { href: '/admin/corrections', label: 'Düzeltmeler', icon: '🔧' },
   { href: '/admin/batch-imports', label: 'Import', icon: '📥' },
   { href: '/admin/brand-portal', label: 'Marka Portal', icon: '🏢' },
+  { href: '/admin/payments', label: 'Ödemeler', icon: '💳' },
 ];
 
 export default function AdminLayout({
