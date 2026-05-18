@@ -225,6 +225,8 @@ export class PaymentsService {
         user.premium_until = newExp;
         // Yeni period başladı → reminder flag'ı sıfırla, yaklaşan bitişte tekrar uyarı
         user.premium_reminder_sent_at = null;
+        // Son satın alınan plan kodunu sakla (auto-renew tekrar mail için)
+        user.last_plan_code = existing.plan_code;
         await this.users.save(user);
         this.logger.log(`Premium granted: user=${user.user_id} until=${newExp.toISOString()} plan=${existing.plan_code}`);
       }
@@ -234,13 +236,27 @@ export class PaymentsService {
   }
 
   /** Kullanıcının aktif Premium durumu — JWT claim'e koymak için */
-  async getPremiumStatus(userId: number): Promise<{ premium: boolean; premium_until: string | null }> {
+  async getPremiumStatus(userId: number): Promise<{
+    premium: boolean;
+    premium_until: string | null;
+    auto_renew_enabled: boolean;
+    last_plan_code: string | null;
+  }> {
     const user = await this.users.findOne({ where: { user_id: userId } });
-    if (!user || !user.premium_until) return { premium: false, premium_until: null };
+    if (!user || !user.premium_until) {
+      return {
+        premium: false,
+        premium_until: null,
+        auto_renew_enabled: user?.auto_renew_enabled ?? false,
+        last_plan_code: user?.last_plan_code ?? null,
+      };
+    }
     const active = user.premium_until.getTime() > Date.now();
     return {
       premium: active,
       premium_until: user.premium_until.toISOString(),
+      auto_renew_enabled: user.auto_renew_enabled,
+      last_plan_code: user.last_plan_code,
     };
   }
 
@@ -490,8 +506,16 @@ export class PaymentsService {
       );
       const ok = await this.mail.send({
         to: user.email,
-        subject: `REVELA Premium ${daysLeft} gün sonra sona eriyor`,
-        html: this.buildReminderHtml(user.email, daysLeft, user.premium_until!),
+        subject: user.auto_renew_enabled
+          ? `REVELA Premium ${daysLeft} gün sonra yenilenecek`
+          : `REVELA Premium ${daysLeft} gün sonra sona eriyor`,
+        html: this.buildReminderHtml(
+          user.email,
+          daysLeft,
+          user.premium_until!,
+          user.auto_renew_enabled,
+          user.last_plan_code,
+        ),
       });
       if (ok) {
         user.premium_reminder_sent_at = new Date();
@@ -508,24 +532,56 @@ export class PaymentsService {
     return { sent, failed, skipped };
   }
 
-  private buildReminderHtml(email: string, daysLeft: number, premiumUntil: Date): string {
+  private buildReminderHtml(
+    email: string,
+    daysLeft: number,
+    premiumUntil: Date,
+    autoRenew: boolean,
+    lastPlanCode: string | null,
+  ): string {
     const trDate = premiumUntil.toLocaleString('tr-TR', { dateStyle: 'long' });
     const siteUrl = this.config.get<string>('SITE_URL', 'https://revela.com.tr');
+    // Auto-renew kapalıysa standart "yenile" CTA, açıksa "tek-tıkla yenile" + plan koduyla deep link
+    const checkoutUrl = autoRenew && lastPlanCode
+      ? `${siteUrl}/odeme?plan=${encodeURIComponent(lastPlanCode)}`
+      : `${siteUrl}/odeme`;
+    const headline = autoRenew
+      ? 'Premium üyeliğin yakında yenilenecek'
+      : 'Premium üyeliğin yakında bitiyor';
+    const ctaLabel = autoRenew ? 'Tek Tıkla Yenile' : 'Aboneliği Yenile';
+    const intro = autoRenew
+      ? `Otomatik yenileme tercihini açtın. Premium üyeliğin <strong>${daysLeft} gün</strong> sonra (${trDate}) sona eriyor — aşağıdaki bağlantı seni doğrudan ödeme sayfasına götürür, plan seçimi yapılı.`
+      : `REVELA Premium üyeliğin <strong>${daysLeft} gün</strong> sonra sona eriyor (${trDate}).`;
+    const footnote = autoRenew
+      ? `Auto-renew tercihini kapatmak istersen <a href="${siteUrl}/premium" style="color:#666;">Premium panelinden</a> kapatabilirsin.`
+      : `Yenilemezsen Premium özellikleri (karşılaştırma, trend, AI Cilt Danışmanı) ${trDate} itibariyle pasif olur. Cilt analizlerin ve verilerin kayıtlı kalmaya devam eder.`;
+
     return `<!DOCTYPE html>
 <html lang="tr">
 <head><meta charset="UTF-8"/></head>
 <body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1F1F1F;">
-  <h2 style="font-size:20px;font-weight:600;margin-bottom:16px;">Premium üyeliğin yakında bitiyor</h2>
+  <h2 style="font-size:20px;font-weight:600;margin-bottom:16px;">${headline}</h2>
   <p>Merhaba,</p>
-  <p>REVELA Premium üyeliğin <strong>${daysLeft} gün</strong> sonra sona eriyor (${trDate}).</p>
-  <p>Yenilemek için tek bir tıklama yeterli:</p>
+  <p>${intro}</p>
   <p style="margin:24px 0;">
-    <a href="${siteUrl}/odeme" style="display:inline-block;padding:12px 24px;background:#1F1F1F;color:white;text-decoration:none;border-radius:4px;font-weight:500;">Aboneliği Yenile</a>
+    <a href="${checkoutUrl}" style="display:inline-block;padding:12px 24px;background:#1F1F1F;color:white;text-decoration:none;border-radius:4px;font-weight:500;">${ctaLabel}</a>
   </p>
-  <p style="color:#666;font-size:13px;">Yenilemezsen Premium özellikleri (karşılaştırma, trend, AI Cilt Danışmanı) ${trDate} itibariyle pasif olur. Cilt analizlerin ve verilerin kayıtlı kalmaya devam eder.</p>
+  <p style="color:#666;font-size:13px;">${footnote}</p>
   <hr style="border:none;border-top:1px solid #e0e0e0;margin:32px 0;"/>
-  <p style="color:#999;font-size:11px;">Bu mail ${email} adresine REVELA Premium üyeliğin için gönderildi. Üyeliğini yenilemek istemiyorsan bu maili görmezden gelebilirsin.</p>
+  <p style="color:#999;font-size:11px;">Bu mail ${email} adresine REVELA Premium üyeliğin için gönderildi.</p>
 </body>
 </html>`;
+  }
+
+  /**
+   * Auto-renew tercihi güncelle (kullanıcı /premium panelinden açar/kapatır).
+   */
+  async setAutoRenew(userId: number, enabled: boolean): Promise<{ user_id: number; auto_renew_enabled: boolean }> {
+    const user = await this.users.findOne({ where: { user_id: userId } });
+    if (!user) throw new BadRequestException(`User ${userId} bulunamadı`);
+    user.auto_renew_enabled = enabled;
+    await this.users.save(user);
+    this.logger.log(`Auto-renew ${enabled ? 'enabled' : 'disabled'} for user ${userId}`);
+    return { user_id: userId, auto_renew_enabled: enabled };
   }
 }

@@ -78,6 +78,26 @@ export class PaymentsController {
     return this.service.getMyPayments(req.user.user_id);
   }
 
+  /**
+   * Auto-renew opt-in toggle (Migration 035, 2026-05-19).
+   * Açıksa premium_until yaklaşırken "tek-tıkla yenile" maili gelir
+   * (linki /odeme?plan=last_plan_code). Tam auto-charge PayTR Subscription
+   * onayında aktive edilecek.
+   */
+  @Post('me/auto-renew')
+  @UseGuards(AppJwtGuard)
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Auto-renew tercihini aç/kapat' })
+  async setAutoRenew(
+    @Req() req: any,
+    @Body() body: { enabled?: boolean },
+  ) {
+    if (typeof body?.enabled !== 'boolean') {
+      throw new BadRequestException('enabled (boolean) zorunlu');
+    }
+    return this.service.setAutoRenew(req.user.user_id, body.enabled);
+  }
+
   // ── ADMIN ──────────────────────────────────────────────────────────────
 
   @Get('admin/list')

@@ -43,6 +43,19 @@ export class AppUser {
   @Column({ type: 'timestamptz', nullable: true })
   premium_reminder_sent_at: Date | null;
 
+  /**
+   * Auto-renew opt-in (Migration 035, 2026-05-19).
+   * true → kullanıcı premium_until yaklaşırken "tek-tıkla yenile" maili alır
+   *        (linki direkt /odeme?plan=last_plan_code).
+   * Tam auto-charge PayTR Subscription API onayı geldiğinde aktive edilecek.
+   */
+  @Column({ type: 'boolean', default: false })
+  auto_renew_enabled: boolean;
+
+  /** Son satın alınan plan kodu (reminder mail'inde aynı plan önerilir). */
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  last_plan_code: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 

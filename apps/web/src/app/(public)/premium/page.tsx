@@ -50,10 +50,17 @@ function formatDate(iso: string): string {
 }
 
 export default function PremiumDashboardPage() {
-  const [status, setStatus] = useState<{ premium: boolean; premium_until: string | null } | null>(null);
+  type PremiumStatus = {
+    premium: boolean;
+    premium_until: string | null;
+    auto_renew_enabled: boolean;
+    last_plan_code: string | null;
+  };
+  const [status, setStatus] = useState<PremiumStatus | null>(null);
   const [history, setHistory] = useState<PaymentRow[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [autoRenewBusy, setAutoRenewBusy] = useState(false);
   const isLoggedIn = !!getUserToken();
 
   useEffect(() => {
@@ -63,7 +70,7 @@ export default function PremiumDashboardPage() {
       return;
     }
     Promise.all([
-      apiFetch<{ premium: boolean; premium_until: string | null }>('/payments/me/status'),
+      apiFetch<PremiumStatus>('/payments/me/status'),
       apiFetch<PaymentRow[]>('/payments/me/history'),
     ])
       .then(([s, h]) => {
@@ -78,6 +85,26 @@ export default function PremiumDashboardPage() {
       })
       .finally(() => setLoading(false));
   }, [isLoggedIn]);
+
+  const toggleAutoRenew = async () => {
+    if (!status || autoRenewBusy) return;
+    setAutoRenewBusy(true);
+    try {
+      const next = !status.auto_renew_enabled;
+      const res = await apiFetch<{ user_id: number; auto_renew_enabled: boolean }>(
+        '/payments/me/auto-renew',
+        {
+          method: 'POST',
+          body: JSON.stringify({ enabled: next }),
+        },
+      );
+      setStatus({ ...status, auto_renew_enabled: res.auto_renew_enabled });
+    } catch (err: any) {
+      setError(err?.message || 'Tercih güncellenemedi');
+    } finally {
+      setAutoRenewBusy(false);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -130,10 +157,37 @@ export default function PremiumDashboardPage() {
                   {status.premium ? 'Premium üyeliğin aktif 🎉' : 'Henüz Premium değilsin'}
                 </h2>
                 {status.premium && status.premium_until && (
-                  <p className="text-xs text-on-surface-variant leading-relaxed">
-                    Bitiş tarihi:{' '}
-                    <strong className="text-on-surface">{formatDate(status.premium_until)}</strong>
-                  </p>
+                  <>
+                    <p className="text-xs text-on-surface-variant leading-relaxed mb-3">
+                      Bitiş tarihi:{' '}
+                      <strong className="text-on-surface">{formatDate(status.premium_until)}</strong>
+                    </p>
+                    {/* Auto-renew toggle */}
+                    <div className="flex items-center justify-between bg-surface-container-low border border-outline-variant/20 rounded-sm p-3">
+                      <div>
+                        <div className="text-xs font-medium text-on-surface">Otomatik yenileme hatırlatması</div>
+                        <div className="text-[10px] text-on-surface-variant">
+                          Açıksa bitiş yaklaşırken tek-tıkla yenile maili alırsın
+                          {status.last_plan_code && ` (son plan: ${status.last_plan_code})`}.
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={toggleAutoRenew}
+                        disabled={autoRenewBusy}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
+                          status.auto_renew_enabled ? 'bg-primary' : 'bg-outline-variant'
+                        }`}
+                        aria-pressed={status.auto_renew_enabled}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            status.auto_renew_enabled ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </>
                 )}
                 {!status.premium && (
                   <p className="text-xs text-on-surface-variant leading-relaxed mb-3">
