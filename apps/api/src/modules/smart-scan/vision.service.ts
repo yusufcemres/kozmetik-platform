@@ -48,7 +48,45 @@ const VISION_TIMEOUT_MS = 12_000;
 export class VisionService {
   private readonly logger = new Logger(VisionService.name);
 
+  /**
+   * Quota cooldown (2026-05-19): bir provider 429 alırsa N dakika boyunca
+   * direkt skip → diğer provider'a geç. Aynı request'te bin retry yerine
+   * sonraki request'lerde de bu provider'a hit atmamak için.
+   * 5 dakika sonra reset (yeni quota window).
+   */
+  private quotaCooldown: Record<string, number> = {};
+  private readonly COOLDOWN_MS = 5 * 60_000;
+
   constructor(private readonly config: ConfigService) {}
+
+  private isInCooldown(provider: 'gemini' | 'claude' | 'openai'): boolean {
+    const ts = this.quotaCooldown[provider];
+    if (!ts) return false;
+    if (Date.now() - ts > this.COOLDOWN_MS) {
+      delete this.quotaCooldown[provider];
+      return false;
+    }
+    return true;
+  }
+
+  private markCooldown(provider: 'gemini' | 'claude' | 'openai', reason: string): void {
+    this.quotaCooldown[provider] = Date.now();
+    this.logger.warn(`Vision provider '${provider}' cooldown 5dk (sebep: ${reason})`);
+  }
+
+  /**
+   * 429/quota hata sinyali tespiti — provider error message'larında bu
+   * pattern'ler quota tükendiğine işaret eder.
+   */
+  private isQuotaError(message: string): boolean {
+    const lower = (message || '').toLowerCase();
+    return lower.includes('429') ||
+      lower.includes('quota') ||
+      lower.includes('rate limit') ||
+      lower.includes('rate_limit') ||
+      lower.includes('limit exceeded') ||
+      lower.includes('insufficient_quota');
+  }
 
   async recognizeProduct(imageBase64: string, mimeType = 'image/jpeg'): Promise<VisionResult> {
     // Defense-in-depth MIME whitelist (DTO controller seviyesinde de enforce ediliyor)
@@ -70,29 +108,40 @@ export class VisionService {
     let claudeAttempted = false;
 
     const geminiKey = this.config.get<string>('GEMINI_API_KEY');
-    if (geminiKey) {
+    if (geminiKey && !this.isInCooldown('gemini')) {
       geminiAttempted = true;
       try {
         return await this.gemini(cleanBase64, mimeType, geminiKey);
       } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('gemini', err.message);
         this.logger.warn(`Gemini failed: ${err.message}, trying Claude…`);
       }
     }
 
     const claudeKey = this.config.get<string>('ANTHROPIC_API_KEY');
-    if (claudeKey) {
+    if (claudeKey && !this.isInCooldown('claude')) {
       claudeAttempted = true;
       try {
         return await this.claude(cleanBase64, mimeType, claudeKey);
       } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('claude', err.message);
         this.logger.error(`Claude vision failed: ${err.message}`);
       }
     }
 
-    // Buraya düştüysek: ya hiç key yoktu (deneme yok) ya da denenen tüm
-    // provider'lar throw etti. Her iki durum da "AI okuyucu offline" demek.
-    if (!geminiAttempted && !claudeAttempted) {
-      this.logger.error('Vision provider yapılandırılmamış: GEMINI_API_KEY ve ANTHROPIC_API_KEY yok');
+    // 3. provider — OpenAI vision (opsiyonel, OPENAI_API_KEY varsa aktif)
+    const openaiKey = this.config.get<string>('OPENAI_API_KEY');
+    if (openaiKey && !this.isInCooldown('openai')) {
+      try {
+        return await this.openai(cleanBase64, mimeType, openaiKey);
+      } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('openai', err.message);
+        this.logger.error(`OpenAI vision failed: ${err.message}`);
+      }
+    }
+
+    if (!geminiAttempted && !claudeAttempted && !openaiKey) {
+      this.logger.error('Vision provider yapılandırılmamış: GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY yok');
     }
     return { ...EMPTY_VISION_RESULT, provider_unavailable: true };
   }
@@ -119,22 +168,35 @@ export class VisionService {
     if (!cleanBase64) return null;
 
     const geminiKey = this.config.get<string>('GEMINI_API_KEY');
-    if (geminiKey) {
+    if (geminiKey && !this.isInCooldown('gemini')) {
       try {
         const raw = await this.geminiRaw(cleanBase64, mimeType, geminiKey, prompt);
         return { raw, model: 'gemini-2.0-flash' };
       } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('gemini', err.message);
         this.logger.warn(`Gemini failed (skin-prompt): ${err.message}, trying Claude…`);
       }
     }
 
     const claudeKey = this.config.get<string>('ANTHROPIC_API_KEY');
-    if (claudeKey) {
+    if (claudeKey && !this.isInCooldown('claude')) {
       try {
         const raw = await this.claudeRaw(cleanBase64, mimeType, claudeKey, prompt);
         return { raw, model: 'claude-sonnet-4-6' };
       } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('claude', err.message);
         this.logger.error(`Claude failed (skin-prompt): ${err.message}`);
+      }
+    }
+
+    const openaiKey = this.config.get<string>('OPENAI_API_KEY');
+    if (openaiKey && !this.isInCooldown('openai')) {
+      try {
+        const raw = await this.openaiRaw(cleanBase64, mimeType, openaiKey, prompt);
+        return { raw, model: 'gpt-4o-mini' };
+      } catch (err: any) {
+        if (this.isQuotaError(err.message)) this.markCooldown('openai', err.message);
+        this.logger.error(`OpenAI failed (skin-prompt): ${err.message}`);
       }
     }
     return null;
@@ -162,6 +224,58 @@ export class VisionService {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
     };
     return json?.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';
+  }
+
+  /**
+   * OpenAI Vision (GPT-4o-mini) — 3. fallback provider.
+   * Sadece OPENAI_API_KEY env var set ise aktif. JSON-only response için
+   * response_format kullanır.
+   */
+  private async openai(image: string, mime: string, apiKey: string): Promise<VisionResult> {
+    const raw = await this.openaiRaw(image, mime, apiKey, this.buildPrompt());
+    try {
+      const cleaned = raw.replace(/^```json\s*|\s*```$/gm, '').trim();
+      const parsed = JSON.parse(cleaned);
+      return {
+        brand: parsed.brand || null,
+        product_name: parsed.product_name || null,
+        product_type: parsed.product_type || null,
+        detected_text: parsed.detected_text || null,
+        confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+        ingredients_list: Array.isArray(parsed.ingredients_list) ? parsed.ingredients_list : undefined,
+        raw,
+      };
+    } catch {
+      return { ...EMPTY_VISION_RESULT, raw };
+    }
+  }
+
+  private async openaiRaw(image: string, mime: string, apiKey: string, prompt: string): Promise<string> {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(VISION_TIMEOUT_MS),
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 2048,
+        response_format: { type: 'json_object' },
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:${mime};base64,${image}` } },
+          ],
+        }],
+      }),
+    });
+    if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
+    const json = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return json?.choices?.[0]?.message?.content ?? '{}';
   }
 
   /** Claude API — custom prompt versiyonu */
