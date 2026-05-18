@@ -48,6 +48,14 @@ export async function verifyMagicLink(token: string): Promise<{ token: string; u
   return api.get(`/user-auth/verify?token=${encodeURIComponent(token)}`);
 }
 
+export async function loginWithGoogle(idToken: string): Promise<{ token: string; user: AppUser }> {
+  return api.post('/user-auth/google', { id_token: idToken });
+}
+
+export async function loginWithFacebook(accessToken: string): Promise<{ token: string; user: AppUser }> {
+  return api.post('/user-auth/facebook', { access_token: accessToken });
+}
+
 export function useUser() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);

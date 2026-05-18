@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Ip, Param, ParseIntPipe, Patch, Post, Query, UseGuards, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, Param, ParseIntPipe, Patch, Post, Query, UseGuards, Req } from '@nestjs/common';
 import { IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiOperation, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
@@ -30,6 +30,39 @@ export class UserAuthController {
   @ApiOperation({ summary: 'Magic link token doğrula, JWT döndür' })
   async verify(@Query('token') token: string, @Ip() ip: string) {
     return this.service.verifyMagicLink(token, ip);
+  }
+
+  /**
+   * Google OAuth login — frontend Google Identity Services'ten id_token alır,
+   * burada server-side verify edilir. JWT döner (magic link ile aynı format).
+   */
+  @Post('google')
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Google ile giriş (id_token doğrula → JWT)' })
+  async loginGoogle(
+    @Body() body: { id_token?: string; credential?: string },
+    @Ip() ip: string,
+    @Headers('user-agent') ua?: string,
+  ) {
+    const token = body?.id_token || body?.credential; // GIS button "credential" anahtarı kullanıyor
+    if (!token) throw new BadRequestException('id_token veya credential zorunlu');
+    return this.service.loginWithGoogle(token, { ip, user_agent: ua });
+  }
+
+  /**
+   * Facebook OAuth login — frontend FB SDK'sından access_token alır.
+   * Backend graph.facebook.com ile debug_token + me doğrular.
+   */
+  @Post('facebook')
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Facebook ile giriş (access_token doğrula → JWT)' })
+  async loginFacebook(
+    @Body() body: { access_token?: string },
+    @Ip() ip: string,
+    @Headers('user-agent') ua?: string,
+  ) {
+    if (!body?.access_token) throw new BadRequestException('access_token zorunlu');
+    return this.service.loginWithFacebook(body.access_token, { ip, user_agent: ua });
   }
 
   @Get('me')

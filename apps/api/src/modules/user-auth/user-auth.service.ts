@@ -217,6 +217,156 @@ export class UserAuthService {
     return this.users.findOne({ where: { user_id: userId, is_active: true } });
   }
 
+  // ============================================================
+  // OAuth — Google + Facebook (2026-05-18, Faz 4)
+  // ============================================================
+  //
+  // Magic link akışıyla coexists: aynı email Google'la veya magic link'le
+  // gelirse aynı AppUser'a düşer (email unique). JWT formatı bire bir aynı.
+  //
+  // Backend env vars (Render):
+  //   GOOGLE_OAUTH_CLIENT_ID (id_token aud kontrolü için)
+  //   FACEBOOK_APP_ID         (debug_token kontrolü için)
+  //
+  // Frontend Google Identity Services / FB SDK token üretir, backend verify eder.
+
+  async loginWithGoogle(
+    idToken: string,
+    ctx: { ip?: string; user_agent?: string } = {},
+  ): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
+    if (!idToken || idToken.length < 100) {
+      throw new UnauthorizedException('Geçersiz Google id_token');
+    }
+    const expectedClientId = this.config.get<string>('GOOGLE_OAUTH_CLIENT_ID');
+
+    // Google'ın resmi tokeninfo endpoint'i — id_token'i decode + signature verify eder.
+    // Production'da google-auth-library JWKS daha hızlı ama bu MVP için yeterli (5xx fail-fast).
+    let payload: { email?: string; email_verified?: string | boolean; aud?: string; name?: string };
+    try {
+      const res = await fetch(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`,
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (!res.ok) {
+        throw new UnauthorizedException('Google token doğrulanamadı');
+      }
+      payload = (await res.json()) as typeof payload;
+    } catch (err: any) {
+      this.logger.warn(`Google tokeninfo fail: ${err.message}`);
+      throw new UnauthorizedException('Google doğrulama servisi erişilemedi');
+    }
+
+    if (!payload.email) {
+      throw new UnauthorizedException('Google hesabında email yok');
+    }
+    if (payload.email_verified !== true && payload.email_verified !== 'true') {
+      throw new UnauthorizedException('Google email doğrulanmamış');
+    }
+    if (expectedClientId && payload.aud !== expectedClientId) {
+      this.logger.error(`Google aud mismatch: got=${payload.aud} expected=${expectedClientId}`);
+      throw new UnauthorizedException('Token başka uygulamaya ait');
+    }
+
+    return this.completeSocialLogin(payload.email, payload.name, 'google', ctx);
+  }
+
+  async loginWithFacebook(
+    accessToken: string,
+    ctx: { ip?: string; user_agent?: string } = {},
+  ): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
+    if (!accessToken || accessToken.length < 20) {
+      throw new UnauthorizedException('Geçersiz Facebook access_token');
+    }
+    const appId = this.config.get<string>('FACEBOOK_APP_ID');
+    const appSecret = this.config.get<string>('FACEBOOK_APP_SECRET');
+
+    // Önce token'ın bizim app'imize ait olduğunu doğrula (debug_token)
+    if (appId && appSecret) {
+      try {
+        const dbg = await fetch(
+          `https://graph.facebook.com/debug_token?input_token=${encodeURIComponent(accessToken)}&access_token=${appId}|${appSecret}`,
+          { signal: AbortSignal.timeout(5000) },
+        );
+        if (!dbg.ok) throw new Error(`debug_token ${dbg.status}`);
+        const dbgJson = (await dbg.json()) as { data?: { app_id?: string; is_valid?: boolean } };
+        if (!dbgJson.data?.is_valid || dbgJson.data?.app_id !== appId) {
+          throw new UnauthorizedException('Facebook token bu uygulamaya ait değil');
+        }
+      } catch (err: any) {
+        if (err instanceof UnauthorizedException) throw err;
+        this.logger.warn(`FB debug_token fail: ${err.message}`);
+        throw new UnauthorizedException('Facebook doğrulama servisi erişilemedi');
+      }
+    }
+
+    // Email + ad çek
+    let me: { id?: string; email?: string; name?: string };
+    try {
+      const res = await fetch(
+        `https://graph.facebook.com/me?fields=id,email,name&access_token=${encodeURIComponent(accessToken)}`,
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (!res.ok) throw new Error(`me ${res.status}`);
+      me = (await res.json()) as typeof me;
+    } catch (err: any) {
+      this.logger.warn(`FB me fail: ${err.message}`);
+      throw new UnauthorizedException('Facebook hesabı okunamadı');
+    }
+
+    if (!me.email) {
+      // FB hesaplarında email gizli olabilir — bu durumda magic link kullanmaları öneriliyor
+      throw new UnauthorizedException('Facebook hesabında email gizli. Magic link ile dene.');
+    }
+
+    return this.completeSocialLogin(me.email, me.name, 'facebook', ctx);
+  }
+
+  /**
+   * Social login common path — email'e göre AppUser bul/oluştur + JWT üret + audit log.
+   * Magic link ile aynı AppUser tablosuna düşer (email unique constraint).
+   */
+  private async completeSocialLogin(
+    email: string,
+    displayName: string | undefined,
+    provider: 'google' | 'facebook',
+    ctx: { ip?: string; user_agent?: string },
+  ): Promise<{ token: string; user: { user_id: number; email: string; display_name: string | null } }> {
+    const normalized = this.normalizeEmail(email);
+    let user = await this.users.findOne({ where: { email: normalized } });
+    if (!user) {
+      user = await this.users.save(
+        this.users.create({
+          email: normalized,
+          display_name: displayName ? displayName.trim().slice(0, 100) : null,
+          is_active: true,
+        }),
+      );
+    } else if (displayName && !user.display_name) {
+      // Mevcut user, display_name boşsa OAuth'tan gelenle doldur
+      user.display_name = displayName.trim().slice(0, 100);
+    }
+    user.last_login_at = new Date();
+    await this.users.save(user);
+
+    const token = await this.jwt.signAsync(
+      { sub: user.user_id, email: user.email, kind: 'app' },
+      { expiresIn: '30d' },
+    );
+
+    void this.audit('LOGIN_SUCCESS', {
+      user_id: user.user_id,
+      email: user.email,
+      ip: ctx.ip,
+      user_agent: ctx.user_agent,
+      details: { provider },
+    });
+
+    return {
+      token,
+      user: { user_id: user.user_id, email: user.email, display_name: user.display_name },
+    };
+  }
+
   /**
    * Profile update — display_name. KVKK Madde 11 (kullanıcı veri düzeltme hakkı).
    * 2026-05-15 Madde 20 ile eklendi: audit trail PROFILE_UPDATE hook.
