@@ -48,11 +48,16 @@ export function AICoachWidget({ analysisId }: AICoachWidgetProps) {
     setInput('');
 
     try {
+      // Multi-turn: önceki mesajları history olarak yolla (max 10 turn)
+      const history = messages
+        .slice(-10)
+        .map((m) => ({ role: m.role, content: m.text }));
+
       const res = await apiFetch<{ answer: string; model: string }>(
         `/skin-analysis/${analysisId}/coach`,
         {
           method: 'POST',
-          body: JSON.stringify({ question: trimmed }),
+          body: JSON.stringify({ question: trimmed, history }),
         },
       );
       const botMsg: Message = { role: 'assistant', text: res.answer, ts: Date.now() };

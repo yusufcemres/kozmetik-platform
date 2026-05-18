@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHmac, randomBytes } from 'crypto';
 import { AppUser, Payment, PaymentPlanCode } from '@database/entities';
+import { MailService } from '@common/mail/mail.service';
 
 /**
  * PayTR Subscription + Linkle Ödeme entegrasyonu (Faz 3 başlangıcı, 2026-05-17).
@@ -40,6 +41,7 @@ export class PaymentsService {
     private readonly config: ConfigService,
     @InjectRepository(Payment) private readonly payments: Repository<Payment>,
     @InjectRepository(AppUser) private readonly users: Repository<AppUser>,
+    private readonly mail: MailService,
   ) {}
 
   /**
@@ -221,6 +223,8 @@ export class PaymentsService {
           newExp = new Date(currentExp.getTime() + pricing.duration_days * 24 * 60 * 60 * 1000);
         }
         user.premium_until = newExp;
+        // Yeni period başladı → reminder flag'ı sıfırla, yaklaşan bitişte tekrar uyarı
+        user.premium_reminder_sent_at = null;
         await this.users.save(user);
         this.logger.log(`Premium granted: user=${user.user_id} until=${newExp.toISOString()} plan=${existing.plan_code}`);
       }
@@ -398,6 +402,7 @@ export class PaymentsService {
       : new Date();
     const newUntil = new Date(base.getTime() + days * 86_400_000);
     user.premium_until = newUntil;
+    user.premium_reminder_sent_at = null;
     await this.users.save(user);
 
     this.logger.warn(`Manual premium grant: user=${userId} +${days}d admin=${adminUserId} reason=${reason}`);
@@ -442,5 +447,85 @@ export class PaymentsService {
       total_premium_users: premiumUsers.n,
       last_30d_revenue_kurus: Number(summary.last_30d_revenue_kurus),
     };
+  }
+
+  // ── PREMIUM ENDING REMINDER ──────────────────────────────────────────
+
+  /**
+   * Premium bitmesine 7 gün veya daha az kalan + henüz uyarılmamış kullanıcılara
+   * "Yakında bitiyor" hatırlatma maili gönderir.
+   *
+   * Cron: daily 09:00 TR (PaymentsCronService).
+   * Idempotent: premium_reminder_sent_at güncellenir → 2. mail gönderilmez.
+   *
+   * Strateji:
+   *  - premium_until BETWEEN NOW() AND NOW() + INTERVAL '7 days'
+   *  - premium_reminder_sent_at IS NULL OR < premium_until - INTERVAL '7 days'
+   *    (yeni period için tekrar uyarı verilebilsin)
+   *
+   * @returns { sent, failed, skipped } sayıları
+   */
+  async sendPremiumEndingReminders(): Promise<{ sent: number; failed: number; skipped: number }> {
+    const dueUsers = await this.users
+      .createQueryBuilder('u')
+      .where('u.premium_until IS NOT NULL')
+      .andWhere(`u.premium_until BETWEEN NOW() AND NOW() + INTERVAL '7 days'`)
+      .andWhere(`(u.premium_reminder_sent_at IS NULL OR u.premium_reminder_sent_at < u.premium_until - INTERVAL '8 days')`)
+      .andWhere('u.is_active = true')
+      .limit(100)
+      .getMany();
+
+    let sent = 0;
+    let failed = 0;
+    let skipped = 0;
+
+    for (const user of dueUsers) {
+      if (!user.email) {
+        skipped++;
+        continue;
+      }
+      const daysLeft = Math.max(
+        0,
+        Math.ceil(((user.premium_until?.getTime() ?? 0) - Date.now()) / 86_400_000),
+      );
+      const ok = await this.mail.send({
+        to: user.email,
+        subject: `REVELA Premium ${daysLeft} gün sonra sona eriyor`,
+        html: this.buildReminderHtml(user.email, daysLeft, user.premium_until!),
+      });
+      if (ok) {
+        user.premium_reminder_sent_at = new Date();
+        await this.users.save(user);
+        sent++;
+      } else {
+        failed++;
+      }
+    }
+
+    if (sent > 0 || failed > 0) {
+      this.logger.log(`Premium reminder run: sent=${sent} failed=${failed} skipped=${skipped}`);
+    }
+    return { sent, failed, skipped };
+  }
+
+  private buildReminderHtml(email: string, daysLeft: number, premiumUntil: Date): string {
+    const trDate = premiumUntil.toLocaleString('tr-TR', { dateStyle: 'long' });
+    const siteUrl = this.config.get<string>('SITE_URL', 'https://revela.com.tr');
+    return `<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"/></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1F1F1F;">
+  <h2 style="font-size:20px;font-weight:600;margin-bottom:16px;">Premium üyeliğin yakında bitiyor</h2>
+  <p>Merhaba,</p>
+  <p>REVELA Premium üyeliğin <strong>${daysLeft} gün</strong> sonra sona eriyor (${trDate}).</p>
+  <p>Yenilemek için tek bir tıklama yeterli:</p>
+  <p style="margin:24px 0;">
+    <a href="${siteUrl}/odeme" style="display:inline-block;padding:12px 24px;background:#1F1F1F;color:white;text-decoration:none;border-radius:4px;font-weight:500;">Aboneliği Yenile</a>
+  </p>
+  <p style="color:#666;font-size:13px;">Yenilemezsen Premium özellikleri (karşılaştırma, trend, AI Cilt Danışmanı) ${trDate} itibariyle pasif olur. Cilt analizlerin ve verilerin kayıtlı kalmaya devam eder.</p>
+  <hr style="border:none;border-top:1px solid #e0e0e0;margin:32px 0;"/>
+  <p style="color:#999;font-size:11px;">Bu mail ${email} adresine REVELA Premium üyeliğin için gönderildi. Üyeliğini yenilemek istemiyorsan bu maili görmezden gelebilirsin.</p>
+</body>
+</html>`;
   }
 }

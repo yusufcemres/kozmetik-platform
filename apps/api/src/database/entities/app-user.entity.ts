@@ -34,6 +34,15 @@ export class AppUser {
   @Column({ type: 'timestamptz', nullable: true })
   premium_until: Date | null;
 
+  /**
+   * Premium bitiş hatırlatma maili gönderim zamanı (Migration 034).
+   * NULL → henüz uyarılmadı, daha önce reminder gönderilmiş kullanıcılara
+   * aynı period için 2. mail gönderilmez. premium_until uzatılınca NULL'a
+   * çekilir → yeni period için tekrar uyarı.
+   */
+  @Column({ type: 'timestamptz', nullable: true })
+  premium_reminder_sent_at: Date | null;
+
   @CreateDateColumn()
   created_at: Date;
 

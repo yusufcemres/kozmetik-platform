@@ -101,17 +101,25 @@ export class SkinAnalysisController {
    */
   @Post(':id/coach')
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: 'AI Cilt Danışmanı — analiz skoru üzerine soru sor' })
+  @ApiOperation({ summary: 'AI Cilt Danışmanı — analiz skoru üzerine soru sor (multi-turn destekli)' })
   async coachAsk(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { question?: string },
+    @Body() body: {
+      question?: string;
+      history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+    },
   ) {
     if (!body?.question || typeof body.question !== 'string') {
       throw new BadRequestException('question alanı zorunlu');
     }
     const analysis = await this.service.getById(id);
     if (!analysis) throw new NotFoundException('Analiz bulunamadı');
-    return this.coach.askQuestion(analysis.scores, analysis.overall_score, body.question);
+    return this.coach.askWithHistory(
+      analysis.scores,
+      analysis.overall_score,
+      body.history ?? [],
+      body.question,
+    );
   }
 
   // ---- Email funnel (Faz 1 Gün 9) ----

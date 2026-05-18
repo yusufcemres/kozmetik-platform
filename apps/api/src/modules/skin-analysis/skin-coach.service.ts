@@ -18,12 +18,32 @@ export class SkinCoachService {
 
   constructor(private readonly config: ConfigService) {}
 
+  /**
+   * Single-turn (backward compat). Yeni client multi-turn için askWithHistory
+   * çağırmalı.
+   */
   async askQuestion(
     scores: SkinScoreBreakdown,
     overall: number,
     question: string,
   ): Promise<{ answer: string; model: string }> {
-    const trimmed = question.trim();
+    return this.askWithHistory(scores, overall, [], question);
+  }
+
+  /**
+   * Multi-turn — kullanıcı sohbet geçmişini dizi olarak yollar, biz
+   * Claude'a system + previous turns + current question olarak iletiriz.
+   *
+   * Frontend localStorage'da history tutar (KVKK: backend saklamaz).
+   * Max 10 turn (5 user + 5 assistant) limiti, token israfını önler.
+   */
+  async askWithHistory(
+    scores: SkinScoreBreakdown,
+    overall: number,
+    history: Array<{ role: 'user' | 'assistant'; content: string }>,
+    currentQuestion: string,
+  ): Promise<{ answer: string; model: string }> {
+    const trimmed = currentQuestion.trim();
     if (trimmed.length < 3 || trimmed.length > 500) {
       throw new ServiceUnavailableException('Soru 3-500 karakter arasında olmalı');
     }
@@ -32,6 +52,27 @@ export class SkinCoachService {
     if (!apiKey) {
       throw new ServiceUnavailableException('AI Danışman servisi yapılandırılmamış');
     }
+
+    // History sanitize: maks 10 turn, her biri max 1000 char, role/content valid
+    const cleanHistory = (Array.isArray(history) ? history : [])
+      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim().length > 0)
+      .slice(-10)
+      .map((m) => ({ role: m.role, content: m.content.slice(0, 1000) }));
+
+    // Alternating turn kontrolü: Claude messages array user/assistant alternasyon ister
+    // Eğer son turn user ile bitiyorsa atla (yeni soru zaten user) — assistant ile bitmeli
+    const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+    let lastRole: 'user' | 'assistant' | null = null;
+    for (const m of cleanHistory) {
+      if (lastRole === m.role) continue; // duplicate role atla
+      messages.push(m);
+      lastRole = m.role;
+    }
+    // Eğer history user ile bitiyorsa son user'ı düşür (yeni question zaten gelecek)
+    if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
+      messages.pop();
+    }
+    messages.push({ role: 'user', content: trimmed });
 
     const systemPrompt = this.buildSystemPrompt(scores, overall);
     try {
@@ -47,7 +88,7 @@ export class SkinCoachService {
           model: 'claude-sonnet-4-6',
           max_tokens: 800,
           system: systemPrompt,
-          messages: [{ role: 'user', content: trimmed }],
+          messages,
         }),
       });
       if (!res.ok) {
