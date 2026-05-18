@@ -172,6 +172,23 @@ export default function FotoTestPage() {
   const [onDeviceMode, setOnDeviceMode] = useState(false);
   const [onDeviceResult, setOnDeviceResult] = useState<OnDeviceScoreResult | null>(null);
 
+  // Premium foto saklama opt-in (2026-05-19)
+  // Sadece premium kullanıcı set edebilir; backend redakte eder yetkisiz isteklerde.
+  const [storePhotoOptIn, setStorePhotoOptIn] = useState(false);
+  const [premiumActive, setPremiumActive] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const token = localStorage.getItem('revela_user_token');
+    if (!token) {
+      setPremiumActive(false);
+      return;
+    }
+    fetch('/api/payments/me/status', { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.ok ? r.json() : null)
+      .then((s: { premium?: boolean } | null) => setPremiumActive(!!s?.premium))
+      .catch(() => setPremiumActive(false));
+  }, []);
+
   // Reminder akışı: email'deki link `?ref=reminder&prev=<id>&token=<64hex>` taşır.
   // Analiz tamamlanınca result CTA bu parametrelerle /karsilastir'a yönlenir
   // (anonim compare — auth gerekmez, token email'in sahibi olduğunu doğrular).
@@ -202,6 +219,8 @@ export default function FotoTestPage() {
           image_mime: data.mime,
           guard_score: data.guard_score,
           consent_version: consentVersion || CONSENT_VERSION,
+          // Sadece premium kullanıcı için gönder, backend yetkisizleri redakte eder
+          ...(premiumActive && storePhotoOptIn ? { store_photo: true } : {}),
         }),
       });
       setResult(res);
@@ -212,8 +231,9 @@ export default function FotoTestPage() {
     }
   };
 
-  const handleConsentAccept = (version: string) => {
+  const handleConsentAccept = (version: string, storePhotoChoice: boolean) => {
     setConsentVersion(version);
+    setStorePhotoOptIn(storePhotoChoice);
     setPhase('camera');
   };
 
@@ -333,6 +353,7 @@ export default function FotoTestPage() {
         open={phase === 'consent'}
         onAccept={handleConsentAccept}
         onDecline={reset}
+        premiumActive={!!premiumActive}
       />
 
       {phase === 'uploading' && (

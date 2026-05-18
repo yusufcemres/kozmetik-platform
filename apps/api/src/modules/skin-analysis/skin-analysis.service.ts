@@ -121,6 +121,22 @@ export class SkinAnalysisService {
       },
     });
 
+    // Foto saklama — sadece Premium kullanıcılarda izinli (2026-05-19 KVKK polish).
+    // Anonim veya free tier kullanıcı store_photo: true gönderse bile sessizce false'a redakte edilir.
+    let storePhotoAllowed = false;
+    if (dto.store_photo === true && context.user_id) {
+      const user = await this.results.manager.query(
+        `SELECT premium_until FROM app_users WHERE user_id = $1 LIMIT 1`,
+        [context.user_id],
+      );
+      const premiumUntil = user?.[0]?.premium_until;
+      if (premiumUntil && new Date(premiumUntil).getTime() > Date.now()) {
+        storePhotoAllowed = true;
+      } else {
+        this.logger.warn(`store_photo redakte: user=${context.user_id} premium değil`);
+      }
+    }
+
     // Gerçek vision çağrısı — başarısızsa BadRequest (cilt analizinde "hayal etme" politikası,
     // placeholder skor kullanıcıya verilmemeli)
     const visionResult = await this.vision.callVisionWithPrompt(
@@ -161,7 +177,7 @@ export class SkinAnalysisService {
         recommendations: this.compactRecommendationsForStorage(recommendations),
         guard_score: dto.guard_score ?? null,
         model_version: `${visionResult.model}-skin-v1`,
-        photo_blob: dto.store_photo ? dto.image_base64 : null,
+        photo_blob: storePhotoAllowed ? dto.image_base64 : null,
         ip: context.ip ?? null,
         user_agent: context.user_agent ? context.user_agent.slice(0, 255) : null,
       }),

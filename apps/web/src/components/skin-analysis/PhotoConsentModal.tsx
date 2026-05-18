@@ -22,13 +22,16 @@ export const CONSENT_VERSION = 'v1-2026-05-26';
 
 export interface PhotoConsentModalProps {
   open: boolean;
-  onAccept: (consentVersion: string) => void;
+  onAccept: (consentVersion: string, storePhotoOptIn: boolean) => void;
   onDecline: () => void;
+  /** Premium kullanıcı mı — foto saklama toggle'ı görünür/kullanılabilir yapılır */
+  premiumActive?: boolean;
 }
 
-export function PhotoConsentModal({ open, onAccept, onDecline }: PhotoConsentModalProps) {
+export function PhotoConsentModal({ open, onAccept, onDecline, premiumActive = false }: PhotoConsentModalProps) {
   const [biometricConsent, setBiometricConsent] = useState(false);
   const [readDisclosure, setReadDisclosure] = useState(false);
+  const [storePhotoOptIn, setStorePhotoOptIn] = useState(false);
 
   if (!open) return null;
 
@@ -126,6 +129,25 @@ export function PhotoConsentModal({ open, onAccept, onDecline }: PhotoConsentMod
                 veriyorum (KVKK Madde 6/3). Bu rızayı her zaman geri alabilirim.
               </span>
             </label>
+
+            {/* Opsiyonel: Premium foto saklama opt-in (2026-05-19) */}
+            <label className={`flex items-start gap-2 ${premiumActive ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}>
+              <input
+                type="checkbox"
+                checked={storePhotoOptIn}
+                onChange={(e) => setStorePhotoOptIn(e.target.checked)}
+                disabled={!premiumActive}
+                className="mt-0.5 shrink-0 accent-primary"
+              />
+              <span className="text-xs text-on-surface-variant">
+                <span className="inline-flex items-center gap-1 mr-1">
+                  <span className="material-icon text-[12px] text-primary" aria-hidden="true">workspace_premium</span>
+                  <strong className="text-primary">Premium</strong>
+                </span>
+                Fotoğrafımı sakla — gelecekteki analizlerle karşılaştırma için (opsiyonel).
+                {!premiumActive && ' (Premium üyelik gerekli)'}
+              </span>
+            </label>
           </div>
         </div>
 
@@ -139,7 +161,7 @@ export function PhotoConsentModal({ open, onAccept, onDecline }: PhotoConsentMod
           </button>
           <button
             type="button"
-            onClick={() => canAccept && onAccept(CONSENT_VERSION)}
+            onClick={() => canAccept && onAccept(CONSENT_VERSION, premiumActive && storePhotoOptIn)}
             disabled={!canAccept}
             className="flex-1 curator-btn-primary text-sm px-4 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
           >
