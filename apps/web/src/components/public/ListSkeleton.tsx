@@ -36,6 +36,40 @@ export function ListPageSkeleton({ sectionLabel }: { sectionLabel?: string }) {
   );
 }
 
+export function FormPageSkeleton({ steps = 5 }: { steps?: number }) {
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-12">
+      <div className="h-3 bg-surface-container rounded w-24 mb-3 animate-pulse" />
+      <div className="h-8 bg-surface-container rounded w-3/4 mb-2 animate-pulse" />
+      <div className="h-4 bg-surface-container rounded w-1/2 mb-8 animate-pulse" />
+      <div className="flex gap-2 mb-8">
+        {Array.from({ length: steps }).map((_, i) => (
+          <div key={i} className="h-1 flex-1 bg-surface-container rounded animate-pulse" />
+        ))}
+      </div>
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-14 bg-surface-container-low rounded-sm animate-pulse" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CenteredCardSkeleton() {
+  return (
+    <div className="max-w-md mx-auto px-4 py-12">
+      <div className="h-10 bg-surface-container rounded w-3/4 mb-3 mx-auto animate-pulse" />
+      <div className="h-4 bg-surface-container rounded w-full mb-8 animate-pulse" />
+      <div className="curator-card p-6 space-y-4">
+        <div className="h-12 bg-surface-container-low rounded-sm animate-pulse" />
+        <div className="h-12 bg-surface-container-low rounded-sm animate-pulse" />
+        <div className="h-10 bg-primary/30 rounded-sm animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
 export function DetailPageSkeleton() {
   return (
     <div className="curator-section max-w-[1200px] mx-auto">

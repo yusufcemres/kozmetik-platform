@@ -276,10 +276,11 @@ export class SmartScanService {
 
   /**
    * Public topluluk istatistigi — homepage sosyal kanit sayaci.
-   * 60sn in-memory cache: scraping defense + DB load azaltma (controller'da @Throttle 30/min de var).
+   * 5dk in-memory cache: scraping defense + DB load azaltma (controller'da @Throttle 10/min + CDN edge cache de var).
+   * 2026-05-19 audit (Madde 4): cache 60s→5dk, throttle 30→10/min, CDN s-maxage=300 eklendi.
    */
   private statsCache: { value: { total_scans: number; total_scanners: number; unique_products: number; scans_this_month: number } | null; ts: number } = { value: null, ts: 0 };
-  private readonly STATS_CACHE_TTL = 60_000;
+  private readonly STATS_CACHE_TTL = 5 * 60_000;
 
   async getPublicStats(): Promise<{
     total_scans: number;

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Ip, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Header, Ip, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { SmartScanService } from './smart-scan.service';
@@ -30,8 +30,9 @@ export class SmartScanController {
   }
 
   @Get('stats')
-  @Throttle({ public: { limit: 30, ttl: 60_000 } })
-  @ApiOperation({ summary: 'Topluluk tarama istatistigi (public sosyal kanit)' })
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
+  @ApiOperation({ summary: 'Topluluk tarama istatistigi (public sosyal kanit, CDN cached 5dk)' })
   async stats() {
     return this.service.getPublicStats();
   }
