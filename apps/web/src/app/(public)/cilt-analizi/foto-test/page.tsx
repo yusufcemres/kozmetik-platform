@@ -362,22 +362,33 @@ export default function FotoTestPage() {
         <div>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-on-surface mb-2">Cilt Analizi Sonucu</h2>
-            {result.model_version === 'on-device-cv-v1' ? (
+            {(result.model_version === 'on-device-cv-v1' || result.model_version === 'on-device-cv-v2') ? (
               <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium mb-1">
                 <span className="material-icon text-[14px]" aria-hidden="true">offline_bolt</span>
                 Lokal Analiz — foto cihazınızdan çıkmadı
               </div>
             ) : null}
             <p className="text-on-surface-variant text-sm">
-              {result.model_version === 'on-device-cv-v1'
+              {(result.model_version === 'on-device-cv-v1' || result.model_version === 'on-device-cv-v2')
                 ? `Model: ${result.model_version} · Ephemeral (DB'ye kaydedilmedi)`
                 : `Analiz ID: ${result.analysis_id} · Model: ${result.model_version}`}
             </p>
-            {result.model_version === 'on-device-cv-v1' && onDeviceResult && (
-              <p className="text-[10px] text-outline mt-2 max-w-md mx-auto leading-relaxed">
-                Bu skor cihazınızda MediaPipe face landmark + klasik CV ile hesaplandı (~%65 doğruluk).
-                Tam karşılaştırma + INCI öneri + Premium AI sohbet için "AI Vision ile Çek" toggle'ını kapat ve tekrar dene.
-              </p>
+            {(result.model_version === 'on-device-cv-v1' || result.model_version === 'on-device-cv-v2') && onDeviceResult && (
+              <>
+                <p className="text-[10px] text-outline mt-2 max-w-md mx-auto leading-relaxed">
+                  Bu skor cihazınızda MediaPipe face landmark + klasik CV ile hesaplandı (~%65 doğruluk).
+                  Tam karşılaştırma + INCI öneri + Premium AI sohbet için "AI Vision ile Çek" toggle'ını kapat ve tekrar dene.
+                </p>
+                {onDeviceResult.confidence !== undefined && onDeviceResult.confidence < 0.7 && (
+                  <p className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 mt-2 max-w-md mx-auto p-2 rounded-sm leading-relaxed">
+                    ⚠ Düşük güven skoru ({Math.round(onDeviceResult.confidence * 100)}%) —
+                    {onDeviceResult.face_tilt_deg && onDeviceResult.face_tilt_deg > 15
+                      ? ` Yüz ${Math.round(onDeviceResult.face_tilt_deg)}° eğik tespit edildi.`
+                      : ''}
+                    {' '}Daha frontal bir foto ile yeniden çekersen sonuç daha güvenilir olur.
+                  </p>
+                )}
+              </>
             )}
           </div>
 

@@ -28,9 +28,17 @@ export interface OnDeviceSkinScore {
 export interface OnDeviceScoreResult {
   scores: OnDeviceSkinScore;
   overall_score: number;
-  model_version: 'on-device-cv-v1';
+  model_version: 'on-device-cv-v1' | 'on-device-cv-v2';
   /** Hangi bölgelerden veri çekildi (debug + güven sinyali) */
   rois_extracted: string[];
+  /**
+   * v2: skor güven seviyesi 0-1.
+   * <0.7 ise UI "tahmin" rozeti göstermeli, Vision API'ye fallback önermeli.
+   * Düşüren faktörler: yüz açısı (tilt), Fitzpatrick aşırı uç (1 veya 6), ROI eksik.
+   */
+  confidence?: number;
+  /** v2: tespit edilen yüz tilt açısı (derece, mutlak değer). 30° üstü güven düşürür. */
+  face_tilt_deg?: number;
 }
 
 // Landmark grupları (478 nokta indexleri — MediaPipe FaceLandmarker)
@@ -138,6 +146,46 @@ function sampleRoi(
 const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
 
 /**
+ * v2: yüz tilt açısı hesapla — sol ve sağ göz dış köşelerinden roll (Z ekseni).
+ * Landmark 33 (sol göz dış), 263 (sağ göz dış) — yatay olmalı, açı = atan2.
+ */
+function calculateFaceTilt(landmarks: { x: number; y: number }[]): number {
+  const leftEye = landmarks[33];
+  const rightEye = landmarks[263];
+  if (!leftEye || !rightEye) return 0;
+  const dx = rightEye.x - leftEye.x;
+  const dy = rightEye.y - leftEye.y;
+  // dx 0'a yakınsa yüz frontal — küçük açı
+  const radians = Math.atan2(dy, dx);
+  return Math.abs((radians * 180) / Math.PI);
+}
+
+/**
+ * v2: Fitzpatrick tone (1-6) → pigmentation/redness eşik kaydırma faktörü.
+ * Koyu ciltlerde (5-6):
+ *  - pigmentation lum_std doğal olarak daha yüksek (kontrast), eşik yukarı kaydırılır
+ *  - redness R-GB farkı koyu ciltlerde mutlak değer daha düşük, eşik aşağı kaydırılır
+ *  - T-zone specular daha az parlama gösterir, eşik aşağı kaydırılır
+ */
+function getToneAdjustment(fitzpatrick: number): {
+  pigmentationOffset: number;
+  rednessOffset: number;
+  oilOffset: number;
+} {
+  if (fitzpatrick >= 5) {
+    return { pigmentationOffset: 5, rednessOffset: -2, oilOffset: -3 };
+  }
+  if (fitzpatrick === 4) {
+    return { pigmentationOffset: 2, rednessOffset: -1, oilOffset: -1 };
+  }
+  if (fitzpatrick <= 2) {
+    // Çok açık ciltte redness baseline yüksek, eşik yukarı kaydır
+    return { pigmentationOffset: -2, rednessOffset: 2, oilOffset: 0 };
+  }
+  return { pigmentationOffset: 0, rednessOffset: 0, oilOffset: 0 };
+}
+
+/**
  * Ana skor fonksiyonu — landmarker null veya yüz yoksa null döner.
  * Caller bu null durumda Vision API'ye fallback yapabilir.
  */
@@ -160,10 +208,20 @@ export function scoreSkinOnDevice(
     if (stats.count > 0) extracted.push(name);
   }
 
-  // 1. T-zone oil — alın + burun specular oranı (kullanıcının T-bölgesinde parlama)
+  // v2: Fitzpatrick'i önce hesapla (tone-adjusted eşikler için)
+  const overallLumForTone = (rois.cheek_left.lumMean + rois.cheek_right.lumMean + rois.forehead.lumMean) / 3;
+  let fitzpatrick_type = 3;
+  if (overallLumForTone >= 200) fitzpatrick_type = 1;
+  else if (overallLumForTone >= 175) fitzpatrick_type = 2;
+  else if (overallLumForTone >= 145) fitzpatrick_type = 3;
+  else if (overallLumForTone >= 115) fitzpatrick_type = 4;
+  else if (overallLumForTone >= 85) fitzpatrick_type = 5;
+  else fitzpatrick_type = 6;
+  const toneAdj = getToneAdjustment(fitzpatrick_type);
+
+  // 1. T-zone oil — alın + burun specular oranı (tone-adjusted)
   const tzoneSpec = (rois.forehead.specularRatio + rois.t_zone_nose.specularRatio) / 2;
-  // 0% specular → 0 skor, 30%+ → 100
-  const t_zone_oil = clamp(tzoneSpec * 300);
+  const t_zone_oil = clamp(tzoneSpec * 300 + toneAdj.oilOffset * 5);
 
   // 2. Pore visibility — cheek+nose edge density (yüksek freq detail)
   const poreEdge = (rois.cheek_left.edgeStrength + rois.cheek_right.edgeStrength + rois.t_zone_nose.edgeStrength) / 3;
@@ -174,19 +232,18 @@ export function scoreSkinOnDevice(
   const wrinkleEdge = (rois.forehead.edgeStrength + rois.eye_outer_corners.edgeStrength + rois.mouth_corners.edgeStrength) / 3;
   const wrinkles = clamp((wrinkleEdge - 6) * 3.5);
 
-  // 4. Pigmentation — luminance std cheek+forehead (eşit ton = düşük std)
+  // 4. Pigmentation — luminance std cheek+forehead (tone-normalize)
   const pigStd = (rois.cheek_left.lumStd + rois.cheek_right.lumStd + rois.forehead.lumStd) / 3;
-  // 10 std → 20 skor, 40+ → 100
-  const pigmentation = clamp((pigStd - 10) * 2.5);
+  // Koyu ciltlerde lum_std doğal olarak yüksek → eşik kaydır
+  const pigmentation = clamp((pigStd - 10 - toneAdj.pigmentationOffset) * 2.5);
 
-  // 5. Redness — cheek R dominance vs G+B ortalaması
+  // 5. Redness — cheek R dominance vs G+B ortalaması (tone-normalize)
   const cheekR = (rois.cheek_left.rMean + rois.cheek_right.rMean) / 2;
   const cheekGB = (rois.cheek_left.gMean + rois.cheek_left.bMean + rois.cheek_right.gMean + rois.cheek_right.bMean) / 4;
   const noseR = rois.t_zone_nose.rMean;
   const noseGB = (rois.t_zone_nose.gMean + rois.t_zone_nose.bMean) / 2;
   const rednessRaw = ((cheekR - cheekGB) + (noseR - noseGB)) / 2;
-  // 5 → 20 skor, 35+ → 100
-  const redness = clamp((rednessRaw - 5) * 3);
+  const redness = clamp((rednessRaw - 5 + toneAdj.rednessOffset) * 3);
 
   // 6. Under-eye darkness — under_eye luminance vs cheek luminance farkı
   const underEyeLum = (rois.under_eye_left.lumMean + rois.under_eye_right.lumMean) / 2;
@@ -200,17 +257,6 @@ export function scoreSkinOnDevice(
   const acneApprox = Math.round(Math.max(0, (pore_visibility / 100) * (redness / 100) * 30));
   const acne_count = Math.min(50, acneApprox);
 
-  // 8. Fitzpatrick — cheek lum ortalamasına göre 1-6 sınıf
-  const overallLum = (rois.cheek_left.lumMean + rois.cheek_right.lumMean + rois.forehead.lumMean) / 3;
-  // 200+ → 1 (çok açık), 50- → 6 (çok koyu)
-  let fitzpatrick_type = 3;
-  if (overallLum >= 200) fitzpatrick_type = 1;
-  else if (overallLum >= 175) fitzpatrick_type = 2;
-  else if (overallLum >= 145) fitzpatrick_type = 3;
-  else if (overallLum >= 115) fitzpatrick_type = 4;
-  else if (overallLum >= 85) fitzpatrick_type = 5;
-  else fitzpatrick_type = 6;
-
   // Overall — Faz 1 service ile aynı ağırlıklar
   const overall_score = clamp(
     t_zone_oil * 0.15 +
@@ -221,13 +267,28 @@ export function scoreSkinOnDevice(
     under_eye_darkness * 0.15
   );
 
+  // v2: confidence + tilt hesapla
+  const face_tilt_deg = calculateFaceTilt(landmarks as any);
+  // Confidence faktörleri:
+  //  - ROI eksikse: her eksik = -0.1
+  //  - Yüz tilt >15°: yüksek değerde -0.3, >25° -0.5
+  //  - Fitzpatrick 1 veya 6 (aşırı uç): -0.1 (eşik kalibrasyonu daha az kesin)
+  let confidence = 1.0;
+  confidence -= (8 - extracted.length) * 0.08; // 8 ROI'nin kaçı eksik
+  if (face_tilt_deg > 25) confidence -= 0.4;
+  else if (face_tilt_deg > 15) confidence -= 0.2;
+  if (fitzpatrick_type === 1 || fitzpatrick_type === 6) confidence -= 0.1;
+  confidence = Math.max(0.2, Math.min(1.0, confidence));
+
   return {
     scores: {
       t_zone_oil, pore_visibility, wrinkles, pigmentation,
       redness, under_eye_darkness, acne_count, fitzpatrick_type,
     },
     overall_score,
-    model_version: 'on-device-cv-v1',
+    model_version: 'on-device-cv-v2',
     rois_extracted: extracted,
+    confidence: Math.round(confidence * 100) / 100,
+    face_tilt_deg: Math.round(face_tilt_deg * 10) / 10,
   };
 }
