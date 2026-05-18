@@ -6,6 +6,7 @@ import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinCoachService } from './skin-coach.service';
 import { SkinAnalysisRequestDto } from './dto/skin-analysis.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import { PremiumGuard, RequirePremium } from '../payments/premium.guard';
 import type { AppAuthRequest, AppMaybeAuthRequest } from '../user-auth/app-auth-request';
 
 /**
@@ -56,9 +57,10 @@ export class SkinAnalysisController {
    * `to` zorunlu (yeni analiz id), `from` opsiyonel (otomatik bir önceki).
    */
   @Get('me/compare')
-  @UseGuards(AppJwtGuard)
+  @UseGuards(AppJwtGuard, PremiumGuard)
+  @RequirePremium()
   @Throttle({ public: { limit: 30, ttl: 60_000 } })
-  @ApiOperation({ summary: 'İki analizi karşılaştır — trend grafiği için' })
+  @ApiOperation({ summary: 'İki analizi karşılaştır — Premium (29 TL+ tier gerekli)' })
   async compareMine(
     @Req() req: AppAuthRequest,
     @Query('to') to: string,
@@ -102,8 +104,10 @@ export class SkinAnalysisController {
    * frontend paywall ile sınırlı.
    */
   @Post(':id/coach')
+  @UseGuards(AppJwtGuard, PremiumGuard)
+  @RequirePremium()
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: 'AI Cilt Danışmanı — analiz skoru üzerine soru sor (multi-turn destekli)' })
+  @ApiOperation({ summary: 'AI Cilt Danışmanı — Premium (49 TL/ay gerekli), multi-turn' })
   async coachAsk(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: {
@@ -129,8 +133,10 @@ export class SkinAnalysisController {
    * Frontend `fetch + body.getReader()` ile tüketir.
    */
   @Post(':id/coach/stream')
+  @UseGuards(AppJwtGuard, PremiumGuard)
+  @RequirePremium()
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: 'AI Cilt Danışmanı — streaming yanıt (SSE)' })
+  @ApiOperation({ summary: 'AI Cilt Danışmanı streaming SSE — Premium (49 TL/ay)' })
   async coachStream(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: {

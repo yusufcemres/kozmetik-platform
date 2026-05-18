@@ -8,6 +8,7 @@ import { SkinAnalysisCronService } from './skin-analysis.cron';
 import { SkinCoachService } from './skin-coach.service';
 import { VisionService } from '../smart-scan/vision.service';
 import { MailModule } from '../../common/mail/mail.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 /**
  * Skin Analysis (Foto-bazlı Cilt Analizi) modülü.
@@ -24,6 +25,7 @@ import { MailModule } from '../../common/mail/mail.module';
     TypeOrmModule.forFeature([SkinAnalysisResult, UserAction]),
     ConfigModule,
     MailModule,
+    PaymentsModule,
   ],
   controllers: [SkinAnalysisController],
   providers: [SkinAnalysisService, VisionService, SkinAnalysisCronService, SkinCoachService],
