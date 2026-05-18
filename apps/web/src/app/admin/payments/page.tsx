@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import PageHeader from '@/components/admin/PageHeader';
 import { api } from '@/lib/api';
+import { formatPriceFromKurus as formatTL } from '@/lib/format';
 import { useToast } from '@/components/admin/Toast';
 
 interface Payment {
@@ -40,14 +41,6 @@ const STATUS_COLORS: Record<Payment['status'], string> = {
   failed: 'bg-red-100 text-red-800',
   refunded: 'bg-gray-100 text-gray-800',
 };
-
-function formatTL(kurus: number): string {
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: 'TRY',
-    maximumFractionDigits: 0,
-  }).format(kurus / 100);
-}
 
 export default function AdminPaymentsPage() {
   const [items, setItems] = useState<Payment[]>([]);

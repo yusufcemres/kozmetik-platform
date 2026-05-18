@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { formatPriceInt as formatTL } from '@/lib/format';
 
 interface PricePoint {
   date: string;
@@ -104,15 +105,6 @@ const FALLBACK: PlatformBrand = {
 
 function getPlatform(key: string): PlatformBrand {
   return PLATFORMS[key] || FALLBACK;
-}
-
-function formatTL(price: number): string {
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: 'TRY',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
 }
 
 export default function PriceChart({ productId }: { productId: number }) {
