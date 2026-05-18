@@ -4,6 +4,7 @@ import { Throttle } from '@nestjs/throttler';
 import { SmartScanService } from './smart-scan.service';
 import { SmartScanRequestDto } from './dto/scan.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import type { AppAuthRequest, AppMaybeAuthRequest } from '../user-auth/app-auth-request';
 
 @ApiTags('Smart Scan')
 @Controller('smart-scan')
@@ -13,7 +14,7 @@ export class SmartScanController {
   @Post()
   @Throttle({ public: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Barkod/görsel tara' })
-  async scan(@Body() body: SmartScanRequestDto, @Req() req: any, @Ip() ip: string) {
+  async scan(@Body() body: SmartScanRequestDto, @Req() req: AppMaybeAuthRequest, @Ip() ip: string) {
     if (!body.barcode && !body.image_base64) {
       throw new BadRequestException('barcode veya image_base64 alanlarından en az biri gerekli');
     }
@@ -25,7 +26,7 @@ export class SmartScanController {
   @Get('history')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kullanıcı tarama geçmişi' })
-  async history(@Req() req: any) {
+  async history(@Req() req: AppAuthRequest) {
     return this.service.getUserHistory(req.user.user_id);
   }
 

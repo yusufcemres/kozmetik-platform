@@ -6,6 +6,7 @@ import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinCoachService } from './skin-coach.service';
 import { SkinAnalysisRequestDto } from './dto/skin-analysis.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import type { AppAuthRequest, AppMaybeAuthRequest } from '../user-auth/app-auth-request';
 
 /**
  * Foto Analiz (Cilt Sağlığı) endpoint'leri.
@@ -26,7 +27,7 @@ export class SkinAnalysisController {
   @ApiOperation({ summary: 'Yüz fotoğrafını analiz et (6-boyut skor + INCI önerisi)' })
   async analyze(
     @Body() body: SkinAnalysisRequestDto,
-    @Req() req: any,
+    @Req() req: AppMaybeAuthRequest,
     @Ip() ip: string,
     @Headers('user-agent') ua?: string,
     @Query('email') email?: string,
@@ -37,7 +38,7 @@ export class SkinAnalysisController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Tek analiz sonucu' })
-  async getOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+  async getOne(@Param('id', ParseIntPipe) id: number, @Req() req: AppMaybeAuthRequest) {
     const userId = req?.user?.user_id;
     return this.service.getById(id, userId);
   }
@@ -45,7 +46,7 @@ export class SkinAnalysisController {
   @Get('me/history')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kullanıcı analiz geçmişi (trend takibi)' })
-  async myHistory(@Req() req: any, @Query('limit') limit?: string) {
+  async myHistory(@Req() req: AppAuthRequest, @Query('limit') limit?: string) {
     const lim = Math.min(Math.max(parseInt(limit ?? '20', 10) || 20, 1), 100);
     return this.service.getUserHistory(req.user.user_id, lim);
   }
@@ -59,7 +60,7 @@ export class SkinAnalysisController {
   @Throttle({ public: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'İki analizi karşılaştır — trend grafiği için' })
   async compareMine(
-    @Req() req: any,
+    @Req() req: AppAuthRequest,
     @Query('to') to: string,
     @Query('from') from?: string,
   ) {
@@ -201,7 +202,7 @@ export class SkinAnalysisController {
   @UseGuards(AppJwtGuard)
   @Throttle({ public: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'KVKK Madde 11(d) — analiz verilerini JSON export et' })
-  async exportMine(@Req() req: any, @Ip() ip: string, @Headers('user-agent') ua?: string) {
+  async exportMine(@Req() req: AppAuthRequest, @Ip() ip: string, @Headers('user-agent') ua?: string) {
     return this.service.exportForUser(req.user.user_id, { ip, user_agent: ua });
   }
 
@@ -209,7 +210,7 @@ export class SkinAnalysisController {
   @UseGuards(AppJwtGuard)
   @Throttle({ public: { limit: 3, ttl: 60_000 } })
   @ApiOperation({ summary: 'KVKK Madde 11(e+f) — tüm cilt analizi kayıtlarını sil' })
-  async deleteMine(@Req() req: any, @Ip() ip: string, @Headers('user-agent') ua?: string) {
+  async deleteMine(@Req() req: AppAuthRequest, @Ip() ip: string, @Headers('user-agent') ua?: string) {
     return this.service.deleteAllForUser(req.user.user_id, { ip, user_agent: ua });
   }
 }

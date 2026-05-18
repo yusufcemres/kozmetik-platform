@@ -16,6 +16,7 @@ import { Throttle } from '@nestjs/throttler';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto/create-review.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import type { AppAuthRequest } from '../user-auth/app-auth-request';
 
 @ApiTags('Reviews')
 @Controller()
@@ -53,7 +54,7 @@ export class ReviewsController {
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Ürün için yorum gönder (bir kullanıcı → bir yorum)' })
   async create(
-    @Req() req: any,
+    @Req() req: AppAuthRequest,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: CreateReviewDto,
   ) {
@@ -66,7 +67,7 @@ export class ReviewsController {
   @Throttle({ public: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Kendi yorumunu güncelle' })
   async update(
-    @Req() req: any,
+    @Req() req: AppAuthRequest,
     @Param('reviewId', ParseIntPipe) reviewId: number,
     @Body() dto: UpdateReviewDto,
   ) {
@@ -78,7 +79,7 @@ export class ReviewsController {
   @ApiBearerAuth()
   @Throttle({ public: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Kendi yorumunu sil' })
-  async remove(@Req() req: any, @Param('reviewId', ParseIntPipe) reviewId: number) {
+  async remove(@Req() req: AppAuthRequest, @Param('reviewId', ParseIntPipe) reviewId: number) {
     return this.service.remove(req.user.user_id, reviewId);
   }
 
@@ -86,7 +87,7 @@ export class ReviewsController {
   @UseGuards(AppJwtGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Kendi yorumlarım' })
-  async mine(@Req() req: any) {
+  async mine(@Req() req: AppAuthRequest) {
     return this.service.myReviews(req.user.user_id);
   }
 }

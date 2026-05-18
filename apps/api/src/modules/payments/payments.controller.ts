@@ -7,6 +7,11 @@ import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
 import { PaymentsService } from './payments.service';
 import type { PaymentPlanCode } from '@database/entities';
+import type { AppAuthRequest } from '../user-auth/app-auth-request';
+import type { Request } from 'express';
+
+// Admin route'larda JwtAuthGuard kullanılır — req.user.admin_user_id field'ı vardır
+type AdminAuthRequest = Request & { user: { admin_user_id?: number; sub?: number; role_key?: string } };
 
 /**
  * PayTR + Premium endpoint'leri (Faz 3 başlangıcı).
@@ -25,7 +30,7 @@ export class PaymentsController {
   @Throttle({ public: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'PayTR iframe token üret (Premium plan satın al)' })
   async checkout(
-    @Req() req: any,
+    @Req() req: AppAuthRequest,
     @Body() body: { plan_code?: PaymentPlanCode },
     @Ip() ip: string,
     @Headers('user-agent') ua?: string,
@@ -63,7 +68,7 @@ export class PaymentsController {
   @Get('me/status')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kullanıcının Premium durumu' })
-  async myStatus(@Req() req: any) {
+  async myStatus(@Req() req: AppAuthRequest) {
     return this.service.getPremiumStatus(req.user.user_id);
   }
 
@@ -74,7 +79,7 @@ export class PaymentsController {
   @UseGuards(AppJwtGuard)
   @Throttle({ public: { limit: 20, ttl: 60_000 } })
   @ApiOperation({ summary: 'Kullanıcının ödeme geçmişi' })
-  async myHistory(@Req() req: any) {
+  async myHistory(@Req() req: AppAuthRequest) {
     return this.service.getMyPayments(req.user.user_id);
   }
 
@@ -89,7 +94,7 @@ export class PaymentsController {
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Auto-renew tercihini aç/kapat' })
   async setAutoRenew(
-    @Req() req: any,
+    @Req() req: AppAuthRequest,
     @Body() body: { enabled?: boolean },
   ) {
     if (typeof body?.enabled !== 'boolean') {
@@ -143,7 +148,7 @@ export class PaymentsController {
   async adminRefund(
     @Param('paymentId', ParseIntPipe) paymentId: number,
     @Body() body: { reason?: string },
-    @Req() req: any,
+    @Req() req: AdminAuthRequest,
   ) {
     return this.service.adminRefund(paymentId, req.user?.admin_user_id ?? 0, body?.reason ?? 'manuel iade');
   }
@@ -156,7 +161,7 @@ export class PaymentsController {
   async adminGrantPremium(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() body: { days?: number; reason?: string },
-    @Req() req: any,
+    @Req() req: AdminAuthRequest,
   ) {
     if (!body?.days) throw new BadRequestException('days zorunlu');
     return this.service.adminGrantPremium(userId, body.days, req.user?.admin_user_id ?? 0, body?.reason ?? 'manuel grant');

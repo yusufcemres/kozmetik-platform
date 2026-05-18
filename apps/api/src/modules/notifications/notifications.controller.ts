@@ -5,6 +5,7 @@ import { AppJwtGuard } from '../user-auth/app-jwt.guard';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
+import type { AppAuthRequest, AppMaybeAuthRequest } from '../user-auth/app-auth-request';
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -21,7 +22,7 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Push subscription kaydet' })
   async subscribe(
     @Body() body: { endpoint: string; keys: { p256dh: string; auth: string }; user_agent?: string },
-    @Req() req: any,
+    @Req() req: AppMaybeAuthRequest,
   ) {
     return this.service.subscribe({
       endpoint: body.endpoint,
@@ -41,7 +42,7 @@ export class NotificationsController {
   @Post('test')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kendine test push gönder' })
-  async testPush(@Req() req: any) {
+  async testPush(@Req() req: AppAuthRequest) {
     const sent = await this.service.sendToUser(req.user.user_id, {
       title: 'REVELA Test',
       body: 'Bildirimler çalışıyor! 🎉',

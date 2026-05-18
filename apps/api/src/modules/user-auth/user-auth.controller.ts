@@ -4,6 +4,7 @@ import { ApiOperation, ApiPropertyOptional, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { UserAuthService } from './user-auth.service';
 import { AppJwtGuard } from './app-jwt.guard';
+import type { AppAuthRequest } from './app-auth-request';
 
 class UpdateProfileDto {
   @ApiPropertyOptional({ example: 'Ada Lovelace', description: 'Görünür isim (max 100)' })
@@ -68,7 +69,7 @@ export class UserAuthController {
   @Get('me')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Mevcut kullanıcı bilgisi' })
-  async me(@Req() req: any) {
+  async me(@Req() req: AppAuthRequest) {
     return req.user;
   }
 
@@ -76,28 +77,28 @@ export class UserAuthController {
   @UseGuards(AppJwtGuard)
   @Throttle({ public: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Profil bilgisini güncelle (display_name)' })
-  async updateMe(@Req() req: any, @Body() body: UpdateProfileDto, @Ip() ip: string) {
+  async updateMe(@Req() req: AppAuthRequest, @Body() body: UpdateProfileDto, @Ip() ip: string) {
     return this.service.updateProfile(req.user.user_id, body, ip);
   }
 
   @Get('me/export')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'KVKK: tüm kullanıcı verilerini JSON olarak indir' })
-  async exportMe(@Req() req: any, @Ip() ip: string) {
+  async exportMe(@Req() req: AppAuthRequest, @Ip() ip: string) {
     return this.service.exportUserData(req.user.user_id, ip);
   }
 
   @Delete('me')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'KVKK: hesabı ve tüm ilişkili verileri sil' })
-  async deleteMe(@Req() req: any, @Ip() ip: string) {
+  async deleteMe(@Req() req: AppAuthRequest, @Ip() ip: string) {
     return this.service.deleteAccount(req.user.user_id, ip);
   }
 
   @Get('me/scan-history')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kullanicinin tarama gecmisi (urun JOIN dahil)' })
-  async myScanHistory(@Req() req: any, @Query('limit') limit?: string) {
+  async myScanHistory(@Req() req: AppAuthRequest, @Query('limit') limit?: string) {
     const lim = Math.min(Math.max(parseInt(limit ?? '50', 10) || 50, 1), 200);
     return this.service.getScanHistory(req.user.user_id, lim);
   }
@@ -105,14 +106,14 @@ export class UserAuthController {
   @Get('me/scan-stats')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Kullanicinin tarama ozeti (toplam, bu ay, Pioner)' })
-  async myScanStats(@Req() req: any) {
+  async myScanStats(@Req() req: AppAuthRequest) {
     return this.service.getScanStats(req.user.user_id);
   }
 
   @Delete('me/scan-history/:historyId')
   @UseGuards(AppJwtGuard)
   @ApiOperation({ summary: 'Tek tarama gecmisini sil' })
-  async deleteScan(@Req() req: any, @Param('historyId', ParseIntPipe) historyId: number) {
+  async deleteScan(@Req() req: AppAuthRequest, @Param('historyId', ParseIntPipe) historyId: number) {
     return this.service.deleteScan(req.user.user_id, historyId);
   }
 }

@@ -13,6 +13,7 @@ import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { FavoritesService } from './favorites.service';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
+import type { AppAuthRequest } from '../user-auth/app-auth-request';
 
 @ApiTags('Favorites')
 @ApiBearerAuth()
@@ -24,31 +25,31 @@ export class FavoritesController {
 
   @Get()
   @ApiOperation({ summary: 'Kullanıcının favori ürünleri' })
-  async list(@Req() req: any) {
+  async list(@Req() req: AppAuthRequest) {
     return this.service.list(req.user.user_id);
   }
 
   @Post(':productId')
   @ApiOperation({ summary: 'Ürünü favorilere ekle' })
-  async add(@Req() req: any, @Param('productId', ParseIntPipe) productId: number) {
+  async add(@Req() req: AppAuthRequest, @Param('productId', ParseIntPipe) productId: number) {
     return this.service.add(req.user.user_id, productId);
   }
 
   @Delete(':productId')
   @ApiOperation({ summary: 'Ürünü favorilerden kaldır' })
-  async remove(@Req() req: any, @Param('productId', ParseIntPipe) productId: number) {
+  async remove(@Req() req: AppAuthRequest, @Param('productId', ParseIntPipe) productId: number) {
     return this.service.remove(req.user.user_id, productId);
   }
 
   @Post('toggle/:productId')
   @ApiOperation({ summary: 'Favori durumunu tersine çevir' })
-  async toggle(@Req() req: any, @Param('productId', ParseIntPipe) productId: number) {
+  async toggle(@Req() req: AppAuthRequest, @Param('productId', ParseIntPipe) productId: number) {
     return this.service.toggle(req.user.user_id, productId);
   }
 
   @Post('bulk')
   @ApiOperation({ summary: 'LocalStorage → DB migration (ilk login)' })
-  async bulk(@Req() req: any, @Body() body: { product_ids: number[] }) {
+  async bulk(@Req() req: AppAuthRequest, @Body() body: { product_ids: number[] }) {
     return this.service.bulkAdd(req.user.user_id, body?.product_ids || []);
   }
 }
