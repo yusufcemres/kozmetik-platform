@@ -114,6 +114,82 @@ const STEPS: QuizStep[] = [
       { value: 'premium', label: 'Premium (₺500+/ay)', icon: 'diamond' },
     ],
   },
+  // 2026-05-18: 6 ek soru — yaşam tarzı + sağlık geçmişi (derin profil)
+  {
+    id: 'sun_exposure',
+    question: 'Güneş ışığına ne kadar maruz kalıyorsun?',
+    description: 'D vitamini sentezi için kritik.',
+    type: 'single',
+    options: [
+      { value: 'high', label: 'Yüksek', description: 'Günde 2+ saat dışarıda', icon: 'wb_sunny' },
+      { value: 'moderate', label: 'Orta', description: '30 dk - 2 saat dışarıda', icon: 'partly_cloudy_day' },
+      { value: 'low', label: 'Düşük', description: '30 dk\'dan az veya kapalı yer', icon: 'cloud' },
+      { value: 'none', label: 'Yok', description: 'Tamamen kapalı yaşam', icon: 'home' },
+    ],
+  },
+  {
+    id: 'water_intake',
+    question: 'Günde ne kadar su içiyorsun?',
+    type: 'single',
+    options: [
+      { value: 'low', label: '<1 litre', description: 'Çok az', icon: 'water_drop' },
+      { value: 'medium', label: '1-2 litre', description: 'Yeterli', icon: 'water' },
+      { value: 'good', label: '2-3 litre', description: 'İyi', icon: 'local_drink' },
+      { value: 'high', label: '3+ litre', description: 'Yüksek', icon: 'water_bottle' },
+    ],
+  },
+  {
+    id: 'sleep_quality',
+    question: 'Uyku düzenin nasıl?',
+    description: 'Magnezyum, B vitaminleri ve melatonin için belirleyici.',
+    type: 'single',
+    options: [
+      { value: 'great', label: '7-9 saat, kaliteli', description: 'Dinç uyanıyorum', icon: 'bedtime' },
+      { value: 'okay', label: '6-7 saat, orta', description: 'Kabul edilebilir', icon: 'hotel' },
+      { value: 'poor', label: '5-6 saat, kaliteli değil', description: 'Sık uyanıyorum', icon: 'snooze' },
+      { value: 'insomnia', label: '<5 saat, uykusuzluk', description: 'Ciddi sorunlu', icon: 'visibility' },
+    ],
+  },
+  {
+    id: 'stress_level',
+    question: 'Genel stres seviyen?',
+    type: 'single',
+    options: [
+      { value: 'low', label: 'Düşük', description: 'Genelde rahatım', icon: 'sentiment_very_satisfied' },
+      { value: 'moderate', label: 'Orta', description: 'İş/aile dengesi var', icon: 'sentiment_neutral' },
+      { value: 'high', label: 'Yüksek', description: 'Sık baş ağrısı/gerginlik', icon: 'sentiment_dissatisfied' },
+      { value: 'chronic', label: 'Kronik', description: 'Sürekli kaygı/tükenmişlik', icon: 'sentiment_very_dissatisfied' },
+    ],
+  },
+  {
+    id: 'medical_conditions',
+    question: 'Tanı konmuş bir durum var mı?',
+    description: 'Takviye etkileşimlerini değerlendiriyoruz (birden fazla seçilebilir).',
+    type: 'multi',
+    maxSelections: 5,
+    options: [
+      { value: 'none', label: 'Hiçbiri', icon: 'check_circle' },
+      { value: 'thyroid', label: 'Tiroid sorunu', icon: 'health_and_safety' },
+      { value: 'diabetes', label: 'Diyabet / insülin direnci', icon: 'bloodtype' },
+      { value: 'anemia', label: 'Anemi (kansızlık)', icon: 'water_drop' },
+      { value: 'hypertension', label: 'Hipertansiyon', icon: 'monitor_heart' },
+      { value: 'gastritis', label: 'Mide / reflü', icon: 'medical_information' },
+      { value: 'pregnancy', label: 'Hamilelik / emzirme', icon: 'pregnant_woman' },
+      { value: 'allergies', label: 'Gıda alerjileri', icon: 'no_food' },
+    ],
+  },
+  {
+    id: 'medication_use',
+    question: 'Düzenli ilaç kullanıyor musun?',
+    description: 'Takviye-ilaç etkileşim kontrolü için.',
+    type: 'single',
+    options: [
+      { value: 'none', label: 'Hayır, hiçbir ilaç kullanmıyorum', icon: 'block' },
+      { value: 'occasional', label: 'Ara sıra ağrı kesici/antibiyotik', icon: 'medication_liquid' },
+      { value: 'chronic_1_2', label: '1-2 kronik ilaç kullanıyorum', icon: 'medication' },
+      { value: 'chronic_3plus', label: '3+ ilaç (polifarmasi)', icon: 'pharmacy' },
+    ],
+  },
 ];
 
 // === Nutrient Risk Analysis ===

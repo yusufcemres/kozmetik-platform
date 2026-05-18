@@ -85,6 +85,67 @@ const STEPS: QuizStep[] = [
       { value: 'detailed', label: 'Detaylı', description: 'Serum, tonik, SPF, aktifler...', icon: 'auto_awesome' },
     ],
   },
+  // 2026-05-18: 5 ek soru — derin cilt yaşı faktörleri
+  {
+    id: 'alcohol',
+    question: 'Alkol tüketim sıklığın?',
+    description: 'Alkol cilt dehidrasyonu ve kollajen yıkımını hızlandırır.',
+    type: 'single',
+    options: [
+      { value: 'never', label: 'Hiç içmem', icon: 'no_drinks' },
+      { value: 'rare', label: 'Ayda 1-2 kez', icon: 'wine_bar' },
+      { value: 'weekly', label: 'Haftada 1-2 kez', icon: 'local_bar' },
+      { value: 'frequent', label: 'Haftada 3+ kez', icon: 'liquor' },
+    ],
+  },
+  {
+    id: 'genetics',
+    question: 'Genetik geçmiş — anne/baba erken yaşlanma belirtileri?',
+    description: 'Cilt yaşlanmasının %20-25\'i genetik.',
+    type: 'single',
+    options: [
+      { value: 'late', label: 'Hayır, geç yaşa kadar genç görünüm', description: 'Genetik avantaj', icon: 'auto_awesome' },
+      { value: 'average', label: 'Yaşıtlara göre normal', description: 'Ortalama', icon: 'face' },
+      { value: 'early', label: 'Erken kırışıklık / leke öyküsü', description: 'Erken yaşlanma eğilimi', icon: 'warning_amber' },
+      { value: 'unknown', label: 'Bilmiyorum', icon: 'help_outline' },
+    ],
+  },
+  {
+    id: 'screen_time',
+    question: 'Günlük ekran maruziyetin?',
+    description: 'Mavi ışık + statik poz kırışıklık riski.',
+    type: 'single',
+    options: [
+      { value: 'low', label: '<3 saat', icon: 'visibility_off' },
+      { value: 'moderate', label: '3-6 saat', icon: 'devices' },
+      { value: 'high', label: '6-10 saat', icon: 'screen_lock_landscape' },
+      { value: 'extreme', label: '10+ saat', icon: 'desktop_windows' },
+    ],
+  },
+  {
+    id: 'diet_sugar',
+    question: 'Şeker / işlenmiş gıda tüketimin?',
+    description: 'Glikasyon (AGE) kollajen ve elastin proteinlerini hasara uğratır.',
+    type: 'single',
+    options: [
+      { value: 'minimal', label: 'Minimal', description: 'Doğal şekerlerle yetinirim', icon: 'eco' },
+      { value: 'moderate', label: 'Orta', description: 'Ara sıra tatlı/atıştırmalık', icon: 'cookie' },
+      { value: 'high', label: 'Yüksek', description: 'Günde 1+ tatlı/işlenmiş', icon: 'cake' },
+      { value: 'very_high', label: 'Çok yüksek', description: 'Her öğünde işlenmiş gıda', icon: 'fastfood' },
+    ],
+  },
+  {
+    id: 'exercise',
+    question: 'Düzenli egzersiz yapıyor musun?',
+    description: 'Egzersiz cilt kan dolaşımı ve kolajen üretimini artırır.',
+    type: 'single',
+    options: [
+      { value: 'daily', label: 'Günlük', description: 'Her gün 30+ dk', icon: 'fitness_center' },
+      { value: 'regular', label: '3-5 kez/hafta', description: 'Düzenli aktivite', icon: 'directions_run' },
+      { value: 'occasional', label: '1-2 kez/hafta', description: 'Ara sıra', icon: 'directions_walk' },
+      { value: 'none', label: 'Yok', description: 'Sedanter yaşam', icon: 'weekend' },
+    ],
+  },
 ];
 
 // === Scoring Algorithm ===
