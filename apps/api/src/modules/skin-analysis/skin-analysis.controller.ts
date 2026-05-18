@@ -1,6 +1,7 @@
-import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, NotFoundException, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Headers, Ip, NotFoundException, Param, ParseIntPipe, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import type { Response } from 'express';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinCoachService } from './skin-coach.service';
 import { SkinAnalysisRequestDto } from './dto/skin-analysis.dto';
@@ -120,6 +121,52 @@ export class SkinAnalysisController {
       body.history ?? [],
       body.question,
     );
+  }
+
+  /**
+   * Streaming versiyon — text/event-stream ile chunk chunk yanıt.
+   * Frontend `fetch + body.getReader()` ile tüketir.
+   */
+  @Post(':id/coach/stream')
+  @Throttle({ public: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'AI Cilt Danışmanı — streaming yanıt (SSE)' })
+  async coachStream(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: {
+      question?: string;
+      history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+    },
+    @Res() res: Response,
+  ): Promise<void> {
+    if (!body?.question || typeof body.question !== 'string') {
+      throw new BadRequestException('question alanı zorunlu');
+    }
+    const analysis = await this.service.getById(id);
+    if (!analysis) throw new NotFoundException('Analiz bulunamadı');
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // nginx proxy buffering kapat
+    res.flushHeaders?.();
+
+    try {
+      const result = await this.coach.streamWithHistory(
+        analysis.scores,
+        analysis.overall_score,
+        body.history ?? [],
+        body.question,
+        (chunk) => {
+          res.write(`data: ${JSON.stringify({ type: 'chunk', text: chunk })}\n\n`);
+        },
+      );
+      res.write(`data: ${JSON.stringify({ type: 'done', model: result.model, totalChars: result.totalChars })}\n\n`);
+    } catch (err: any) {
+      const message = err?.message || 'AI Danışman ulaşılamadı';
+      res.write(`data: ${JSON.stringify({ type: 'error', message })}\n\n`);
+    } finally {
+      res.end();
+    }
   }
 
   // ---- Email funnel (Faz 1 Gün 9) ----

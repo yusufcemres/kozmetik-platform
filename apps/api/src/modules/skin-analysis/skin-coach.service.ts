@@ -37,6 +37,109 @@ export class SkinCoachService {
    * Frontend localStorage'da history tutar (KVKK: backend saklamaz).
    * Max 10 turn (5 user + 5 assistant) limiti, token israfını önler.
    */
+  /**
+   * Streaming versiyon — Anthropic stream:true ile NDJSON event tüketir,
+   * her text delta için callback çağırır. Controller @Res() ile SSE
+   * yazıyor (text/event-stream).
+   */
+  async streamWithHistory(
+    scores: SkinScoreBreakdown,
+    overall: number,
+    history: Array<{ role: 'user' | 'assistant'; content: string }>,
+    currentQuestion: string,
+    onChunk: (text: string) => void,
+  ): Promise<{ model: string; totalChars: number }> {
+    const trimmed = currentQuestion.trim();
+    if (trimmed.length < 3 || trimmed.length > 500) {
+      throw new ServiceUnavailableException('Soru 3-500 karakter arasında olmalı');
+    }
+    const apiKey = this.config.get<string>('ANTHROPIC_API_KEY');
+    if (!apiKey) {
+      throw new ServiceUnavailableException('AI Danışman servisi yapılandırılmamış');
+    }
+
+    const cleanHistory = (Array.isArray(history) ? history : [])
+      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim().length > 0)
+      .slice(-10)
+      .map((m) => ({ role: m.role, content: m.content.slice(0, 1000) }));
+    const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+    let lastRole: 'user' | 'assistant' | null = null;
+    for (const m of cleanHistory) {
+      if (lastRole === m.role) continue;
+      messages.push(m);
+      lastRole = m.role;
+    }
+    if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
+      messages.pop();
+    }
+    messages.push({ role: 'user', content: trimmed });
+
+    const systemPrompt = this.buildSystemPrompt(scores, overall);
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(this.TIMEOUT_MS * 2), // Stream daha uzun sürebilir
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        system: systemPrompt,
+        messages,
+        stream: true,
+      }),
+    });
+    if (!res.ok || !res.body) {
+      const text = await res.text().catch(() => '');
+      this.logger.error(`Coach stream Claude ${res.status}: ${text.slice(0, 200)}`);
+      throw new ServiceUnavailableException(
+        'AI Danışman geçici olarak yanıt veremiyor. Birkaç dakika sonra dene.',
+      );
+    }
+
+    // Anthropic SSE format: "event: <type>\ndata: <json>\n\n"
+    // text delta: { type: 'content_block_delta', delta: { type: 'text_delta', text: '...' } }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let totalChars = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        // SSE event'leri "\n\n" ile ayrılır
+        const events = buffer.split('\n\n');
+        buffer = events.pop() ?? '';
+        for (const ev of events) {
+          if (!ev.trim()) continue;
+          const dataLine = ev.split('\n').find((l) => l.startsWith('data: '));
+          if (!dataLine) continue;
+          const json = dataLine.slice(6).trim();
+          if (json === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(json);
+            if (parsed?.type === 'content_block_delta' && parsed?.delta?.type === 'text_delta') {
+              const chunk = parsed.delta.text || '';
+              if (chunk) {
+                onChunk(chunk);
+                totalChars += chunk.length;
+              }
+            }
+          } catch {
+            // JSON parse hatası — skip, kontrolsüz event olabilir
+          }
+        }
+      }
+    } finally {
+      try { reader.releaseLock(); } catch {}
+    }
+
+    return { model: 'claude-sonnet-4-6', totalChars };
+  }
+
   async askWithHistory(
     scores: SkinScoreBreakdown,
     overall: number,

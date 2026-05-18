@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
+import { getUserToken } from '@/lib/user-auth';
 
 /**
  * AI Cilt Danışmanı sohbet widget'ı (Faz 2 #5 MVP).
@@ -53,15 +54,69 @@ export function AICoachWidget({ analysisId }: AICoachWidgetProps) {
         .slice(-10)
         .map((m) => ({ role: m.role, content: m.text }));
 
-      const res = await apiFetch<{ answer: string; model: string }>(
-        `/skin-analysis/${analysisId}/coach`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ question: trimmed, history }),
+      // SSE streaming — chunk chunk yanıt
+      const token = getUserToken();
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+      const streamRes = await fetch(`${apiBase}/skin-analysis/${analysisId}/coach/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-      );
-      const botMsg: Message = { role: 'assistant', text: res.answer, ts: Date.now() };
-      setMessages((prev) => [...prev, botMsg]);
+        body: JSON.stringify({ question: trimmed, history }),
+      });
+      if (!streamRes.ok || !streamRes.body) {
+        // Streaming başarısız → non-stream fallback
+        const fallback = await apiFetch<{ answer: string; model: string }>(
+          `/skin-analysis/${analysisId}/coach`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ question: trimmed, history }),
+          },
+        );
+        const botMsg: Message = { role: 'assistant', text: fallback.answer, ts: Date.now() };
+        setMessages((prev) => [...prev, botMsg]);
+        return;
+      }
+
+      // Boş bot mesajı oluştur, chunk geldikçe text güncelle
+      let accumulated = '';
+      const botStartTs = Date.now();
+      setMessages((prev) => [...prev, { role: 'assistant', text: '', ts: botStartTs }]);
+
+      const reader = streamRes.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split('\n\n');
+        buffer = events.pop() ?? '';
+        for (const ev of events) {
+          const dataLine = ev.split('\n').find((l) => l.startsWith('data: '));
+          if (!dataLine) continue;
+          try {
+            const parsed = JSON.parse(dataLine.slice(6).trim());
+            if (parsed?.type === 'chunk' && parsed?.text) {
+              accumulated += parsed.text;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.ts === botStartTs ? { ...m, text: accumulated } : m,
+                ),
+              );
+            } else if (parsed?.type === 'error') {
+              throw new Error(parsed.message || 'Stream hatası');
+            }
+          } catch {
+            // JSON parse fail (non-data line) — skip
+          }
+        }
+      }
+
+      if (!accumulated) {
+        throw new Error('Boş yanıt');
+      }
     } catch (err: any) {
       const msg =
         err instanceof ApiError && err.status === 503
