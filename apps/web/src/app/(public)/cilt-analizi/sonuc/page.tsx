@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { api, API_BASE_URL } from '@/lib/api';
+import AffiliateLink from '@/components/public/AffiliateLink';
 import ProductCarousel from '@/components/public/ProductCarousel';
 
 // === Types ===
@@ -802,14 +803,16 @@ function ResultsContent() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {cheapest && (
-                        <a
-                          href={`${API_BASE_URL}/r/${cheapest.affiliate_link_id}`}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow sponsored"
+                        <AffiliateLink
+                          href={cheapest.affiliate_url}
+                          affiliateLinkId={cheapest.affiliate_link_id}
+                          productId={product.product_id}
+                          platform={cheapest.platform}
+                          price={cheapest.price_snapshot ? Number(cheapest.price_snapshot) : undefined}
                           className="bg-primary text-on-primary px-4 py-2 rounded-sm text-xs font-medium hover:bg-primary/90 transition-colors hidden sm:block"
                         >
                           {cheapest.price_snapshot ? `₺${Number(cheapest.price_snapshot).toFixed(0)}` : 'Satın Al'}
-                        </a>
+                        </AffiliateLink>
                       )}
                       <button
                         onClick={() => setExpandedProduct(isExpanded ? null : product.product_id)}
@@ -850,15 +853,17 @@ function ResultsContent() {
                       </div>
                       {/* Mobile buy button */}
                       {cheapest && (
-                        <a
-                          href={`${API_BASE_URL}/r/${cheapest.affiliate_link_id}`}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow sponsored"
+                        <AffiliateLink
+                          href={cheapest.affiliate_url}
+                          affiliateLinkId={cheapest.affiliate_link_id}
+                          productId={product.product_id}
+                          platform={cheapest.platform}
+                          price={cheapest.price_snapshot ? Number(cheapest.price_snapshot) : undefined}
                           className="sm:hidden mt-3 w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-2.5 rounded-sm text-xs font-medium"
                         >
                           {cheapest.price_snapshot ? `₺${Number(cheapest.price_snapshot).toFixed(0)} — ` : ''}Satın Al
                           <span className="material-icon text-[14px]" aria-hidden="true">open_in_new</span>
-                        </a>
+                        </AffiliateLink>
                       )}
                     </div>
                   )}

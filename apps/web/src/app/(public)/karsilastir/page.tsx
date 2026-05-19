@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import ScoreBadge from '@/components/public/ScoreBadge';
+import AffiliateLinkComponent from '@/components/public/AffiliateLink';
 
 // === Types ===
 
@@ -668,15 +669,16 @@ export default function ComparePage() {
                       <td key={p.product_id} className="px-4 py-3 text-center">
                         <div className="flex flex-wrap justify-center gap-1">
                           {(p.affiliate_links || []).filter((l) => l.is_active).map((l) => (
-                            <a
+                            <AffiliateLinkComponent
                               key={l.affiliate_link_id}
-                              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'}/r/${l.affiliate_link_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer nofollow sponsored"
+                              href={l.affiliate_url}
+                              affiliateLinkId={l.affiliate_link_id}
+                              productId={p.product_id}
+                              platform={l.platform}
                               className="label-caps bg-primary/5 text-primary px-2 py-0.5 rounded-sm hover:bg-primary/10 transition-colors"
                             >
                               {platformLabel(l.platform)}
-                            </a>
+                            </AffiliateLinkComponent>
                           ))}
                         </div>
                       </td>

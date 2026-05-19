@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { apiFetch, API_BASE_URL } from '@/lib/api';
+import AffiliateLink from '@/components/public/AffiliateLink';
 
 // === Types ===
 
@@ -315,17 +316,19 @@ export default async function RecommendationsPage() {
                         Detaylar
                       </Link>
                       {link && (
-                        <a
+                        <AffiliateLink
                           href={link.affiliate_url}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow sponsored"
+                          affiliateLinkId={link.affiliate_link_id}
+                          productId={product.product_id}
+                          platform={link.platform}
+                          price={link.price_snapshot ? Number(link.price_snapshot) : undefined}
                           className="flex-1 curator-btn-primary text-[10px] py-2.5 text-center flex items-center justify-center gap-1.5"
                         >
                           <span className="material-icon text-[14px]" aria-hidden="true">shopping_bag</span>
                           {link.price_snapshot
                             ? `₺${Number(link.price_snapshot).toFixed(0)} — ${PLATFORM_LABELS[link.platform] || 'Satin Al'}`
                             : PLATFORM_LABELS[link.platform] || 'Satin Al'}
-                        </a>
+                        </AffiliateLink>
                       )}
                     </div>
                   </div>
@@ -397,10 +400,17 @@ export default async function RecommendationsPage() {
                         <div className="flex items-center gap-3 mt-4">
                           <Link href={`/takviyeler/${product.product_slug}`} className="flex-1 curator-btn-outline text-[10px] py-2.5 text-center">Detaylar</Link>
                           {link && (
-                            <a href={link.affiliate_url} target="_blank" rel="noopener noreferrer nofollow sponsored" className="flex-1 curator-btn-primary text-[10px] py-2.5 text-center flex items-center justify-center gap-1.5">
+                            <AffiliateLink
+                              href={link.affiliate_url}
+                              affiliateLinkId={link.affiliate_link_id}
+                              productId={product.product_id}
+                              platform={link.platform}
+                              price={link.price_snapshot ? Number(link.price_snapshot) : undefined}
+                              className="flex-1 curator-btn-primary text-[10px] py-2.5 text-center flex items-center justify-center gap-1.5"
+                            >
                               <span className="material-icon text-[14px]" aria-hidden="true">shopping_bag</span>
                               {link.price_snapshot ? `₺${Number(link.price_snapshot).toFixed(0)} — ${PLATFORM_LABELS[link.platform] || 'Satın Al'}` : PLATFORM_LABELS[link.platform] || 'Satın Al'}
-                            </a>
+                            </AffiliateLink>
                           )}
                         </div>
                       </div>
