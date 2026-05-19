@@ -60,10 +60,10 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
     fetchData();
   }, [fetchData]);
 
-  const deleteItem = useCallback(async (id: number | string) => {
+  const deleteItem = useCallback(async (id: unknown) => {
     if (!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return false;
     try {
-      await api.delete(`${endpoint}/${id}`, { token });
+      await api.delete(`${endpoint}/${String(id)}`, { token });
       toast('Kayıt silindi', 'success');
       await fetchData();
       return true;
@@ -85,9 +85,9 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
     }
   }, [endpoint, token, fetchData, toast]);
 
-  const updateItem = useCallback(async (id: number | string, body: Record<string, unknown>) => {
+  const updateItem = useCallback(async (id: unknown, body: Record<string, unknown>) => {
     try {
-      await api.put(`${endpoint}/${id}`, body, { token });
+      await api.put(`${endpoint}/${String(id)}`, body, { token });
       toast('Kayıt güncellendi', 'success');
       await fetchData();
       return true;

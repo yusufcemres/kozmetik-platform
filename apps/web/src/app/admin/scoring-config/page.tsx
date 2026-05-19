@@ -68,8 +68,8 @@ export default function ScoringConfigPage() {
       };
       await api.put('/admin/scoring-config', payload, { token });
       setSaved(true);
-    } catch (err: any) {
-      alert(err.message || 'Kaydetme hatası');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Kaydetme hatası');
     } finally {
       setSaving(false);
     }

@@ -13,12 +13,12 @@ const columns = [
   {
     key: 'brand',
     label: 'Marka',
-    render: (_: any, row: any) => row.brand?.brand_name || '-',
+    render: (_: unknown, row: Record<string, unknown>) => (row.brand as { brand_name?: string } | null)?.brand_name || '-',
   },
   {
     key: 'category',
     label: 'Kategori',
-    render: (_: any, row: any) => row.category?.category_name || '-',
+    render: (_: unknown, row: Record<string, unknown>) => (row.category as { category_name?: string } | null)?.category_name || '-',
   },
   {
     key: 'status',
@@ -116,7 +116,7 @@ function buildFormFields(
 export default function ProductsPage() {
   const crud = useAdminCrud({ endpoint: '/products', limit: 15, idField: 'product_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
   const [brands, setBrands] = useState<{ value: string; label: string }[]>([]);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
@@ -127,11 +127,13 @@ export default function ProductsPage() {
     api
       .get<{ data: { brand_id: number; brand_name: string }[] }>('/brands?limit=200', { token })
       .then((res) => {
-        const rows = (res as any).data || (res as any) || [];
+        type BrandRow = { brand_id: number; brand_name: string };
+        const r = res as { data?: BrandRow[] } | BrandRow[];
+        const rows: BrandRow[] = Array.isArray(r) ? r : r.data || [];
         setBrands(
           rows
-            .map((b: any) => ({ value: String(b.brand_id), label: b.brand_name }))
-            .sort((a: any, b: any) => a.label.localeCompare(b.label, 'tr')),
+            .map((b) => ({ value: String(b.brand_id), label: b.brand_name }))
+            .sort((a, b) => a.label.localeCompare(b.label, 'tr')),
         );
       })
       .catch((err) => {
@@ -139,15 +141,16 @@ export default function ProductsPage() {
         setBrands([]);
       });
     // Kategori tree -> flat
+    type CategoryNode = { category_id: number; category_name: string; children?: CategoryNode[] };
     api
-      .get<any[]>('/categories/tree', { token })
+      .get<CategoryNode[]>('/categories/tree', { token })
       .then((tree) => {
         const flat: { value: string; label: string }[] = [];
-        const walk = (n: any, depth = 0) => {
+        const walk = (n: CategoryNode, depth = 0) => {
           flat.push({ value: String(n.category_id), label: `${'— '.repeat(depth)}${n.category_name}` });
-          (n.children || []).forEach((c: any) => walk(c, depth + 1));
+          (n.children || []).forEach((c) => walk(c, depth + 1));
         };
-        (tree as any[]).forEach((n) => walk(n));
+        tree.forEach((n) => walk(n));
         setCategories(flat);
       })
       .catch(() => setCategories([]));
@@ -156,12 +159,14 @@ export default function ProductsPage() {
   const formFields = useMemo(() => buildFormFields(brands, categories), [brands, categories]);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => {
+  const openEdit = (row: Record<string, unknown>) => {
     // brand/category id'leri row.brand.brand_id'den cek (row'da sadece brand object var)
-    const enriched = {
+    const brand = row.brand as { brand_id?: number } | null | undefined;
+    const category = row.category as { category_id?: number } | null | undefined;
+    const enriched: Record<string, unknown> = {
       ...row,
-      brand_id: row.brand_id != null ? String(row.brand_id) : (row.brand?.brand_id != null ? String(row.brand.brand_id) : ''),
-      category_id: row.category_id != null ? String(row.category_id) : (row.category?.category_id != null ? String(row.category.category_id) : ''),
+      brand_id: row.brand_id != null ? String(row.brand_id) : (brand?.brand_id != null ? String(brand.brand_id) : ''),
+      category_id: row.category_id != null ? String(row.category_id) : (category?.category_id != null ? String(category.category_id) : ''),
     };
     setEditItem(enriched);
     setModalOpen(true);

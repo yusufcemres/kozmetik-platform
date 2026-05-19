@@ -64,8 +64,8 @@ export default function AdminNotificationsPage() {
         );
         setResult(res);
       }
-    } catch (err: any) {
-      setError(err.message || 'Gönderim başarısız');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gönderim başarısız');
     } finally {
       setSending(false);
     }

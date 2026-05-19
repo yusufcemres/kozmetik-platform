@@ -45,13 +45,13 @@ const formFields: FormField[] = [
 export default function CorrectionsPage() {
   const crud = useAdminCrud({ endpoint: '/admin/corrections', idField: 'correction_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
 
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: Record<string, unknown>) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
-      return crud.updateItem(editItem.correction_id, data);
+      return crud.updateItem(editItem.correction_id as number, data);
     }
     return false;
   };

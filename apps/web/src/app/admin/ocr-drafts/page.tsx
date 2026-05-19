@@ -44,8 +44,8 @@ export default function OcrDraftsPage() {
     try {
       const data = await api.get<OcrDraft[]>('/products/admin/ocr-drafts', { token });
       setDrafts(data);
-    } catch (e: any) {
-      toast(e.message || 'Yüklenemedi', 'error');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Yüklenemedi', 'error');
     } finally {
       setLoading(false);
     }
@@ -59,16 +59,18 @@ export default function OcrDraftsPage() {
       api.get<{ data: Brand[] }>('/brands?limit=200', { token }).catch(() => ({ data: [] })),
       api.get<Category[]>('/categories/tree', { token }).catch(() => []),
     ]).then(([b, c]) => {
-      const brandRows = ((b as any).data || (b as any) || []) as Brand[];
-      brandRows.sort((a, b) => (a.brand_name || '').localeCompare(b.brand_name || '', 'tr'));
+      const bRes = b as { data?: Brand[] } | Brand[];
+      const brandRows: Brand[] = Array.isArray(bRes) ? bRes : bRes.data || [];
+      brandRows.sort((x, y) => (x.brand_name || '').localeCompare(y.brand_name || '', 'tr'));
       setBrands(brandRows);
       // Flatten category tree
+      type CategoryNode = { category_id: number; category_name: string; category_slug: string; children?: CategoryNode[] };
       const flat: Category[] = [];
-      const walk = (n: any) => {
+      const walk = (n: CategoryNode) => {
         flat.push({ category_id: n.category_id, category_name: n.category_name, category_slug: n.category_slug });
         (n.children || []).forEach(walk);
       };
-      (c as any[]).forEach(walk);
+      (c as CategoryNode[]).forEach(walk);
       setCategories(flat);
     });
   }, [token, load]);
@@ -80,8 +82,8 @@ export default function OcrDraftsPage() {
       toast('Güncellendi', 'success');
       setEditing(null);
       load();
-    } catch (e: any) {
-      toast(e.message || 'Güncellenemedi', 'error');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Güncellenemedi', 'error');
     }
   };
 
@@ -103,8 +105,8 @@ export default function OcrDraftsPage() {
       toast('Yayınlandı', 'success');
       load();
       setSelected((p) => { const n = new Set(p); n.delete(id); return n; });
-    } catch (e: any) {
-      toast(e.message || 'Yayınlanamadı', 'error');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Yayınlanamadı', 'error');
     }
   };
 
@@ -115,8 +117,8 @@ export default function OcrDraftsPage() {
       toast('Silindi', 'success');
       load();
       setSelected((p) => { const n = new Set(p); n.delete(id); return n; });
-    } catch (e: any) {
-      toast(e.message || 'Silinemedi', 'error');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Silinemedi', 'error');
     }
   };
 
@@ -373,7 +375,7 @@ export default function OcrDraftsPage() {
               onSubmit={(e) => {
                 e.preventDefault();
                 const fd = new FormData(e.currentTarget);
-                const patch: any = {
+                const patch: Partial<OcrDraft & { brand_id?: number; category_id?: number; product_name?: string; barcode?: string | null; short_description?: string }> = {
                   product_name: String(fd.get('product_name') || '').trim() || undefined,
                   brand_id: fd.get('brand_id') ? Number(fd.get('brand_id')) : undefined,
                   category_id: fd.get('category_id') ? Number(fd.get('category_id')) : undefined,

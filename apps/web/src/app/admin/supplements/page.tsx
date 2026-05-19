@@ -61,8 +61,8 @@ export default function SupplementsPage() {
             columns={[
               { key: 'product_id', label: 'ID' },
               { key: 'product_name', label: 'Ürün Adı' },
-              { key: 'brand', label: 'Marka', render: (v: any) => v?.brand_name || '-' },
-              { key: 'category', label: 'Kategori', render: (v: any) => v?.category_name || '-' },
+              { key: 'brand', label: 'Marka', render: (v: unknown) => (v as { brand_name?: string } | null)?.brand_name || '-' },
+              { key: 'category', label: 'Kategori', render: (v: unknown) => (v as { category_name?: string } | null)?.category_name || '-' },
               { key: 'status', label: 'Durum' },
             ]}
             data={data}

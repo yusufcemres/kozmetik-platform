@@ -11,12 +11,12 @@ const columns = [
   {
     key: 'ingredient',
     label: 'İçerik Maddesi',
-    render: (_: any, row: any) => row.ingredient?.inci_name || '-',
+    render: (_: unknown, row: Record<string, unknown>) => (row.ingredient as { inci_name?: string } | null)?.inci_name || '-',
   },
   {
     key: 'need',
     label: 'İhtiyaç',
-    render: (_: any, row: any) => row.need?.need_name || '-',
+    render: (_: unknown, row: Record<string, unknown>) => (row.need as { need_name?: string } | null)?.need_name || '-',
   },
   { key: 'relevance_score', label: 'Skor (0-100)' },
   { key: 'effect_type', label: 'Etki Tipi' },
@@ -51,14 +51,14 @@ const formFields: FormField[] = [
 export default function MappingsPage() {
   const crud = useAdminCrud({ endpoint: '/ingredient-need-mappings', idField: 'ingredient_need_mapping_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: Record<string, unknown>) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
-      return crud.updateItem(editItem.ingredient_need_mapping_id, data);
+      return crud.updateItem(editItem.ingredient_need_mapping_id as number, data);
     }
     return crud.createItem(data);
   };

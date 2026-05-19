@@ -33,13 +33,13 @@ const formFields: FormField[] = [
 export default function BrandsPage() {
   const crud = useAdminCrud({ endpoint: '/brands', idField: 'brand_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: Record<string, unknown>) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
-    if (editItem) return crud.updateItem(editItem.brand_id, data);
+  const handleSubmit = async (data: Record<string, unknown>) => {
+    if (editItem) return crud.updateItem(editItem.brand_id as number, data);
     return crud.createItem(data);
   };
 

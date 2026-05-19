@@ -22,8 +22,8 @@ export default function TagReviewPage() {
     try {
       const res = await apiFetch<BulkResult>('/tag-validator/bulk?limit=200', { method: 'POST' });
       setResult(res);
-    } catch (e: any) {
-      setErr(e.message);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Hata');
     } finally {
       setLoading(false);
     }
@@ -36,8 +36,8 @@ export default function TagReviewPage() {
     try {
       const res = await apiFetch<any>(`/tag-validator/check/${productId}`, { method: 'POST' });
       setSingleResult(res);
-    } catch (e: any) {
-      setErr(e.message);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Hata');
     } finally {
       setLoading(false);
     }

@@ -63,14 +63,14 @@ const formFields: FormField[] = [
 export default function ArticlesPage() {
   const crud = useAdminCrud({ endpoint: '/articles/admin', idField: 'article_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: Record<string, unknown>) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
-      return crud.updateItem(editItem.article_id, data);
+      return crud.updateItem(editItem.article_id as number, data);
     }
     return crud.createItem(data);
   };

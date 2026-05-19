@@ -32,14 +32,14 @@ const formFields: FormField[] = [
 export default function ApprovedWordingsPage() {
   const crud = useAdminCrud({ endpoint: '/methodology/approved-wordings', idField: 'wording_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: Record<string, unknown>) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
-      return crud.updateItem(editItem.wording_id, data);
+      return crud.updateItem(editItem.wording_id as number, data);
     }
     return crud.createItem(data);
   };
@@ -62,7 +62,7 @@ export default function ApprovedWordingsPage() {
         onSearch={crud.handleSearch}
         searchPlaceholder="İfade ara..."
         onEdit={openEdit}
-        onDelete={(row) => crud.deleteItem(row.wording_id)}
+        onDelete={(row) => crud.deleteItem(row.wording_id as number)}
       />
       <AdminFormModal
         open={modalOpen}

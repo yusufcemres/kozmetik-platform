@@ -75,8 +75,8 @@ export default function AdminPaymentsPage() {
       setItems(list.items);
       setTotal(list.total);
       setSummary(sum);
-    } catch (err: any) {
-      toast(err?.message || 'Yükleme hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Yükleme hatası', 'error');
     } finally {
       setLoading(false);
     }
@@ -94,8 +94,8 @@ export default function AdminPaymentsPage() {
       await api.post(`/payments/admin/${paymentId}/refund`, { reason }, { token });
       toast(`Payment #${paymentId} iade edildi`, 'success');
       load();
-    } catch (err: any) {
-      toast(err?.message || 'İade hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'İade hatası', 'error');
     }
   };
 
@@ -110,10 +110,10 @@ export default function AdminPaymentsPage() {
         days: parseInt(days, 10),
         reason,
       }, { token });
-      toast(`User #${userId} premium until: ${new Date((res as any).premium_until).toLocaleString('tr-TR')}`, 'success');
+      toast(`User #${userId} premium until: ${new Date((res as { premium_until: string }).premium_until).toLocaleString('tr-TR')}`, 'success');
       load();
-    } catch (err: any) {
-      toast(err?.message || 'Grant hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Grant hatası', 'error');
     }
   };
 

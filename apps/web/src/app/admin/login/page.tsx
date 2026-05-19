@@ -30,8 +30,8 @@ export default function AdminLoginPage() {
       localStorage.setItem('admin_token', data.access_token);
       localStorage.setItem('admin_user', JSON.stringify(data.user));
       window.location.href = '/admin';
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Giriş başarısız');
     }
   };
 
