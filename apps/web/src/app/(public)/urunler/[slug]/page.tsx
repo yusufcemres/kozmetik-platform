@@ -159,10 +159,20 @@ type ScoreExplanation = {
 };
 
 type CosmeticScore = {
-  total: number;
+  overall_score: number;
+  total?: number;
   grade?: string;
   explanation: ScoreExplanation[];
-  [key: string]: unknown;
+  floor_cap_applied?: string;
+  breakdown?: Record<string, number>;
+  flags?: {
+    allergens?: string[];
+    fragrances?: string[];
+    harmful?: string[];
+    cmr?: string[];
+    endocrine?: string[];
+    eu_banned?: string[];
+  };
 };
 
 interface ProductFullResponse {

@@ -28,11 +28,12 @@ interface DashboardData {
 
 type RecentQuestion = {
   question_id: number;
+  question: string;
   question_text?: string;
+  category: string;
   status: 'pending' | 'answered' | string;
   created_at: string;
   product_name?: string;
-  [key: string]: unknown;
 };
 
 const GRADE_COLORS: Record<string, string> = {

@@ -24,9 +24,12 @@ type InciToken = {
     common_name?: string | null;
     evidence_grade?: string | null;
     function_summary?: string | null;
-    [key: string]: unknown;
+    allergen_flag?: boolean;
+    fragrance_flag?: boolean;
+    cmr_class?: boolean | string | null;
+    eu_banned?: boolean;
+    ingredient_slug?: string;
   };
-  [key: string]: unknown;
 };
 
 // Tek INCI kartı — varsayılan kapalı, tıklayınca detay açılır

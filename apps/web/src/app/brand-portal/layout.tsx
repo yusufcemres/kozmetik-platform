@@ -43,7 +43,8 @@ function BrandPortalShell({ children }: { children: React.ReactNode }) {
     contact_name?: string;
     contact_email?: string;
     brand_name?: string;
-    [key: string]: unknown;
+    email?: string;
+    plan?: string;
   };
   let accountInfo: BrandAccountInfo | null = null;
   if (typeof window !== 'undefined') {
