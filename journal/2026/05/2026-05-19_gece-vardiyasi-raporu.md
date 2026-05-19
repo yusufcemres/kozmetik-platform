@@ -308,3 +308,33 @@ para ödemeden erişilebilirdi:
 - **Modül F** — Akademik partnership outreach
 - **Brand Portal Q1 2027** sprint başlangıcı
 - **scoring.service spec** — minimum coverage 50%
+
+---
+
+## 🌅 Son Sprint (08:00-08:45, 3 ek commit)
+
+### `:any` final temizlik — batch 13+14+15
+
+| # | Commit | İş |
+|---|---|---|
+| 50 | `ec86628` | **`:any` batch 13** — API DTO (CreateProductLabelDto) + useAdminCrud + 3 admin page (inci-proposals + ingredients + review-queue) |
+| 51 | `4791770` | **`:any` batch 14** — 19 web file × 35+ occurrence: ai-arama, inci-analiz, odeme, premium, cilt-analizi/{foto-test, karsilastir, trend, veri-haklarim}, profilim, tara (InciToken type), giris (Google/FB SDK types), urunler/[slug] (CosmeticScore + ScoreExplanation), takviyeler/[slug], brand-portal/{dashboard, layout, login, register, questions, products/[id]/edit} |
+| 52 | `d20890f` | **`:any` batch 15** — mail.service catch narrow (production katmanı son occurrence) |
+
+**Net sonuç:**
+- API `modules/` + `common/` production katmanında functional `:any` = **0** (sadece spec mock + scripts kaldı, intentional)
+- Web app + components production katmanında functional `:any` = **0** (sadece AdminTable generic backward-compat `value: any` kaldı — comment'la dokümante)
+- Toplam ~70 occurrence (batch 2-12) + 13+35+1 (batch 13-15) = **~120 :any** elendi
+
+**Toplam commit:** 49 → **52** (Modül J + 3 cleanup batch)
+
+### Üretim hazırlık skoru — final
+
+| Bileşen | Skor |
+|---|---|
+| Dev kod kalitesi | %100 (functional `:any` sıfır) |
+| LAUNCH_CHECKLIST | %78 (kullanıcı tarafı kalan) |
+| Faz 1+2+3 dev | %100 |
+| Faz 4+5 polish | %100 |
+| Test coverage | %~12 (skin-combo 8 + newsletter 9 + skin-coach 3 + vision 3 + user-auth 4) |
+| Modül H + I + J | %100 |
