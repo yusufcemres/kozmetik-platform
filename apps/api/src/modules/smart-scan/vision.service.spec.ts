@@ -102,4 +102,36 @@ describe('VisionService', () => {
       expect(config.get).toHaveBeenCalled();
     });
   });
+
+  describe('Quota cooldown (2026-05-19 polish)', () => {
+    it('isQuotaError 429/quota/rate limit pattern tespit eder', () => {
+      const isQuotaError = (service as any).isQuotaError.bind(service);
+      expect(isQuotaError('Gemini 429: rate limit exceeded')).toBe(true);
+      expect(isQuotaError('quota exceeded for project')).toBe(true);
+      expect(isQuotaError('rate_limit_exceeded')).toBe(true);
+      expect(isQuotaError('insufficient_quota')).toBe(true);
+      expect(isQuotaError('OpenAI 500 internal error')).toBe(false);
+      expect(isQuotaError('Network timeout')).toBe(false);
+    });
+
+    it('markCooldown sonrası isInCooldown true döner', () => {
+      const markCooldown = (service as any).markCooldown.bind(service);
+      const isInCooldown = (service as any).isInCooldown.bind(service);
+      expect(isInCooldown('gemini')).toBe(false);
+      markCooldown('gemini', '429');
+      expect(isInCooldown('gemini')).toBe(true);
+      expect(isInCooldown('claude')).toBe(false);
+    });
+
+    it('cooldown 5dk sonra reset olur', () => {
+      const markCooldown = (service as any).markCooldown.bind(service);
+      const isInCooldown = (service as any).isInCooldown.bind(service);
+      const realNow = Date.now();
+      markCooldown('openai', 'quota');
+      // 5 dakika + 1ms sonra
+      jest.spyOn(Date, 'now').mockReturnValue(realNow + 5 * 60_000 + 1);
+      expect(isInCooldown('openai')).toBe(false);
+      jest.restoreAllMocks();
+    });
+  });
 });
