@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, ILike, In } from 'typeorm';
+import { Repository, Like, ILike, In, FindOptionsWhere } from 'typeorm';
 import {
   Product, ProductLabel, ProductImage, ProductMaster, ProductVariant,
   AffiliateLink, AffiliateClick, FormulaRevision, PriceHistory, Category,
@@ -107,7 +107,7 @@ export class ProductsService {
     const sort = query.sort ?? 'newest';
     let { category_id } = query;
     const { category_slug } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<Product> = {};
 
     // Sprint 6: Eğer rich filter aktifse → unified query builder path
     const hasRichFilter = !!(
@@ -396,7 +396,7 @@ export class ProductsService {
 
       if (search) qb.andWhere('p.product_name ILIKE :search', { search: `%${search}%` });
       if (brand_id) qb.andWhere('p.brand_id = :bid', { bid: Number(brand_id) });
-      if (category_id) qb.andWhere('p.category_id IN (:...cids)', { cids: where.category_id?.value || [Number(category_id)] });
+      if (category_id) qb.andWhere('p.category_id IN (:...cids)', { cids: (where.category_id as { value?: number[] } | undefined)?.value || [Number(category_id)] });
       if (target_area) qb.andWhere('p.target_area = :ta', { ta: target_area });
       if (usage_time) qb.andWhere('p.usage_time_hint = :ut', { ut: usage_time });
       if (product_type) qb.andWhere('p.product_type_label ILIKE :pt', { pt: `%${product_type}%` });
@@ -794,7 +794,23 @@ export class ProductsService {
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return null;
-    const data: any = await res.json();
+    type OpenFoodFactsResp = {
+      status: number;
+      product?: {
+        product_name?: string;
+        product_name_en?: string;
+        brands?: string;
+        quantity?: string;
+        image_url?: string;
+        image_front_url?: string;
+        countries?: string;
+        categories?: string;
+        ingredients_text_en?: string;
+        ingredients_text?: string;
+        ingredients_text_tr?: string;
+      } & Record<string, string | undefined>;
+    };
+    const data = (await res.json()) as OpenFoodFactsResp;
     if (data.status !== 1 || !data.product) return null;
     const p = data.product;
 
@@ -1142,7 +1158,7 @@ export class ProductsService {
       WHERE p.product_id != $1
         AND p.status != 'archived'
     `;
-    const params: any[] = [productId];
+    const params: (string | number)[] = [productId];
     let paramIdx = 2;
 
     if (domainType) {
@@ -1420,7 +1436,7 @@ export class ProductsService {
     });
 
     // Global stats
-    const allPrices = rows.map((r: any) => parseFloat(r.price));
+    const allPrices = (rows as { price: string }[]).map((r) => parseFloat(r.price));
     return {
       period_days: days,
       global_min: allPrices.length ? Math.min(...allPrices) : 0,
