@@ -222,3 +222,89 @@ para ödemeden erişilebilirdi:
 - **Day 11 checklist:** `journal/2026/05/2026-05-17_faz1-day11-test-checklist.md`
 - **Kuyruk planı:** `journal/2026/05/2026-05-18_revela_kuyrukta_kalan_isler.md`
 - **Foto Analiz V2 memory:** `project_revela_foto_analiz_v2.md`
+
+---
+
+## 🌙 Bayram gecesi devam (19 May 04:00 → 08:00, 12 ek commit)
+
+### Modül I — SEO etki sayfaları (1 commit)
+
+| # | Commit | İş |
+|---|---|---|
+| 38 | `771c512` | **Modül I pilot** — 10 Aktif × Yöntem etki sayfası SSG (`/etki/[aktif]-[yontem]`) + ACTIVE_METHOD_PAIRS sözlük |
+
+### Newsletter feature kompleti (3 commit)
+
+| # | Commit | İş |
+|---|---|---|
+| 39 | `01dbeb0` | **Newsletter subscription + admin broadcast** — Migration 036 + service + controller + admin UI |
+| 40 | `f355bbf` | **Newsletter spec** — subscribe/unsubscribe 9 unit test (hepsi geçti) |
+| 41 | `bc67304` | **`/healthz` alias** — uptime monitor convention (`@Controller(['health', 'healthz'])`) |
+
+### `:any` cleanup batch 11-12 (2 commit, 38 occurrence)
+
+| # | Commit | İş |
+|---|---|---|
+| 42 | `5e5dc75` | **`:any` cleanup batch 11** — products.service.ts **SIFIRA İNDİRİLDİ** (24→0) |
+| 43 | `eb66081` | **AdminTable + AdminFormModal generic refactor** + admin web batch (`<T extends object>` + 14 occurrence cleanup) |
+
+### Modül J — "Senin Cildine Combo" tam implementasyon (5 commit)
+
+| # | Commit | İş |
+|---|---|---|
+| 44 | `964699e` | **Modül J iskelet** — 2-serum öneri hero (sahte sabah/akşam logic) |
+| 45 | `4ff4113` | **`:any` cleanup batch 12** — admin pages 14 occurrence (11 dosya) |
+| 46 | `0dba51c` | **Modül J #1 — Backend ComboService** (386 satır) + 2 endpoint (`/skin-analysis/:id/combo` + `/skin-analysis/combo/from-scores`) — INCI_PROFILE 22 ingredient + DIM_INGREDIENT_MAP 6 dim + Fitzpatrick filter + AM/PM ayrım + sinerji/kontraendikasyon |
+| 47 | `71b42ed` | **Modül J #2 — Frontend SkinComboWidget** backend'den çeker (foto-test sahte etiket → gerçek logic) |
+| 48 | `5e86d55` | **Modül J #3 — Quiz çıktısı /onerilerimiz** Combo entegre (heuristik 6-boyut skor: skinType/ageRange/sun/sleep/stress/sensitivity → ComboWidget) |
+| 49 | `16fe7fe` | **Modül J #4 — SkinComboService 8 unit test** (8/8 pass: <40 skor null, top-2 boyut sıralı, Fitzpatrick 5 retinol elenir, sinerji flag, kontraendikasyon warning, DB enrich, photosensitive AM slot yok) |
+
+### Modül J sonuç özeti
+
+**Önceki MVP iskeletten farkı:**
+- ❌ Sahte "Sabah/Akşam" etiket → ✅ Photosensitive INCI'ye göre gerçek AM/PM ataması
+- ❌ Skor sıralaması only → ✅ Top-2 boyut → INCI havuzu → Fitzpatrick filter → contra/synergy
+- ❌ Frontend sadece div → ✅ Backend service + 2 endpoint + DB ingredient enrich
+- ❌ Quiz akışı entegre değil → ✅ /onerilerimiz heuristik 6 skor → ComboWidget
+
+**Algoritma karar matrisi:**
+- Fitzpatrick 5-6 → retinol/AHA arkaya, bakuchiol/azelaik öne (PIH riski)
+- Fitzpatrick 1-2 → sensitivity:low tercih (rosacea + hassasiyet)
+- Retinol + niacinamide → sinerji TRUE (klinik kanıt)
+- Retinol + glycolic → contra TRUE (uyarı: ayrı uygula)
+- ≥40 skor olmayan → null + bariyer notu
+
+**INCI profili kapsamı:** 22 INCI × 6 boyut. Modül H niche INCI'leri dahil.
+
+### Sayısal güncelleme
+
+- **Toplam commit:** 37 → **49** (+12)
+- **Modül J:** Skeleton → **tam** (4 commit, 386 satır backend + frontend widget + 8 spec test)
+- **`:any` cleanup:** products.service 24 → 0, AdminTable generic, admin pages 14 occurrence cleanup
+- **Newsletter:** Migration 036 + servis + 9 spec
+- **Modül I:** 10 SSG SEO sayfası
+- **`/healthz` alias:** uptime monitor convention
+
+### Production hazırlık skoru — güncel
+
+| Bileşen | Skor | Δ |
+|---|---|---|
+| Dev kod kalitesi | %99 (+1) | products.service `:any` sıfırlandı |
+| LAUNCH_CHECKLIST | %78 (+3) | Newsletter + Modül I + healthz |
+| Faz 1+2+3 dev | %100 | Day 11/12 + PayTR onayı bekliyor |
+| Faz 4+5 polish | %100 | Modül H + J kapandı |
+| Test coverage | %~12 (+2) | skin-combo 8 + newsletter 9 + skin-coach 3 |
+| Modül H + I + J | %100 | Niche INCI + SEO etki + Combo tam |
+
+### Sıradaki bekleyen iş
+
+**Kullanıcı tarafı (deploy):**
+1. Render manual deploy trigger ("deploy asıl tetıklıcem")
+2. Render boot'ta Migration 034/035/036 otomatik (`migrationsRun: true`)
+3. Day 11 e2e manuel test
+4. Day 12 PR aç + RELEASE_NOTES_FAZ1.md
+
+**Sıradaki dev sprint (sabah sonrası):**
+- **Modül F** — Akademik partnership outreach
+- **Brand Portal Q1 2027** sprint başlangıcı
+- **scoring.service spec** — minimum coverage 50%
