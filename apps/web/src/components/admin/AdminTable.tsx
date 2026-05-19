@@ -1,9 +1,27 @@
 'use client';
 
-interface Column {
+/**
+ * Generic admin table — T row tipini caller belirler.
+ *
+ * 2026-05-19 Madde 22 cleanup: any → generic. Default T = Record<string,unknown>
+ * eski callsite'lar kırılmadan upgrade edilebilir.
+ *
+ * Kullanım:
+ *   <AdminTable<MyRow> columns={...} data={rows} ... />
+ *   Column<MyRow> sayesinde col.render satır tipini biliyor.
+ */
+
+/**
+ * Column<T> — key generic'siz string kalıyor (eski callsite'lar 'kategori_slug'
+ * gibi inline string geçiyor). value: any backward compat — eski render
+ * callback'leri (v: string) gibi narrow imzayla çalışsın.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Column<T = Record<string, unknown>> {
   key: string;
   label: string;
-  render?: (value: any, row: any) => React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render?: (value: any, row: T) => React.ReactNode;
 }
 
 interface PaginationMeta {
@@ -13,9 +31,9 @@ interface PaginationMeta {
   totalPages: number;
 }
 
-interface AdminTableProps {
-  columns: Column[];
-  data: any[];
+interface AdminTableProps<T> {
+  columns: Column<T>[];
+  data: T[];
   loading?: boolean;
   meta?: PaginationMeta;
   page?: number;
@@ -23,11 +41,11 @@ interface AdminTableProps {
   search?: string;
   onSearch?: (term: string) => void;
   searchPlaceholder?: string;
-  onEdit?: (row: any) => void;
-  onDelete?: (row: any) => void;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
 }
 
-export default function AdminTable({
+export default function AdminTable<T extends object = Record<string, unknown>>({
   columns,
   data,
   loading,
@@ -39,7 +57,7 @@ export default function AdminTable({
   searchPlaceholder = 'Ara...',
   onEdit,
   onDelete,
-}: AdminTableProps) {
+}: AdminTableProps<T>) {
   return (
     <div className="bg-white rounded-lg shadow">
       {/* Search bar */}
@@ -102,11 +120,14 @@ export default function AdminTable({
             ) : (
               data.map((row, i) => (
                 <tr key={i} className="hover:bg-gray-50">
-                  {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3">
-                      {col.render ? col.render(row[col.key], row) : (row[col.key] ?? '-')}
-                    </td>
-                  ))}
+                  {columns.map((col) => {
+                    const value = (row as Record<string, unknown>)[col.key];
+                    return (
+                      <td key={col.key} className="px-4 py-3">
+                        {col.render ? col.render(value, row) : ((value as React.ReactNode) ?? '-')}
+                      </td>
+                    );
+                  })}
                   {(onEdit || onDelete) && (
                     <td className="px-4 py-3 text-right space-x-2">
                       {onEdit && (

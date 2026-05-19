@@ -9,16 +9,16 @@ export interface FormField {
   placeholder?: string;
   required?: boolean;
   options?: { value: string; label: string }[];
-  defaultValue?: any;
+  defaultValue?: string | number | boolean;
 }
 
 interface AdminFormModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Record<string, any>) => Promise<boolean>;
+  onSubmit: (data: Record<string, unknown>) => Promise<boolean>;
   title: string;
   fields: FormField[];
-  initialData?: Record<string, any> | null;
+  initialData?: Record<string, unknown> | null;
   submitLabel?: string;
 }
 
@@ -31,12 +31,12 @@ export default function AdminFormModal({
   initialData,
   submitLabel,
 }: AdminFormModalProps) {
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
-      const initial: Record<string, any> = {};
+      const initial: Record<string, unknown> = {};
       fields.forEach((f) => {
         if (initialData && initialData[f.key] !== undefined) {
           initial[f.key] = initialData[f.key];
@@ -64,7 +64,7 @@ export default function AdminFormModal({
     if (success) onClose();
   };
 
-  const updateField = (key: string, value: any) => {
+  const updateField = (key: string, value: unknown) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -97,7 +97,7 @@ export default function AdminFormModal({
 
               {field.type === 'textarea' ? (
                 <textarea
-                  value={formData[field.key] || ''}
+                  value={String(formData[field.key] ?? '')}
                   onChange={(e) => updateField(field.key, e.target.value)}
                   placeholder={field.placeholder}
                   required={field.required}
@@ -106,7 +106,7 @@ export default function AdminFormModal({
                 />
               ) : field.type === 'select' ? (
                 <select
-                  value={formData[field.key] || ''}
+                  value={String(formData[field.key] ?? '')}
                   onChange={(e) => updateField(field.key, e.target.value)}
                   required={field.required}
                   className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
@@ -131,7 +131,7 @@ export default function AdminFormModal({
               ) : (
                 <input
                   type={field.type || 'text'}
-                  value={formData[field.key] ?? ''}
+                  value={String(formData[field.key] ?? '')}
                   onChange={(e) =>
                     updateField(
                       field.key,
