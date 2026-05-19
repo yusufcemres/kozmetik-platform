@@ -5,7 +5,9 @@ import { CacheService } from './common/cache/cache.service';
 import { DataSource } from 'typeorm';
 
 @ApiTags('Health')
-@Controller('health')
+// 2026-05-19: /healthz alias eklendi (k8s + Render + uptime tool convention).
+// Eski /health backward-compat için kalıyor.
+@Controller(['health', 'healthz'])
 @SkipThrottle()
 export class HealthController {
   private readonly startedAt = Date.now();
