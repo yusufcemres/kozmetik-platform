@@ -83,3 +83,6 @@ export { UserFavorite } from './user-favorite.entity';
 
 // Product Reviews (V2.B.12)
 export { ProductReview } from './product-review.entity';
+
+// Newsletter Subscriptions (Faz P, Migration 036)
+export { NewsletterSubscription } from './newsletter-subscription.entity';

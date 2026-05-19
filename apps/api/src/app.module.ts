@@ -33,6 +33,7 @@ import { B2bModule } from './modules/b2b/b2b.module';
 import { PriceAlertsModule } from './modules/price-alerts/price-alerts.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { BrandPortalModule } from './modules/brand-portal/brand-portal.module';
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { TitckModule } from './modules/titck/titck.module';
 import { TagValidatorModule } from './modules/tag-validator/tag-validator.module';
 import { ProfileEngineModule } from './modules/profile-engine/profile-engine.module';
@@ -87,7 +88,7 @@ const featureModules = skipDb
       ProductsModule, IngestionModule, MappingsModule, MethodologyModule,
       ScoringModule, SearchModule, ContentModule, ProfilesModule, SystemModule,
       SupplementsModule, InteractionsModule, AffiliateModule, B2bModule, PriceAlertsModule,
-      AnalyticsModule, BrandPortalModule,
+      AnalyticsModule, BrandPortalModule, NewsletterModule,
       TitckModule, TagValidatorModule, ProfileEngineModule, BlogModule, AiSearchModule,
       ReviewsModule,
     ];
