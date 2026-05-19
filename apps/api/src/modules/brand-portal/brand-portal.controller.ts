@@ -17,6 +17,21 @@ import { BrandPlanGuard, RequirePlan } from './guards/brand-plan.guard';
 import { CurrentUser } from '@common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 
+/**
+ * BrandAuthGuard'dan gelen req.user shape — JWT payload + brand context.
+ * Admin endpoint'lerinde JwtAuthGuard kullanılır → admin_user_id field.
+ * (Madde 22 type cleanup, 2026-05-19)
+ */
+interface BrandPortalUser {
+  account_id: number;
+  brand_id: number;
+  email?: string;
+  plan?: string;
+  plan_code?: string;
+  // Admin path için (JwtAuthGuard)
+  admin_user_id?: number;
+}
+
 @ApiTags('Brand Portal')
 @Controller('brand-portal')
 export class BrandPortalController {
@@ -42,7 +57,7 @@ export class BrandPortalController {
   @UseGuards(BrandAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Marka dashboard özeti' })
-  async getDashboard(@CurrentUser() user: any) {
+  async getDashboard(@CurrentUser() user: BrandPortalUser) {
     return this.service.getDashboard(user.account_id, user.brand_id);
   }
 
@@ -53,7 +68,7 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Markanın ürünlerini listele' })
   async getProducts(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
@@ -65,7 +80,7 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Ürün bilgisi güncelleme isteği (audit trail)' })
   async updateProduct(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Param('productId', ParseIntPipe) productId: number,
     @Body() dto: UpdateProductInfoDto,
   ) {
@@ -98,7 +113,7 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Marka paneli — soruları listele' })
   async getBrandQuestions(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Query('status') status?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -111,7 +126,7 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soruyu yanıtla' })
   async answerQuestion(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Param('questionId', ParseIntPipe) questionId: number,
     @Body() dto: AnswerQuestionDto,
   ) {
@@ -124,7 +139,7 @@ export class BrandPortalController {
   @UseGuards(BrandAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Marka sertifikalarını listele' })
-  async getCertificates(@CurrentUser() user: any) {
+  async getCertificates(@CurrentUser() user: BrandPortalUser) {
     return this.service.getBrandCertificates(user.brand_id);
   }
 
@@ -134,7 +149,7 @@ export class BrandPortalController {
   @UseGuards(BrandAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Şeffaflık skoru' })
-  async getTransparency(@CurrentUser() user: any) {
+  async getTransparency(@CurrentUser() user: BrandPortalUser) {
     return this.service.calculateTransparencyScore(user.brand_id);
   }
 
@@ -151,7 +166,7 @@ export class BrandPortalController {
   @RequirePlan('professional', 'enterprise')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Marka analitikleri (Pro+)' })
-  async getAnalytics(@CurrentUser() user: any) {
+  async getAnalytics(@CurrentUser() user: BrandPortalUser) {
     // Analytics will be expanded in FAZ 22.10
     return {
       brand_id: user.brand_id,
@@ -175,11 +190,11 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Admin — marka doğrula' })
   async verifyBrand(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Param('accountId', ParseIntPipe) accountId: number,
     @Body('method') method: string,
   ) {
-    return this.service.verifyBrand(accountId, user.admin_user_id, method || 'manual');
+    return this.service.verifyBrand(accountId, user.admin_user_id ?? 0, method || 'manual');
   }
 
   @Patch('admin/reject/:accountId')
@@ -187,10 +202,10 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Admin — marka reddet' })
   async rejectBrand(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Param('accountId', ParseIntPipe) accountId: number,
   ) {
-    return this.service.rejectBrand(accountId, user.admin_user_id);
+    return this.service.rejectBrand(accountId, user.admin_user_id ?? 0);
   }
 
   @Get('admin/edits')
@@ -209,10 +224,10 @@ export class BrandPortalController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Admin — düzenleme onayla/reddet' })
   async reviewEdit(
-    @CurrentUser() user: any,
+    @CurrentUser() user: BrandPortalUser,
     @Param('editId', ParseIntPipe) editId: number,
     @Body('approved') approved: boolean,
   ) {
-    return this.service.reviewEdit(editId, user.admin_user_id, approved);
+    return this.service.reviewEdit(editId, user.admin_user_id ?? 0, approved);
   }
 }
