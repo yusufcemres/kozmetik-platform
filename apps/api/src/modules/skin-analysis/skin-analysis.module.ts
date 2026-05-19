@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { SkinAnalysisResult, UserAction } from '@database/entities';
+import { SkinAnalysisResult, UserAction, Ingredient } from '@database/entities';
 import { SkinAnalysisController } from './skin-analysis.controller';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinAnalysisCronService } from './skin-analysis.cron';
 import { SkinCoachService } from './skin-coach.service';
+import { SkinComboService } from './skin-combo.service';
 import { VisionService } from '../smart-scan/vision.service';
 import { MailModule } from '../../common/mail/mail.module';
 import { PaymentsModule } from '../payments/payments.module';
@@ -22,13 +23,13 @@ import { PaymentsModule } from '../payments/payments.module';
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SkinAnalysisResult, UserAction]),
+    TypeOrmModule.forFeature([SkinAnalysisResult, UserAction, Ingredient]),
     ConfigModule,
     MailModule,
     PaymentsModule,
   ],
   controllers: [SkinAnalysisController],
-  providers: [SkinAnalysisService, VisionService, SkinAnalysisCronService, SkinCoachService],
+  providers: [SkinAnalysisService, VisionService, SkinAnalysisCronService, SkinCoachService, SkinComboService],
   exports: [SkinAnalysisService],
 })
 export class SkinAnalysisModule {}

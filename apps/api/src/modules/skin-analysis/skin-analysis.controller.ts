@@ -4,6 +4,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinCoachService } from './skin-coach.service';
+import { SkinComboService } from './skin-combo.service';
 import { SkinAnalysisRequestDto } from './dto/skin-analysis.dto';
 import { AppJwtGuard } from '../user-auth/app-jwt.guard';
 import { PremiumGuard, RequirePremium } from '../payments/premium.guard';
@@ -21,6 +22,7 @@ export class SkinAnalysisController {
   constructor(
     private readonly service: SkinAnalysisService,
     private readonly coach: SkinCoachService,
+    private readonly combo: SkinComboService,
   ) {}
 
   @Post()
@@ -96,6 +98,39 @@ export class SkinAnalysisController {
   async historyByToken(@Param('token') token: string, @Query('limit') limit?: string) {
     const lim = Math.min(Math.max(parseInt(limit ?? '20', 10) || 20, 1), 50);
     return this.service.getHistoryByToken(token, lim);
+  }
+
+  /**
+   * Modül J — Senin Cildine Combo: 2-serum öneri (2026-05-19).
+   * Public — auth gerektirmez (foto analiz public olduğu için, combo da).
+   * Premium gating ileride: combo "v2 sinerji haritası" Premium feature olabilir.
+   */
+  @Get(':id/combo')
+  @Throttle({ public: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Modül J — Senin Cildine Combo: cilt skoruna göre 2-serum öneri' })
+  async getCombo(@Param('id', ParseIntPipe) id: number) {
+    const analysis = await this.service.getById(id);
+    if (!analysis) throw new NotFoundException('Analiz bulunamadı');
+    const fitzpatrick = analysis.scores?.fitzpatrick_type ?? null;
+    return this.combo.recommendCombo(analysis.scores, fitzpatrick);
+  }
+
+  /**
+   * Quiz combo — anonim profilden (skin_type + concerns) direkt combo.
+   * /onerilerimiz sayfası için. Foto analizi olmadan da combo verir.
+   * Body: skor breakdown'u; quiz UI hesaplayıp gönderir.
+   */
+  @Post('combo/from-scores')
+  @Throttle({ public: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Quiz çıktısı için direkt combo (foto gerek yok)' })
+  async comboFromScores(@Body() body: {
+    scores?: Partial<Record<'t_zone_oil' | 'pore_visibility' | 'wrinkles' | 'pigmentation' | 'redness' | 'under_eye_darkness', number>>;
+    fitzpatrick_type?: number;
+  }) {
+    if (!body?.scores || typeof body.scores !== 'object') {
+      throw new BadRequestException('scores zorunlu (boyut: değer obje)');
+    }
+    return this.combo.recommendCombo(body.scores as Parameters<SkinComboService['recommendCombo']>[0], body.fitzpatrick_type ?? null);
   }
 
   /**
