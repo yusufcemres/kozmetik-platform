@@ -914,17 +914,17 @@ export class ProductsService {
       this.reviewsService.aggregateForProduct(product.product_id).catch(() => null),
     ]);
 
-    // Interactions dedup
+    // Interactions dedup — IngredientInteraction entity dönüyor
     const seen = new Set<number>();
-    const interactions = interactionBatches.flat().filter((r: any) => {
+    const interactions = interactionBatches.flat().filter((r) => {
       if (seen.has(r.interaction_id)) return false;
       seen.add(r.interaction_id);
       return true;
     });
 
-    // Supplement cross-refs dedup
-    const supplementMap = new Map<number, any>();
-    supplementBatches.flat().forEach((p: any) => {
+    // Supplement cross-refs dedup — Product entity dönüyor
+    const supplementMap = new Map<number, typeof supplementBatches[number][number]>();
+    supplementBatches.flat().forEach((p) => {
       if (!supplementMap.has(p.product_id)) supplementMap.set(p.product_id, p);
     });
     const supplement_cross_refs = Array.from(supplementMap.values()).slice(0, 6);
@@ -1137,13 +1137,13 @@ export class ProductsService {
     if (!source) throw new NotFoundException('Ürün bulunamadı');
 
     const sourceKeyIngredients = (source.ingredients || [])
-      .filter((pi: any) => pi.is_highlighted_in_claims)
-      .map((pi: any) => ({
+      .filter((pi) => pi.is_highlighted_in_claims)
+      .map((pi) => ({
         ingredient_id: pi.ingredient_id,
-        name: pi.ingredient?.inci_name || pi.ingredient?.ingredient_name || '',
+        name: pi.ingredient?.inci_name || (pi.ingredient as { ingredient_name?: string } | undefined)?.ingredient_name || '',
       }));
 
-    const sourceNeeds = (source.need_scores || []).map((ns: any) => ({
+    const sourceNeeds = (source.need_scores || []).map((ns) => ({
       need_id: ns.need_id,
       name: ns.need?.need_name || '',
       score: Number(ns.compatibility_score) || 0,
@@ -1173,46 +1173,57 @@ export class ProductsService {
     }
 
     candidateQuery += ` LIMIT 200`;
-    const candidates: any[] = await this.repo.manager.query(candidateQuery, params);
+    type CandidateRow = {
+      product_id: number;
+      product_name: string;
+      product_slug: string;
+      category_id: number;
+      domain_type: string;
+      product_type_label: string | null;
+      brand_name: string;
+      brand_slug: string;
+    };
+    const candidates = (await this.repo.manager.query(candidateQuery, params)) as CandidateRow[];
     if (!candidates.length) return [];
 
     const candidateIds = candidates.map((c) => c.product_id);
 
-    // Batch fetch key ingredients for all candidates
-    const candidateIngredients: any[] = await this.repo.manager.query(
+    type CandidateIngRow = { product_id: number; ingredient_id: number; inci_name: string };
+    type CandidateNeedRow = { product_id: number; need_id: number; need_name: string; compatibility_score: string };
+    type CandidatePriceRow = { product_id: number; price_snapshot: string | number };
+    type CandidateImageRow = { product_id: number; image_url: string };
+
+    const candidateIngredients = (await this.repo.manager.query(
       `SELECT pi.product_id, pi.ingredient_id, i.inci_name
        FROM product_ingredients pi
        JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
        WHERE pi.product_id = ANY($1) AND pi.is_highlighted_in_claims = true`,
       [candidateIds],
-    );
+    )) as CandidateIngRow[];
 
-    // Batch fetch need scores for all candidates
-    const candidateNeedScores: any[] = await this.repo.manager.query(
+    const candidateNeedScores = (await this.repo.manager.query(
       `SELECT pns.product_id, pns.need_id, n.need_name, pns.compatibility_score
        FROM product_need_scores pns
        JOIN needs n ON n.need_id = pns.need_id
        WHERE pns.product_id = ANY($1)`,
       [candidateIds],
-    );
+    )) as CandidateNeedRow[];
 
-    // Batch fetch lowest prices
-    const candidatePrices: any[] = await this.repo.manager.query(
+    const candidatePrices = (await this.repo.manager.query(
       `SELECT DISTINCT ON (al.product_id) al.product_id, al.price_snapshot
        FROM affiliate_links al
        WHERE al.product_id = ANY($1) AND al.is_active = true AND al.price_snapshot IS NOT NULL
        ORDER BY al.product_id, al.price_snapshot ASC`,
       [candidateIds],
-    );
+    )) as CandidatePriceRow[];
 
-    // Batch fetch images
-    const candidateImages: any[] = await this.repo.manager.query(
+    const candidateImages = (await this.repo.manager.query(
       `SELECT DISTINCT ON (pi.product_id) pi.product_id, pi.image_url
        FROM product_images pi
        WHERE pi.product_id = ANY($1)
        ORDER BY pi.product_id, pi.sort_order ASC`,
       [candidateIds],
-    );
+    )) as CandidateImageRow[];
 
     // Index by product_id
     const ingByProduct = new Map<number, { ingredient_id: number; name: string }[]>();
