@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { SkinAnalysisResult, UserAction, Ingredient } from '@database/entities';
+import { SkinAnalysisResult, UserAction, Ingredient, AppUser } from '@database/entities';
 import { SkinAnalysisController } from './skin-analysis.controller';
 import { SkinAnalysisService } from './skin-analysis.service';
 import { SkinAnalysisCronService } from './skin-analysis.cron';
@@ -23,7 +23,7 @@ import { PaymentsModule } from '../payments/payments.module';
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SkinAnalysisResult, UserAction, Ingredient]),
+    TypeOrmModule.forFeature([SkinAnalysisResult, UserAction, Ingredient, AppUser]),
     ConfigModule,
     MailModule,
     PaymentsModule,
