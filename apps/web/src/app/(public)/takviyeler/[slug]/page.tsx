@@ -13,6 +13,7 @@ import { apiFetch, API_BASE_URL } from '@/lib/api';
  */
 export const revalidate = 60;
 import { formatPrice } from '@/lib/format';
+import AffiliateLink from '@/components/public/AffiliateLink';
 import { PLATFORM_INFO, platformLabel as sharedPlatformLabel } from '@/lib/platforms';
 import ScoreBadge from '@/components/public/ScoreBadge';
 import PriceChart from '@/components/public/PriceChart';
@@ -973,11 +974,13 @@ export default async function SupplementDetailPage({
                 const pInfo = PLATFORM_INFO[link.platform];
                 const branded = !!pInfo;
                 return (
-                  <a
+                  <AffiliateLink
                     key={link.affiliate_link_id}
-                    href={`${API_BASE_URL}/r/${link.affiliate_link_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow sponsored"
+                    href={link.affiliate_url}
+                    affiliateLinkId={link.affiliate_link_id}
+                    productId={product.product_id}
+                    platform={link.platform}
+                    price={link.price_snapshot ? Number(link.price_snapshot) : undefined}
                     aria-label={`${platformLabel(link.platform)}'de aç`}
                     className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors"
                   >
@@ -1000,7 +1003,7 @@ export default async function SupplementDetailPage({
                       )}
                       <span className="material-icon text-outline-variant text-[18px]" aria-hidden="true">arrow_forward</span>
                     </div>
-                  </a>
+                  </AffiliateLink>
                 );
               })}
             </div>
