@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, DataSource } from 'typeorm';
 import { Ingredient } from '@database/entities';
 import type { SkinScoreBreakdown } from './dto/skin-analysis.dto';
 
@@ -202,7 +202,57 @@ export interface ComboResult {
 export class SkinComboService {
   constructor(
     @InjectRepository(Ingredient) private readonly ingredients: Repository<Ingredient>,
+    private readonly dataSource: DataSource,
   ) {}
+
+  /**
+   * Verilen INCI slug için "en uygun" yayında REVELA ürününü döner.
+   *
+   * Kriter:
+   *  - product_ingredient eşleşmesi var
+   *  - status='published' + domain_type='cosmetic'
+   *  - INCI ilk 5'te (inci_order_rank ≤ 5) → konsantrasyon yüksek olasılığı
+   *  - Bulunmazsa ilk 10'da gevşet
+   *  - Bulunmazsa fallback: herhangi yayında ürün
+   *
+   * Top-1 döner (slug, name, brand) — frontend tıklayınca /urunler/[slug] açılır.
+   */
+  private async findBestProductForInci(slug: string): Promise<{
+    product_id: number;
+    product_name: string;
+    product_slug: string;
+    brand_name: string | null;
+  } | null> {
+    const sql = `
+      SELECT p.product_id, p.product_name, p.product_slug, b.brand_name
+      FROM product_ingredients pi
+      JOIN ingredients i ON i.ingredient_id = pi.ingredient_id
+      JOIN products p ON p.product_id = pi.product_id
+      LEFT JOIN brands b ON b.brand_id = p.brand_id
+      WHERE i.ingredient_slug = $1
+        AND p.status = 'published'
+        AND p.domain_type = 'cosmetic'
+        AND pi.inci_order_rank <= $2
+      ORDER BY pi.inci_order_rank ASC, p.product_id DESC
+      LIMIT 1
+    `;
+    const rows = (await this.dataSource.query(sql, [slug, 5])) as Array<{
+      product_id: number;
+      product_name: string;
+      product_slug: string;
+      brand_name: string | null;
+    }>;
+    if (rows.length > 0) return rows[0];
+
+    // Gevşet: ilk 10'a kadar
+    const rowsLoose = (await this.dataSource.query(sql, [slug, 10])) as Array<{
+      product_id: number;
+      product_name: string;
+      product_slug: string;
+      brand_name: string | null;
+    }>;
+    return rowsLoose[0] ?? null;
+  }
 
   /**
    * Cilt skoru + opsiyonel cilt tipi/hassasiyet → 2-serum combo öner.
@@ -288,13 +338,17 @@ export class SkinComboService {
     const secondProfile = secondSlug ? INCI_PROFILE[secondSlug] : null;
     const { aTime, bTime } = assignTime(firstProfile, secondProfile);
 
-    // 5. DB detayını çek
+    // 5. DB detayını çek + INCI'ye uygun en iyi yayında ürünü bul (paralel)
     const slugs = [firstSlug, ...(secondSlug ? [secondSlug] : [])];
-    const ingredients = await this.ingredients.find({
-      where: { ingredient_slug: In(slugs) },
-      select: ['ingredient_id', 'ingredient_slug', 'inci_name', 'function_summary', 'evidence_grade'],
-    });
+    const [ingredients, ...productMatches] = await Promise.all([
+      this.ingredients.find({
+        where: { ingredient_slug: In(slugs) },
+        select: ['ingredient_id', 'ingredient_slug', 'inci_name', 'function_summary', 'evidence_grade'],
+      }),
+      ...slugs.map((s) => this.findBestProductForInci(s)),
+    ]);
     const byslug = new Map(ingredients.map((i) => [i.ingredient_slug, i]));
+    const productBySlug = new Map(slugs.map((s, idx) => [s, productMatches[idx]]));
 
     const buildPick = (
       slug: string,
@@ -312,7 +366,7 @@ export class SkinComboService {
         time_of_day: time,
         function_summary: ing?.function_summary ?? null,
         evidence_grade: ing?.evidence_grade ?? null,
-        product: null, // ProductMatching ayrı service, ileride entegre edilebilir
+        product: productBySlug.get(slug) ?? null,
       };
     };
 

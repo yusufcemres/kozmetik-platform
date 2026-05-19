@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { SkinComboService } from './skin-combo.service';
 import { Ingredient } from '@database/entities';
 import type { SkinScoreBreakdown } from './dto/skin-analysis.dto';
@@ -16,12 +16,16 @@ import type { SkinScoreBreakdown } from './dto/skin-analysis.dto';
 describe('SkinComboService — recommendCombo', () => {
   let service: SkinComboService;
   let ingredients: jest.Mocked<Repository<Ingredient>>;
+  let dataSource: jest.Mocked<DataSource>;
 
   beforeEach(() => {
     ingredients = {
       find: jest.fn().mockResolvedValue([]),
     } as unknown as jest.Mocked<Repository<Ingredient>>;
-    service = new SkinComboService(ingredients);
+    dataSource = {
+      query: jest.fn().mockResolvedValue([]),
+    } as unknown as jest.Mocked<DataSource>;
+    service = new SkinComboService(ingredients, dataSource);
   });
 
   const baseScores = (overrides: Partial<SkinScoreBreakdown> = {}): SkinScoreBreakdown => ({
@@ -122,5 +126,51 @@ describe('SkinComboService — recommendCombo', () => {
     const result = await service.recommendCombo(baseScores({ wrinkles: 70 }));
     expect(result.morning).toBeNull();
     expect(result.evening?.time_of_day).toBe('PM');
+  });
+
+  it('INCI için yayında ürün varsa pick.product doldurulur (strict ilk 5)', async () => {
+    dataSource.query = jest.fn().mockResolvedValue([
+      {
+        product_id: 101,
+        product_name: 'XYZ Retinol 0.5 Serum',
+        product_slug: 'xyz-retinol-serum',
+        brand_name: 'XYZ Cosmetics',
+      },
+    ]);
+    const result = await service.recommendCombo(baseScores({ wrinkles: 70 }));
+    expect(result.evening?.product).toEqual({
+      product_id: 101,
+      product_name: 'XYZ Retinol 0.5 Serum',
+      product_slug: 'xyz-retinol-serum',
+      brand_name: 'XYZ Cosmetics',
+    });
+    // İlk denemede strict (inci_order_rank ≤ 5)
+    expect(dataSource.query).toHaveBeenCalledWith(expect.any(String), ['retinol', 5]);
+  });
+
+  it('strict (≤5) eşleşme yoksa gevşek (≤10) sorguya fallback yapar', async () => {
+    dataSource.query = jest
+      .fn()
+      .mockResolvedValueOnce([]) // strict boş
+      .mockResolvedValueOnce([
+        {
+          product_id: 202,
+          product_name: 'Loose Match',
+          product_slug: 'loose-match',
+          brand_name: null,
+        },
+      ]); // gevşek dolu
+    const result = await service.recommendCombo(baseScores({ wrinkles: 70 }));
+    expect(result.evening?.product?.product_slug).toBe('loose-match');
+    expect(dataSource.query).toHaveBeenCalledTimes(2);
+    expect(dataSource.query).toHaveBeenNthCalledWith(2, expect.any(String), ['retinol', 10]);
+  });
+
+  it('hiç ürün yoksa product=null kalır (combo yine döner)', async () => {
+    dataSource.query = jest.fn().mockResolvedValue([]);
+    const result = await service.recommendCombo(baseScores({ wrinkles: 70 }));
+    expect(result.evening?.product).toBeNull();
+    // Combo yine üretilir
+    expect(result.evening?.slug).toBe('retinol');
   });
 });
