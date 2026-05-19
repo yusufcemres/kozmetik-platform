@@ -47,6 +47,8 @@
 | 28 | `bc7b789` | docs(journal): gece raporu v2 |
 | 29 | `cd06d53` | onerilerimiz + sonuc + karsilastir affiliate_click GA4 wiring |
 | 30 | `1b00b3b` | **`:any` cleanup batch 7** — products.service partial (5 occurrence) |
+| 31 | `5e61df0` | docs(journal): gece raporu v3 |
+| 32 | `ede1902` | **`:any` cleanup batch 8** — web tarafı (7 file, 11 occurrence) |
 
 ---
 
@@ -66,8 +68,8 @@ para ödemeden erişilebilirdi:
 
 ## 📊 Sayısal Özet
 
-- **30 commit** master push (bayram gecesi 20, bayram öncesi akşam 10)
-- **~4.000 satır** kod eklendi (backend + frontend + spec + template)
+- **32 commit** master push (bayram gecesi 22, bayram öncesi akşam 10)
+- **~4.500 satır** kod eklendi (backend + frontend + spec + template)
 - **3 yeni migration** önerisi (034 premium_reminder, 035 auto_renew, henüz prod apply yok)
 - **3 yeni controller endpoint** (/payments/me/auto-renew, /skin-analysis/:id/coach/stream, /payments/me/auto-renew)
 - **7 yeni TypeScript spec test** (vision cooldown ×3 + user-auth normalize ×4)
@@ -164,10 +166,11 @@ para ödemeden erişilebilirdi:
 
 ## 🌅 Açış cümlesi (sabah ilk göz attığında)
 
-> "Gece 30 commit push'lattım. Kritik bulgu: Premium API'leri kapatıldı.
+> "Gece 32 commit push'lattım. Kritik bulgu: Premium API'leri kapatıldı.
 > Yarım iş yok. Faz 5 cleanup tam, LAUNCH_CHECKLIST 6 item kapandı,
-> :any cleanup ~%55 azaldı (7 batch), affiliate_click GA4 wiring 5 sayfada.
-> Sıra: prod health check → Day 11 test → 3 SQL apply → env vars."
+> :any cleanup 8 batch (API + web 88 occurrence azaldı), affiliate_click GA4
+> wiring 5 sayfada. Sıra: prod health check → Day 11 test → 3 SQL apply →
+> env vars."
 
 İyi sabahlar 🌷
 
