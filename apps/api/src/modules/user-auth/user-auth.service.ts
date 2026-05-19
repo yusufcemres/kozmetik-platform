@@ -102,7 +102,8 @@ export class UserAuthService {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  private normalizeEmail(email: string): string {
+  // Public yapıldı (spec testleri için) — davranış değişmedi.
+  normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
   }
 
