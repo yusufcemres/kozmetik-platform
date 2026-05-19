@@ -117,11 +117,11 @@ export function AICoachWidget({ analysisId }: AICoachWidgetProps) {
       if (!accumulated) {
         throw new Error('Boş yanıt');
       }
-    } catch (err: any) {
+    } catch (err) {
       const msg =
         err instanceof ApiError && err.status === 503
           ? 'AI Danışman geçici olarak yanıt vermiyor. Birkaç dakika sonra dene.'
-          : err?.message || 'Soru gönderilemedi';
+          : err instanceof Error ? err.message : 'Soru gönderilemedi';
       setError(msg);
       // Hata olunca user message'ı geri al (UX retry için)
       setMessages((prev) => prev.filter((m) => m !== userMsg));

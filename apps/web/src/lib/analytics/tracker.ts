@@ -35,7 +35,7 @@ class RevelaTracker {
 
   track(
     eventType: AnalyticsEventType,
-    props?: { product_id?: number; brand_id?: number; [key: string]: any },
+    props?: { product_id?: number; brand_id?: number; [key: string]: unknown },
   ) {
     if (!this.initialized) return;
 

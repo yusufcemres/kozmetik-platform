@@ -39,8 +39,8 @@ export default function PushToggle() {
         setEnabled(res.success);
         setMessage(res.message);
       }
-    } catch (err: any) {
-      setMessage(err.message || 'Bir hata oluştu');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Bir hata oluştu');
     } finally {
       setLoading(false);
     }

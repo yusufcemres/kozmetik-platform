@@ -80,14 +80,15 @@ export function CaptureGuard({ onCapture, onCaptureRaw, onCancel, defaultMode = 
           await videoRef.current.play();
         }
         setStatus('ready');
-      } catch (err: any) {
+      } catch (err) {
         if (cancelled) return;
-        if (err.name === 'NotAllowedError') {
+        const e = err as { name?: string; message?: string };
+        if (e?.name === 'NotAllowedError') {
           setStatus('denied');
           setError('Kamera izni verilmedi. Lütfen tarayıcı ayarlarından izin verin veya "Galeriden Seç" deneyin.');
         } else {
           setStatus('error');
-          setError(err.message || 'Kamera başlatılamadı');
+          setError(e?.message || 'Kamera başlatılamadı');
         }
       }
     })();
@@ -166,8 +167,8 @@ export function CaptureGuard({ onCapture, onCaptureRaw, onCancel, defaultMode = 
           landmarkerResult,
         });
       }
-    } catch (err: any) {
-      setError(err.message || 'Foto işlenemedi');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Foto işlenemedi');
       setStatus('error');
     } finally {
       URL.revokeObjectURL(url);

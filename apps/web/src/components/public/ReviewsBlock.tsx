@@ -117,8 +117,8 @@ export default function ReviewsBlock({ productId }: { productId: number }) {
       }
       setEditing(false);
       await refresh();
-    } catch (e: any) {
-      setError(e?.message ?? 'Yorum gönderilemedi.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Yorum gönderilemedi.');
     } finally {
       setSaving(false);
     }
@@ -134,8 +134,8 @@ export default function ReviewsBlock({ productId }: { productId: number }) {
       setMyReview(null);
       setForm({ rating: 5, title: '', body: '' });
       await refresh();
-    } catch (e: any) {
-      setError(e?.message ?? 'Silme başarısız.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Silme başarısız.');
     }
   }
 

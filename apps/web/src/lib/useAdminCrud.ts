@@ -67,32 +67,32 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
       toast('Kayıt silindi', 'success');
       await fetchData();
       return true;
-    } catch (err: any) {
-      toast(err.message || 'Silme hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Silme hatası', 'error');
       return false;
     }
   }, [endpoint, token, fetchData, toast]);
 
-  const createItem = useCallback(async (body: Record<string, any>) => {
+  const createItem = useCallback(async (body: Record<string, unknown>) => {
     try {
       await api.post(endpoint, body, { token });
       toast('Kayıt oluşturuldu', 'success');
       await fetchData();
       return true;
-    } catch (err: any) {
-      toast(err.message || 'Oluşturma hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Oluşturma hatası', 'error');
       return false;
     }
   }, [endpoint, token, fetchData, toast]);
 
-  const updateItem = useCallback(async (id: number | string, body: Record<string, any>) => {
+  const updateItem = useCallback(async (id: number | string, body: Record<string, unknown>) => {
     try {
       await api.put(`${endpoint}/${id}`, body, { token });
       toast('Kayıt güncellendi', 'success');
       await fetchData();
       return true;
-    } catch (err: any) {
-      toast(err.message || 'Güncelleme hatası', 'error');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Güncelleme hatası', 'error');
       return false;
     }
   }, [endpoint, token, fetchData, toast]);

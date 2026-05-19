@@ -8,7 +8,7 @@ import type { AnalyticsEventType } from '@/lib/analytics';
 interface AnalyticsContextValue {
   track: (
     eventType: AnalyticsEventType,
-    props?: { product_id?: number; brand_id?: number; [key: string]: any },
+    props?: { product_id?: number; brand_id?: number; [key: string]: unknown },
   ) => void;
 }
 
