@@ -880,19 +880,22 @@ export class ProductsService {
    */
   async findBySlugFull(slug: string) {
     const cacheKey = `product:slug:${slug}:full`;
-    const cached = await this.cache.get<any>(cacheKey);
+    type PIRef = { ingredient_id: number; inci_order_rank?: number; is_key_ingredient?: boolean; is_highlighted_in_claims?: boolean };
+    type ProductWithIngredients = { product_id: number; ingredients?: PIRef[]; need_scores?: Array<{ need_id: number; compatibility_score: number; need?: { need_name?: string } }>; domain_type?: string };
+
+    const cached = await this.cache.get<unknown>(cacheKey);
     if (cached) return cached;
 
-    const product: any = await this.findBySlug(slug);
+    const product = (await this.findBySlug(slug)) as unknown as ProductWithIngredients;
 
     const keyIngredientIds: number[] = (product.ingredients || [])
-      .filter((pi: any) => (pi.is_key_ingredient || pi.inci_order_rank <= 5) && pi.ingredient_id)
-      .map((pi: any) => pi.ingredient_id)
+      .filter((pi) => (pi.is_key_ingredient || (pi.inci_order_rank ?? 99) <= 5) && pi.ingredient_id)
+      .map((pi) => pi.ingredient_id)
       .slice(0, 5);
 
     const topIngredientIds: number[] = (product.ingredients || [])
-      .filter((pi: any) => pi.ingredient_id && pi.inci_order_rank <= 3)
-      .map((pi: any) => pi.ingredient_id)
+      .filter((pi) => pi.ingredient_id && (pi.inci_order_rank ?? 99) <= 3)
+      .map((pi) => pi.ingredient_id)
       .slice(0, 5);
 
     const [similar, interactionBatches, cosmeticScore, supplementBatches, reviewsAggregate] = await Promise.all([
