@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { getAllActiveMethodSlugs } from '@/lib/content/active-method-pairs';
 
 export const revalidate = 3600;
 
@@ -53,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/giris`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/rehber`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/etki`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/ai-arama`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE_URL}/uzmanlar`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];
@@ -116,5 +118,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages, ...blogPages, ...rehberPages];
+  // Modül I — Aktif × Yöntem etki sayfaları (10 statik pilot, 2026-05-19)
+  const etkiPages: MetadataRoute.Sitemap = getAllActiveMethodSlugs().map((slug) => ({
+    url: `${BASE_URL}/etki/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }));
+
+  return [...staticPages, ...productPages, ...supplementPages, ...ingredientPages, ...needPages, ...brandPages, ...blogPages, ...rehberPages, ...etkiPages];
 }
