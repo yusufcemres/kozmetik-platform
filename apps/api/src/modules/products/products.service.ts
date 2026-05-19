@@ -860,13 +860,13 @@ export class ProductsService {
     if (!entity) throw new NotFoundException('Ürün bulunamadı');
     if (entity.affiliate_links) {
       entity.affiliate_links = entity.affiliate_links.filter(
-        (l: any) => l.verification_status !== 'needs_review' && l.verification_status !== 'dead',
+        (l) => l.verification_status !== 'needs_review' && l.verification_status !== 'dead',
       );
     }
     // pending_review INCI'leri publike gosterme (admin onay bekliyor)
     if (entity.ingredients) {
       entity.ingredients = entity.ingredients.filter(
-        (pi: any) => pi.match_status !== 'pending_review',
+        (pi) => pi.match_status !== 'pending_review',
       );
     }
     await this.cache.set(cacheKey, entity, 600);
@@ -1318,11 +1318,11 @@ export class ProductsService {
     return scored.slice(0, limit);
   }
 
-  private getLowestPrice(product: any): number | null {
+  private getLowestPrice(product: { affiliate_links?: Array<{ is_active?: boolean; price_snapshot?: number | string | null }> }): number | null {
     const links = product.affiliate_links || [];
     const prices = links
-      .filter((l: any) => l.is_active && l.price_snapshot)
-      .map((l: any) => Number(l.price_snapshot));
+      .filter((l) => l.is_active && l.price_snapshot != null)
+      .map((l) => Number(l.price_snapshot));
     return prices.length ? Math.min(...prices) : null;
   }
 
