@@ -58,8 +58,8 @@ export class MailService {
         return false;
       }
       return true;
-    } catch (err: any) {
-      this.logger.error(`Resend send failed to=${params.to}: ${err.message}`);
+    } catch (err) {
+      this.logger.error(`Resend send failed to=${params.to}: ${err instanceof Error ? err.message : String(err)}`);
       return false;
     }
   }
