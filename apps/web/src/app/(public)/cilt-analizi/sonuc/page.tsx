@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { api, API_BASE_URL } from '@/lib/api';
 import AffiliateLink from '@/components/public/AffiliateLink';
 import ProductCarousel from '@/components/public/ProductCarousel';
+import { SkinComboWidget } from '@/components/skin-analysis/SkinComboWidget';
 
 // === Types ===
 
@@ -697,6 +698,24 @@ function ResultsContent() {
           </div>
         </section>
       )}
+
+      {/* Modül J — Senin Cildine Combo (quiz çıktısından heuristik skor) */}
+      <section className="mb-10">
+        <SkinComboWidget
+          scores={(() => {
+            // Quiz cevaplarından heuristik 6-boyut skor üret (yaklaşık, foto analizi yerine)
+            const s: Record<string, number> = {
+              t_zone_oil: skinType === 'oily' ? 70 : skinType === 'combination' ? 55 : 30,
+              pore_visibility: skinType === 'oily' ? 60 : 40,
+              wrinkles: ageRange === '55+' ? 75 : ageRange === '45-54' ? 65 : ageRange === '35-44' ? 50 : 30,
+              pigmentation: sun === 'high' || sun === 'frequent' ? 60 : 40,
+              redness: skinFeel === 'sensitive' || sensitivityList.includes('rosacea') ? 65 : 35,
+              under_eye_darkness: sleep === 'poor' || sleep === 'irregular' ? 65 : stress === 'high' ? 55 : 40,
+            };
+            return s;
+          })()}
+        />
+      </section>
 
       {/* Product Recommendations — Enriched */}
       <section className="mb-10">
