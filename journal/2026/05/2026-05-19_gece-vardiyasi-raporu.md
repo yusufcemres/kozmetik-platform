@@ -52,6 +52,8 @@
 | 33 | `326d223` | docs(journal): gece raporu v4 |
 | 34 | `3f9ae7c` | **test(skin-coach)** input validation (3 yeni spec) |
 | 35 | `b429a60` | **`:any` cleanup batch 9** — products.service crossSell typed |
+| 36 | `ee349cd` | docs(journal): gece raporu v5 |
+| 37 | `6eaf0de` | **`:any` cleanup batch 10** — products.service findBySlug + getLowestPrice |
 
 ---
 
@@ -71,8 +73,8 @@ para ödemeden erişilebilirdi:
 
 ## 📊 Sayısal Özet
 
-- **35 commit** master push (bayram gecesi 25, bayram öncesi akşam 10)
-- **~4.700 satır** kod eklendi (backend + frontend + spec + template)
+- **37 commit** master push (bayram gecesi 27, bayram öncesi akşam 10)
+- **~4.800 satır** kod eklendi (backend + frontend + spec + template)
 - **3 yeni migration** önerisi (034 premium_reminder, 035 auto_renew, henüz prod apply yok)
 - **3 yeni controller endpoint** (/payments/me/auto-renew, /skin-analysis/:id/coach/stream, /payments/me/auto-renew)
 - **7 yeni TypeScript spec test** (vision cooldown ×3 + user-auth normalize ×4)
@@ -169,11 +171,12 @@ para ödemeden erişilebilirdi:
 
 ## 🌅 Açış cümlesi (sabah ilk göz attığında)
 
-> "Gece 35 commit push'lattım. Kritik bulgu: Premium API'leri kapatıldı.
-> Yarım iş yok. Faz 5 cleanup tam, LAUNCH_CHECKLIST 6 item kapandı,
-> :any cleanup 9 batch (API + web ~95 occurrence azaldı), affiliate_click GA4
-> wiring 5 sayfada, skin-coach + user-auth + vision spec eklendi. Sıra:
-> prod health check → Day 11 test → 3 SQL apply → env vars."
+> "Gece 37 commit push'lattım (08:45'te bitti, 8 saat 45 dk otonom).
+> Kritik bulgu: Premium API'leri kapatıldı. Yarım iş yok. Faz 5 cleanup tam,
+> LAUNCH_CHECKLIST 6 item kapandı, :any cleanup 10 batch (API + web ~100
+> occurrence azaldı), affiliate_click GA4 wiring 5 sayfada, skin-coach +
+> user-auth + vision spec eklendi. Sıra: prod health check → Day 11 test →
+> 3 SQL apply → env vars."
 
 İyi sabahlar 🌷
 
