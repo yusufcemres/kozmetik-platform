@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { SkinComboWidget } from '@/components/skin-analysis/SkinComboWidget';
 import Image from 'next/image';
 import { CaptureGuard } from '@/components/skin-analysis/CaptureGuard';
 import { RadarChart } from '@/components/skin-analysis/RadarChart';
@@ -463,84 +464,12 @@ export default function FotoTestPage() {
             )}
           </div>
 
-          {/* Modül J — "Senin Cildine Combo" 2-serum öneri hero (2026-05-19) */}
-          {(() => {
-            const recKeys = Object.keys(result.recommendations);
-            if (recKeys.length < 2) return null;
-            // Top-2 sorunlu boyut: skor değeri en yüksek 2 dim (recommendations'ta zaten ≥40 var)
-            const ranked = recKeys
-              .map((k) => ({ dim: k, score: Number((result.scores as Record<string, number>)[k]) || 0 }))
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 2);
-            const combo = ranked
-              .map(({ dim, score }) => {
-                const items = result.recommendations[dim] || [];
-                const top = items[0];
-                return top ? { dim, score, rec: top } : null;
-              })
-              .filter((x): x is { dim: string; score: number; rec: typeof result.recommendations[string][number] } => !!x);
-            if (combo.length < 2) return null;
-
-            return (
-              <div className="mb-8">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="material-icon text-primary" aria-hidden="true">auto_awesome</span>
-                  <h3 className="text-base font-semibold text-on-surface">Senin Cildine Combo</h3>
-                </div>
-                <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">
-                  En yüksek skorlu 2 boyut için, REVELA INCI veritabanından kanıt-temelli
-                  2 aktif serum önerisi. Sabah-akşam ayrı kullan; ikisini birlikte
-                  uygulama, 20-30 dk arayla.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {combo.map((c, i) => (
-                    <div
-                      key={c.dim}
-                      className="curator-card p-4 border-primary/40 bg-primary/5"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="label-caps text-primary">
-                          {i === 0 ? 'Sabah' : 'Akşam'} · {DIMENSION_LABELS[c.dim] || c.dim}
-                        </span>
-                        <span className="text-xs font-bold text-primary">Skor {c.score}</span>
-                      </div>
-                      {c.rec.ingredient?.ingredient_slug ? (
-                        <Link
-                          href={`/icerikler/${c.rec.ingredient.ingredient_slug}`}
-                          className="text-base font-bold text-on-surface hover:text-primary transition-colors block mb-1"
-                        >
-                          {c.rec.display_name}
-                        </Link>
-                      ) : (
-                        <span className="text-base font-bold text-on-surface block mb-1">
-                          {c.rec.display_name}
-                        </span>
-                      )}
-                      {c.rec.ingredient?.function_summary && (
-                        <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
-                          {c.rec.ingredient.function_summary}
-                        </p>
-                      )}
-                      {c.rec.products && c.rec.products.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-outline-variant/20">
-                          <Link
-                            href={`/urunler/${c.rec.products[0].product_slug}`}
-                            className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                          >
-                            <span className="material-icon material-icon-sm" aria-hidden="true">shopping_bag</span>
-                            {c.rec.products[0].brand_name} {c.rec.products[0].product_name}
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[10px] text-outline mt-3 text-center">
-                  Bu combo bir öneri özetidir. Aşağıdaki detaylı liste tüm boyutlar için top 3 INCI verir.
-                </p>
-              </div>
-            );
-          })()}
+          {/* Modül J — Senin Cildine Combo (backend recommendCombo) */}
+          <SkinComboWidget
+            analysisId={result.analysis_id > 0 ? result.analysis_id : undefined}
+            scores={result.scores as Record<string, number>}
+            fitzpatrick={result.scores.fitzpatrick_type ?? null}
+          />
 
           {/* INCI Recommendations + REVELA ürün widget (Day 8) */}
           {Object.keys(result.recommendations).length > 0 && (
