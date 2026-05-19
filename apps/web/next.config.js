@@ -153,4 +153,28 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Sentry wrapper — source map upload (release tracking) için opsiyonel.
+// SENTRY_AUTH_TOKEN env varsa aktif, yoksa next config'i olduğu gibi export eder.
+// LAUNCH_CHECKLIST "Sentry release version tag deploy hook + Source map upload".
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { withSentryConfig } = require('@sentry/nextjs');
+  if (process.env.SENTRY_AUTH_TOKEN && process.env.NEXT_PUBLIC_SENTRY_DSN) {
+    module.exports = withSentryConfig(nextConfig, {
+      // Build-time options
+      silent: true, // build log'unda Sentry mesajları yok
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT || 'revela-web',
+      // VERCEL_GIT_COMMIT_SHA otomatik release tag — sentry.{client,server}.config.ts'te de aynı.
+      release: { name: process.env.VERCEL_GIT_COMMIT_SHA || process.env.SENTRY_RELEASE },
+      sourcemaps: {
+        disable: false,
+        deleteSourcemapsAfterUpload: true,
+      },
+    });
+  } else {
+    module.exports = nextConfig;
+  }
+} catch {
+  module.exports = nextConfig;
+}
