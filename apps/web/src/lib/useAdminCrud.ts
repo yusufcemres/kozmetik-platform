@@ -48,8 +48,8 @@ export function useAdminCrud<T = any>({ endpoint, limit = 20, idField = 'id' }: 
         setData(res.data || []);
         setMeta(res.meta || { total: 0, page: 1, limit, totalPages: 1 });
       }
-    } catch (err: any) {
-      setError(err.message || 'Veri yüklenemedi');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Veri yüklenemedi');
       setData([]);
     } finally {
       setLoading(false);

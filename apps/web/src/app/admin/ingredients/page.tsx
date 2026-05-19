@@ -6,6 +6,19 @@ import AdminTable from '@/components/admin/AdminTable';
 import AdminFormModal, { FormField } from '@/components/admin/AdminFormModal';
 import { useAdminCrud } from '@/lib/useAdminCrud';
 
+type IngredientRow = {
+  ingredient_id: number;
+  inci_name: string;
+  common_name?: string | null;
+  ingredient_group?: string | null;
+  origin_type?: string | null;
+  evidence_level?: string | null;
+  allergen_flag?: boolean;
+  fragrance_flag?: boolean;
+  preservative_flag?: boolean;
+  [key: string]: unknown;
+};
+
 const columns = [
   { key: 'ingredient_id', label: 'ID' },
   { key: 'inci_name', label: 'INCI Adı' },
@@ -15,12 +28,12 @@ const columns = [
   {
     key: 'evidence_level',
     label: 'Kanıt',
-    render: (v: string) => v || '-',
+    render: (v: unknown) => (typeof v === 'string' && v) || '-',
   },
   {
     key: 'allergen_flag',
     label: 'Bayraklar',
-    render: (_: any, row: any) => (
+    render: (_: unknown, row: IngredientRow) => (
       <div className="flex gap-1">
         {row.allergen_flag && <span className="text-xs bg-red-100 text-red-700 px-1 rounded">Alerjen</span>}
         {row.fragrance_flag && <span className="text-xs bg-orange-100 text-orange-700 px-1 rounded">Parfüm</span>}
@@ -61,12 +74,12 @@ const formFields: FormField[] = [
 export default function IngredientsPage() {
   const crud = useAdminCrud({ endpoint: '/ingredients', idField: 'ingredient_id' });
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<IngredientRow | null>(null);
 
   const openCreate = () => { setEditItem(null); setModalOpen(true); };
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: IngredientRow) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
       return crud.updateItem(editItem.ingredient_id, data);
     }

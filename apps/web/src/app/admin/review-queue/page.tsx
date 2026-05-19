@@ -48,18 +48,22 @@ const formFields: FormField[] = [
 ];
 
 export default function ReviewQueuePage() {
+  type ReviewQueueRow = {
+    product_ingredient_id: number;
+    [key: string]: unknown;
+  };
   const [filter, setFilter] = useState<'suggested' | 'review_needed'>('review_needed');
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<ReviewQueueRow | null>(null);
 
   const crud = useAdminCrud({
     endpoint: `/admin/review-queue?status=${filter}`,
     idField: 'product_ingredient_id',
   });
 
-  const openEdit = (row: any) => { setEditItem(row); setModalOpen(true); };
+  const openEdit = (row: ReviewQueueRow) => { setEditItem(row); setModalOpen(true); };
 
-  const handleSubmit = async (data: Record<string, any>) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     if (editItem) {
       return crud.updateItem(editItem.product_ingredient_id, data);
     }

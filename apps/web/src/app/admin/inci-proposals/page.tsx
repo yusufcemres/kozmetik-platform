@@ -37,8 +37,8 @@ export default function InciProposalsPage() {
     try {
       const data = await api.get<InciProposal[]>('/products/admin/inci-proposals', { token });
       setItems(data);
-    } catch (e: any) {
-      toast(e.message || 'Yüklenemedi', 'error');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Yüklenemedi', 'error');
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function InciProposalsPage() {
       await api.post(`/products/admin/inci-proposals/${id}/approve`, {}, { token });
       toast('Onaylandı', 'success');
       load();
-    } catch (e: any) { toast(e.message || 'Onaylanamadı', 'error'); }
+    } catch (e) { toast(e instanceof Error ? e.message : 'Onaylanamadı', 'error'); }
   };
 
   const rejectOne = async (id: number) => {
@@ -74,7 +74,7 @@ export default function InciProposalsPage() {
       await api.delete(`/products/admin/inci-proposals/${id}`, { token });
       toast('Reddedildi', 'success');
       load();
-    } catch (e: any) { toast(e.message || 'Reddedilemedi', 'error'); }
+    } catch (e) { toast(e instanceof Error ? e.message : 'Reddedilemedi', 'error'); }
   };
 
   const bulkAction = async (action: 'approve' | 'reject') => {

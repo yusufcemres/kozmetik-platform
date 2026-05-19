@@ -62,11 +62,11 @@ export class CreateProductLabelDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  packaging_symbols_json?: any;
+  packaging_symbols_json?: Record<string, unknown>;
 
   @ApiPropertyOptional()
   @IsOptional()
-  claim_texts_json?: any;
+  claim_texts_json?: string[];
 }
 
 export class CreateProductImageDto {
