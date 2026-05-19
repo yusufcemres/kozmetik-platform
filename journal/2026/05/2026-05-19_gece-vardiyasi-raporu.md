@@ -338,3 +338,86 @@ para ödemeden erişilebilirdi:
 | Faz 4+5 polish | %100 |
 | Test coverage | %~12 (skin-combo 8 + newsletter 9 + skin-coach 3 + vision 3 + user-auth 4) |
 | Modül H + I + J | %100 |
+
+---
+
+## 🌞 Gündüz Devamı (19 May 11:00 → 13:02, deploy günü, 6 ek commit)
+
+### Deploy süreci + tıkanma fix
+
+**Render** `030c62b` → **`0aba6396`** (52 commit prod'a indi)
+- 12:03 PM: ilk deploy `6e3e260` → boot fail: PremiumGuard `AppUserRepository` SkinAnalysisModule'da yok
+- 12:09 PM: fix `0aba639` push — SkinAnalysisModule.TypeOrmModule.forFeature listesine AppUser eklendi
+- 12:10 PM: yeni deploy başarılı, uptime ok
+- Migration 034/035/036 otomatik uygulandı, PremiumGuard 5 endpoint aktif
+
+**Vercel** `4uy0fhqtg` (10h eski) → **`mz0iuok78`** (12:44 deploy)
+- Free plan queue tıkandı — 1 deploy 19 dk queued kaldı
+- Cloud TS strict 4 farklı type hatası verdi (local tsc geçiyordu):
+  - InciToken `[key:string]:unknown` index signature → JSX render `unknown` to ReactNode
+  - CosmeticScore broad index signature → `score.overall_score: unknown`
+  - RecentQuestion `question` field eksik
+  - BrandAccountInfo `email`/`plan` eksik
+- Fix `ff9d880` push + queued olan cancel + CLI fresh deploy → ready
+
+### Yeni commit'ler (6 adet)
+
+| # | Commit | İş |
+|---|---|---|
+| 53 | `6e3e260` | **Modül J #5** — Product matching (INCI → yayında REVELA ürün), `findBestProductForInci()` strict ≤5 + fallback ≤10, 11/11 spec test (8 önceki + 3 yeni) |
+| 54 | `ff9d880` | **Vercel cloud TS fixes** — 4 type narrow (InciToken/CosmeticScore/RecentQuestion/BrandAccountInfo) |
+| 55 | `0aba639` | **🚨 Render boot fix** — PremiumGuard AppUser repo cross-module DI |
+| 56 | `e61d2c2` | **Modül G `/bilim` sayfası** — RI v1.0 5-bileşen formül + FDA timeline (5 teknoloji) + Bilim Kurulu CTA + peer-review roadmap (Q3 2026 → Q3 2027) + JSON-LD TechArticle + Footer link |
+| 57 | `be25606` | **scoring.service spec** — 12/12 test (calculateScores 6 + getPersonalScore 4 + updateConfig 2) |
+
+### Brand Portal admin onay flow audit düzeltmesi
+
+**Bulgu:** Önceki audit "admin onay flow eksik" demişti → **YANLIŞ**. Gerçek:
+- Backend `reviewEdit()` zaten approved=true ise product'a apply ediyor (productRepo update)
+- `/admin/brand-portal` sayfası 2 tab (applications + edits) ile var
+- Admin nav `layout.tsx:31`'de link mevcut
+- Brand Portal Q1 2027 sprint için temel CRUD + onay tam, kalan sadece dashboard analytics detay metrikleri
+
+### Test coverage update
+
+| Spec | Test | Δ |
+|---|---|---|
+| skin-combo.service | 11 | +3 (product matching) |
+| **scoring.service** | **12** | **+12 (yeni)** |
+| diğer 6 spec | ~37 | — |
+| **TOPLAM API** | **~60 case** | **+15 bu seans** |
+| Web Playwright | 29 | — |
+
+### Bilgi dersleri (memory'ye kaydedildi)
+
+1. **Vercel monorepo deploy** — Root Directory `apps/web` ise CLI'yi repo root'tan koş, `apps/web`'den koşma (path duplicate). `vercel projects ls` ile gerçek proje adını seç. Memory: `feedback_vercel_railway_manual_deploy.md`
+2. **Vercel cloud TS strict** — Local'de geçen `[key: string]: unknown` index signature cloud'da JSX `unknown→ReactNode` hatası verir. Spesifik field'ları açıkça type'la.
+3. **NestJS guard cross-module DI** — Bir modülün export ettiği guard, başka modülde `@UseGuards` ile kullanıldığında, guard'ın repo dependency'leri o modülde de `TypeOrmModule.forFeature`'a eklenmelidir.
+
+### Kullanıcı tarafı kalan (öncelik sırası)
+
+1. **Day 11 e2e manuel test** — `RELEASE_NOTES_FAZ1.md:118-127` 10 senaryo (60-90 dk)
+2. **Day 12 PR aç** — `gh pr create --title "feat: REVELA Foto Analiz Faz 1 POC"`
+3. **PayTR merchant onayı** + env vars (PAYTR_MERCHANT_ID/KEY/SALT/TEST_MODE)
+4. **OAuth credentials** — Google Cloud + Facebook Dev → 6 env (CLIENT_ID + SECRET)
+5. **OPENAI_API_KEY** — vision 3. fallback aktivasyonu
+6. **ANTHROPIC_API_KEY rotate** — sızmıştı, pending
+7. **3 SQL apply** — Velavit (54 ürün) + V2 noise cleanup + Modül H seed
+8. **Domain TODO** — gizlilik/iletisim/kullanim-kosullari 3 sayfada `revela.com.tr` placeholder
+
+### Dev tarafı sıradaki sprint
+
+- **Modül F outreach** — Yıldız Teknik + Hacettepe + Boğaziçi + İst. Ü. + Ege akademik partnership mail draft (patron + dev)
+- **Frontend unit test setup** — Vitest, 0 dosya şu an
+- **scoring full coverage** — recalculateAll + getTopProductsByNeed (query builder mocking veya e2e)
+- **Brand Portal dashboard analytics** — detaylı metrikler
+- **PayTR Subscription API** — auto-renew (PayTR onayı sonrası)
+
+### Final sayısal (3 günlük seans 17→19 May)
+
+- **Toplam commit:** 57 master push (gece+gündüz)
+- **Functional `:any` production:** 0 (15 batch cleanup)
+- **Yeni modüller:** G + H + I + J %100 (5/5 ana modül, sadece F outreach kaldı)
+- **Test:** 27 → 60+ case
+- **Production canlı:** API `0aba6396` (Render) + Web `mz0iuok78` (Vercel, head `be25606`)
+- **Kritik bulgu çözüldü:** Premium API güvenlik açığı (cdcbbf6) + PremiumGuard DI (0aba639)
