@@ -35,6 +35,9 @@ export default function Footer() {
             <Link href="/hakkimizda" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
               Hakkımızda
             </Link>
+            <Link href="/bilim" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
+              Bilim Çerçevemiz
+            </Link>
             <Link href="/metodoloji" className="text-sm text-on-surface-variant hover:text-on-surface underline-offset-4 hover:underline transition-all">
               Metodoloji
             </Link>
