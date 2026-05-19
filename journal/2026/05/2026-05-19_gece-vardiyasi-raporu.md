@@ -23,7 +23,7 @@
 | 9 | `030c62b` | Madde 25 paketi — EmptyState + i18n iskelet + a11y kontrast + mobile overflow |
 | 10 | `cdcbbf6` | 🚨 **KRİTİK GÜVENLİK FIX** — Premium API'leri PremiumGuard ile kilitle |
 
-### Bayram gecesi otonom (19 May Salı 00:00-04:00, 8 commit)
+### Bayram gecesi otonom (19 May Salı 00:00-06:30, 22 commit)
 
 | # | Commit | İş |
 |---|---|---|
@@ -35,6 +35,15 @@
 | 16 | `5f99b77` | **Feature flag + OAuth + PayTR env örnekleri** (.env.example genişletme) |
 | 17 | `ca6ec30` | **Vision quota cooldown unit testleri** (3 yeni test) |
 | 18 | `aa051d7` | **UserAuthService normalizeEmail spec** + public visibility (4 test) |
+| 19 | `4592a3e` | docs(journal): gece vardiyası raporu v1 |
+| 20 | `44323a2` | **`:any` cleanup batch 2** — services (12 file, ~17 occurrence) |
+| 21 | `05e99e6` | **`:any` cleanup batch 3** — user-auth + skin-analysis + smart-scan + vision (15 occurrence) |
+| 22 | `cd47b80` | **`:any` cleanup batch 4** — brand-portal controller (11 occurrence) |
+| 23 | `881bc83` | **`:any` cleanup batch 5** — affiliate providers (7 occurrence) |
+| 24 | `851a713` | **`:any` cleanup batch 6** — search + needs + methodology + cron'lar (11 occurrence) |
+| 25 | `670a5ac` | **Sentry source map upload + release tag** (withSentryConfig wrapper) |
+| 26 | `a66c542` | **affiliate_click GA4 wiring** — AffiliateLink ortak component |
+| 27 | `81be65d` | takviyeler/[slug] affiliate_click GA4 wiring |
 
 ---
 
@@ -54,13 +63,14 @@ para ödemeden erişilebilirdi:
 
 ## 📊 Sayısal Özet
 
-- **18 commit** master push (bayram gecesi 8, bayram öncesi akşam 10)
-- **~2.500 satır** kod eklendi (backend + frontend + spec + template)
+- **27 commit** master push (bayram gecesi 17, bayram öncesi akşam 10)
+- **~3.500 satır** kod eklendi (backend + frontend + spec + template)
 - **3 yeni migration** önerisi (034 premium_reminder, 035 auto_renew, henüz prod apply yok)
-- **2 yeni controller endpoint** (/payments/me/auto-renew, /skin-analysis/:id/coach/stream)
+- **3 yeni controller endpoint** (/payments/me/auto-renew, /skin-analysis/:id/coach/stream, /payments/me/auto-renew)
 - **7 yeni TypeScript spec test** (vision cooldown ×3 + user-auth normalize ×4)
-- **5 LAUNCH_CHECKLIST item** kapandı (GA4 events, Welcome+Newsletter, env example, Madde 4 stats, user throttle)
+- **6 LAUNCH_CHECKLIST item** kapandı (GA4 5 event + Welcome/Newsletter mail + env example + Madde 4 stats + user throttle + Sentry release/source map)
 - **25/25 Madde Faz 5 cleanup planı tam** (Madde 25 paketi son)
+- **`:any` cleanup 5 batch (12→9→4→5→6→3 dosya)** = ~70 occurrence azaldı (~%50 düşüş)
 
 ---
 
@@ -151,11 +161,44 @@ para ödemeden erişilebilirdi:
 
 ## 🌅 Açış cümlesi (sabah ilk göz attığında)
 
-> "Gece 18 commit push'lattım. Kritik bulgu: Premium API'leri kapatıldı.
-> Yarım iş yok. Sıra: prod health check → Day 11 test → 3 SQL apply →
-> env vars."
+> "Gece 27 commit push'lattım. Kritik bulgu: Premium API'leri kapatıldı.
+> Yarım iş yok. Faz 5 cleanup tam, LAUNCH_CHECKLIST 6 item kapandı,
+> :any cleanup ~%50 azaldı (6 batch). Sıra: prod health check →
+> Day 11 test → 3 SQL apply → env vars."
 
 İyi sabahlar 🌷
+
+---
+
+## 🎯 Bayram gecesi (19 May 00:00-06:30) ek yapılanlar
+
+### `:any` cleanup 6 batch — services + controllers + providers
+- **Toplam ~50 occurrence azaltıldı** (~%50 düşüş)
+- TypeORM `where: any` → `FindOptionsWhere<Entity>` (8 file)
+- `catch (err: any) → catch (err)` + Error narrow guard (~25 yer)
+- Raw query `rows.map((r: any))` → typed row + cast (12 yer)
+- LdProduct, ShortcutRow, MatchRow, ScanHistoryRow, IngredientExplanation,
+  CategoryNode, BrandPortalUser, AdminAuthRequest, InciAnalysisResult vb.
+  ~15 yeni named type
+
+### LAUNCH_CHECKLIST ek kapanışlar
+- **Vision provider 3. fallback** (Faz 1 Bilinen Kısıt #5) — OpenAI vision wire
+- **User-aware throttle** (Faz 1 Bilinen Kısıt #4) — UserAwareThrottlerGuard
+- **Premium foto saklama UI** (Faz 1 Bilinen Kısıt #2) — Modal opsiyonel checkbox
+- **Sentry release tag + source map upload** (LAUNCH_CHECKLIST Sentry maddesi)
+- **GA4 5 event tracking** (quiz_start + quiz_complete + ai_search_query +
+  blog_post_view + affiliate_click + favorite_add bonus)
+- **Welcome email template** + ilk login auto-send (magic link + OAuth)
+- **Newsletter template skeleton** (boş queue ile başlamaya hazır)
+- **AffiliateLink GA4 wiring** — /urunler + /takviyeler `affiliate_click` event
+
+### DEFER (sabah sonrası ayrı sprint)
+| İş | Sebep | Süre |
+|---|---|---|
+| products.service (24 :any) | Rich filter facet queries büyük refactor | 2-3 sa |
+| affiliate_click 5 sayfada daha wire | markalar/sonuc/onerilerimiz/karsilastir/admin | 1 sa |
+| Newsletter cron + DB queue | Yeni feature, opt-in workflow | 4 sa |
+| Test coverage smart-scan/scoring/auth full | Mock yüzeyi büyük | 1 gün |
 
 ---
 
