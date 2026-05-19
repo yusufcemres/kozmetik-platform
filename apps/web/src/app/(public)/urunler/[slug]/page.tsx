@@ -1456,6 +1456,9 @@ export default async function ProductDetailPage({
                       key={link.affiliate_link_id}
                       href={link.affiliate_url}
                       affiliateLinkId={link.affiliate_link_id}
+                      productId={product.product_id}
+                      platform={link.platform}
+                      price={link.price_snapshot ? Number(link.price_snapshot) : undefined}
                       className={`flex items-center gap-4 px-6 py-4 hover:bg-surface-container-low transition-colors duration-300 border-l-4 ${isCheapest ? 'bg-score-high-bg/30' : ''}`}
                       style={pInfo ? { borderLeftColor: pInfo.color } : { borderLeftColor: 'transparent' }}
                       aria-label={`${platformLabel(link.platform)} sayfasında aç`}
