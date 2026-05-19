@@ -204,7 +204,7 @@ export class SearchService {
       WHERE p.status != 'archived'
         AND (p.product_name ILIKE $2 OR b.brand_name ILIKE $2)
     `;
-    const params: any[] = [q, `%${q}%`];
+    const params: (string | number)[] = [q, `%${q}%`];
     let paramIdx = 3;
 
     if (filters.domain_type) {
@@ -239,8 +239,9 @@ export class SearchService {
     params.push(limit);
 
     try {
-      const rows = await this.dataSource.query(sql, params);
-      return rows.map((r: any) => ({
+      type ProductRow = { product_id: number; product_name: string; product_slug: string; brand_name: string; sim: string };
+      const rows = (await this.dataSource.query(sql, params)) as ProductRow[];
+      return rows.map((r) => ({
         type: 'product' as const,
         id: r.product_id,
         name: r.product_name,
@@ -269,7 +270,8 @@ export class SearchService {
          LIMIT $3`,
         [q, `%${q}%`, limit],
       );
-      return rows.map((r: any) => ({
+      type IngRow = { ingredient_id: number; inci_name: string; ingredient_slug: string; common_name: string | null; sim: string };
+      return (rows as IngRow[]).map((r) => ({
         type: 'ingredient' as const,
         id: r.ingredient_id,
         name: r.inci_name,
@@ -296,7 +298,8 @@ export class SearchService {
          LIMIT $3`,
         [q, `%${q}%`, limit],
       );
-      return rows.map((r: any) => ({
+      type BrandRow = { brand_id: number; brand_name: string; brand_slug: string; sim: string; product_count: string };
+      return (rows as BrandRow[]).map((r) => ({
         type: 'brand' as const,
         id: r.brand_id,
         name: r.brand_name,
@@ -321,7 +324,8 @@ export class SearchService {
          LIMIT $3`,
         [q, `%${q}%`, limit],
       );
-      return rows.map((r: any) => ({
+      type NeedRow = { need_id: number; need_name: string; need_slug: string; user_friendly_label: string | null; sim: string };
+      return (rows as NeedRow[]).map((r) => ({
         type: 'need' as const,
         id: r.need_id,
         name: r.need_name,

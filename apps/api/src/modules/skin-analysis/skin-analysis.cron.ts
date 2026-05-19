@@ -27,8 +27,8 @@ export class SkinAnalysisCronService {
       if (result.sent > 0 || result.failed > 0) {
         this.logger.log(`Daily reminder run: sent=${result.sent} failed=${result.failed}`);
       }
-    } catch (err: any) {
-      this.logger.error(`Reminder cron failed: ${err.message}`);
+    } catch (err) {
+      this.logger.error(`Reminder cron failed: ${err instanceof Error ? err.message : err}`);
     }
   }
 }

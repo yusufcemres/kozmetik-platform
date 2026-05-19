@@ -168,8 +168,8 @@ export class SkinAnalysisController {
         },
       );
       res.write(`data: ${JSON.stringify({ type: 'done', model: result.model, totalChars: result.totalChars })}\n\n`);
-    } catch (err: any) {
-      const message = err?.message || 'AI Danışman ulaşılamadı';
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'AI Danışman ulaşılamadı';
       res.write(`data: ${JSON.stringify({ type: 'error', message })}\n\n`);
     } finally {
       res.end();

@@ -207,9 +207,9 @@ export class SkinCoachService {
         throw new ServiceUnavailableException('AI Danışman boş yanıt döndü');
       }
       return { answer, model: 'claude-sonnet-4-6' };
-    } catch (err: any) {
+    } catch (err) {
       if (err instanceof ServiceUnavailableException) throw err;
-      this.logger.error(`Coach failed: ${err.message}`);
+      this.logger.error(`Coach failed: ${err instanceof Error ? err.message : err}`);
       throw new ServiceUnavailableException('AI Danışman ulaşılamadı');
     }
   }

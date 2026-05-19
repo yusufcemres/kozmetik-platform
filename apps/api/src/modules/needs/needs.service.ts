@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Need } from '@database/entities';
 import { CreateNeedDto } from './dto/create-need.dto';
 import { UpdateNeedDto } from './dto/update-need.dto';
@@ -26,7 +26,7 @@ export class NeedsService {
 
   async findAll(query: PaginationDto & { need_category?: string; domain_type?: string }) {
     const { page, limit, search, need_category, domain_type } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<Need> = {};
     if (search) {
       where.need_name = Like(`%${search}%`);
     }

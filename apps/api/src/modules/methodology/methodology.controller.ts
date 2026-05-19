@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MethodologyService } from './methodology.service';
+import { EvidenceLevel, ApprovedWording } from '@database/entities';
 import { PaginationDto } from '@common/dto/pagination.dto';
 import { JwtAuthGuard } from '@common/guards/jwt-auth.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
@@ -25,7 +26,7 @@ export class MethodologyController {
   @Roles('super_admin', 'methodology_reviewer')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Kanıt seviyesi güncelle' })
-  updateEvidenceLevel(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+  updateEvidenceLevel(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<EvidenceLevel>) {
     return this.service.updateEvidenceLevel(id, data);
   }
 
@@ -44,7 +45,7 @@ export class MethodologyController {
   @Roles('super_admin', 'methodology_reviewer', 'content_editor')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Onaylı ifade oluştur' })
-  createWording(@Body() data: any) {
+  createWording(@Body() data: Partial<ApprovedWording>) {
     return this.service.createWording(data);
   }
 
@@ -53,7 +54,7 @@ export class MethodologyController {
   @Roles('super_admin', 'methodology_reviewer')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Onaylı ifade güncelle' })
-  updateWording(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+  updateWording(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<ApprovedWording>) {
     return this.service.updateWording(id, data);
   }
 

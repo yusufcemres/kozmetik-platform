@@ -121,9 +121,10 @@ export class NotificationsService implements OnModuleInit {
         sub.last_notified_at = new Date();
         await this.subs.save(sub);
         sent++;
-      } catch (err: any) {
-        this.logger.error(`Push failed for sub ${sub.subscription_id}: ${err.message}`);
-        if (err.statusCode === 410 || err.statusCode === 404) {
+      } catch (err) {
+        const e = err as { message?: string; statusCode?: number };
+        this.logger.error(`Push failed for sub ${sub.subscription_id}: ${e?.message ?? err}`);
+        if (e?.statusCode === 410 || e?.statusCode === 404) {
           sub.is_active = false;
           await this.subs.save(sub);
           expired++;

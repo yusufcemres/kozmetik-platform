@@ -26,8 +26,8 @@ export class PaymentsCronService {
           `Daily premium reminder run: sent=${result.sent} failed=${result.failed} skipped=${result.skipped}`,
         );
       }
-    } catch (err: any) {
-      this.logger.error(`Premium reminder cron failed: ${err.message}`);
+    } catch (err) {
+      this.logger.error(`Premium reminder cron failed: ${err instanceof Error ? err.message : err}`);
     }
   }
 }
