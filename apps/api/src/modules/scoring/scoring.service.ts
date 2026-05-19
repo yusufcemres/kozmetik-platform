@@ -70,17 +70,24 @@ export class ScoringService {
     }
 
     // Calculate score for each need
+    type IngredientExplanation = {
+      ingredient_id: number;
+      relevance: number;
+      strength: number;
+      contribution: number;
+      effect_type: string;
+    };
     const scores: Array<{
       need_id: number;
       compatibility_score: number;
-      explanation_logic: any;
+      explanation_logic: { ingredients: IngredientExplanation[]; matched_count: number };
       confidence_level: string;
     }> = [];
 
     for (const [needId, needMappings] of needMap) {
       let totalScore = 0;
       let maxPossible = 0;
-      const explanations: any[] = [];
+      const explanations: IngredientExplanation[] = [];
 
       for (const mapping of needMappings) {
         const pi = productIngredients.find(

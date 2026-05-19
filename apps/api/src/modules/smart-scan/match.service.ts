@@ -126,7 +126,14 @@ export class MatchService {
       [brandQuery, nameQuery],
     );
 
-    return rows.map((r: any) => ({
+    type MatchRow = {
+      product_id: number;
+      product_slug: string;
+      product_name: string;
+      brand_name: string;
+      score: string;
+    };
+    return (rows as MatchRow[]).map((r) => ({
       product_id: r.product_id,
       product_slug: r.product_slug,
       product_name: r.product_name,

@@ -133,9 +133,10 @@ export class PaymentsService {
         throw new ServiceUnavailableException(json.reason || 'PayTR token alınamadı');
       }
       iframeToken = json.token;
-    } catch (err: any) {
+    } catch (err) {
       if (err instanceof ServiceUnavailableException) throw err;
-      this.logger.error(`PayTR HTTP failed: ${err.message}`);
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error(`PayTR HTTP failed: ${message}`);
       throw new ServiceUnavailableException('PayTR servisine ulaşılamadı');
     }
 

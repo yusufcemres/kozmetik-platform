@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull, Not } from 'typeorm';
+import { Repository, IsNull, Not, FindOptionsWhere } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import {
   BrandAccount,
@@ -289,7 +289,7 @@ export class BrandPortalService {
   // ─── Q&A — BRAND (marka cevabı) ───────────────────────────
 
   async getBrandQuestions(brandId: number, status?: string, page = 1, limit = 20) {
-    const where: any = { brand_id: brandId };
+    const where: FindOptionsWhere<BrandQuestion> = { brand_id: brandId };
     if (status) {
       where.status = status;
     }

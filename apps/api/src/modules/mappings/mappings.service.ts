@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { IngredientNeedMapping } from '@database/entities';
 import { CreateIngredientNeedMappingDto } from './dto/create-mapping.dto';
 import { UpdateIngredientNeedMappingDto } from './dto/update-mapping.dto';
@@ -20,7 +20,7 @@ export class MappingsService {
 
   async findAll(query: PaginationDto & { ingredient_id?: number; need_id?: number }) {
     const { page, limit, ingredient_id, need_id } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<IngredientNeedMapping> = {};
     if (ingredient_id) where.ingredient_id = ingredient_id;
     if (need_id) where.need_id = need_id;
 

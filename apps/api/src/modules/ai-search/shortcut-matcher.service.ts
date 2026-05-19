@@ -29,7 +29,18 @@ export class ShortcutMatcherService {
        FROM ai_search_shortcuts WHERE is_active = true`,
     );
 
-    let best: { score: number; row: any } | null = null;
+    type ShortcutRow = {
+      shortcut_id: number;
+      intent_key: string;
+      keywords: string[];
+      title: string;
+      description: string;
+      caution: string | null;
+      product_ids: number[];
+      ingredient_ids: number[];
+      blog_post_ids: number[];
+    };
+    let best: { score: number; row: ShortcutRow } | null = null;
     for (const row of shortcuts) {
       const kws: string[] = (row.keywords || []).map((k: string) => this.normalize(k));
       let score = 0;

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Ingredient, IngredientAlias, IngredientEvidenceLink } from '@database/entities';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -48,7 +48,7 @@ export class IngredientsService {
 
   async findAll(query: PaginationDto) {
     const { page, limit, search } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<Ingredient> = {};
     if (search) {
       where.inci_name = Like(`%${search}%`);
     }

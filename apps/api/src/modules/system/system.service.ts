@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { UserCorrection, AuditLog, BatchImport } from '@database/entities';
 import { PaginationDto } from '@common/dto/pagination.dto';
 
@@ -29,7 +29,7 @@ export class SystemService {
 
   async getCorrections(query: PaginationDto & { status?: string }) {
     const { page, limit, status } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<UserCorrection> = {};
     if (status) where.status = status;
 
     const [data, total] = await this.correctionRepo.findAndCount({
@@ -57,7 +57,7 @@ export class SystemService {
 
   async getAuditLogs(query: PaginationDto & { entity_type?: string }) {
     const { page, limit, entity_type } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<AuditLog> = {};
     if (entity_type) where.entity_type = entity_type;
 
     const [data, total] = await this.auditRepo.findAndCount({
@@ -77,7 +77,7 @@ export class SystemService {
     entity_type: string;
     entity_id: number;
     action: string;
-    changes?: any;
+    changes?: Record<string, unknown>;
     admin_user_id?: number;
     admin_email?: string;
   }) {

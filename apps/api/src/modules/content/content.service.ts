@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import {
   ContentArticle, ProductRelatedArticle,
   IngredientRelatedArticle, NeedRelatedArticle,
@@ -35,7 +35,7 @@ export class ContentService {
 
   async findAll(query: PaginationDto & { content_type?: string; status?: string }) {
     const { page, limit, search, content_type, status } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<ContentArticle> = {};
     if (search) where.title = Like(`%${search}%`);
     if (content_type) where.content_type = content_type;
     if (status) where.status = status;
@@ -55,7 +55,7 @@ export class ContentService {
 
   async findPublished(query: PaginationDto & { content_type?: string }) {
     const { page, limit, content_type } = query;
-    const where: any = { status: 'published' };
+    const where: FindOptionsWhere<ContentArticle> = { status: 'published' };
     if (content_type) where.content_type = content_type;
 
     const [data, total] = await this.repo.findAndCount({

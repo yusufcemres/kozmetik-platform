@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, FindOptionsWhere } from 'typeorm';
 import { Category } from '@database/entities';
+
+type CategoryNode = Category & { children: CategoryNode[] };
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PaginationDto } from '@common/dto/pagination.dto';
@@ -27,7 +29,7 @@ export class CategoriesService {
 
   async findAll(query: PaginationDto) {
     const { page, limit, search } = query;
-    const where: any = {};
+    const where: FindOptionsWhere<Category> = {};
     if (search) {
       where.category_name = Like(`%${search}%`);
     }
@@ -86,7 +88,7 @@ export class CategoriesService {
     });
 
     const roots = all.filter((c) => !c.parent_category_id);
-    const buildChildren = (parentId: number): any[] =>
+    const buildChildren = (parentId: number): CategoryNode[] =>
       all
         .filter((c) => c.parent_category_id === parentId)
         .map((c) => ({ ...c, children: buildChildren(c.category_id) }));

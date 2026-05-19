@@ -14,15 +14,17 @@ export class InternalLinkingService {
 
   private async getIndex() {
     if (this.cache && Date.now() - this.cachedAt < 5 * 60_000) return this.cache;
-    const ings = await this.dataSource.query(
+    type IngRow = { name: string; inci_slug: string };
+    type BrandRow = { name: string; slug: string };
+    const ings: IngRow[] = await this.dataSource.query(
       `SELECT LOWER(inci_name) AS name, ingredient_slug AS inci_slug FROM ingredients WHERE inci_name IS NOT NULL`,
     );
-    const brands = await this.dataSource.query(
+    const brands: BrandRow[] = await this.dataSource.query(
       `SELECT LOWER(brand_name) AS name, brand_slug AS slug FROM brands`,
     );
     this.cache = {
-      ingredients: new Map(ings.map((r: any) => [r.name, r.inci_slug])),
-      brands: new Map(brands.map((r: any) => [r.name, r.slug])),
+      ingredients: new Map(ings.map((r) => [r.name, r.inci_slug])),
+      brands: new Map(brands.map((r) => [r.name, r.slug])),
     };
     this.cachedAt = Date.now();
     return this.cache;
