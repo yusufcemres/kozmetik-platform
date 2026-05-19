@@ -3,9 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
 import { UnknownScan, ScanHistory, ProductIngredient } from '@database/entities';
-import { VisionService } from './vision.service';
+import { VisionService, VisionResult } from './vision.service';
 import { MatchService, MatchCandidate } from './match.service';
 import { IngredientsService } from '../ingredients/ingredients.service';
+
+/** ingredients.analyzeInciList return shape — explicit type yerine ReturnType reuse. */
+type InciAnalysisResult = Awaited<ReturnType<IngredientsService['analyzeInciList']>>;
 
 export interface SmartScanRequest {
   barcode?: string;
@@ -26,12 +29,12 @@ export interface SmartScanResponse {
     brand_name: string;
   };
   candidates?: MatchCandidate[];
-  vision_result?: any;
+  vision_result?: VisionResult;
   scan_id?: number;
   /** Yeni fotodan eklenen INCI sayisi (matched product enrichment). */
   enriched_inci_count?: number;
   /** Vision'in fotodan okuduğu tüm INCI'lerin analiz sonucu (inci-only mode + enrichment için). */
-  inci_analysis?: any;
+  inci_analysis?: InciAnalysisResult;
 }
 
 @Injectable()
@@ -56,11 +59,12 @@ export class SmartScanService {
   private async enrichProductWithInci(
     productId: number,
     inciList: string[],
-  ): Promise<{ added: number; analysis: any }> {
+  ): Promise<{ added: number; analysis: InciAnalysisResult | null }> {
     if (!inciList || inciList.length === 0) return { added: 0, analysis: null };
     // ingredients.analyzeInciList ile fuzzy match
     const analysis = await this.ingredientsService.analyzeInciList(inciList.join(', '));
-    const matched = (analysis.tokens || []).filter((t: any) => t.matched && t.ingredient);
+    type Token = InciAnalysisResult['tokens'][number];
+    const matched = ((analysis.tokens || []) as Token[]).filter((t) => t.matched && t.ingredient);
     if (matched.length === 0) return { added: 0, analysis };
     // Mevcut INCI'leri al
     const existing = await this.pi
@@ -171,8 +175,8 @@ export class SmartScanService {
               try {
                 enrichResult = await this.enrichProductWithInci(best.product_id, visionResult.ingredients_list!);
                 this.logger.log(`Enrich: product #${best.product_id} added ${enrichResult.added} new INCIs`);
-              } catch (err: any) {
-                this.logger.warn(`Enrich failed: ${err.message}`);
+              } catch (err) {
+                this.logger.warn(`Enrich failed: ${err instanceof Error ? err.message : err}`);
               }
             }
             await this.recordHistory(
@@ -222,8 +226,8 @@ export class SmartScanService {
             vision_result: visionResult,
             inci_analysis: analysis,
           };
-        } catch (err: any) {
-          this.logger.warn(`INCI-only analysis failed: ${err.message}`);
+        } catch (err) {
+          this.logger.warn(`INCI-only analysis failed: ${err instanceof Error ? err.message : err}`);
         }
       }
 
@@ -269,8 +273,8 @@ export class SmartScanService {
         raw_barcode: barcode,
         raw_query: query,
       }));
-    } catch (err: any) {
-      this.logger.error(`History save failed: ${err.message}`);
+    } catch (err) {
+      this.logger.error(`History save failed: ${err instanceof Error ? err.message : err}`);
     }
   }
 

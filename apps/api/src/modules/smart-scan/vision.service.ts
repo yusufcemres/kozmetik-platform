@@ -112,9 +112,10 @@ export class VisionService {
       geminiAttempted = true;
       try {
         return await this.gemini(cleanBase64, mimeType, geminiKey);
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('gemini', err.message);
-        this.logger.warn(`Gemini failed: ${err.message}, trying Claude…`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('gemini', msg);
+        this.logger.warn(`Gemini failed: ${msg}, trying Claude…`);
       }
     }
 
@@ -123,9 +124,10 @@ export class VisionService {
       claudeAttempted = true;
       try {
         return await this.claude(cleanBase64, mimeType, claudeKey);
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('claude', err.message);
-        this.logger.error(`Claude vision failed: ${err.message}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('claude', msg);
+        this.logger.error(`Claude vision failed: ${msg}`);
       }
     }
 
@@ -134,9 +136,10 @@ export class VisionService {
     if (openaiKey && !this.isInCooldown('openai')) {
       try {
         return await this.openai(cleanBase64, mimeType, openaiKey);
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('openai', err.message);
-        this.logger.error(`OpenAI vision failed: ${err.message}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('openai', msg);
+        this.logger.error(`OpenAI vision failed: ${msg}`);
       }
     }
 
@@ -172,9 +175,10 @@ export class VisionService {
       try {
         const raw = await this.geminiRaw(cleanBase64, mimeType, geminiKey, prompt);
         return { raw, model: 'gemini-2.0-flash' };
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('gemini', err.message);
-        this.logger.warn(`Gemini failed (skin-prompt): ${err.message}, trying Claude…`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('gemini', msg);
+        this.logger.warn(`Gemini failed (skin-prompt): ${msg}, trying Claude…`);
       }
     }
 
@@ -183,9 +187,10 @@ export class VisionService {
       try {
         const raw = await this.claudeRaw(cleanBase64, mimeType, claudeKey, prompt);
         return { raw, model: 'claude-sonnet-4-6' };
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('claude', err.message);
-        this.logger.error(`Claude failed (skin-prompt): ${err.message}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('claude', msg);
+        this.logger.error(`Claude failed (skin-prompt): ${msg}`);
       }
     }
 
@@ -194,9 +199,10 @@ export class VisionService {
       try {
         const raw = await this.openaiRaw(cleanBase64, mimeType, openaiKey, prompt);
         return { raw, model: 'gpt-4o-mini' };
-      } catch (err: any) {
-        if (this.isQuotaError(err.message)) this.markCooldown('openai', err.message);
-        this.logger.error(`OpenAI failed (skin-prompt): ${err.message}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (this.isQuotaError(msg)) this.markCooldown('openai', msg);
+        this.logger.error(`OpenAI failed (skin-prompt): ${msg}`);
       }
     }
     return null;

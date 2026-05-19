@@ -88,8 +88,8 @@ export class SkinAnalysisService {
           details: params.details ?? null,
         }),
       );
-    } catch (err: any) {
-      this.logger.warn(`audit log failed: ${err.message}`);
+    } catch (err) {
+      this.logger.warn(`audit log failed: ${err instanceof Error ? err.message : err}`);
     }
   }
 
@@ -256,8 +256,8 @@ Aksi halde, SADECE aşağıdaki JSON formatında cevap ver (başka hiçbir metin
         acne_count: parsed.acne_count != null ? clamp(parsed.acne_count, 50) : undefined,
         fitzpatrick_type: parsed.fitzpatrick_type != null ? clamp(parsed.fitzpatrick_type, 6) : undefined,
       };
-    } catch (err: any) {
-      this.logger.warn(`parseSkinJSON failed: ${err.message}, raw: ${raw.slice(0, 200)}`);
+    } catch (err) {
+      this.logger.warn(`parseSkinJSON failed: ${err instanceof Error ? err.message : err}, raw: ${raw.slice(0, 200)}`);
       return null;
     }
   }

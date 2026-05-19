@@ -19,6 +19,11 @@ import { buildWelcomeHtml } from '@common/mail/templates';
 // Audit hardening 2026-05-15: token TTL 20→10 dk, IP rate 5→2/min
 // SHA256 hash + 32 byte random = 256-bit entropy. 2 deneme/dk × 10 dk = 20 brute force penceresi (yeterli).
 const TOKEN_TTL_MINUTES = 10;
+
+/** unknown → string narrowing helper (catch bloklarında DRY). */
+function errMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 per minute per email
 const IP_RATE_LIMIT_MAX = 2; // 2 requests per minute per IP
 const IP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -79,8 +84,8 @@ export class UserAuthService {
           details: params.details ?? null,
         }),
       );
-    } catch (err: any) {
-      this.logger.warn(`audit log failed: ${err.message}`);
+    } catch (err) {
+      this.logger.warn(`audit log failed: ${errMessage(err)}`);
     }
   }
 
@@ -185,8 +190,8 @@ export class UserAuthService {
         const text = await res.text();
         this.logger.error(`Resend error: ${res.status} ${text}`);
       }
-    } catch (err: any) {
-      this.logger.error(`Resend send failed: ${err.message}`);
+    } catch (err) {
+      this.logger.error(`Resend send failed: ${errMessage(err)}`);
     }
   }
 
@@ -274,8 +279,8 @@ export class UserAuthService {
         throw new UnauthorizedException('Google token doğrulanamadı');
       }
       payload = (await res.json()) as typeof payload;
-    } catch (err: any) {
-      this.logger.warn(`Google tokeninfo fail: ${err.message}`);
+    } catch (err) {
+      this.logger.warn(`Google tokeninfo fail: ${errMessage(err)}`);
       throw new UnauthorizedException('Google doğrulama servisi erişilemedi');
     }
 
@@ -315,9 +320,9 @@ export class UserAuthService {
         if (!dbgJson.data?.is_valid || dbgJson.data?.app_id !== appId) {
           throw new UnauthorizedException('Facebook token bu uygulamaya ait değil');
         }
-      } catch (err: any) {
+      } catch (err) {
         if (err instanceof UnauthorizedException) throw err;
-        this.logger.warn(`FB debug_token fail: ${err.message}`);
+        this.logger.warn(`FB debug_token fail: ${errMessage(err)}`);
         throw new UnauthorizedException('Facebook doğrulama servisi erişilemedi');
       }
     }
@@ -331,8 +336,8 @@ export class UserAuthService {
       );
       if (!res.ok) throw new Error(`me ${res.status}`);
       me = (await res.json()) as typeof me;
-    } catch (err: any) {
-      this.logger.warn(`FB me fail: ${err.message}`);
+    } catch (err) {
+      this.logger.warn(`FB me fail: ${errMessage(err)}`);
       throw new UnauthorizedException('Facebook hesabı okunamadı');
     }
 
@@ -458,7 +463,21 @@ export class UserAuthService {
       LIMIT $2`,
       [userId, limit],
     );
-    return rows.map((r: any) => ({
+    type ScanHistoryRow = {
+      history_id: number;
+      method: string;
+      confidence: string | number | null;
+      raw_barcode: string | null;
+      raw_query: string | null;
+      created_at: Date;
+      product_id: number | null;
+      product_name: string | null;
+      product_slug: string | null;
+      brand_name: string | null;
+      image_url: string | null;
+      top_need_name: string | null;
+    };
+    return (rows as ScanHistoryRow[]).map((r) => ({
       history_id: r.history_id,
       method: r.method,
       confidence: r.confidence != null ? Number(r.confidence) : null,
@@ -467,8 +486,8 @@ export class UserAuthService {
       created_at: r.created_at,
       product: r.product_id ? {
         product_id: r.product_id,
-        product_name: r.product_name,
-        product_slug: r.product_slug,
+        product_name: r.product_name ?? '',
+        product_slug: r.product_slug ?? '',
         brand_name: r.brand_name,
         image_url: r.image_url,
         top_need_name: r.top_need_name,
