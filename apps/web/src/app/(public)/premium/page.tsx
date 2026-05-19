@@ -77,10 +77,10 @@ export default function PremiumDashboardPage() {
         setStatus(s);
         setHistory(h);
       })
-      .catch((err: any) => {
+      .catch((err) => {
         const msg = err instanceof ApiError && err.status === 401
           ? 'Giriş süresi dolmuş — tekrar giriş yap.'
-          : err?.message || 'Premium bilgisi yüklenemedi';
+          : err instanceof Error ? err.message : 'Premium bilgisi yüklenemedi';
         setError(msg);
       })
       .finally(() => setLoading(false));
@@ -99,8 +99,8 @@ export default function PremiumDashboardPage() {
         },
       );
       setStatus({ ...status, auto_renew_enabled: res.auto_renew_enabled });
-    } catch (err: any) {
-      setError(err?.message || 'Tercih güncellenemedi');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Tercih güncellenemedi');
     } finally {
       setAutoRenewBusy(false);
     }

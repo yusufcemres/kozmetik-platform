@@ -151,11 +151,25 @@ type SupplementCrossRef = {
   images?: { image_url: string }[];
 };
 
+type ScoreExplanation = {
+  component: string;
+  reason: string;
+  delta: number;
+  citation?: { url?: string; title?: string };
+};
+
+type CosmeticScore = {
+  total: number;
+  grade?: string;
+  explanation: ScoreExplanation[];
+  [key: string]: unknown;
+};
+
 interface ProductFullResponse {
   product: Product;
   similar: SimilarProductResult[];
   interactions: IngredientInteraction[];
-  cosmetic_score: any | null;
+  cosmetic_score: CosmeticScore | null;
   supplement_cross_refs: SupplementCrossRef[];
   reviews_aggregate: ReviewsAggregate | null;
 }
@@ -867,7 +881,7 @@ export default async function ProductDetailPage({
                           Bu puan neden?
                         </summary>
                         <ul className="mt-2 space-y-1.5">
-                          {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
+                          {score.explanation.filter((e: ScoreExplanation) => e.component !== 'floor_cap').map((e: ScoreExplanation, i: number) => (
                             <li key={i} className="text-xs text-on-surface-variant leading-relaxed flex items-start gap-1.5">
                               <span className="material-icon text-sm text-outline mt-0.5 shrink-0" aria-hidden="true">
                                 {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}

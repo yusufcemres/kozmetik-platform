@@ -505,7 +505,7 @@ export default async function SupplementDetailPage({
                       Bu puan neden?
                     </summary>
                     <ul className="mt-1 space-y-0.5">
-                      {score.explanation.filter((e: any) => e.component !== 'floor_cap').map((e: any, i: number) => (
+                      {score.explanation.filter((e) => e.component !== 'floor_cap').map((e, i: number) => (
                         <li key={i} className="text-[10px] text-on-surface-variant leading-snug flex items-start gap-1">
                           <span className="material-icon text-[10px] text-outline mt-0.5 shrink-0" aria-hidden="true">
                             {e.delta >= 0 ? 'add_circle_outline' : 'remove_circle_outline'}
@@ -529,7 +529,7 @@ export default async function SupplementDetailPage({
                   <div className="mt-3 flex items-start gap-2 bg-error/5 text-error rounded-sm p-2">
                     <span className="material-icon text-sm mt-0.5 shrink-0" aria-hidden="true">warning</span>
                     <p className="text-[10px] leading-relaxed">
-                      {score.explanation?.find((e: any) => e.component === 'floor_cap')?.reason || 'Güvenlik limiti uygulandı.'}
+                      {score.explanation?.find((e) => e.component === 'floor_cap')?.reason || 'Güvenlik limiti uygulandı.'}
                     </p>
                   </div>
                 )}

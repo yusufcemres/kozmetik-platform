@@ -95,8 +95,8 @@ export default function OdemePage() {
         },
       );
       setIframeToken(res.iframe_token);
-    } catch (err: any) {
-      let msg = err?.message || 'Ödeme başlatılamadı';
+    } catch (err) {
+      let msg = err instanceof Error ? err.message : 'Ödeme başlatılamadı';
       if (err instanceof ApiError) {
         if (err.status === 401) msg = 'Giriş yapman gerekiyor.';
         else if (err.status === 503) msg = 'Ödeme servisi henüz aktif değil (PayTR merchant onayı bekleniyor). Birkaç gün içinde açılacak.';

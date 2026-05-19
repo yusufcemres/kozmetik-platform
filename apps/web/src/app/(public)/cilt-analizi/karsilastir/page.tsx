@@ -82,8 +82,8 @@ function CompareContent() {
 
     apiFetch<CompareResponse>(endpoint)
       .then(setData)
-      .catch((err: any) => {
-        let msg = err?.message || 'Karşılaştırma yüklenemedi';
+      .catch((err) => {
+        let msg = err instanceof Error ? err.message : 'Karşılaştırma yüklenemedi';
         if (err instanceof ApiError) {
           if (err.status === 401) {
             msg = 'Giriş yapman gerekiyor (karşılaştırma sadece kayıtlı kullanıcılar için).';

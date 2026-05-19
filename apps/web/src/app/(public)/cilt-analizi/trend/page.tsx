@@ -36,7 +36,8 @@ function TrendContent() {
       .then((res) => {
         // /me/history → SkinAnalysisResult[] (entity shape), /history-by-token → typed map
         // Her ikisinde de scores + overall_score + created_at + analysis_id alanları var
-        const rows: TrendDataPoint[] = (Array.isArray(res) ? res : []).map((r: any) => ({
+        type TrendRow = { analysis_id: number | string; created_at: string | Date; scores: TrendDataPoint['scores']; overall_score: number };
+        const rows: TrendDataPoint[] = (Array.isArray(res) ? res : []).map((r: TrendRow) => ({
           analysis_id: Number(r.analysis_id),
           created_at: typeof r.created_at === 'string' ? r.created_at : new Date(r.created_at).toISOString(),
           scores: r.scores,
@@ -44,8 +45,8 @@ function TrendContent() {
         }));
         setData(rows);
       })
-      .catch((err: any) => {
-        let msg = err?.message || 'Geçmiş yüklenemedi';
+      .catch((err) => {
+        let msg = err instanceof Error ? err.message : 'Geçmiş yüklenemedi';
         if (err instanceof ApiError) {
           if (err.status === 401) msg = 'Giriş yapman gerekiyor.';
           if (err.status === 404 && token) msg = 'Bağlantı geçersiz veya iptal edilmiş.';

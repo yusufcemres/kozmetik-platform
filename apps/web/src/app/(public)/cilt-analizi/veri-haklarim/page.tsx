@@ -38,10 +38,10 @@ export default function VeriHaklarimPage() {
       a.remove();
       URL.revokeObjectURL(url);
       setMsg({ type: 'success', text: `${data.analyses?.length ?? 0} analiz JSON dosyası indirildi.` });
-    } catch (err: any) {
+    } catch (err) {
       const message = err instanceof ApiError && err.status === 401
         ? 'Giriş yapman gerekiyor.'
-        : err?.message || 'Export başarısız';
+        : err instanceof Error ? err.message : 'Export başarısız';
       setMsg({ type: 'error', text: message });
     } finally {
       setExporting(false);
@@ -55,10 +55,10 @@ export default function VeriHaklarimPage() {
       const res = await apiFetch<{ deleted: number }>('/skin-analysis/me/delete-all', { method: 'DELETE' });
       setMsg({ type: 'success', text: `${res.deleted} kayıt geri dönüşsüz silindi.` });
       setConfirmDelete(false);
-    } catch (err: any) {
+    } catch (err) {
       const message = err instanceof ApiError && err.status === 401
         ? 'Giriş yapman gerekiyor.'
-        : err?.message || 'Silme başarısız';
+        : err instanceof Error ? err.message : 'Silme başarısız';
       setMsg({ type: 'error', text: message });
     } finally {
       setDeleting(false);

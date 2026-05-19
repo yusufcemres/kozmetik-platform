@@ -97,8 +97,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
       const data = await res.json();
       setMessage(`${data.pending_edits} alan güncelleme isteği oluşturuldu. Admin onayı bekleniyor.`);
-    } catch (err: any) {
-      setMessage(err.message);
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Güncelleme başarısız');
     } finally {
       setSaving(false);
     }

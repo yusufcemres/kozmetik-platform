@@ -33,8 +33,8 @@ export default function BrandLoginPage() {
       localStorage.setItem('brand_token', data.access_token);
       localStorage.setItem('brand_account', JSON.stringify(data.account));
       window.location.href = '/brand-portal/dashboard';
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Giriş başarısız');
     } finally {
       setLoading(false);
     }

@@ -95,8 +95,8 @@ function EmailOptInWidget({ analysisId }: { analysisId: number }) {
         body: JSON.stringify({ email: trimmed }),
       });
       setState('success');
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Kayıt başarısız, lütfen tekrar dene');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Kayıt başarısız, lütfen tekrar dene');
       setState('error');
     }
   };
@@ -226,8 +226,8 @@ export default function FotoTestPage() {
       });
       setResult(res);
       setPhase('result');
-    } catch (err: any) {
-      setError(err.message || 'Bilinmeyen hata');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
       setPhase('error');
     }
   };

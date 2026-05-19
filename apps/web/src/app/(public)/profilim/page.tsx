@@ -533,8 +533,8 @@ function ProfilePageInner() {
                     try {
                       const serverData = await api.get<Record<string, unknown>>('/user-auth/me/export', { token });
                       exportData._server = serverData;
-                    } catch (err: any) {
-                      alert('Sunucu verileri alinamadi: ' + (err?.message || 'bilinmeyen hata'));
+                    } catch (err) {
+                      alert('Sunucu verileri alinamadi: ' + (err instanceof Error ? err.message : 'bilinmeyen hata'));
                     }
                   }
                   exportData._exported_at = new Date().toISOString();
@@ -588,8 +588,8 @@ function ProfilePageInner() {
                     document.cookie = 'skin_profile_id=; path=/; max-age=0; SameSite=Lax';
                     alert('Hesabin silindi. Ana sayfaya yonlendiriliyorsun.');
                     window.location.href = '/';
-                  } catch (err: any) {
-                    alert('Hesap silinemedi: ' + (err?.message || 'bilinmeyen hata'));
+                  } catch (err) {
+                    alert('Hesap silinemedi: ' + (err instanceof Error ? err.message : 'bilinmeyen hata'));
                   }
                 }}
                 className="inline-flex items-center gap-2 text-[10px] font-label uppercase tracking-widest px-6 py-3 rounded-md border border-error bg-error/5 text-error hover:bg-error/10 transition-colors"

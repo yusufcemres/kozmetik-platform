@@ -107,8 +107,8 @@ function InciAnalysisInner() {
         const btn = document.querySelector<HTMLButtonElement>('[data-inci-analyze]');
         btn?.click();
       }, 100);
-    } catch (err: any) {
-      setError(err?.message || 'Foto işlenemedi');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Foto işlenemedi');
       setPhotoBusy(false);
     }
   };

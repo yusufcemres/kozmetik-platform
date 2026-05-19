@@ -23,8 +23,17 @@ interface DashboardData {
       scientific_evidence: number;
     };
   };
-  recent_questions: any[];
+  recent_questions: RecentQuestion[];
 }
+
+type RecentQuestion = {
+  question_id: number;
+  question_text?: string;
+  status: 'pending' | 'answered' | string;
+  created_at: string;
+  product_name?: string;
+  [key: string]: unknown;
+};
 
 const GRADE_COLORS: Record<string, string> = {
   S: 'text-yellow-500',
@@ -143,7 +152,7 @@ export default function BrandDashboardPage() {
           <p className="text-sm text-on-surface-variant py-4">Henüz soru yok.</p>
         ) : (
           <div className="space-y-3">
-            {recent_questions.map((q: any) => (
+            {recent_questions.map((q) => (
               <div
                 key={q.question_id}
                 className="flex items-start gap-3 p-3 rounded-lg bg-surface-container"

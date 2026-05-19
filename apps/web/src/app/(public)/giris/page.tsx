@@ -17,10 +17,29 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID || '';
 const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID || '';
 
+type GoogleCredentialResponse = { credential?: string; select_by?: string };
+type GoogleAccountsId = {
+  initialize: (config: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+    ux_mode?: string;
+    auto_select?: boolean;
+  }) => void;
+  renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+};
+type FacebookLoginResponse = {
+  status?: string;
+  authResponse?: { accessToken?: string; userID?: string };
+};
+type FacebookSdk = {
+  login: (cb: (response: FacebookLoginResponse) => void, options?: { scope?: string }) => void;
+  init?: (config: Record<string, unknown>) => void;
+};
+
 declare global {
   interface Window {
-    google?: any;
-    FB?: any;
+    google?: { accounts?: { id?: GoogleAccountsId } };
+    FB?: FacebookSdk;
     fbAsyncInit?: () => void;
   }
 }
@@ -53,7 +72,7 @@ function GirisInner() {
   );
 
   const handleGoogleCredential = useCallback(
-    async (response: any) => {
+    async (response: GoogleCredentialResponse) => {
       const credential: string | undefined = response?.credential;
       if (!credential) {
         setSocialError('Google girişi tamamlanamadı');
@@ -64,8 +83,8 @@ function GirisInner() {
       try {
         const res = await loginWithGoogle(credential);
         finishSocialLogin(res.token, res.user);
-      } catch (err: any) {
-        setSocialError(err?.message || 'Google ile giriş başarısız');
+      } catch (err) {
+        setSocialError(err instanceof Error ? err.message : 'Google ile giriş başarısız');
         setSocialLoading(null);
       }
     },
@@ -109,7 +128,7 @@ function GirisInner() {
     setSocialError(null);
     setSocialLoading('facebook');
     window.FB.login(
-      (response: any) => {
+      (response: FacebookLoginResponse) => {
         const accessToken: string | undefined = response?.authResponse?.accessToken;
         if (response?.status !== 'connected' || !accessToken) {
           setSocialError('Facebook girişi iptal edildi');
@@ -118,8 +137,8 @@ function GirisInner() {
         }
         loginWithFacebook(accessToken)
           .then((res) => finishSocialLogin(res.token, res.user))
-          .catch((err: any) => {
-            setSocialError(err?.message || 'Facebook ile giriş başarısız');
+          .catch((err) => {
+            setSocialError(err instanceof Error ? err.message : 'Facebook ile giriş başarısız');
             setSocialLoading(null);
           });
       },
@@ -141,9 +160,9 @@ function GirisInner() {
       if (res.devToken) {
         setDevToken(res.devToken);
       }
-    } catch (err: any) {
+    } catch (err) {
       setStatus('error');
-      setMessage(err.message || 'Bir hata oluştu');
+      setMessage(err instanceof Error ? err.message : 'Bir hata oluştu');
     }
   };
 

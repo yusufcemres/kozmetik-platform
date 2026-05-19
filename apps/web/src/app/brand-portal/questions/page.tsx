@@ -94,8 +94,8 @@ export default function BrandQuestionsPage() {
       setAnswering(null);
       setAnswerText('');
       loadQuestions();
-    } catch (err: any) {
-      alert(err.message || 'Hata');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Hata');
     } finally {
       setSubmitting(false);
     }

@@ -38,11 +38,18 @@ function BrandPortalShell({ children }: { children: React.ReactNode }) {
     window.location.href = '/brand-portal/login';
   };
 
-  let accountInfo: any = null;
+  type BrandAccountInfo = {
+    account_id?: number;
+    contact_name?: string;
+    contact_email?: string;
+    brand_name?: string;
+    [key: string]: unknown;
+  };
+  let accountInfo: BrandAccountInfo | null = null;
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem('brand_account');
-      if (stored) accountInfo = JSON.parse(stored);
+      if (stored) accountInfo = JSON.parse(stored) as BrandAccountInfo;
     } catch {}
   }
 

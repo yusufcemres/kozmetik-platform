@@ -45,8 +45,8 @@ export default function AiSearchPage() {
         ? (res.products?.length ?? 0) + (res.ingredients?.length ?? 0) + (res.posts?.length ?? 0)
         : res.type === 'fallback' ? (res.products?.length ?? 0) : 0;
       GAEvents.aiSearchQuery(query, intent, count);
-    } catch (e: any) {
-      setErr(e.message || 'Arama başarısız');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Arama başarısız');
     } finally {
       setLoading(false);
     }

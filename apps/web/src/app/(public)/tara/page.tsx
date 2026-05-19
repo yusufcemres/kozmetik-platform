@@ -15,8 +15,22 @@ interface BatchProgress {
   results: Array<{ filename: string; status: 'ok' | 'fail'; product_slug?: string; product_name?: string; brand_name?: string; barcode?: string; error?: string }>;
 }
 
+type InciToken = {
+  rank: number;
+  raw: string;
+  matched: boolean;
+  ingredient?: {
+    inci_name?: string;
+    common_name?: string | null;
+    evidence_grade?: string | null;
+    function_summary?: string | null;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
 // Tek INCI kartı — varsayılan kapalı, tıklayınca detay açılır
-function InciCard({ token: t }: { token: any }) {
+function InciCard({ token: t }: { token: InciToken }) {
   const [open, setOpen] = useState(false);
   const gradeColor = !t.ingredient?.evidence_grade ? 'bg-surface-container text-outline' :
     t.ingredient.evidence_grade === 'A' ? 'bg-green-100 text-green-700' :
@@ -161,9 +175,10 @@ export default function TaraPage() {
           video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
-      } catch (envErr: any) {
+      } catch (envErr) {
         // Arka kamera yoksa (laptop, tablet ön kameralı) → ön kameraya düş
-        if (envErr.name === 'OverconstrainedError' || envErr.name === 'NotFoundError') {
+        const envName = envErr instanceof Error ? envErr.name : '';
+        if (envName === 'OverconstrainedError' || envName === 'NotFoundError') {
           stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false,
@@ -172,11 +187,11 @@ export default function TaraPage() {
           throw envErr;
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       setPhase('error');
       // Kullanıcı dostu mesajlar
-      const name = err.name || '';
-      let msg = err.message || 'Kamera erişimi reddedildi.';
+      const name = err instanceof Error ? err.name : '';
+      let msg = err instanceof Error ? err.message : 'Kamera erişimi reddedildi.';
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
         msg = 'Kamera izni reddedildi. Tarayıcı ayarlarından bu siteye kamera izni vermen gerekiyor.';
       } else if (name === 'NotFoundError') {
@@ -201,7 +216,7 @@ export default function TaraPage() {
       try {
         // iOS Safari: play() user gesture içinde olmalı (bu zaten button click'inden geldi)
         await videoRef.current.play();
-      } catch (playErr: any) {
+      } catch (playErr) {
         // iOS bazen autoplay reject eder — track'leri durdurma, kullanıcıya bildir
         console.warn('video.play() failed:', playErr);
         // Çoğu zaman zaten oynuyor, sadece promise reject ediyor — devam
@@ -230,14 +245,14 @@ export default function TaraPage() {
       if (res.status === 'matched' && res.confidence >= 0.8) {
         setTimeout(() => router.push(`/urunler/${res.product!.product_slug}?scan=1`), 1400);
       }
-    } catch (err: any) {
+    } catch (err) {
       setPhase('error');
       // 503 → AI provider'lar (Gemini + Claude) ulaşılamıyor; "Ürün bulunamadı"
       // yerine net mesaj göster, kullanıcı yanlış yere bakmasın.
       if (err instanceof ApiError && err.status === 503) {
         setError('AI görsel tanıma servisi şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene veya katalogda manuel ara.');
       } else {
-        setError(err.message || 'Tarama başarısız');
+        setError(err instanceof Error ? err.message : 'Tarama başarısız');
       }
     }
   };
@@ -275,12 +290,12 @@ export default function TaraPage() {
       // Barkod yoksa vision'a gonder (resize)
       const { base64, mime } = await fileToResizedBase64(file, 1600, 0.82);
       await handleDetected({ image_base64: base64, image_mime: mime });
-    } catch (err: any) {
+    } catch (err) {
       setPhase('error');
       if (err instanceof ApiError && err.status === 503) {
         setError('AI görsel tanıma servisi şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene veya katalogda manuel ara.');
       } else {
-        setError(err.message || 'Foto islenemedi');
+        setError(err instanceof Error ? err.message : 'Foto islenemedi');
       }
     }
   };
@@ -320,11 +335,11 @@ export default function TaraPage() {
             barcode: barcode?.rawValue,
           }],
         } : prev);
-      } catch (err: any) {
+      } catch (err) {
         setBatchProgress((prev) => prev ? {
           ...prev,
           current: i + 1,
-          results: [...prev.results, { filename: file.name, status: 'fail', error: err.message }],
+          results: [...prev.results, { filename: file.name, status: 'fail', error: err instanceof Error ? err.message : 'bilinmeyen hata' }],
         } : prev);
       }
     }
