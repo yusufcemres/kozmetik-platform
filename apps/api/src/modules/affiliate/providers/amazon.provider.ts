@@ -115,13 +115,14 @@ export class AmazonTrProvider extends BaseAffiliateProvider {
         currency: 'TRY',
         fetched_at: fetchedAt,
       };
-    } catch (err: any) {
+    } catch (err) {
+      const e = err as { message?: string };
       return {
         price: null,
         in_stock: false,
         currency: 'TRY',
         fetched_at: fetchedAt,
-        error: err?.message || 'Bağlantı hatası',
+        error: e?.message || 'Bağlantı hatası',
         error_type: this.classifyNetworkError(err),
       };
     }

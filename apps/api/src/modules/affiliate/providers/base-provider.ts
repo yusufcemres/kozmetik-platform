@@ -46,10 +46,11 @@ export abstract class BaseAffiliateProvider {
   }
 
   /** Exception → error_type eşlemesi (provider'lar kendi fetch'inde kullanır). */
-  protected classifyNetworkError(err: any): AffiliateErrorType {
-    const name = err?.name || '';
-    const code = err?.code || '';
-    const msg = String(err?.message || '').toLowerCase();
+  protected classifyNetworkError(err: unknown): AffiliateErrorType {
+    const e = err as { name?: string; code?: string; message?: string } | null;
+    const name = e?.name || '';
+    const code = e?.code || '';
+    const msg = String(e?.message || '').toLowerCase();
     if (name === 'TimeoutError' || name === 'AbortError' || msg.includes('timeout')) return 'timeout';
     if (code === 'ENOTFOUND' || code === 'ECONNREFUSED' || code === 'ECONNRESET' || msg.includes('fetch failed')) return 'network';
     return 'unknown';

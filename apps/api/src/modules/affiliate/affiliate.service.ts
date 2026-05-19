@@ -143,7 +143,7 @@ export class AffiliateService {
             }),
           );
         }
-      } catch (err: any) {
+      } catch (err) {
         errors++;
         errorBreakdown['exception'] = (errorBreakdown['exception'] || 0) + 1;
         this.logger.error(
@@ -152,7 +152,7 @@ export class AffiliateService {
             link_id: link.affiliate_link_id,
             platform: link.platform,
             status: 'exception',
-            error: err?.message,
+            error: err instanceof Error ? err.message : String(err),
           }),
         );
       }

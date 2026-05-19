@@ -46,10 +46,14 @@ export class TrendyolProvider extends BaseAffiliateProvider {
       jsonLd.each((_, el) => {
         try {
           const data = JSON.parse($(el).text());
-          const extractFromProduct = (item: any) => {
+          type LdProduct = {
+            '@type'?: string;
+            offers?: { price?: string | number; availability?: string } | Array<{ price?: string | number; availability?: string }>;
+          };
+          const extractFromProduct = (item: LdProduct) => {
             if (item?.['@type'] === 'Product' && item.offers) {
               const offers = Array.isArray(item.offers) ? item.offers[0] : item.offers;
-              if (offers.price && price === null) price = parseFloat(offers.price);
+              if (offers.price != null && price === null) price = parseFloat(String(offers.price));
               if (offers.availability) inStock = String(offers.availability).includes('InStock');
             }
           };
@@ -107,13 +111,14 @@ export class TrendyolProvider extends BaseAffiliateProvider {
         currency: 'TRY',
         fetched_at: fetchedAt,
       };
-    } catch (err: any) {
+    } catch (err) {
+      const e = err as { message?: string };
       return {
         price: null,
         in_stock: false,
         currency: 'TRY',
         fetched_at: fetchedAt,
-        error: err?.message || 'Bağlantı hatası',
+        error: e?.message || 'Bağlantı hatası',
         error_type: this.classifyNetworkError(err),
       };
     }
